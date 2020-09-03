@@ -12,6 +12,9 @@
     <Folder Include="Data\Migrations\" />
     <Folder Include="wwwroot\UploadExcel\" />
     <Folder Include="Views\PharmacyDetails\" />
+    <Folder Include="Views\Cities\" />
+    <Folder Include="Views\PharmacyChains\" />
+    <Folder Include="Views\Companies\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.7" />
