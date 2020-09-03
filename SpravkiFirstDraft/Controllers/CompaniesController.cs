@@ -1,5 +1,6 @@
 ﻿namespace SpravkiFirstDraft.Controllers
 {
+    using System;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -10,15 +11,16 @@
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
     using SpravkiFirstDraft.Data;
+    using SpravkiFirstDraft.Data.Enums;
     using SpravkiFirstDraft.Data.Models;
 
-    public class PharmacyChainsController : Controller
+    public class CompaniesController :Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
         private readonly SpravkiDbContext context;
 
-        public PharmacyChainsController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        public CompaniesController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
 
         {
 
@@ -121,7 +123,7 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        PharmacyChain newPharmacyChain = new PharmacyChain();
+                        Company newCompany = new Company();
 
                         for (int j = row.FirstCellNum; j < cellCount; j++)
 
@@ -136,12 +138,17 @@
 
                             if (j == 0)
                             {
-                                newPharmacyChain.Name = currentRow;
+                                newCompany.Name = currentRow;
                             }
+                            if (j == 1)
+                            {
+                                newCompany.VAT = currentRow;
+                            }
+
 
                         }
 
-                        context.PharmacyChains.Add(newPharmacyChain);
+                        context.Companies.Add(newCompany);
                         context.SaveChanges();
 
                         sb.AppendLine("</tr>");

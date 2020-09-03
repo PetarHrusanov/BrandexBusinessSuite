@@ -168,7 +168,7 @@
                             {
                                 int companyId = context.Companies
                                     .Where(x => x.Name.ToLower()
-                                    .TrimEnd().StartsWith(currentRow.ToLower().TrimEnd()))
+                                    .TrimEnd().Contains(currentRow.ToLower().TrimEnd()))
                                     .Select(x => x.Id).FirstOrDefault();
                                 newPharmacy.CompanyId = companyId;
                             }
