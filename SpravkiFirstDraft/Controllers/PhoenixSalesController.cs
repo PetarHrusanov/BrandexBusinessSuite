@@ -14,13 +14,13 @@
     using SpravkiFirstDraft.Data.Enums;
     using SpravkiFirstDraft.Data.Models;
 
-    public class PhoenixSales : Controller
+    public class PhoenixSalesController : Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
         private readonly SpravkiDbContext context;
 
-        public PhoenixSales(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        public PhoenixSalesController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
 
         {
 

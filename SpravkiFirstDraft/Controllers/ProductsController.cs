@@ -1,26 +1,25 @@
-﻿namespace SpravkiFirstDraft.Controllers
-{
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using NPOI.HSSF.UserModel;
-    using NPOI.SS.UserModel;
-    using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
-    using SpravkiFirstDraft.Data.Enums;
-    using SpravkiFirstDraft.Data.Models;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using SpravkiFirstDraft.Data;
+using SpravkiFirstDraft.Data.Models;
 
-    public class PhoenixSales : Controller
+namespace SpravkiFirstDraft.Controllers
+{
+    public class ProductsController :Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
         private readonly SpravkiDbContext context;
 
-        public PhoenixSales(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        public ProductsController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
 
         {
 
@@ -123,7 +122,7 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        Pharmacy newPharmacy = new Pharmacy();
+                        Product newProduct = new Product();
 
                         for (int j = row.FirstCellNum; j < cellCount; j++)
 
@@ -138,107 +137,63 @@
 
                             if (j == 0)
                             {
-                                newPharmacy.BrandexId = int.Parse(currentRow);
+                                newProduct.Name = currentRow;
                             }
+
+                            if (j == 1)
+                            {
+                                newProduct.ShortName = currentRow;
+                            }
+
                             if (j == 2)
                             {
-                                if(currentRow== "")
-                                {
-                                    newPharmacy.PharmacyClass = PharmacyClass.Other;
-                                }
-
-                                else
-                                {
-                                    newPharmacy.PharmacyClass = (PharmacyClass)Enum.Parse(typeof(PharmacyClass), currentRow, true);
-                                }
-          
+                                newProduct.BrandexId = int.Parse(currentRow);
                             }
+
                             if (j == 3)
                             {
-                                if (currentRow == "1")
+                                if (currentRow != "")
                                 {
-                                    newPharmacy.Active = true;
-                                }
-                                else
-                                {
-                                    newPharmacy.Active = false;
+                                    newProduct.PhoenixId = int.Parse(currentRow);
                                 }
                             }
+
                             if (j == 4)
                             {
-                                int companyId = context.Companies
-                                    .Where(x => x.Name.ToLower()
-                                    .TrimEnd().Contains(currentRow.ToLower().TrimEnd()))
-                                    .Select(x => x.Id).FirstOrDefault();
-                                newPharmacy.CompanyId = companyId;
+                                if (currentRow != "")
+                                {
+                                    newProduct.PharmnetId = int.Parse(currentRow);
+                                }
+
+                                    
                             }
+
                             if (j == 5)
                             {
-                                newPharmacy.Name = currentRow;
+                                if (currentRow != "")
+                                {
+                                    newProduct.StingId = int.Parse(currentRow);
+                                }
+                                 
                             }
+
                             if (j == 6)
                             {
-                                int chainId = context.PharmacyChains
-                                    .Where(x => x.Name.ToLower().TrimEnd() == currentRow.ToLower().TrimEnd())
-                                    .Select(x => x.Id).FirstOrDefault();
-                                newPharmacy.PharmacyChainId = chainId;
+                                if (currentRow != "")
+                                {
+                                    newProduct.SopharmaId = currentRow;
+                                }
                             }
+
                             if (j == 7)
                             {
-                                newPharmacy.Address = currentRow;
-                            }
-
-                            if (j == 9)
-                            {
-                                int regionId = context.Regions
-                                    .Where(x => x.Name.ToLower()
-                                    .TrimEnd().Contains(currentRow.ToLower().TrimEnd()))
-                                    .Select(x => x.Id).FirstOrDefault();
-                                newPharmacy.RegionId = regionId;
-                            }
-
-                            if (j == 15)
-                            {
-                                if (currentRow != "")
-                                {
-                                    newPharmacy.PharmnetId = int.Parse(currentRow);
-                                }
-                            }
-
-                            if (j == 16)
-                            {
-                                if (currentRow != "")
-                                {
-                                    newPharmacy.PhoenixId = int.Parse(currentRow);
-                                }
-                            }
-                            if (j == 17)
-                            {
-                                if (currentRow != "")
-                                {
-                                    newPharmacy.SopharmaId = int.Parse(currentRow);
-                                }
-                            }
-                            if (j == 18)
-                            {
-                                if (currentRow != "")
-                                {
-                                    newPharmacy.StingId = int.Parse(currentRow);
-                                }
-                            }
-                            if (j == 21)
-                            {
-                                int cityId = context.Cities
-                                    .Where(x => x.Name.ToLower()
-                                    .TrimEnd().Contains(currentRow.ToLower().TrimEnd()))
-                                    .Select(x => x.Id).FirstOrDefault();
-                                newPharmacy.CityId = cityId;
+                                newProduct.Price = double.Parse(currentRow);
                             }
 
 
                         }
 
-                        context.Pharmacies.Add(newPharmacy);
+                        context.Products.Add(newProduct);
                         context.SaveChanges();
 
                         sb.AppendLine("</tr>");
