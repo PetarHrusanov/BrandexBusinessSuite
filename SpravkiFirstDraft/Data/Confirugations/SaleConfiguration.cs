@@ -22,6 +22,11 @@
                 .HasOne(p => p.Pharmacy)
                 .WithMany(s => s.Sales)
                 .HasForeignKey(s => s.PharmacyId);
+
+            builder
+                .HasOne(p => p.Distributor)
+                .WithMany(s => s.Sales)
+                .HasForeignKey(s => s.DistributorId);
         }
     }
 }

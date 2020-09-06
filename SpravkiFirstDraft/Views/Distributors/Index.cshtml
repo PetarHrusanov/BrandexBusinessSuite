@@ -1,0 +1,15 @@
+﻿@model SpravkiFirstDraft.Models.Distributor.DistributorsCollectionModel 
+<form asp-action="Import" method="POST">
+    <p>
+        Name: <input type="text" name="name" />
+        <input type="submit" value="Add" />
+    </p>
+</form>
+<div class="row">
+    @foreach (var distributor in Model.Distributors)
+    {
+        <div class="col-md-4 media">
+            @distributor
+        </div>
+    }
+</div>

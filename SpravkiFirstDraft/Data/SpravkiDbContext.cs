@@ -25,5 +25,7 @@ namespace SpravkiFirstDraft.Data
 
         public DbSet<Sale> Sales { get; set; }
 
+        public DbSet<Distributor> Distributors { get; set; }
+
     }
 }
