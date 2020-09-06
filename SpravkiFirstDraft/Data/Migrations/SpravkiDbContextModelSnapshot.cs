@@ -55,6 +55,21 @@ namespace SpravkiFirstDraft.Data.Migrations
                     b.ToTable("Companies");
                 });
 
+            modelBuilder.Entity("SpravkiFirstDraft.Data.Models.Distributor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Distributors");
+                });
+
             modelBuilder.Entity("SpravkiFirstDraft.Data.Models.Pharmacy", b =>
                 {
                     b.Property<int>("Id")
@@ -193,6 +208,9 @@ namespace SpravkiFirstDraft.Data.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DistributorId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PharmacyId")
                         .HasColumnType("int");
 
@@ -200,6 +218,8 @@ namespace SpravkiFirstDraft.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DistributorId");
 
                     b.HasIndex("PharmacyId");
 
@@ -237,6 +257,12 @@ namespace SpravkiFirstDraft.Data.Migrations
 
             modelBuilder.Entity("SpravkiFirstDraft.Data.Models.Sale", b =>
                 {
+                    b.HasOne("SpravkiFirstDraft.Data.Models.Distributor", "Distributor")
+                        .WithMany("Sales")
+                        .HasForeignKey("DistributorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SpravkiFirstDraft.Data.Models.Pharmacy", "Pharmacy")
                         .WithMany("Sales")
                         .HasForeignKey("PharmacyId")

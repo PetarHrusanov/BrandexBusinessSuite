@@ -176,6 +176,11 @@
 
                         }
 
+                        var phoenixId = context.Distributors
+                            .Where(n => n.Name == "Phoenix")
+                            .Select(i => i.Id)
+                            .FirstOrDefault();
+                        newSale.DistributorId = phoenixId;
                         context.Sales.Add(newSale);
                         context.SaveChanges();
 
@@ -189,7 +194,13 @@
 
             }
 
-            return this.Content(sb.ToString());
+            var phoenixOutput = new PhoenixOutputModel();
+
+            phoenixOutput.Date = phoenixInput.Date;
+
+            phoenixOutput.Table = sb.ToString();
+
+            return this.View(phoenixOutput);
 
         }
     }
