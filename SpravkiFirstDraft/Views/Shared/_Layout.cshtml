@@ -25,34 +25,32 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="PharmacyDetails" asp-action="Index">PharmacyDetails</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cities" asp-action="Index">Cities</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="PharmacyChains" asp-action="Index">PharmacyChains</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Companies" asp-action="Index">Companies</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Phoenix" asp-action="Index">Phoenix</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Sopharma" asp-action="Index">Sopharma</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Distributors" asp-action="Index">Distributors</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Regular Datasets<span class="fa fa-caret-down"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Cities" asp-action="Index">Cities</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="PharmacyChains" asp-action="Index">PharmacyChains</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Products</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Companies" asp-action="Index">Companies</a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Distributors" asp-action="Index">Distributors</a></li>
+
+                            </ul>
+                        </li>
                     </ul>
+
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
