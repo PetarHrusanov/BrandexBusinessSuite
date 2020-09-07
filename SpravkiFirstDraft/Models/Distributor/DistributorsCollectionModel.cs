@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SpravkiFirstDraft.Models.Distributor
+﻿namespace SpravkiFirstDraft.Models.Distributor
 {
+    using System;
+    using System.Collections.Generic;
+
     public class DistributorsCollectionModel
     {
         public DistributorsCollectionModel()
