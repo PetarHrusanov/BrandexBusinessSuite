@@ -1,22 +1,21 @@
-﻿<h1>Welcome to the future :)</h1>
+﻿@model SpravkiFirstDraft.Models.Sales.SaleFiltersExcelInputModel 
+<h1>Welcome to the future :)</h1>
+<hr />
 <form asp-controller="Home" asp-action="Export">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <input type="file" id="fileupload" name="files" class="form-control" />
-            </div>
-            <div class="col-md-3">
-                <input type="button" name="Upload" value="Upload" id="btnupload" class="btn btn-primary" />
-                <a href="@Url.Action("Download", "Home")">Download</a>
-            </div>
-            <div class="col-md-5">
-                <input type="submit" name="Export" value="Create and Export" id="btnExport"
-                       class="btn btn-primary" asp-action="Export" />
-            </div>
-        </div>
-        <div class="clearfix">&nbsp;</div>
-        <div class="row">
-            <div id="divPrint"></div>
-        </div>
+    <h2>Generate All</h2>
+    <div>
+        <input type="text" id="date" name="date" placeholder="Format MM/yyyy; Example: 07/2020" size="30"/>
+        <input type="submit" name="Export" value="Generate" id="btnExport"
+               class="btn btn-primary" asp-action="Export" />
     </div>
 </form>
+<hr />
+<form asp-controller="Home" asp-action="ByCity">
+    <h2>Generate By Region</h2>
+    <p>
+        Region: <select name="authorId" asp-items="@Model.Options"></select>
+        Date: <input type="text" asp-for="Date" />
+        <input type="submit" value="Generate" />
+    </p>
+</form>
+<hr />
