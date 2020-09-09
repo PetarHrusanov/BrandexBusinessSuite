@@ -8,12 +8,14 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Rendering;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
     using SpravkiFirstDraft.Data;
-    using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models;
     using SpravkiFirstDraft.Models.Sales;
+    using SpravkiFirstDraft.Models.Pharmacies;
+    using System;
 
     public class HomeController : Controller
     {
@@ -32,10 +34,19 @@
 
         public IActionResult Index()
         {
-            return View();
+            var inputFilter = new SaleFiltersExcelInputModel();
+
+            inputFilter.Options = context.Regions.Select(a =>
+                                  new SelectListItem
+                                  {
+                                      Value = a.Id.ToString(),
+                                      Text = a.Name
+                                  }).ToList();
+
+            return View(inputFilter);
         }
 
-        public async Task<IActionResult> Export()
+        public async Task<IActionResult> Export(string date = null)
         {
             string sWebRootFolder = hostEnvironment.WebRootPath;
             string sFileName = @"Employees.xlsx";
@@ -49,6 +60,43 @@
             using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
             {
 
+                var collectionPhamracies = new List<PharmacyExcelModel>();
+
+                if (date != null)
+                {
+                    var currRowDate = DateTime.ParseExact(date, "MM/yyyy", null);
+                    collectionPhamracies = context.Pharmacies.Select(p => new PharmacyExcelModel
+                    {
+                        Name = p.Name,
+                        Address = p.Address,
+                        PharmacyClass = p.PharmacyClass,
+                        Region = p.Region.Name,
+                        Sales = p.Sales
+                            .Where(d => d.Date.Month == currRowDate.Month && d.Date.Year == currRowDate.Year)
+                            .Select(s => new SaleExcelOutputModel
+                        {
+                            Name = s.Product.Name,
+                            Count = s.Count
+                        }).ToList()
+                    }).ToList();
+                }
+                else
+                {
+                    collectionPhamracies = context.Pharmacies.Select(p => new PharmacyExcelModel
+                    {
+                        Name = p.Name,
+                        Address = p.Address,
+                        PharmacyClass = p.PharmacyClass,
+                        Region = p.Region.Name,
+                        Sales = p.Sales.Select(s => new SaleExcelOutputModel
+                        {
+                            Name = s.Product.Name,
+                            Count = s.Count
+                        }).ToList()
+                    }).ToList();
+                }
+
+           
                 IWorkbook workbook;
  
                 workbook = new XSSFWorkbook();
@@ -97,24 +145,12 @@
 
                 row.CreateCell(19).SetCellValue("ZinSeD");
 
-                //var collectionPharmacies = context.Pharmacies.Where(p => p.Active == true);
+                row.CreateCell(20).SetCellValue("Region");
 
-                var collectionPharmacies = context.Pharmacies.Select(p => new {
-                    Name = p.Name,
-                    Address = p.Address,
-                    PharmacyClass = p.PharmacyClass,
-                    Sales =
-                    context.Sales.Where(id => id.PharmacyId == p.Id).Select(s => new SaleExcelOutputModel
-                    {
-                        Name = s.Product.Name,
-                        Count = s.Count
-                    }).ToList()
-
-                }).ToList();
 
                 int counter = 1;
 
-                foreach (var item in collectionPharmacies)
+                foreach (var item in collectionPhamracies)
                 {
                     row = excelSheet.CreateRow(counter);
 
@@ -142,6 +178,8 @@
                     row.CreateCell(17).SetCellValue(item.Sales.Where(i => i.Name == "ДиабеФор Глюко").Sum(b => b.Count));
                     row.CreateCell(18).SetCellValue(item.Sales.Where(i => i.Name == "ДиабеФор Протект").Sum(b => b.Count));
                     row.CreateCell(19).SetCellValue(item.Sales.Where(i => i.Name == "ЗинСеД").Sum(b => b.Count));
+
+                    row.CreateCell(20).SetCellValue(item.Region);
 
                     counter++;
                   

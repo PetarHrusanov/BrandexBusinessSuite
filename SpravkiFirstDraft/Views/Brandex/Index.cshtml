@@ -1,10 +1,10 @@
-﻿@model SpravkiFirstDraft.Models.Pharmnet.PharmnetInputModel
-@using (Html.BeginForm("Import", "Pharmnet", FormMethod.Post, new { enctype = "multipart/form-data" }))
+﻿@model SpravkiFirstDraft.Models.Brandex.BrandexInputModel
+@using (Html.BeginForm("Import", "Brandex", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-        <h4>Pharmnet Input Form</h4>
+        <h4>Brandex Input Form</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
@@ -17,7 +17,6 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <input type="file" name="ImageFile" required />
             </div>
@@ -30,5 +29,3 @@
         </div>
     </div>
 }
-
-
