@@ -1,6 +1,5 @@
 ﻿namespace SpravkiFirstDraft.Models.Brandex
 {
-    using System;
     using Microsoft.AspNetCore.Http;
 
     public class BrandexInputModel

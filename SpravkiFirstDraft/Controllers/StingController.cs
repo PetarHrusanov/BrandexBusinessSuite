@@ -5,6 +5,7 @@
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -14,21 +15,25 @@
     using SpravkiFirstDraft.Data;
     using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models.Pharmnet;
+    using SpravkiFirstDraft.Models.Sales;
     using SpravkiFirstDraft.Models.Sopharma;
     using SpravkiFirstDraft.Models.Sting;
+    using SpravkiFirstDraft.Services.Sales;
 
     public class StingController : Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
         private readonly SpravkiDbContext context;
+        private readonly ISalesService salesService;
 
-        public StingController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        public StingController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context, ISalesService salesService)
 
         {
 
             this.hostEnvironment = hostEnvironment;
             this.context = context;
+            this.salesService = salesService;
 
         }
 
@@ -37,12 +42,12 @@
             return View();
         }
 
-        public ActionResult Import(StingInputModel stingInput)
+        public async Task<ActionResult> ImportAsync(StingInputModel stingInput)
         {
 
             IFormFile file = Request.Form.Files[0];
 
-            DateTime dateForDb = DateTime.ParseExact(stingInput.Date, "yyyy-MM-dd", null);
+            DateTime dateForDb = DateTime.ParseExact(stingInput.Date, "dd-MM-yyyy", null);
 
             string folderName = "UploadExcel";
 
@@ -52,7 +57,6 @@
 
             var errorDictionary = new Dictionary<int, string>();
 
-            StringBuilder sb = new StringBuilder();
 
             if (!Directory.Exists(newPath))
 
@@ -104,21 +108,15 @@
 
                     int cellCount = headerRow.LastCellNum;
 
-                    sb.Append("<table class='table table-bordered'><tr>");
-
                     for (int j = 0; j < cellCount; j++)
                     {
                         ICell cell = headerRow.GetCell(j);
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
-                        sb.Append("<th>" + cell.ToString() + "</th>");
 
                     }
 
-                    sb.Append("</tr>");
-
-                    sb.AppendLine("<tr>");
 
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
@@ -130,7 +128,7 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        Sale newSale = new Sale();
+                        var newSale = new SaleInputModel();
                         newSale.Date = dateForDb;
 
 
@@ -142,7 +140,6 @@
 
                             if (row.GetCell(j) != null)
                             {
-                                sb.Append("<td>" + row.GetCell(j).ToString() + "</td>");
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
                             }
 
@@ -162,6 +159,7 @@
                                         var producId = this.context.Products.Where(c => c.StingId == int.Parse(currentRow)).Select(p => p.Id).First();
                                         newSale.ProductId = producId;
                                     }
+
                                     else
                                     {
                                         errorDictionary[i] = currentRow;
@@ -189,40 +187,19 @@
 
                         }
 
-                        if(newSale.PharmacyId!=0
-                            && newSale.ProductId!=0
-                            && newSale.Date !=null
-                            && newSale.Count != 0)
-                        {
-                            var stingId = context.Distributors
-                           .Where(n => n.Name == "Sting")
-                           .Select(i => i.Id)
-                           .FirstOrDefault();
-                            newSale.DistributorId = stingId;
-                            context.Sales.Add(newSale);
-                            context.Sales.Add(newSale);
-                            context.SaveChanges();
-                        }
+                        await salesService.CreateSale(newSale, "Sting");
 
-                        
-
-                        sb.AppendLine("</tr>");
 
                     }
-
-                    sb.Append("</table>");
 
                 }
 
             }
 
-            var stingOtuptModel = new StingOutputModel();
-
-            stingOtuptModel.Date = stingInput.Date;
-
-            stingOtuptModel.Table = sb.ToString();
-
-            stingOtuptModel.Errors = errorDictionary;
+            var stingOtuptModel = new StingOutputModel {
+                Date = stingInput.Date,
+                Errors = errorDictionary
+            };
 
             return this.View(stingOtuptModel);
 

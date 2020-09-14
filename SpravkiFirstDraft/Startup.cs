@@ -1,18 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using SpravkiFirstDraft.Data;
-
 namespace SpravkiFirstDraft
 {
+
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using SpravkiFirstDraft.Data;
+    using SpravkiFirstDraft.Services;
+    using SpravkiFirstDraft.Services.Pharmacies;
+    using SpravkiFirstDraft.Services.Products;
+    using SpravkiFirstDraft.Services.Sales;
+
     public class Startup
     {
         private readonly IConfiguration configuration;
@@ -27,6 +27,12 @@ namespace SpravkiFirstDraft
         {
             services.AddDbContext<SpravkiDbContext>(
                options => options.UseSqlServer(this.configuration.GetConnectionString("DefaultConnection")));
+
+            services
+                .AddTransient<ISalesService, SalesService>()
+                .AddTransient<IProductsService, ProductsService>()
+                .AddTransient<IPharmaciesService, PharmaciesService>()
+                .AddTransient<INumbersChecker, NumbersChecker>();
 
             services.AddControllersWithViews();
         }

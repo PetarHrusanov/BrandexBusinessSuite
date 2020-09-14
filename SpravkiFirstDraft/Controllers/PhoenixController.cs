@@ -1,9 +1,11 @@
 ﻿namespace SpravkiFirstDraft.Controllers
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -14,6 +16,8 @@
     using SpravkiFirstDraft.Data.Enums;
     using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models.Phoenix;
+    using SpravkiFirstDraft.Models.Sales;
+    using SpravkiFirstDraft.Services.Sales;
 
     public class PhoenixController : Controller
     {
@@ -21,12 +25,15 @@
 
         private readonly SpravkiDbContext context;
 
-        public PhoenixController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        private readonly ISalesService salesService;
+
+        public PhoenixController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context, ISalesService salesService)
 
         {
 
             this.hostEnvironment = hostEnvironment;
             this.context = context;
+            this.salesService = salesService;
 
         }
 
@@ -35,12 +42,12 @@
             return View();
         }
 
-        public ActionResult Import(PhoenixInputModel phoenixInput)
+        public async System.Threading.Tasks.Task<ActionResult> ImportAsync(PhoenixInputModel phoenixInput)
         {
 
             IFormFile file = Request.Form.Files[0];
 
-            DateTime dateForDb = DateTime.ParseExact(phoenixInput.Date, "yyyy-MM-dd", null);
+            DateTime dateForDb = DateTime.ParseExact(phoenixInput.Date, "dd-MM-yyyy", null);
 
             string folderName = "UploadExcel";
 
@@ -48,7 +55,7 @@
 
             string newPath = Path.Combine(webRootPath, folderName);
 
-            StringBuilder sb = new StringBuilder();
+            var errorDictionary = new Dictionary<int, string>();
 
             if (!Directory.Exists(newPath))
 
@@ -100,22 +107,6 @@
 
                     int cellCount = headerRow.LastCellNum;
 
-                    sb.Append("<table class='table table-bordered'><tr>");
-
-                    for (int j = 0; j < cellCount; j++)
-                    {
-                        ICell cell = headerRow.GetCell(j);
-
-                        if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-
-                        sb.Append("<th>" + cell.ToString() + "</th>");
-
-                    }
-
-                    sb.Append("</tr>");
-
-                    sb.AppendLine("<tr>");
-
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
                     {
@@ -126,7 +117,7 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        Sale newSale = new Sale();
+                        var newSale = new SaleInputModel();
                         newSale.Date = dateForDb;
 
                         for (int j = row.FirstCellNum; j < cellCount; j++)
@@ -137,58 +128,48 @@
 
                             if (row.GetCell(j) != null)
                             {
-                                sb.Append("<td>" + row.GetCell(j).ToString() + "</td>");
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
                             }
 
-                            if (j == 0)
+                            switch (j)
                             {
-                                int rowProductId = int.Parse(currentRow);
-                                var productId = this.context.Products.Where(c => c.PhoenixId == rowProductId).Select(p => p.Id).First();
-                                newSale.ProductId = productId;
-                            }
-                            if (j == 2)
-                            {
-                                int rowPharmacytId = int.Parse(currentRow);
-                                var pharmacyId = this.context.Pharmacies.Where(c => c.PhoenixId == rowPharmacytId).Select(p => p.Id).First();
-                                newSale.PharmacyId = pharmacyId;
+                                case 0:
+                                    int rowProductId = int.Parse(currentRow);
+                                    var productId = this.context.Products.Where(c => c.PhoenixId == rowProductId).Select(p => p.Id).First();
+                                    newSale.ProductId = productId;
+                                    break;
+                                case 2:
+                                    int rowPharmacytId = int.Parse(currentRow);
+                                    if (this.context.Pharmacies.Where(c => c.PhoenixId == rowPharmacytId).Select(p => p.Id).Any())
+                                    {
+                                        var pharmacyId = this.context.Pharmacies.Where(c => c.PhoenixId == rowPharmacytId).Select(p => p.Id).First();
+                                        newSale.PharmacyId = pharmacyId;
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
+                                case 14:
+                                    int countProduct = int.Parse(currentRow);
+                                    newSale.Count = countProduct;
+                                    break;
+                                case 16:
+                                    var currRowDate = DateTime.Parse(currentRow);
+                                    if (currentRow != null)
+                                    {
+                                        newSale.Date = currRowDate;
+                                    }
+                                    break;
 
-                            }
-
-                            if (j == 14)
-                            {
-                                int countProduct = int.Parse(currentRow);
-                                newSale.Count = countProduct;
-                            }
-
-                            if (j == 16)
-                            {
-                                var currRowDate = DateTime.Parse(currentRow);
-
-                                if (currentRow != null)
-                                {
-                                    newSale.Date = currRowDate;
-                                }
-
- 
                             }
 
 
                         }
 
-                        var phoenixId = context.Distributors
-                            .Where(n => n.Name == "Phoenix")
-                            .Select(i => i.Id)
-                            .FirstOrDefault();
-                        newSale.DistributorId = phoenixId;
-                        context.Sales.Add(newSale);
-                        context.SaveChanges();
-
-                        sb.AppendLine("</tr>");
+                        await salesService.CreateSale(newSale, "Phoenix");
 
                     }
-
-                    sb.Append("</table>");
 
                 }
 
@@ -198,7 +179,7 @@
 
             phoenixOutput.Date = phoenixInput.Date;
 
-            phoenixOutput.Table = sb.ToString();
+            phoenixOutput.Errors = errorDictionary;
 
             return this.View(phoenixOutput);
 
