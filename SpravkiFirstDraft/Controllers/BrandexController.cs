@@ -16,33 +16,55 @@
     using SpravkiFirstDraft.Data;
     using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models.Brandex;
+    using SpravkiFirstDraft.Models.Sales;
+    using SpravkiFirstDraft.Services;
+    using SpravkiFirstDraft.Services.Pharmacies;
+    using SpravkiFirstDraft.Services.Products;
+    using SpravkiFirstDraft.Services.Sales;
 
-    public class BrandexController : Controller
+    public class BrandexController :Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
+        // db Services
         private readonly SpravkiDbContext context;
+        private readonly ISalesService salesService;
+        private readonly IProductsService productsService;
+        private readonly IPharmaciesService pharmaciesService;
 
-        public BrandexController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        // universal Services
+        private readonly INumbersChecker numbersChecker;
+
+        public BrandexController(IWebHostEnvironment hostEnvironment,
+            SpravkiDbContext context,
+            ISalesService salesService,
+            INumbersChecker numbersChecker,
+            IProductsService productsService,
+            IPharmaciesService pharmaciesService
+            )
 
         {
 
             this.hostEnvironment = hostEnvironment;
             this.context = context;
+            this.salesService = salesService;
+            this.numbersChecker = numbersChecker;
+            this.productsService = productsService;
+            this.pharmaciesService = pharmaciesService;
 
         }
 
-        public IActionResult Index()
+        public ActionResult Index()
         {
-            return View();
+            return this.View();
         }
 
-        public ActionResult Import(BrandexInputModel brandexInput)
+        public async Task<ActionResult> Import(BrandexInputModel brandexInput)
         {
 
             IFormFile file = Request.Form.Files[0];
 
-            DateTime dateForDb = DateTime.ParseExact(brandexInput.Date, "yyyy-MM-dd", null);
+            DateTime dateForDb = DateTime.ParseExact(brandexInput.Date, "dd-MM-yyyy", null);
 
             string folderName = "UploadExcel";
 
@@ -51,8 +73,6 @@
             string newPath = Path.Combine(webRootPath, folderName);
 
             var errorDictionary = new Dictionary<int, string>();
-
-            StringBuilder sb = new StringBuilder();
 
             if (!Directory.Exists(newPath))
 
@@ -104,21 +124,13 @@
 
                     int cellCount = headerRow.LastCellNum;
 
-                    sb.Append("<table class='table table-bordered'><tr>");
-
                     for (int j = 0; j < cellCount; j++)
                     {
                         ICell cell = headerRow.GetCell(j);
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
-                        sb.Append("<th>" + cell.ToString() + "</th>");
-
                     }
-
-                    sb.Append("</tr>");
-
-                    sb.AppendLine("<tr>");
 
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
@@ -130,7 +142,7 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        Sale newSale = new Sale();
+                        var newSale = new SaleInputModel();
                         newSale.Date = dateForDb;
 
 
@@ -142,7 +154,6 @@
 
                             if (row.GetCell(j) != null)
                             {
-                                sb.Append("<td>" + row.GetCell(j).ToString() + "</td>");
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
                             }
 
@@ -157,10 +168,17 @@
                                     }
                                     break;
                                 case 3:
-                                    if(this.context.Products.Where(c=> c.BrandexId == int.Parse(currentRow)).Any())
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        var producId = this.context.Products.Where(c => c.BrandexId == int.Parse(currentRow)).Select(p => p.Id).First();
-                                        newSale.ProductId = producId;
+                                        if (await this.productsService.CheckProductByDistributor(currentRow, "Brandex"))
+                                        {
+                                            var producId = await this.productsService.ProductIdByDistributor(currentRow, "Brandex");
+                                            newSale.ProductId = producId;
+                                        }
+                                        else
+                                        {
+                                            errorDictionary[i] = currentRow;
+                                        }
                                     }
                                     else
                                     {
@@ -172,12 +190,13 @@
                                     newSale.Count = countProduct;
                                     break;
                                 case 5:
-                                    if(Regex.IsMatch(currentRow, @"^\d+$"))
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
                                         int rowPharmacytId = int.Parse(currentRow);
-                                        if (this.context.Pharmacies.Where(c => c.BrandexId == rowPharmacytId).Any())
+
+                                        if (await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, "Brandex"))
                                         {
-                                            var pharmacyId = this.context.Pharmacies.Where(c => c.BrandexId == rowPharmacytId).Select(p => p.Id).First();
+                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, "Brandex");
                                             newSale.PharmacyId = pharmacyId;
                                         }
                                         else
@@ -196,45 +215,22 @@
 
                         }
 
-                        if(newSale.PharmacyId!=0
-                            && newSale.ProductId!=0
-                            && newSale.Date !=null
-                            && newSale.Count != 0)
-                        {
-                            var stingId = context.Distributors
-                           .Where(n => n.Name == "Brandex")
-                           .Select(i => i.Id)
-                           .FirstOrDefault();
-                            newSale.DistributorId = stingId;
-                            context.Sales.Add(newSale);
-                            context.Sales.Add(newSale);
-                            context.SaveChanges();
-                        }
-
-                        
-
-                        sb.AppendLine("</tr>");
+                        await this.salesService.CreateSale(newSale, "Brandex");
+        
 
                     }
-
-                    sb.Append("</table>");
 
                 }
 
             }
 
-            var brandexOutputModel = new BrandexOutputModel();
-
-            brandexOutputModel.Date = brandexInput.Date;
-
-            brandexOutputModel.Table = sb.ToString();
-
-            brandexOutputModel.Errors = errorDictionary;
+            var brandexOutputModel = new BrandexOutputModel {
+                Date = brandexInput.Date,
+                Errors = errorDictionary
+            };
 
             return this.View(brandexOutputModel);
 
         }
-
-        //public async Task<IActionResult>()
     }
 }
