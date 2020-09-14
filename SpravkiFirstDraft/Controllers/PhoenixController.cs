@@ -17,23 +17,40 @@
     using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models.Phoenix;
     using SpravkiFirstDraft.Models.Sales;
+    using SpravkiFirstDraft.Services;
+    using SpravkiFirstDraft.Services.Pharmacies;
+    using SpravkiFirstDraft.Services.Products;
     using SpravkiFirstDraft.Services.Sales;
 
     public class PhoenixController : Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
+        // db Services
         private readonly SpravkiDbContext context;
-
         private readonly ISalesService salesService;
+        private readonly IProductsService productsService;
+        private readonly IPharmaciesService pharmaciesService;
 
-        public PhoenixController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context, ISalesService salesService)
+        // universal Services
+        private readonly INumbersChecker numbersChecker;
+
+        public PhoenixController(IWebHostEnvironment hostEnvironment,
+            SpravkiDbContext context,
+            ISalesService salesService,
+            INumbersChecker numbersChecker,
+            IProductsService productsService,
+            IPharmaciesService pharmaciesService
+            )
 
         {
 
             this.hostEnvironment = hostEnvironment;
             this.context = context;
             this.salesService = salesService;
+            this.numbersChecker = numbersChecker;
+            this.productsService = productsService;
+            this.pharmaciesService = pharmaciesService;
 
         }
 
@@ -134,26 +151,51 @@
                             switch (j)
                             {
                                 case 0:
-                                    int rowProductId = int.Parse(currentRow);
-                                    var productId = this.context.Products.Where(c => c.PhoenixId == rowProductId).Select(p => p.Id).First();
-                                    newSale.ProductId = productId;
-                                    break;
-                                case 2:
-                                    int rowPharmacytId = int.Parse(currentRow);
-                                    if (this.context.Pharmacies.Where(c => c.PhoenixId == rowPharmacytId).Select(p => p.Id).Any())
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        var pharmacyId = this.context.Pharmacies.Where(c => c.PhoenixId == rowPharmacytId).Select(p => p.Id).First();
-                                        newSale.PharmacyId = pharmacyId;
+                                        if(await this.productsService.CheckProductByDistributor(currentRow, "Phoenix"))
+                                        {
+                                            var productId = await this.productsService.ProductIdByDistributor(currentRow, "Phoenix");
+                                            newSale.ProductId = productId;
+                                        }
+                                        else
+                                        {
+                                            errorDictionary[i] = currentRow;
+                                        }
                                     }
                                     else
                                     {
                                         errorDictionary[i] = currentRow;
                                     }
                                     break;
-                                case 14:
-                                    int countProduct = int.Parse(currentRow);
-                                    newSale.Count = countProduct;
+
+                                case 2:
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
+                                    {
+                                        if(await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, "Phoenix"))
+                                        {
+                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, "Phoenix");
+                                            newSale.PharmacyId = pharmacyId;
+                                        }
+                                        else
+                                        {
+                                            errorDictionary[i] = currentRow;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
                                     break;
+
+                                case 14:
+                                    if (this.numbersChecker.NegativeNumberIncludedCheck(currentRow))
+                                    {
+                                        int countProduct = int.Parse(currentRow);
+                                        newSale.Count = countProduct;
+                                    }
+                                    break;
+
                                 case 16:
                                     var currRowDate = DateTime.Parse(currentRow);
                                     if (currentRow != null)
