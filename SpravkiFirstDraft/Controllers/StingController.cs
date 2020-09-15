@@ -18,22 +18,41 @@
     using SpravkiFirstDraft.Models.Sales;
     using SpravkiFirstDraft.Models.Sopharma;
     using SpravkiFirstDraft.Models.Sting;
+    using SpravkiFirstDraft.Services;
+    using SpravkiFirstDraft.Services.Pharmacies;
+    using SpravkiFirstDraft.Services.Products;
     using SpravkiFirstDraft.Services.Sales;
+    using static Common.DataConstants.Ditributors;
 
     public class StingController : Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
+        // db Services
         private readonly SpravkiDbContext context;
         private readonly ISalesService salesService;
+        private readonly IProductsService productsService;
+        private readonly IPharmaciesService pharmaciesService;
 
-        public StingController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context, ISalesService salesService)
+        // universal Services
+        private readonly INumbersChecker numbersChecker;
+
+        public StingController(IWebHostEnvironment hostEnvironment,
+            SpravkiDbContext context,
+            ISalesService salesService,
+            INumbersChecker numbersChecker,
+            IProductsService productsService,
+            IPharmaciesService pharmaciesService
+            )
 
         {
 
             this.hostEnvironment = hostEnvironment;
             this.context = context;
             this.salesService = salesService;
+            this.numbersChecker = numbersChecker;
+            this.productsService = productsService;
+            this.pharmaciesService = pharmaciesService;
 
         }
 
@@ -153,33 +172,55 @@
                                         newSale.Date = currRowDate;
                                     }
                                     break;
-                                case 1:
-                                    if(this.context.Products.Where(c=> c.StingId == int.Parse(currentRow)).Any())
-                                    {
-                                        var producId = this.context.Products.Where(c => c.StingId == int.Parse(currentRow)).Select(p => p.Id).First();
-                                        newSale.ProductId = producId;
-                                    }
 
+                                case 1:
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
+                                    {
+                                        if(await this.productsService.CheckProductByDistributor(currentRow, Sting))
+                                        {
+                                            var producId = await this.productsService.ProductIdByDistributor(currentRow, Sting);
+                                            newSale.ProductId = producId;
+                                        }
+                                        else
+                                        {
+                                            errorDictionary[i] = currentRow;
+                                        }
+                                    }
                                     else
                                     {
                                         errorDictionary[i] = currentRow;
                                     }
                                     break;
+
                                 case 6:
-                                    int rowPharmacytId = int.Parse(currentRow);
-                                    if (this.context.Pharmacies.Where(c => c.StingId == rowPharmacytId).Any())
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        var pharmacyId = this.context.Pharmacies.Where(c => c.StingId == rowPharmacytId).Select(p => p.Id).First();
-                                        newSale.PharmacyId = pharmacyId;
+                                        if(await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, Sting))
+                                        {
+                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Sting);
+                                            newSale.PharmacyId = pharmacyId;
+                                        }
+                                        else
+                                        {
+                                            errorDictionary[i] = currentRow;
+                                        }
                                     }
                                     else
                                     {
                                         errorDictionary[i] = currentRow;
                                     }
                                     break;
+
                                 case 11:
-                                    int countProduct = int.Parse(currentRow);
-                                    newSale.Count = countProduct;
+                                    if (this.numbersChecker.NegativeNumberIncludedCheck(currentRow))
+                                    {
+                                        int countProduct = int.Parse(currentRow);
+                                        newSale.Count = countProduct;
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
                                     break;
 
                             }
@@ -187,7 +228,7 @@
 
                         }
 
-                        await salesService.CreateSale(newSale, "Sting");
+                        await salesService.CreateSale(newSale, Sting);
 
 
                     }

@@ -21,8 +21,9 @@
     using SpravkiFirstDraft.Services.Pharmacies;
     using SpravkiFirstDraft.Services.Products;
     using SpravkiFirstDraft.Services.Sales;
+    using static Common.DataConstants.Ditributors;
 
-    public class BrandexController :Controller
+    public class BrandexController : Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
@@ -170,9 +171,9 @@
                                 case 3:
                                     if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        if (await this.productsService.CheckProductByDistributor(currentRow, "Brandex"))
+                                        if (await this.productsService.CheckProductByDistributor(currentRow, Brandex))
                                         {
-                                            var producId = await this.productsService.ProductIdByDistributor(currentRow, "Brandex");
+                                            var producId = await this.productsService.ProductIdByDistributor(currentRow, Brandex);
                                             newSale.ProductId = producId;
                                         }
                                         else
@@ -194,9 +195,9 @@
                                     {
                                         int rowPharmacytId = int.Parse(currentRow);
 
-                                        if (await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, "Brandex"))
+                                        if (await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, Brandex))
                                         {
-                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, "Brandex");
+                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Brandex);
                                             newSale.PharmacyId = pharmacyId;
                                         }
                                         else
@@ -215,9 +216,7 @@
 
                         }
 
-                        await this.salesService.CreateSale(newSale, "Brandex");
-        
-
+                        await this.salesService.CreateSale(newSale, Brandex);
                     }
 
                 }
@@ -231,6 +230,12 @@
 
             return this.View(brandexOutputModel);
 
+        }
+
+        public async Task<ActionResult> Upload(SaleInputModel saleInput)
+        {
+
+            return this.View();
         }
     }
 }
