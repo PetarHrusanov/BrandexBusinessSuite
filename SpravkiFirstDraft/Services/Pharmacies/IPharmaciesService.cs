@@ -8,5 +8,7 @@
         Task<bool> CheckPharmacyByDistributor(string input, string Distributor);
 
         Task<int> PharmacyIdByDistributor(string input, string Distributor);
+
+        Task<string> NameById(string input, string distributor);
     }
 }

@@ -245,5 +245,24 @@
             return this.View(stingOtuptModel);
 
         }
+
+        public async Task<ActionResult> Upload(string pharmacyId, string productId, string date, int count)
+        {
+            if (await this.salesService.UploadIndividualSale(pharmacyId, productId, date, count, Sting))
+            {
+                var saleOutputModel = new SaleOutputModel
+                {
+                    ProductName = await this.productsService.NameById(productId, Sting),
+                    PharmacyName = await this.pharmaciesService.NameById(pharmacyId, Sting),
+                    Count = count,
+                    Date = date,
+                    DistributorName = Sting
+                };
+                return this.View(saleOutputModel);
+
+            }
+
+            return Redirect("Index");
+        }
     }
 }
