@@ -18,6 +18,7 @@
     using SpravkiFirstDraft.Models.Brandex;
     using SpravkiFirstDraft.Models.Sales;
     using SpravkiFirstDraft.Services;
+    using SpravkiFirstDraft.Services.Distributor;
     using SpravkiFirstDraft.Services.Pharmacies;
     using SpravkiFirstDraft.Services.Products;
     using SpravkiFirstDraft.Services.Sales;
@@ -32,6 +33,7 @@
         private readonly ISalesService salesService;
         private readonly IProductsService productsService;
         private readonly IPharmaciesService pharmaciesService;
+        private readonly IDistributorService distributorService;
 
         // universal Services
         private readonly INumbersChecker numbersChecker;
@@ -41,7 +43,8 @@
             ISalesService salesService,
             INumbersChecker numbersChecker,
             IProductsService productsService,
-            IPharmaciesService pharmaciesService
+            IPharmaciesService pharmaciesService,
+            IDistributorService distributorService
             )
 
         {
@@ -52,6 +55,7 @@
             this.numbersChecker = numbersChecker;
             this.productsService = productsService;
             this.pharmaciesService = pharmaciesService;
+            this.distributorService = distributorService;
 
         }
 
@@ -232,10 +236,23 @@
 
         }
 
-        public async Task<ActionResult> Upload(SaleInputModel saleInput)
-        {
 
-            return this.View();
+        public async Task<ActionResult> Upload(string pharmacyId, string productId, string date, int count)
+        {
+            if(await this.salesService.UploadIndividualSale(pharmacyId, productId, date, count, Brandex))
+            {
+                var saleOutputModel = new SaleOutputModel
+                {
+                    ProductName = await this.productsService.NameById(productId, Brandex),
+                    PharmacyName = await this.pharmaciesService.NameById(pharmacyId, Brandex),
+                    Count = count,
+                    Date = date,
+                    DistributorName = Brandex
+                };
+                return this.View(saleOutputModel);
+            }
+
+            return Redirect("Index");
         }
     }
 }

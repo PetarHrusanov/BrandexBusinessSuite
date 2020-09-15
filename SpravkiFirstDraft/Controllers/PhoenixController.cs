@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -226,6 +227,25 @@
 
             return this.View(phoenixOutput);
 
+        }
+
+        public async Task<ActionResult> Upload(string pharmacyId, string productId, string date, int count)
+        {
+            if (await this.salesService.UploadIndividualSale(pharmacyId, productId, date, count, Phoenix))
+            {
+                var saleOutputModel = new SaleOutputModel
+                {
+                    ProductName = await this.productsService.NameById(productId, Phoenix),
+                    PharmacyName = await this.pharmaciesService.NameById(pharmacyId, Phoenix),
+                    Count = count,
+                    Date = date,
+                    DistributorName = Phoenix
+                };
+                return this.View(saleOutputModel);
+
+            }
+
+            return Redirect("Index");
         }
     }
 }

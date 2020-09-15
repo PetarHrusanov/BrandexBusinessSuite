@@ -33,3 +33,45 @@
 }
 
 
+@using (Html.BeginForm("Upload", "Sting", FormMethod.Post))
+{
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <h2>Upload Individually</h2>
+        <div class="form-group">
+            <div class="form-group">
+                <label name="pharmacyId" class="control-label">Sting Pharmacy Id</label>
+                <input name="pharmacyId" class="form-control" />
+                @*<span asp-validation-for="Name" class="text-danger"></span>*@
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-group">
+                <label name="productId" class="control-label">Sting Product Id</label>
+                <input name="productId" class="form-control" />
+                @*<span asp-validation-for="Name" class="text-danger"></span>*@
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-group">
+                <label name="date" class="control-label">Date</label>
+                <input name="date" class="form-control" />
+                @*<span asp-validation-for="Name" class="text-danger"></span>*@
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-group">
+                <label name="count" class="control-label">Count</label>
+                <input name="count" class="form-control" />
+                @*<span asp-validation-for="Name" class="text-danger"></span>*@
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+

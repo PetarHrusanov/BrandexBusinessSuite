@@ -55,5 +55,27 @@
                         return 0;
                 };
         }
+
+        public async Task<string> NameById(string input, string distributor)
+        {
+            int convertedNumber;
+            bool success = int.TryParse(input, out convertedNumber);
+
+            switch (distributor)
+            {
+                case Brandex:
+                    return await this.db.Pharmacies.Where(c => c.BrandexId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                case Sting:
+                    return await this.db.Pharmacies.Where(c => c.StingId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                case Phoenix:
+                    return await this.db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                case Pharmnet:
+                    return await this.db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                case Sopharma:
+                    return await this.db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                default:
+                    return "";
+            };
+        }
     }
 }
