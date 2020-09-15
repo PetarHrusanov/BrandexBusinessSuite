@@ -21,6 +21,7 @@
     using SpravkiFirstDraft.Services.Pharmacies;
     using SpravkiFirstDraft.Services.Products;
     using SpravkiFirstDraft.Services.Sales;
+    using static Common.DataConstants.Ditributors;
 
     public class PhoenixController : Controller
     {
@@ -153,9 +154,9 @@
                                 case 0:
                                     if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        if(await this.productsService.CheckProductByDistributor(currentRow, "Phoenix"))
+                                        if(await this.productsService.CheckProductByDistributor(currentRow, Phoenix))
                                         {
-                                            var productId = await this.productsService.ProductIdByDistributor(currentRow, "Phoenix");
+                                            var productId = await this.productsService.ProductIdByDistributor(currentRow, Phoenix);
                                             newSale.ProductId = productId;
                                         }
                                         else
@@ -172,9 +173,9 @@
                                 case 2:
                                     if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        if(await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, "Phoenix"))
+                                        if(await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, Phoenix))
                                         {
-                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, "Phoenix");
+                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Phoenix);
                                             newSale.PharmacyId = pharmacyId;
                                         }
                                         else
@@ -209,7 +210,7 @@
 
                         }
 
-                        await salesService.CreateSale(newSale, "Phoenix");
+                        await salesService.CreateSale(newSale, Phoenix);
 
                     }
 

@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using SpravkiFirstDraft.Data;
+    using static Common.DataConstants.Ditributors;
 
     public class PharmaciesService :IPharmaciesService
     {
@@ -20,15 +21,15 @@
             int convertedNumber = int.Parse(input);
             switch (Distributor)
             {
-                case "Brandex":
+                case Brandex:
                     return await this.db.Pharmacies.Where(c => c.BrandexId == convertedNumber).AnyAsync();
-                case "Sting":
+                case Sting:
                     return await this.db.Pharmacies.Where(c => c.StingId == convertedNumber).AnyAsync();
-                case "Phoenix":
+                case Phoenix:
                     return await this.db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).AnyAsync();
-                case "Pharmnet":
+                case Pharmnet:
                     return await this.db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).AnyAsync();
-                case "Sopharma":
+                case Sopharma:
                     return await this.db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).AnyAsync();
                 default:
                     return false;
@@ -40,15 +41,15 @@
                 int convertedNumber = int.Parse(input);
                 switch (Distributor)
                 {
-                    case "Brandex":
+                    case Brandex:
                         return await this.db.Pharmacies.Where(c => c.BrandexId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
-                    case "Sting":
+                    case Sting:
                         return await this.db.Pharmacies.Where(c => c.StingId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
-                    case "Phoenix":
+                    case Phoenix:
                         return await this.db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
-                    case "Pharmnet":
+                    case Pharmnet:
                         return await this.db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
-                    case "Sopharma":
+                    case Sopharma:
                         return await this.db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
                     default:
                         return 0;
