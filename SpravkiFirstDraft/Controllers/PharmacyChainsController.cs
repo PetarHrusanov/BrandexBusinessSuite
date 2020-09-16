@@ -1,8 +1,10 @@
 ﻿namespace SpravkiFirstDraft.Controllers
 {
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -11,19 +13,27 @@
     using NPOI.XSSF.UserModel;
     using SpravkiFirstDraft.Data;
     using SpravkiFirstDraft.Data.Models;
+    using SpravkiFirstDraft.Models;
+    using SpravkiFirstDraft.Models.PharmacyChains;
+    using SpravkiFirstDraft.Services.PharmacyChains;
 
     public class PharmacyChainsController : Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
+        // db Services
         private readonly SpravkiDbContext context;
+        private readonly IPharmacyChainsService pharmacyChainsService;
 
-        public PharmacyChainsController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        public PharmacyChainsController(IWebHostEnvironment hostEnvironment,
+            SpravkiDbContext context,
+            IPharmacyChainsService pharmacyChainsService)
 
         {
 
             this.hostEnvironment = hostEnvironment;
             this.context = context;
+            this.pharmacyChainsService = pharmacyChainsService;
 
         }
 
@@ -32,7 +42,7 @@
             return View();
         }
 
-        public ActionResult Import()
+        public async System.Threading.Tasks.Task<ActionResult> Import()
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -43,7 +53,7 @@
 
             string newPath = Path.Combine(webRootPath, folderName);
 
-            StringBuilder sb = new StringBuilder();
+            var errorDictionary = new Dictionary<int, string>();
 
             if (!Directory.Exists(newPath))
 
@@ -95,21 +105,13 @@
 
                     int cellCount = headerRow.LastCellNum;
 
-                    sb.Append("<table class='table table-bordered'><tr>");
-
                     for (int j = 0; j < cellCount; j++)
                     {
                         ICell cell = headerRow.GetCell(j);
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
-                        sb.Append("<th>" + cell.ToString() + "</th>");
-
                     }
-
-                    sb.Append("</tr>");
-
-                    sb.AppendLine("<tr>");
 
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
@@ -121,7 +123,7 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        PharmacyChain newPharmacyChain = new PharmacyChain();
+                        var newPharmacyChain = new PharmacyChainsInputModel();
 
                         for (int j = row.FirstCellNum; j < cellCount; j++)
 
@@ -130,32 +132,56 @@
 
                             if (row.GetCell(j) != null)
                             {
-                                sb.Append("<td>" + row.GetCell(j).ToString() + "</td>");
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
                             }
 
                             if (j == 0)
                             {
-                                newPharmacyChain.Name = currentRow;
+                                if(await this.pharmacyChainsService.UploadPharmacyChain(currentRow) != null)
+                                {
+
+                                }
+                                else
+                                {
+                                    errorDictionary[i] = currentRow;
+                                }
+                                
                             }
 
                         }
 
-                        context.PharmacyChains.Add(newPharmacyChain);
-                        context.SaveChanges();
-
-                        sb.AppendLine("</tr>");
-
                     }
-
-                    sb.Append("</table>");
 
                 }
 
             }
 
-            return this.Content(sb.ToString());
+            var pharmacyChainsErrorModel = new CustomErrorDictionaryOutputModel
+            {
+                Errors = errorDictionary
+            };
 
+            return this.View(pharmacyChainsErrorModel);
+
+        }
+
+        public async Task<ActionResult> Upload(string pharmacyChainName)
+        {
+            if (pharmacyChainName != null)
+            {
+                await this.pharmacyChainsService.UploadPharmacyChain(pharmacyChainName);
+                var pharmacyChainOutputModel = new PharmacyChainOutputModel
+                {
+                    Name = pharmacyChainName
+                };
+
+                return this.View(pharmacyChainOutputModel);
+            }
+
+            else
+            {
+                return Redirect("Index");
+            }
         }
     }
 }
