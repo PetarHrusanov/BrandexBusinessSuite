@@ -39,6 +39,8 @@
     <Folder Include="Services\Pharmacies\" />
     <Folder Include="Common\" />
     <Folder Include="Services\Distributor\" />
+    <Folder Include="Services\Cities\" />
+    <Folder Include="Models\Cities\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.7" />

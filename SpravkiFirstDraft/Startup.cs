@@ -9,6 +9,7 @@ namespace SpravkiFirstDraft
     using Microsoft.Extensions.Hosting;
     using SpravkiFirstDraft.Data;
     using SpravkiFirstDraft.Services;
+    using SpravkiFirstDraft.Services.Cities;
     using SpravkiFirstDraft.Services.Distributor;
     using SpravkiFirstDraft.Services.Pharmacies;
     using SpravkiFirstDraft.Services.Products;
@@ -34,6 +35,7 @@ namespace SpravkiFirstDraft
                 .AddTransient<IProductsService, ProductsService>()
                 .AddTransient<IPharmaciesService, PharmaciesService>()
                 .AddTransient<IDistributorService, DistributorService>()
+                .AddTransient<ICitiesService, CitiesService>()
                 .AddTransient<INumbersChecker, NumbersChecker>();
 
             services.AddControllersWithViews();
