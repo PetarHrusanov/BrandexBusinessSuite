@@ -4,6 +4,7 @@
 
     public interface ICitiesService
     {
+
         Task<string> UploadCity(string city);
     }
 }

@@ -1,9 +1,11 @@
 ﻿namespace SpravkiFirstDraft.Controllers
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -13,19 +15,32 @@
     using SpravkiFirstDraft.Data;
     using SpravkiFirstDraft.Data.Enums;
     using SpravkiFirstDraft.Data.Models;
+    using SpravkiFirstDraft.Models;
+    using SpravkiFirstDraft.Models.Companies;
+    using SpravkiFirstDraft.Services;
+    using SpravkiFirstDraft.Services.Companies;
 
     public class CompaniesController :Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
+        // db Services
         private readonly SpravkiDbContext context;
+        private readonly ICompaniesService companiesService;
 
-        public CompaniesController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        private readonly INumbersChecker numbersChecker;
+
+        public CompaniesController(IWebHostEnvironment hostEnvironment,
+            SpravkiDbContext context,
+            INumbersChecker numbersChecker,
+            ICompaniesService companiesService)
 
         {
 
             this.hostEnvironment = hostEnvironment;
             this.context = context;
+            this.numbersChecker = numbersChecker;
+            this.companiesService = companiesService;
 
         }
 
@@ -34,7 +49,7 @@
             return View();
         }
 
-        public ActionResult Import()
+        public async System.Threading.Tasks.Task<ActionResult> ImportAsync()
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -45,7 +60,8 @@
 
             string newPath = Path.Combine(webRootPath, folderName);
 
-            StringBuilder sb = new StringBuilder();
+            var errorDictionary = new Dictionary<int, string>();
+
 
             if (!Directory.Exists(newPath))
 
@@ -56,7 +72,6 @@
             }
 
             if (file.Length > 0)
-
             {
 
                 string sFileExtension = Path.GetExtension(file.FileName).ToLower();
@@ -97,21 +112,14 @@
 
                     int cellCount = headerRow.LastCellNum;
 
-                    sb.Append("<table class='table table-bordered'><tr>");
-
                     for (int j = 0; j < cellCount; j++)
                     {
                         ICell cell = headerRow.GetCell(j);
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
-                        sb.Append("<th>" + cell.ToString() + "</th>");
 
                     }
-
-                    sb.Append("</tr>");
-
-                    sb.AppendLine("<tr>");
 
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
@@ -123,46 +131,92 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        Company newCompany = new Company();
+                        var newCompany = new CompanyInputModel();
 
                         for (int j = row.FirstCellNum; j < cellCount; j++)
-
                         {
                             string currentRow = "";
 
                             if (row.GetCell(j) != null)
                             {
-                                sb.Append("<td>" + row.GetCell(j).ToString() + "</td>");
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
                             }
 
-                            if (j == 0)
+                            switch (j)
                             {
-                                newCompany.Name = currentRow;
-                            }
-                            if (j == 1)
-                            {
-                                newCompany.VAT = currentRow;
-                            }
+                                case 0:
+                                    if (currentRow != null)
+                                    {
+                                        newCompany.Name = currentRow;
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
+                                case 1:
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
+                                    {
+                                        newCompany.VAT = currentRow;
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
 
-
+                            }
                         }
 
-                        context.Companies.Add(newCompany);
-                        context.SaveChanges();
-
-                        sb.AppendLine("</tr>");
-
+                        await this.companiesService.UploadCompany(newCompany);
+                        
+                     
                     }
-
-                    sb.Append("</table>");
-
                 }
-
             }
 
-            return this.Content(sb.ToString());
+            var errorsCombined = new CustomErrorDictionaryOutputModel
+            {
+                Errors = errorDictionary
+            };
 
+            return this.View(errorsCombined);
+
+        }
+
+        public async Task<ActionResult> Upload(string companyName, string vat, string ownerName)
+        {
+            if (companyName != null)
+            {
+                var inputCity = new CompanyInputModel
+                {
+                    Name = companyName,
+                    VAT = vat,
+                    Owner = ownerName
+                };
+
+                if(await companiesService.UploadCompany(inputCity))
+                {
+                    var outputCity = new CompanyOutputModel
+                    {
+                        Name = inputCity.Name,
+                        VAT = inputCity.VAT,
+                        Owner = inputCity.Owner
+                    };
+
+                    return this.View(outputCity);
+                }
+                else
+                {
+                    return Redirect("Index");
+                }
+                
+            }
+
+            else
+            {
+                return Redirect("Index");
+            }
         }
     }
 }
