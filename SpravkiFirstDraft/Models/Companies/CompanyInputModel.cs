@@ -1,5 +1,4 @@
-﻿using System;
-namespace SpravkiFirstDraft.Models.Companies
+﻿namespace SpravkiFirstDraft.Models.Companies
 {
     public class CompanyInputModel
     {
