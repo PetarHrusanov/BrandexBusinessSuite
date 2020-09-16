@@ -41,6 +41,8 @@
     <Folder Include="Services\Distributor\" />
     <Folder Include="Services\Cities\" />
     <Folder Include="Models\Cities\" />
+    <Folder Include="Services\Companies\" />
+    <Folder Include="Models\Companies\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.7" />
