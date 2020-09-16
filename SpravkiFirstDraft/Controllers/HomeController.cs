@@ -159,9 +159,6 @@
                     row.CreateCell(2).SetCellValue(item.PharmacyClass.ToString());
 
                     row.CreateCell(3).SetCellValue(item.Sales.Where(i => i.Name == "Бланд 30 табл.").Sum(b => b.Count));
-
-                    //row.CreateCell(3).SetCellValue(item.Sales.Where(i => i.Product.Id == 20).Sum(b => b.Count));
-
                     row.CreateCell(4).SetCellValue(item.Sales.Where(i => i.Name == "Слийп 30 табл.").Sum(b => b.Count));
                     row.CreateCell(5).SetCellValue(item.Sales.Where(i => i.Name == "Лаксал (псилиум)").Sum(b => b.Count));
                     row.CreateCell(6).SetCellValue(item.Sales.Where(i => i.Name == "Флексен").Sum(b => b.Count));

@@ -191,6 +191,7 @@
                                     }
                                     break;
                                 case 4:
+                                    // da napravq proverka
                                     int countProduct = int.Parse(currentRow);
                                     newSale.Count = countProduct;
                                     break;

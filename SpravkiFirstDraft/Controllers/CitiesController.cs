@@ -1,32 +1,40 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using SpravkiFirstDraft.Data;
-using SpravkiFirstDraft.Data.Enums;
-using SpravkiFirstDraft.Data.Models;
-
-namespace SpravkiFirstDraft.Controllers
+﻿namespace SpravkiFirstDraft.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using NPOI.HSSF.UserModel;
+    using NPOI.SS.UserModel;
+    using NPOI.XSSF.UserModel;
+    using SpravkiFirstDraft.Data;
+    using SpravkiFirstDraft.Data.Enums;
+    using SpravkiFirstDraft.Data.Models;
+    using SpravkiFirstDraft.Models;
+    using SpravkiFirstDraft.Models.Cities;
+    using SpravkiFirstDraft.Services.Cities;
+
     public class CitiesController :Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
+        // db Services
         private readonly SpravkiDbContext context;
+        private readonly ICitiesService citiesService;
 
-        public CitiesController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        public CitiesController(IWebHostEnvironment hostEnvironment,
+            SpravkiDbContext context,
+            ICitiesService citiesService)
 
         {
-
             this.hostEnvironment = hostEnvironment;
             this.context = context;
-
+            this.citiesService = citiesService;
         }
 
         public IActionResult Index()
@@ -34,7 +42,7 @@ namespace SpravkiFirstDraft.Controllers
             return View();
         }
 
-        public ActionResult Import()
+        public async Task<ActionResult> Import(IFormFile ImageFile)
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -45,7 +53,8 @@ namespace SpravkiFirstDraft.Controllers
 
             string newPath = Path.Combine(webRootPath, folderName);
 
-            StringBuilder sb = new StringBuilder();
+            var errorDictionary = new Dictionary<int, string>();
+
 
             if (!Directory.Exists(newPath))
 
@@ -97,21 +106,13 @@ namespace SpravkiFirstDraft.Controllers
 
                     int cellCount = headerRow.LastCellNum;
 
-                    sb.Append("<table class='table table-bordered'><tr>");
-
                     for (int j = 0; j < cellCount; j++)
                     {
                         ICell cell = headerRow.GetCell(j);
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
-                        sb.Append("<th>" + cell.ToString() + "</th>");
-
                     }
-
-                    sb.Append("</tr>");
-
-                    sb.AppendLine("<tr>");
 
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
@@ -132,33 +133,54 @@ namespace SpravkiFirstDraft.Controllers
 
                             if (row.GetCell(j) != null)
                             {
-                                sb.Append("<td>" + row.GetCell(j).ToString() + "</td>");
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
                             }
 
                             if (j == 0)
                             {
-                                newCity.Name = currentRow;
+                                if (currentRow != "")
+                                {
+                                    await this.citiesService.UploadCity(currentRow);
+                                }
+                                else
+                                {
+                                    errorDictionary[i] = currentRow;
+                                }
+
                             }
 
-
                         }
-
-                        context.Cities.Add(newCity);
-                        context.SaveChanges();
-
-                        sb.AppendLine("</tr>");
-
+                   
                     }
-
-                    sb.Append("</table>");
 
                 }
 
             }
 
-            return this.Content(sb.ToString());
+            var citiesErrorModel = new CustomErrorDictionaryOutputModel
+            {
+                Errors = errorDictionary
+            };
+
+            return this.View(citiesErrorModel);
 
         }
+
+        public async Task<ActionResult> Upload(string cityName)
+        {
+            if (cityName != null)
+            {
+                var outputCity = new CityOutputModel
+                {
+                    Name = await this.citiesService.UploadCity(cityName)
+                };
+                return this.View(outputCity);
+            }
+
+            else
+            {
+                return Redirect("Index");
+            }
+         }
     }
 }
