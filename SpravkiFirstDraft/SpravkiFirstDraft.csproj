@@ -46,6 +46,8 @@
     <Folder Include="Models\PharmacyChains\" />
     <Folder Include="Services\PharmacyChains\" />
     <Folder Include="Services\Regions\" />
+    <Folder Include="Models\Regions\" />
+    <Folder Include="Views\Region\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.7" />

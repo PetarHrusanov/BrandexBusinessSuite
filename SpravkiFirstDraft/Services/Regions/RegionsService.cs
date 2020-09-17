@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SpravkiFirstDraft.Data;
+using SpravkiFirstDraft.Data.Models;
 
 namespace SpravkiFirstDraft.Services.Regions
 {
@@ -28,9 +29,23 @@ namespace SpravkiFirstDraft.Services.Regions
                                     .FirstOrDefaultAsync();
         }
 
-        public Task<string> UploadRegion(string regionName)
+        public async Task<string> UploadRegion(string regionName)
         {
-            throw new NotImplementedException();
+            if (regionName != null)
+            {
+                var regionDbModel = new Region
+                {
+                    Name = regionName
+                };
+
+                await this.db.Regions.AddAsync(regionDbModel);
+                await this.db.SaveChangesAsync();
+                return regionName;
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }
