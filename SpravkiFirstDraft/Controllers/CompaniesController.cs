@@ -194,23 +194,15 @@
                     VAT = vat,
                     Owner = ownerName
                 };
-
-                if(await companiesService.UploadCompany(inputCity))
+                var companyOutputModel = new CompanyOutputModel
                 {
-                    var outputCity = new CompanyOutputModel
-                    {
-                        Name = inputCity.Name,
-                        VAT = inputCity.VAT,
-                        Owner = inputCity.Owner
-                    };
+                    Name = await companiesService.UploadCompany(inputCity),
+                    VAT = vat,
+                    Owner = ownerName
+                };
 
-                    return this.View(outputCity);
-                }
-                else
-                {
-                    return Redirect("Index");
-                }
-                
+                return this.View(companyOutputModel);
+
             }
 
             else

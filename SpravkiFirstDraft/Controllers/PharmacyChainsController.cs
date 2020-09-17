@@ -15,6 +15,7 @@
     using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models;
     using SpravkiFirstDraft.Models.PharmacyChains;
+    using SpravkiFirstDraft.Services.Companies;
     using SpravkiFirstDraft.Services.PharmacyChains;
 
     public class PharmacyChainsController : Controller
@@ -42,7 +43,7 @@
             return View();
         }
 
-        public async System.Threading.Tasks.Task<ActionResult> Import()
+        public async Task<ActionResult> Import()
         {
 
             IFormFile file = Request.Form.Files[0];

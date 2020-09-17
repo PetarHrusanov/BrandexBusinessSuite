@@ -15,6 +15,7 @@ namespace SpravkiFirstDraft
     using SpravkiFirstDraft.Services.Pharmacies;
     using SpravkiFirstDraft.Services.PharmacyChains;
     using SpravkiFirstDraft.Services.Products;
+    using SpravkiFirstDraft.Services.Regions;
     using SpravkiFirstDraft.Services.Sales;
 
     public class Startup
@@ -40,6 +41,7 @@ namespace SpravkiFirstDraft
                 .AddTransient<ICitiesService, CitiesService>()
                 .AddTransient<ICompaniesService, CompaniesService>()
                 .AddTransient<IPharmacyChainsService, PharmacyChainsService>()
+                .AddTransient<IRegionsService, RegionsService>()
                 .AddTransient<INumbersChecker, NumbersChecker>();
 
             services.AddControllersWithViews();
