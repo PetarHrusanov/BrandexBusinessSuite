@@ -1,0 +1,90 @@
+﻿@model SpravkiFirstDraft.Models.Pharmacies.PharmacyOutputModel
+@{ ViewData["Title"] = "Details"; }
+<h1>Uploaded Pharmacy Chains</h1>
+<div>
+    <hr />
+    <h2>Details</h2>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Pharmacy Name
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Name
+        </dd>
+        <dt class="col-sm-2">
+            Class
+        </dt>
+        <dd class="col-sm-10">
+            @Model.PharmacyClass
+        </dd>
+        <dt class="col-sm-2">
+            Company
+        </dt>
+        <dd class="col-sm-10">
+            @Model.CompanyName
+        </dd>
+        <dt class="col-sm-2">
+            Company
+        </dt>
+        <dd class="col-sm-10">
+            @Model.CompanyName
+        </dd>
+        <dt class="col-sm-2">
+            Pharmacy Chain Name
+        </dt>
+        <dd class="col-sm-10">
+            @Model.PharmacyChainName
+        </dd>
+        <dt class="col-sm-2">
+            Address
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Address
+        </dd>
+        <dt class="col-sm-2">
+            Region
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Region
+        </dd>
+        <dt class="col-sm-2">
+            Region
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Region
+        </dd>
+        <dt class="col-sm-2">
+            BrandexId
+        </dt>
+        <dd class="col-sm-10">
+            @Model.BrandexId
+        </dd>
+        <dt class="col-sm-2">
+            PharmnetId
+        </dt>
+        <dd class="col-sm-10">
+            @Model.PharmnetId
+        </dd>
+        <dt class="col-sm-2">
+            PhoenixId
+        </dt>
+        <dd class="col-sm-10">
+            @Model.PhoenixId
+        </dd>
+        <dt class="col-sm-2">
+            SopharmaId
+        </dt>
+        <dd class="col-sm-10">
+            @Model.SopharmaId
+        </dd>
+        <dt class="col-sm-2">
+            StingId
+        </dt>
+        <dd class="col-sm-10">
+            @Model.StingId
+        </dd>
+    </dl>
+    <div>
+        <a asp-action="Index">Index</a>
+    </div>
+</div>

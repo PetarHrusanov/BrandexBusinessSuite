@@ -1,7 +1,9 @@
 ﻿namespace SpravkiFirstDraft.Services.PharmacyChains
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
     using SpravkiFirstDraft.Data;
     using SpravkiFirstDraft.Data.Models;
 
@@ -34,6 +36,16 @@
             }
         }
 
-       
+        public async Task<bool> CheckPharmacyChainByName(string pharmacyChainName)
+        {
+            return await db.PharmacyChains.Where(x => x.Name.ToLower().TrimEnd() == pharmacyChainName.ToLower().TrimEnd())
+                                    .Select(x => x.Id).AnyAsync();
+        }
+
+        public async Task<int> IdByName(string pharmacyChainName)
+        {
+            return await db.PharmacyChains.Where(x => x.Name.ToLower().TrimEnd() == pharmacyChainName.ToLower().TrimEnd())
+                                    .Select(x => x.Id).FirstOrDefaultAsync();
+        }
     }
 }

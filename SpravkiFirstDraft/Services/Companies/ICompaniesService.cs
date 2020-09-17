@@ -6,6 +6,10 @@ namespace SpravkiFirstDraft.Services.Companies
 {
     public interface ICompaniesService
     {
-        Task<bool> UploadCompany(CompanyInputModel company);
+        Task<string> UploadCompany(CompanyInputModel company);
+
+        Task<bool> CheckCompanyByName(string companyName);
+
+        Task<int> IdByName(string companyName);
     }
 }
