@@ -16,19 +16,25 @@
     using SpravkiFirstDraft.Models.Sales;
     using SpravkiFirstDraft.Models.Pharmacies;
     using System;
+    using SpravkiFirstDraft.Services.Products;
 
     public class HomeController : Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
+        // db Services
         private readonly SpravkiDbContext context;
+        private readonly IProductsService productsService;
 
-        public HomeController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        public HomeController(IWebHostEnvironment hostEnvironment,
+            SpravkiDbContext context,
+            IProductsService productsService)
 
         {
 
             this.hostEnvironment = hostEnvironment;
             this.context = context;
+            this.productsService = productsService;
 
         }
 
@@ -62,6 +68,13 @@
 
                 var collectionPhamracies = new List<PharmacyExcelModel>();
 
+                IWorkbook workbook;
+
+                workbook = new XSSFWorkbook();
+
+                ISheet excelSheet = workbook.CreateSheet("employee");
+                IRow row = excelSheet.CreateRow(0);
+
                 if (date != null)
                 {
                     var currRowDate = DateTime.ParseExact(date, "MM/yyyy", null);
@@ -76,110 +89,121 @@
                             .Select(s => new SaleExcelOutputModel
                         {
                             Name = s.Product.Name,
-                            Count = s.Count
+                            Count = s.Count,
+                            Date = currRowDate
                         }).ToList()
                     }).ToList();
+
+                    row.CreateCell(0).SetCellValue("Pharmacy Name");
+                    row.CreateCell(1).SetCellValue("Pharmacy Address");
+                    row.CreateCell(2).SetCellValue("Pharmacy Class");
+                    row.CreateCell(3).SetCellValue("Region");
+
+                    var products = await this.productsService.GetProductsNames();
+
+                    int productCounter = 4;
+                    foreach (var product in products)
+                    {
+
+
+                        row.CreateCell(productCounter).SetCellValue(product);
+                        productCounter++;
+                    }
+
+                    int counter = 1;
+
+                    foreach (var pharmacy in collectionPhamracies)
+                    {
+                        row = excelSheet.CreateRow(counter);
+
+                        row.CreateCell(0).SetCellValue(pharmacy.Name);
+                        row.CreateCell(1).SetCellValue(pharmacy.Address);
+                        row.CreateCell(2).SetCellValue(pharmacy.PharmacyClass.ToString());
+                        row.CreateCell(3).SetCellValue(pharmacy.Region);
+
+                        productCounter = 4;
+                        foreach (var product in products)
+                        {
+
+                            row.CreateCell(productCounter).SetCellValue(pharmacy.Sales.Where(i => i.Name == product).Sum(b => b.Count));
+                            productCounter++;
+                        }
+
+                        counter++;
+
+                    }
                 }
                 else
                 {
-                    collectionPhamracies = context.Pharmacies.Select(p => new PharmacyExcelModel
+                    var datesRough = this.context.Sales.Select(s => s.Date).Distinct().ToList();
+                    var dates = datesRough.Select(t => new DateTime(t.Year, t.Month, 1)).Distinct().ToList();
+
+                    row.CreateCell(0).SetCellValue("Pharmacy Name");
+                    row.CreateCell(1).SetCellValue("Pharmacy Address");
+                    row.CreateCell(2).SetCellValue("Pharmacy Class");
+                    row.CreateCell(3).SetCellValue("Region");
+                    row.CreateCell(4).SetCellValue("Date");
+
+                    var products = await this.productsService.GetProductsNames();
+
+                    int productCounter = 5;
+
+                    foreach (var product in products)
                     {
-                        Name = p.Name,
-                        Address = p.Address,
-                        PharmacyClass = p.PharmacyClass,
-                        Region = p.Region.Name,
-                        Sales = p.Sales.Select(s => new SaleExcelOutputModel
+
+
+                        row.CreateCell(productCounter).SetCellValue(product);
+                        productCounter++;
+                    }
+
+                    int counter = 1;
+
+                    foreach (var currentDate in dates)
+                    {
+                        // da se mahat li tezi bez prodajbi
+                        collectionPhamracies = context.Pharmacies.Where(p => p.Sales.Count>0).Select(p => new PharmacyExcelModel
                         {
-                            Name = s.Product.Name,
-                            Count = s.Count
-                        }).ToList()
-                    }).ToList();
-                }
+                            Name = p.Name,
+                            Address = p.Address,
+                            PharmacyClass = p.PharmacyClass,
+                            Region = p.Region.Name,
+                            Sales = p.Sales
+                            //.Where(s => s.)
+                            .Where(d => d.Date.Month == currentDate.Month && d.Date.Year == currentDate.Year)
+                            .Select(s => new SaleExcelOutputModel
+                            {
+                                Name = s.Product.Name,
+                                Count = s.Count,
+                                Date = currentDate
+                            }).ToList()
+                        }).ToList();
 
-           
-                IWorkbook workbook;
- 
-                workbook = new XSSFWorkbook();
- 
-                ISheet excelSheet = workbook.CreateSheet("employee");
- 
-                IRow row = excelSheet.CreateRow(0);
+                        foreach (var pharmacy in collectionPhamracies)
+                        {
+                            row = excelSheet.CreateRow(counter);
 
-                row.CreateCell(0).SetCellValue("Pharmacy Name");
+                            row.CreateCell(0).SetCellValue(pharmacy.Name);
+                            row.CreateCell(1).SetCellValue(pharmacy.Address);
+                            row.CreateCell(2).SetCellValue(pharmacy.PharmacyClass.ToString());
+                            row.CreateCell(3).SetCellValue(pharmacy.Region);
+                            row.CreateCell(4).SetCellValue(currentDate.ToString());
 
-                row.CreateCell(1).SetCellValue("Pharmacy Address");
+                            productCounter = 5;
+                            foreach (var product in products)
+                            {
 
-                row.CreateCell(2).SetCellValue("Pharmacy Class");
+                                row.CreateCell(productCounter).SetCellValue(pharmacy.Sales.Where(i => i.Name == product).Sum(b => b.Count));
+                                productCounter++;
+                            }
 
-                row.CreateCell(3).SetCellValue("Bland");
+                            counter++;
 
-                row.CreateCell(4).SetCellValue("Sleep");
-
-                row.CreateCell(5).SetCellValue("Laxal");
-
-                row.CreateCell(6).SetCellValue("Flexen");
-
-                row.CreateCell(7).SetCellValue("ForFlex");
-
-                row.CreateCell(8).SetCellValue("GinkgoVin");
-
-                row.CreateCell(9).SetCellValue("GinkgoVin + Centella");
-
-                row.CreateCell(10).SetCellValue("Ceget+");
-
-                row.CreateCell(11).SetCellValue("EnzyMill 60");
-
-                row.CreateCell(12).SetCellValue("EnzyMill 15");
-
-                row.CreateCell(13).SetCellValue("CystiRen");
-
-                row.CreateCell(14).SetCellValue("ProstaRen");
-
-                row.CreateCell(15).SetCellValue("DetoxiFive");
-
-                row.CreateCell(16).SetCellValue("LadyHarmonia");
-
-                row.CreateCell(17).SetCellValue("DiabeFor Gluco");
-
-                row.CreateCell(18).SetCellValue("DiabeFor Protect");
-
-                row.CreateCell(19).SetCellValue("ZinSeD");
-
-                row.CreateCell(20).SetCellValue("Region");
+                        }
+                    }
 
 
-                int counter = 1;
 
-                foreach (var item in collectionPhamracies)
-                {
-                    row = excelSheet.CreateRow(counter);
-
-                    row.CreateCell(0).SetCellValue(item.Name);
-                    row.CreateCell(1).SetCellValue(item.Address);
-                    row.CreateCell(2).SetCellValue(item.PharmacyClass.ToString());
-
-                    row.CreateCell(3).SetCellValue(item.Sales.Where(i => i.Name == "Бланд 30 табл.").Sum(b => b.Count));
-                    row.CreateCell(4).SetCellValue(item.Sales.Where(i => i.Name == "Слийп 30 табл.").Sum(b => b.Count));
-                    row.CreateCell(5).SetCellValue(item.Sales.Where(i => i.Name == "Лаксал (псилиум)").Sum(b => b.Count));
-                    row.CreateCell(6).SetCellValue(item.Sales.Where(i => i.Name == "Флексен").Sum(b => b.Count));
-                    row.CreateCell(7).SetCellValue(item.Sales.Where(i => i.Name == "Форфлекс").Sum(b => b.Count));
-                    row.CreateCell(8).SetCellValue(item.Sales.Where(i => i.Name == "Гинко Вин").Sum(b => b.Count));
-                    row.CreateCell(9).SetCellValue(item.Sales.Where(i => i.Name == "Гинко Вин+ Центела").Sum(b => b.Count));
-                    row.CreateCell(10).SetCellValue(item.Sales.Where(i => i.Name == "Цегет+ ( с добавен Селен)").Sum(b => b.Count));
-                    row.CreateCell(11).SetCellValue(item.Sales.Where(i => i.Name == "Ензи-Мил").Sum(b => b.Count));
-                    row.CreateCell(12).SetCellValue(item.Sales.Where(i => i.Name == "Ензи-мил компакт").Sum(b => b.Count));
-                    row.CreateCell(13).SetCellValue(item.Sales.Where(i => i.Name == "Цистирен").Sum(b => b.Count));
-                    row.CreateCell(14).SetCellValue(item.Sales.Where(i => i.Name == "ПростаРен").Sum(b => b.Count));
-                    row.CreateCell(15).SetCellValue(item.Sales.Where(i => i.Name == "ДетоксиФайв").Sum(b => b.Count));
-                    row.CreateCell(16).SetCellValue(item.Sales.Where(i => i.Name == "Лейди Хармония").Sum(b => b.Count));
-                    row.CreateCell(17).SetCellValue(item.Sales.Where(i => i.Name == "ДиабеФор Глюко").Sum(b => b.Count));
-                    row.CreateCell(18).SetCellValue(item.Sales.Where(i => i.Name == "ДиабеФор Протект").Sum(b => b.Count));
-                    row.CreateCell(19).SetCellValue(item.Sales.Where(i => i.Name == "ЗинСеД").Sum(b => b.Count));
-
-                    row.CreateCell(20).SetCellValue(item.Region);
-
-                    counter++;
-                  
+                    
                 }
  
                 workbook.Write(fs);
@@ -203,7 +227,6 @@
         {
             return View();
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

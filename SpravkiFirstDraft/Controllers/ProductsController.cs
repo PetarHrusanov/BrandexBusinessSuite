@@ -1,31 +1,44 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using SpravkiFirstDraft.Data;
-using SpravkiFirstDraft.Data.Models;
-
-namespace SpravkiFirstDraft.Controllers
+﻿namespace SpravkiFirstDraft.Controllers
 {
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using NPOI.HSSF.UserModel;
+    using NPOI.SS.UserModel;
+    using NPOI.XSSF.UserModel;
+    using SpravkiFirstDraft.Data;
+    using SpravkiFirstDraft.Data.Models;
+    using SpravkiFirstDraft.Models;
+    using SpravkiFirstDraft.Models.Products;
+    using SpravkiFirstDraft.Services;
+    using SpravkiFirstDraft.Services.Products;
+
     public class ProductsController :Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
+        // db Services
         private readonly SpravkiDbContext context;
+        private readonly IProductsService productsService;
 
-        public ProductsController(IWebHostEnvironment hostEnvironment, SpravkiDbContext context)
+        private readonly INumbersChecker numbersChecker;
+
+
+        public ProductsController(IWebHostEnvironment hostEnvironment,
+            SpravkiDbContext context,
+            IProductsService productsService,
+            INumbersChecker numbersChecker)
 
         {
 
             this.hostEnvironment = hostEnvironment;
             this.context = context;
-
+            this.productsService = productsService;
+            this.numbersChecker = numbersChecker;
         }
 
         public IActionResult Index()
@@ -33,7 +46,7 @@ namespace SpravkiFirstDraft.Controllers
             return View();
         }
 
-        public ActionResult Import()
+        public async System.Threading.Tasks.Task<ActionResult> ImportAsync()
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -44,7 +57,7 @@ namespace SpravkiFirstDraft.Controllers
 
             string newPath = Path.Combine(webRootPath, folderName);
 
-            StringBuilder sb = new StringBuilder();
+            var errorDictionary = new Dictionary<int, string>();
 
             if (!Directory.Exists(newPath))
 
@@ -96,21 +109,14 @@ namespace SpravkiFirstDraft.Controllers
 
                     int cellCount = headerRow.LastCellNum;
 
-                    sb.Append("<table class='table table-bordered'><tr>");
-
                     for (int j = 0; j < cellCount; j++)
                     {
                         ICell cell = headerRow.GetCell(j);
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
-                        sb.Append("<th>" + cell.ToString() + "</th>");
 
                     }
-
-                    sb.Append("</tr>");
-
-                    sb.AppendLine("<tr>");
 
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
@@ -122,92 +128,161 @@ namespace SpravkiFirstDraft.Controllers
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        Product newProduct = new Product();
+                        var newProduct = new ProductInputModel();
 
                         for (int j = row.FirstCellNum; j < cellCount; j++)
 
                         {
-                            string currentRow = "";
+                            string currentRow = string.Empty;
 
                             if (row.GetCell(j) != null)
                             {
-                                sb.Append("<td>" + row.GetCell(j).ToString() + "</td>");
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
                             }
 
-                            if (j == 0)
+                            switch (j)
                             {
-                                newProduct.Name = currentRow;
+                                case 0:
+                                    if(currentRow!= "")
+                                    {
+                                        newProduct.Name = currentRow;
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+             
+                                    break;
+
+                                case 1:
+                                    if (currentRow != "")
+                                    {
+                                        newProduct.ShortName = currentRow;
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
+
+                                case 2:
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
+                                    {
+                                        newProduct.BrandexId = int.Parse(currentRow);
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
+
+                                case 3:
+                                    if (currentRow != "")
+                                    {
+                                        newProduct.PhoenixId = int.Parse(currentRow);
+                                    }
+                                    break;
+
+                                case 4:
+                                    if (currentRow != "")
+                                    {
+                                        newProduct.PharmnetId = int.Parse(currentRow);
+                                    }
+                                    break;
+
+                                case 5:
+                                    if (currentRow != "")
+                                    {
+                                        newProduct.StingId = int.Parse(currentRow);
+                                    }
+                                    break;
+
+                                case 6:
+                                    if (currentRow != "")
+                                    {
+                                        newProduct.SopharmaId = currentRow;
+                                    }
+                                    break;
+
+                                case 7:
+                                    if (numbersChecker.NegativeNumberIncludedCheck(currentRow))
+                                    {
+                                        newProduct.Price = double.Parse(currentRow);
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
                             }
-
-                            if (j == 1)
-                            {
-                                newProduct.ShortName = currentRow;
-                            }
-
-                            if (j == 2)
-                            {
-                                newProduct.BrandexId = int.Parse(currentRow);
-                            }
-
-                            if (j == 3)
-                            {
-                                if (currentRow != "")
-                                {
-                                    newProduct.PhoenixId = int.Parse(currentRow);
-                                }
-                            }
-
-                            if (j == 4)
-                            {
-                                if (currentRow != "")
-                                {
-                                    newProduct.PharmnetId = int.Parse(currentRow);
-                                }
-
-                                    
-                            }
-
-                            if (j == 5)
-                            {
-                                if (currentRow != "")
-                                {
-                                    newProduct.StingId = int.Parse(currentRow);
-                                }
-                                 
-                            }
-
-                            if (j == 6)
-                            {
-                                if (currentRow != "")
-                                {
-                                    newProduct.SopharmaId = currentRow;
-                                }
-                            }
-
-                            if (j == 7)
-                            {
-                                newProduct.Price = double.Parse(currentRow);
-                            }
-
 
                         }
 
-                        context.Products.Add(newProduct);
-                        context.SaveChanges();
-
-                        sb.AppendLine("</tr>");
+                        await this.productsService.CreateProduct(newProduct);
 
                     }
-
-                    sb.Append("</table>");
-
+                    
                 }
 
             }
 
-            return this.Content(sb.ToString());
+            var productsErrorModel = new CustomErrorDictionaryOutputModel
+            {
+                Errors = errorDictionary
+            };
 
+            return this.View(productsErrorModel);
+
+        }
+
+        public async Task<ActionResult> Upload(string productName,
+            string productShortName,
+            double productPrice,
+            int brandexId,
+            int? pharmnetId,
+            int? phoenixId,
+            string sopharmaId,
+            int? stingId)
+        {
+            if (productName != null &&
+                productShortName != null &&
+                productPrice != 0 &&
+                brandexId != 0)
+            {
+                var newProduct = new ProductInputModel
+                {
+                    Name = productName,
+                    ShortName = productShortName,
+                    Price = productPrice,
+                    BrandexId = brandexId,
+                    PharmnetId = pharmnetId,
+                    PhoenixId = phoenixId,
+                    SopharmaId = sopharmaId,
+                    StingId = stingId
+                };
+
+                if(await this.productsService.CreateProduct(newProduct)!= "")
+                {
+                    var outputProduct = new ProductOutputModel
+                    {
+                        Name = productName,
+                        ShortName = productShortName,
+                        Price = productPrice,
+                        BrandexId = brandexId
+                    };
+
+                    return this.View(outputProduct);
+                }
+                else
+                {
+                    return Redirect("Index");
+                }
+            }
+
+            else
+            {
+                return Redirect("Index");
+            }
         }
     }
 }
