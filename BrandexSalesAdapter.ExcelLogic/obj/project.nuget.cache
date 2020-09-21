@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "LBF/rZz4HtBe0pzVX8O67vBpO/rby7j5tXJtHTVK6usztWe2u26DRnf3TD0JqdSgJwmCqxa9PjO2+CF6DoI5nA==",
+  "dgSpecHash": "amJfaWHu4iBkNSt/HQnJ4EXasyQbiZ2JDzdtMYWk7/9NPJPTZg9E+TqmGQGP6et4s9ZwRv6bvsfOEk2NFRoXFA==",
   "success": true,
-  "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic.csproj",
+  "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/BrandexSalesAdapter.ExcelLogic.csproj",
   "expectedPackageFiles": [
     "/Users/Petar/.nuget/packages/dotnetcore.npoi/1.2.2/dotnetcore.npoi.1.2.2.nupkg.sha512",
     "/Users/Petar/.nuget/packages/dotnetcore.npoi.core/1.2.2/dotnetcore.npoi.core.1.2.2.nupkg.sha512",

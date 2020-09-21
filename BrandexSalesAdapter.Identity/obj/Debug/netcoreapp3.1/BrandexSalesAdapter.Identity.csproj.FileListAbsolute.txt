@@ -16,3 +16,4 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/netcoreapp3.1/BrandexSalesAdapter.Identity.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/netcoreapp3.1/BrandexSalesAdapter.Identity.pdb
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/netcoreapp3.1/BrandexSalesAdapter.Identity.genruntimeconfig.cache
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/netcoreapp3.1/BrandexSalesAdapter.Identity.csprojAssemblyReference.cache
