@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'BrandexSalesAdapter.ExcelLogic' " />
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Data\Models\" />
+    <Folder Include="Data\Enums\" />
+    <Folder Include="Data\Confirugations\" />
+    <Folder Include="Data\Migrations\" />
+    <Folder Include="wwwroot\UploadExcel\" />
+    <Folder Include="Views\PharmacyDetails\" />
+    <Folder Include="Views\Cities\" />
+    <Folder Include="Views\PharmacyChains\" />
+    <Folder Include="Views\Companies\" />
+    <Folder Include="Views\Products\" />
+    <Folder Include="Views\Phoenix\" />
+    <Folder Include="Models\Phoenix\" />
+    <Folder Include="Views\Sopharma\" />
+    <Folder Include="Models\Sopharma\" />
+    <Folder Include="Models\Distributor\" />
+    <Folder Include="Views\Distributors\" />
+    <Folder Include="Views\Pharmnet\" />
+    <Folder Include="Models\Pharmnet\" />
+    <Folder Include="Models\Sting\" />
+    <Folder Include="Views\Sting\" />
+    <Folder Include="Models\Pharmacies\" />
+    <Folder Include="Models\Sales\" />
+    <Folder Include="Models\Brandex\" />
+    <Folder Include="Models\Common\" />
+    <Folder Include="Models\Enums\" />
+    <Folder Include="Infrastructure\" />
+    <Folder Include="Services\" />
+    <Folder Include="Services\Sales\" />
+    <Folder Include="Services\Products\" />
+    <Folder Include="Views\Brandex\" />
+    <Folder Include="Services\Pharmacies\" />
+    <Folder Include="Common\" />
+    <Folder Include="Services\Distributor\" />
+    <Folder Include="Services\Cities\" />
+    <Folder Include="Models\Cities\" />
+    <Folder Include="Services\Companies\" />
+    <Folder Include="Models\Companies\" />
+    <Folder Include="Models\PharmacyChains\" />
+    <Folder Include="Services\PharmacyChains\" />
+    <Folder Include="Services\Regions\" />
+    <Folder Include="Models\Regions\" />
+    <Folder Include="Views\Region\" />
+    <Folder Include="Models\Products\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.7">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.7">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="DotNetCore.NPOI" Version="1.2.2" />
+  </ItemGroup>
+</Project>

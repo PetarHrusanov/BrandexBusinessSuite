@@ -1,0 +1,109 @@
+﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="{2F4DB71A-D889-4470-83B2-091163C0D3BD}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="SpravkiFirstDraft/Controllers/BrandexController.cs">
+    <Files>
+      <File FileName="SpravkiFirstDraft/Models/Companies/CompanyInputModel.cs" Line="1" Column="1" IsPinned="True" />
+      <File FileName="SpravkiFirstDraft/Controllers/PharmnetController.cs" IsPinned="True" />
+      <File FileName="SpravkiFirstDraft/Views/Sting/Index.cshtml" IsPinned="True" />
+      <File FileName="SpravkiFirstDraft/Models/Sales/SaleOutputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Models/Cities/CityInputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Views/Companies/Index.cshtml" />
+      <File FileName="SpravkiFirstDraft/Controllers/CompaniesController.cs" />
+      <File FileName="SpravkiFirstDraft/Views/Companies/Import.cshtml" />
+      <File FileName="SpravkiFirstDraft/Models/Companies/CompanyOutputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Companies/CompaniesService.cs" />
+      <File FileName="SpravkiFirstDraft/Views/Companies/Upload.cshtml" />
+      <File FileName="SpravkiFirstDraft/Views/Cities/Index.cshtml" />
+      <File FileName="SpravkiFirstDraft/Controllers/DistributorsController.cs" />
+      <File FileName="SpravkiFirstDraft/Controllers/PharmacyChainsController.cs" />
+      <File FileName="SpravkiFirstDraft/Controllers/HomeController.cs" />
+      <File FileName="SpravkiFirstDraft/Models/PharmacyChains/PharmacyChainsInputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Services/PharmacyChains/IPharmacyChainsService.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Pharmacies/IPharmaciesService.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Cities/ICitiesService.cs" />
+      <File FileName="SpravkiFirstDraft/Services/PharmacyChains/PharmacyChainsService.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Cities/CitiesService.cs" />
+      <File FileName="SpravkiFirstDraft/Startup.cs" />
+      <File FileName="SpravkiFirstDraft/Controllers/CitiesController.cs" />
+      <File FileName="SpravkiFirstDraft/Views/PharmacyChains/Index.cshtml" />
+      <File FileName="SpravkiFirstDraft/Views/PharmacyChains/Import.cshtml" />
+      <File FileName="SpravkiFirstDraft/Views/PharmacyChains/Upload.cshtml" />
+      <File FileName="SpravkiFirstDraft/Models/PharmacyChains/PharmacyChainOutputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Controllers/PharmacyDetailsController.cs" />
+      <File FileName="SpravkiFirstDraft/Views/PharmacyDetails/Index.cshtml" />
+      <File FileName="SpravkiFirstDraft/Models/Pharmacies/PharmacyExcelModel.cs" />
+      <File FileName="SpravkiFirstDraft/Models/Pharmacies/PharmacyInputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Data/Models/Pharmacy.cs" />
+      <File FileName="SpravkiFirstDraft/Controllers/BrandexController.cs" Line="13" Column="31" />
+      <File FileName="SpravkiFirstDraft/Controllers/ProductsController.cs" />
+      <File FileName="SpravkiFirstDraft/Controllers/SopharmaController.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Products/ProductsService.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Products/IProductsService.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Pharmacies/PharmaciesService.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Companies/ICompaniesService.cs" />
+      <File FileName="SpravkiFirstDraft/Controllers/PhoenixController.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Regions/IRegionsService.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Regions/RegionsService.cs" />
+      <File FileName="SpravkiFirstDraft/Views/PharmacyDetails/Import.cshtml" />
+      <File FileName="SpravkiFirstDraft/Program.cs" />
+      <File FileName="SpravkiFirstDraft/Data/Models/City.cs" />
+      <File FileName="SpravkiFirstDraft/Data/Models/Company.cs" />
+      <File FileName="SpravkiFirstDraft/Data/Enums/PharmacyClass.cs" />
+      <File FileName="SpravkiFirstDraft/Views/PharmacyDetails/Upload.cshtml" />
+      <File FileName="SpravkiFirstDraft/Models/Pharmacies/PharmacyOutputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Controllers/RegionController.cs" />
+      <File FileName="SpravkiFirstDraft/Models/Regions/RegionInputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Models/Regions/RegionOutputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Views/Region/Index.cshtml" />
+      <File FileName="SpravkiFirstDraft/Views/Region/Import.cshtml" />
+      <File FileName="SpravkiFirstDraft/Views/Region/Upload.cshtml" />
+      <File FileName="SpravkiFirstDraft/Views/Shared/_Layout.cshtml" />
+      <File FileName="SpravkiFirstDraft/Models/Sales/SaleExcelOutputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Views/Products/Index.cshtml" />
+      <File FileName="SpravkiFirstDraft/Views/Cities/Upload.cshtml" />
+      <File FileName="SpravkiFirstDraft/Views/Products/Import.cshtml" />
+      <File FileName="SpravkiFirstDraft/Views/Products/Upload.cshtml" />
+      <File FileName="SpravkiFirstDraft/Models/Products/ProductInputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Data/Models/Product.cs" />
+      <File FileName="SpravkiFirstDraft/Models/Products/ProductOutputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Models/Products/ProductShortOutputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Sales/ISalesService.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Sales/SalesService.cs" />
+      <File FileName="SpravkiFirstDraft/Controllers/StingController.cs" />
+      <File FileName="SpravkiFirstDraft/Services/Distributor/DistributorService.cs" />
+      <File FileName="SpravkiFirstDraft/Models/Sales/SaleFiltersExcelInputModel.cs" />
+      <File FileName="SpravkiFirstDraft/Models/Enums/RegionInput.cs" />
+      <File FileName="SpravkiFirstDraft/Views/Home/Index.cshtml" />
+      <File FileName="SpravkiFirstDraft/Services/INumbersChecker.cs" />
+      <File FileName="SpravkiFirstDraft/Services/NumbersChecker.cs" />
+      <File FileName="SpravkiFirstDraft/Common/DataConstants.cs" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="ExcelSpravkiFirstDraft" expanded="True" selected="True">
+            <Node name="SpravkiFirstDraft" expanded="True">
+              <Node name="Common" expanded="True" />
+              <Node name="Controllers" expanded="True" />
+              <Node name="Models" expanded="True" />
+              <Node name="Services" expanded="True">
+                <Node name="Pharmacies" expanded="True" />
+                <Node name="Sales" expanded="True" />
+              </Node>
+              <Node name="Views" expanded="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.SpravkiFirstDraft PreferredExecutionTarget="/Applications/Safari.app" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>

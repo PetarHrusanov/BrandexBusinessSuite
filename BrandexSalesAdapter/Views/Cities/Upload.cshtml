@@ -1,0 +1,18 @@
+﻿@model BrandexSalesAdapter.ExcelLogic.Models.Cities.CityOutputModel
+@{ ViewData["Title"] = "Details"; }
+<h1>Uploaded City</h1>
+<div>
+    <hr />
+    <h2>Details</h2>
+    <dl class="row">
+        <dt class="col-sm-2">
+            City Name
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Name
+        </dd>
+    </dl>
+    <div>
+        <a asp-action="Index">Index</a>
+    </div>
+</div>
