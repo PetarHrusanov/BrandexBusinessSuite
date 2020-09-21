@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SpravkiFirstDraft.Services.Regions
 {
@@ -10,5 +12,7 @@ namespace SpravkiFirstDraft.Services.Regions
         Task<bool> CheckRegionByName(string regionName);
 
         Task<int> IdByName(string regionName);
+
+        Task<List<SelectListItem>> RegionsForSelect();
     }
 }

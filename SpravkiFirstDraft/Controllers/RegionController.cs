@@ -1,6 +1,5 @@
 ﻿namespace SpravkiFirstDraft.Controllers
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
@@ -10,7 +9,6 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
     using SpravkiFirstDraft.Models;
     using SpravkiFirstDraft.Models.Regions;
     using SpravkiFirstDraft.Services.Regions;
@@ -20,16 +18,14 @@
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly SpravkiDbContext context;
         private readonly IRegionsService regionService;
 
-        public RegionController(IWebHostEnvironment hostEnvironment,
-            SpravkiDbContext context,
+        public RegionController(
+            IWebHostEnvironment hostEnvironment,
             IRegionsService regionService)
 
         {
             this.hostEnvironment = hostEnvironment;
-            this.context = context;
             this.regionService = regionService;
         }
 
@@ -125,19 +121,12 @@
                             if (row.GetCell(j) != null)
                             {
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
+                                await this.regionService.UploadRegion(currentRow);
                             }
-
-                            if (j == 0)
+                            else
                             {
-                                if (currentRow != "")
-                                {
-                                    await this.regionService.UploadRegion(currentRow);
-                                }
-                                else
-                                {
-                                    errorDictionary[i] = currentRow;
-                                }
-
+                                errorDictionary[i] = currentRow;
+                                continue;
                             }
 
                         }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SpravkiFirstDraft.Data;
 using SpravkiFirstDraft.Data.Models;
@@ -46,6 +48,16 @@ namespace SpravkiFirstDraft.Services.Regions
             {
                 return "";
             }
+        }
+
+        public async Task<List<SelectListItem>> RegionsForSelect()
+        {
+            return await this.db.Regions.Select(a =>
+                                  new SelectListItem
+                                  {
+                                      Value = a.Id.ToString(),
+                                      Text = a.Name
+                                  }).ToListAsync();
         }
     }
 }

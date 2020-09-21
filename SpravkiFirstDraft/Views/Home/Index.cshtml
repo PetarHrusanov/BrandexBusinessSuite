@@ -13,9 +13,9 @@
 <form asp-controller="Home" asp-action="ByCity">
     <h2>Generate By Region</h2>
     <p>
-        Region: <select name="authorId" asp-items="@Model.Options"></select>
-        Date: <input type="text" asp-for="Date" />
-        <input type="submit" value="Generate" />
+        Region: <select name="regionId" asp-items="@Model.Options"></select>
+        Date: <input type="text" name="date" />
+        <input type="submit" value="Export" />
     </p>
 </form>
 <hr />

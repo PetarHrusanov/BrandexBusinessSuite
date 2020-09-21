@@ -11,11 +11,8 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
-    using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models;
     using SpravkiFirstDraft.Models.PharmacyChains;
-    using SpravkiFirstDraft.Services.Companies;
     using SpravkiFirstDraft.Services.PharmacyChains;
 
     public class PharmacyChainsController : Controller
@@ -23,17 +20,15 @@
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly SpravkiDbContext context;
         private readonly IPharmacyChainsService pharmacyChainsService;
 
-        public PharmacyChainsController(IWebHostEnvironment hostEnvironment,
-            SpravkiDbContext context,
+        public PharmacyChainsController(
+            IWebHostEnvironment hostEnvironment,
             IPharmacyChainsService pharmacyChainsService)
 
         {
 
             this.hostEnvironment = hostEnvironment;
-            this.context = context;
             this.pharmacyChainsService = pharmacyChainsService;
 
         }
@@ -134,19 +129,13 @@
                             if (row.GetCell(j) != null)
                             {
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
+                                await this.pharmacyChainsService.UploadPharmacyChain(currentRow);
                             }
 
-                            if (j == 0)
+                            else
                             {
-                                if(await this.pharmacyChainsService.UploadPharmacyChain(currentRow) != null)
-                                {
-
-                                }
-                                else
-                                {
-                                    errorDictionary[i] = currentRow;
-                                }
-                                
+                                errorDictionary[i] = currentRow;
+                                continue;
                             }
 
                         }

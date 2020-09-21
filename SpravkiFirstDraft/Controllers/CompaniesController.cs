@@ -1,10 +1,8 @@
 ﻿namespace SpravkiFirstDraft.Controllers
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -12,9 +10,6 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
-    using SpravkiFirstDraft.Data.Enums;
-    using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models;
     using SpravkiFirstDraft.Models.Companies;
     using SpravkiFirstDraft.Services;
@@ -25,20 +20,18 @@
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly SpravkiDbContext context;
         private readonly ICompaniesService companiesService;
 
         private readonly INumbersChecker numbersChecker;
 
-        public CompaniesController(IWebHostEnvironment hostEnvironment,
-            SpravkiDbContext context,
+        public CompaniesController(
+            IWebHostEnvironment hostEnvironment,
             INumbersChecker numbersChecker,
             ICompaniesService companiesService)
 
         {
 
             this.hostEnvironment = hostEnvironment;
-            this.context = context;
             this.numbersChecker = numbersChecker;
             this.companiesService = companiesService;
 
@@ -154,6 +147,7 @@
                                         errorDictionary[i] = currentRow;
                                     }
                                     break;
+
                                 case 1:
                                     if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
