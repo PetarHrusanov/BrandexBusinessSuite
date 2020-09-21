@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -12,11 +11,7 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
-    using SpravkiFirstDraft.Data.Models;
-    using SpravkiFirstDraft.Models.Pharmnet;
     using SpravkiFirstDraft.Models.Sales;
-    using SpravkiFirstDraft.Models.Sopharma;
     using SpravkiFirstDraft.Models.Sting;
     using SpravkiFirstDraft.Services;
     using SpravkiFirstDraft.Services.Pharmacies;
@@ -29,7 +24,6 @@
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly SpravkiDbContext context;
         private readonly ISalesService salesService;
         private readonly IProductsService productsService;
         private readonly IPharmaciesService pharmaciesService;
@@ -37,8 +31,8 @@
         // universal Services
         private readonly INumbersChecker numbersChecker;
 
-        public StingController(IWebHostEnvironment hostEnvironment,
-            SpravkiDbContext context,
+        public StingController(
+            IWebHostEnvironment hostEnvironment,
             ISalesService salesService,
             INumbersChecker numbersChecker,
             IProductsService productsService,
@@ -48,7 +42,6 @@
         {
 
             this.hostEnvironment = hostEnvironment;
-            this.context = context;
             this.salesService = salesService;
             this.numbersChecker = numbersChecker;
             this.productsService = productsService;
@@ -148,6 +141,7 @@
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
                         var newSale = new SaleInputModel();
+
                         newSale.Date = dateForDb;
 
 
@@ -162,23 +156,26 @@
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
                             }
 
+                            else
+                            {
+                                errorDictionary[i] = currentRow;
+                                continue;
+                            }
+
                             switch (j)
                             {
                                 case 0:
-
                                     var currRowDate = DateTime.ParseExact(currentRow, "yyyy-MM", null);
-                                    if (currentRow != null)
-                                    {
-                                        newSale.Date = currRowDate;
-                                    }
+                                    newSale.Date = currRowDate;
                                     break;
 
                                 case 1:
                                     if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        if(await this.productsService.CheckProductByDistributor(currentRow, Sting))
+                                        var producId = await this.productsService.ProductIdByDistributor(currentRow, Sting);
+                                        if (producId!=0)
                                         {
-                                            var producId = await this.productsService.ProductIdByDistributor(currentRow, Sting);
+                                            //var producId = await this.productsService.ProductIdByDistributor(currentRow, Sting);
                                             newSale.ProductId = producId;
                                         }
                                         else
@@ -195,9 +192,11 @@
                                 case 6:
                                     if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        if(await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, Sting))
+                                        var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Sting);
+
+                                        if (pharmacyId!=0)
                                         {
-                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Sting);
+                                            //var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Sting);
                                             newSale.PharmacyId = pharmacyId;
                                         }
                                         else
@@ -222,14 +221,11 @@
                                         errorDictionary[i] = currentRow;
                                     }
                                     break;
-
                             }
-
 
                         }
 
                         await salesService.CreateSale(newSale, Sting);
-
 
                     }
 
@@ -258,6 +254,7 @@
                     Date = date,
                     DistributorName = Sting
                 };
+
                 return this.View(saleOutputModel);
 
             }

@@ -1,12 +1,14 @@
 ﻿namespace SpravkiFirstDraft.Services.Pharmacies
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using SpravkiFirstDraft.Data;
     using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models.Pharmacies;
+    using SpravkiFirstDraft.Models.Sales;
     using static Common.DataConstants.Ditributors;
 
     public class PharmaciesService :IPharmaciesService
@@ -115,6 +117,57 @@
                 default:
                     return "";
             };
+        }
+
+        public async Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime date, int? regionId)
+        {
+            if (date != null && regionId!=null)
+            {
+                //int filterRegionId = (int)regionId;
+                //var currRowDate = DateTime.ParseExact(date, "MM/yyyy", null);
+
+                return await db.Pharmacies
+                    .Where(p => p.RegionId == regionId)
+                    .Select(p => new PharmacyExcelModel
+                {
+                    Name = p.Name,
+                    Address = p.Address,
+                    PharmacyClass = p.PharmacyClass,
+                    Region = p.Region.Name,
+                    Sales = p.Sales
+                            .Where(d => d.Date.Month == date.Month && d.Date.Year == date.Year)
+                            .Select(s => new SaleExcelOutputModel
+                            {
+                                Name = s.Product.Name,
+                                ProductId = s.ProductId,
+                                Count = s.Count,
+                                Date = date
+                            }).ToList()
+                }).ToListAsync();
+            }
+
+            else
+            {
+                //var currRowDate = DateTime.ParseExact(date, "MM/yyyy", null);
+
+                return await db.Pharmacies.Select(p => new PharmacyExcelModel
+                {
+                    Name = p.Name,
+                    Address = p.Address,
+                    PharmacyClass = p.PharmacyClass,
+                    Region = p.Region.Name,
+                    Sales = p.Sales
+                            .Where(d => d.Date.Month == date.Month && d.Date.Year == date.Year)
+                            .Select(s => new SaleExcelOutputModel
+                            {
+                                Name = s.Product.Name,
+                                ProductId = s.ProductId,
+                                Count = s.Count,
+                                Date = date
+                            }).ToList()
+                }).ToListAsync();
+            }
+            
         }
     }
 }

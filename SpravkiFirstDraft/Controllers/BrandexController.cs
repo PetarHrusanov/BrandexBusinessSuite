@@ -4,8 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
-    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -13,8 +11,6 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
-    using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models.Brandex;
     using SpravkiFirstDraft.Models.Sales;
     using SpravkiFirstDraft.Services;
@@ -29,7 +25,6 @@
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly SpravkiDbContext context;
         private readonly ISalesService salesService;
         private readonly IProductsService productsService;
         private readonly IPharmaciesService pharmaciesService;
@@ -38,8 +33,8 @@
         // universal Services
         private readonly INumbersChecker numbersChecker;
 
-        public BrandexController(IWebHostEnvironment hostEnvironment,
-            SpravkiDbContext context,
+        public BrandexController(
+            IWebHostEnvironment hostEnvironment,
             ISalesService salesService,
             INumbersChecker numbersChecker,
             IProductsService productsService,
@@ -50,7 +45,6 @@
         {
 
             this.hostEnvironment = hostEnvironment;
-            this.context = context;
             this.salesService = salesService;
             this.numbersChecker = numbersChecker;
             this.productsService = productsService;
@@ -82,9 +76,7 @@
             if (!Directory.Exists(newPath))
 
             {
-
                 Directory.CreateDirectory(newPath);
-
             }
 
             if (file.Length > 0)
@@ -172,12 +164,14 @@
                                         newSale.Date = currRowDate;
                                     }
                                     break;
+
                                 case 3:
                                     if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        if (await this.productsService.CheckProductByDistributor(currentRow, Brandex))
-                                        {
-                                            var producId = await this.productsService.ProductIdByDistributor(currentRow, Brandex);
+                                        var producId = await this.productsService.ProductIdByDistributor(currentRow, Brandex);
+
+                                        if (producId!=0)
+                                        {   
                                             newSale.ProductId = producId;
                                         }
                                         else
@@ -190,20 +184,14 @@
                                         errorDictionary[i] = currentRow;
                                     }
                                     break;
-                                case 4:
-                                    // da napravq proverka
-                                    int countProduct = int.Parse(currentRow);
-                                    newSale.Count = countProduct;
-                                    break;
-                                case 5:
-                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
-                                    {
-                                        int rowPharmacytId = int.Parse(currentRow);
 
-                                        if (await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, Brandex))
+                                case 4:
+                                    if (currentRow != "")
+                                    {
+                                        if (this.numbersChecker.WholeNumberCheck(currentRow))
                                         {
-                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Brandex);
-                                            newSale.PharmacyId = pharmacyId;
+                                            int countProduct = int.Parse(currentRow);
+                                            newSale.Count = countProduct;
                                         }
                                         else
                                         {
@@ -216,8 +204,30 @@
                                     }
                                     break;
 
-                            }
+                                case 5:
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
+                                    {
+                                        int rowPharmacytId = int.Parse(currentRow);
 
+                                        var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Brandex);
+
+                                        if (await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, Brandex))
+                                        {
+                                            newSale.PharmacyId = pharmacyId;
+                                        }
+
+                                        else
+                                        {
+                                            errorDictionary[i] = currentRow;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
+
+                            }
 
                         }
 

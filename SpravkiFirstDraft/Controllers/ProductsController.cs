@@ -10,8 +10,6 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
-    using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models;
     using SpravkiFirstDraft.Models.Products;
     using SpravkiFirstDraft.Services;
@@ -22,21 +20,19 @@
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly SpravkiDbContext context;
         private readonly IProductsService productsService;
 
         private readonly INumbersChecker numbersChecker;
 
 
-        public ProductsController(IWebHostEnvironment hostEnvironment,
-            SpravkiDbContext context,
+        public ProductsController(
+            IWebHostEnvironment hostEnvironment,
             IProductsService productsService,
             INumbersChecker numbersChecker)
 
         {
 
             this.hostEnvironment = hostEnvironment;
-            this.context = context;
             this.productsService = productsService;
             this.numbersChecker = numbersChecker;
         }

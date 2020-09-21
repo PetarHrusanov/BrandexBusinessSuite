@@ -1,10 +1,8 @@
 ﻿namespace SpravkiFirstDraft.Controllers
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -12,8 +10,6 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
-    using SpravkiFirstDraft.Data.Enums;
     using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models;
     using SpravkiFirstDraft.Models.Cities;
@@ -24,16 +20,14 @@
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly SpravkiDbContext context;
         private readonly ICitiesService citiesService;
 
-        public CitiesController(IWebHostEnvironment hostEnvironment,
-            SpravkiDbContext context,
+        public CitiesController(
+            IWebHostEnvironment hostEnvironment,
             ICitiesService citiesService)
 
         {
             this.hostEnvironment = hostEnvironment;
-            this.context = context;
             this.citiesService = citiesService;
         }
 
@@ -134,19 +128,13 @@
                             if (row.GetCell(j) != null)
                             {
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
+                                await this.citiesService.UploadCity(currentRow);
                             }
 
-                            if (j == 0)
+                            else
                             {
-                                if (currentRow != "")
-                                {
-                                    await this.citiesService.UploadCity(currentRow);
-                                }
-                                else
-                                {
-                                    errorDictionary[i] = currentRow;
-                                }
-
+                                errorDictionary[i] = currentRow;
+                                continue;
                             }
 
                         }

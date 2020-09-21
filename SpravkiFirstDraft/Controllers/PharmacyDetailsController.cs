@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -12,9 +11,7 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
     using SpravkiFirstDraft.Data.Enums;
-    using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models;
     using SpravkiFirstDraft.Models.Pharmacies;
     using SpravkiFirstDraft.Services;
@@ -29,7 +26,6 @@
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly SpravkiDbContext context;
         private readonly IPharmaciesService pharmaciesService;
         private readonly ICompaniesService companiesService;
         private readonly IRegionsService regionsService;
@@ -39,8 +35,8 @@
         // universal Services
         private readonly INumbersChecker numbersChecker;
 
-        public PharmacyDetailsController(IWebHostEnvironment hostEnvironment,
-            SpravkiDbContext context,
+        public PharmacyDetailsController(
+            IWebHostEnvironment hostEnvironment,
             INumbersChecker numbersChecker,
             IPharmaciesService pharmaciesService,
             ICompaniesService companiesService,
@@ -51,7 +47,6 @@
         {
 
             this.hostEnvironment = hostEnvironment;
-            this.context = context;
             this.numbersChecker = numbersChecker;
             this.pharmaciesService = pharmaciesService;
             this.companiesService = companiesService;
@@ -187,9 +182,10 @@
                                     break;
 
                                 case 4:
-                                    if (await companiesService.CheckCompanyByName(currentRow))
+                                    int companyId = await this.companiesService.IdByName(currentRow);
+                                    if (companyId!=0)
                                     {
-                                        int companyId = await this.companiesService.IdByName(currentRow);
+                                        //int companyId = await this.companiesService.IdByName(currentRow);
                                         newPharmacy.CompanyId = companyId;
                                     }
                                     else
@@ -203,9 +199,10 @@
                                     break;
 
                                 case 6:
-                                    if(await this.pharmacyChainsService.CheckPharmacyChainByName(currentRow))
+                                    int chainId = await this.pharmacyChainsService.IdByName(currentRow);
+                                    if (chainId!=0)
                                     {
-                                        int chainId = await this.pharmacyChainsService.IdByName(currentRow);
+                                        //int chainId = await this.pharmacyChainsService.IdByName(currentRow);
                                         newPharmacy.PharmacyChainId = chainId;
                                     }
                                     else
@@ -219,9 +216,11 @@
                                     break;
 
                                 case 9:
-                                    if (await regionsService.CheckRegionByName(currentRow))
+                                    int regionId = await this.regionsService.IdByName(currentRow);
+
+                                    if (regionId!=0)
                                     {
-                                        int regionId = await this.regionsService.IdByName(currentRow);
+                                        //int regionId = await this.regionsService.IdByName(currentRow);
                                         newPharmacy.RegionId = regionId;
                                     }
                                     else
@@ -275,9 +274,10 @@
                                     break;
 
                                 case 21:
-                                    if (await this.citiesService.CheckCityName(currentRow))
+                                    int cityId = await this.citiesService.IdByName(currentRow);
+                                    if (cityId!=0)
                                     {
-                                        int cityId = await this.citiesService.IdByName(currentRow);
+                                        //int cityId = await this.citiesService.IdByName(currentRow);
                                         newPharmacy.CityId = cityId;
                                     }
                                     else

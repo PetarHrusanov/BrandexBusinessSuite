@@ -4,8 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
-    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -13,9 +11,6 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using SpravkiFirstDraft.Data;
-    using SpravkiFirstDraft.Data.Enums;
-    using SpravkiFirstDraft.Data.Models;
     using SpravkiFirstDraft.Models.Phoenix;
     using SpravkiFirstDraft.Models.Sales;
     using SpravkiFirstDraft.Services;
@@ -29,7 +24,6 @@
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly SpravkiDbContext context;
         private readonly ISalesService salesService;
         private readonly IProductsService productsService;
         private readonly IPharmaciesService pharmaciesService;
@@ -37,8 +31,8 @@
         // universal Services
         private readonly INumbersChecker numbersChecker;
 
-        public PhoenixController(IWebHostEnvironment hostEnvironment,
-            SpravkiDbContext context,
+        public PhoenixController(
+            IWebHostEnvironment hostEnvironment,
             ISalesService salesService,
             INumbersChecker numbersChecker,
             IProductsService productsService,
@@ -48,7 +42,6 @@
         {
 
             this.hostEnvironment = hostEnvironment;
-            this.context = context;
             this.salesService = salesService;
             this.numbersChecker = numbersChecker;
             this.productsService = productsService;
@@ -155,9 +148,11 @@
                                 case 0:
                                     if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        if(await this.productsService.CheckProductByDistributor(currentRow, Phoenix))
+                                        var productId = await this.productsService.ProductIdByDistributor(currentRow, Phoenix);
+
+                                        if (productId!=0)
                                         {
-                                            var productId = await this.productsService.ProductIdByDistributor(currentRow, Phoenix);
+                                            //var productId = await this.productsService.ProductIdByDistributor(currentRow, Phoenix);
                                             newSale.ProductId = productId;
                                         }
                                         else
@@ -174,9 +169,10 @@
                                 case 2:
                                     if (this.numbersChecker.WholeNumberCheck(currentRow))
                                     {
-                                        if(await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, Phoenix))
+                                        var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Phoenix);
+                                        if (pharmacyId!=0)
                                         {
-                                            var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Phoenix);
+                                            //var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Phoenix);
                                             newSale.PharmacyId = pharmacyId;
                                         }
                                         else
