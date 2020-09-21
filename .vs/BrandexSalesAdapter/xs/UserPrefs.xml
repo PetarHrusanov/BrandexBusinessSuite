@@ -1,66 +1,10 @@
 ﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="{2F4DB71A-D889-4470-83B2-091163C0D3BD}|Default">
   <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.ExcelLogic PreferredExecutionTarget="/Applications/Safari.app" />
   <MonoDevelop.Ide.Workbench>
-    <Files>
-      <File FileName="BrandexSalesAdapter/Views/Sopharma/Index.cshtml" Line="1" Column="38" />
-      <File FileName="BrandexSalesAdapter/Views/Sting/Import.cshtml" />
-      <File FileName="BrandexSalesAdapter/Views/Sting/Index.cshtml" />
-      <File FileName="BrandexSalesAdapter/Views/Sting/Upload.cshtml" />
-      <File FileName="BrandexSalesAdapter/Views/Sopharma/Import.cshtml" />
-      <File FileName="BrandexSalesAdapter/Views/Sopharma/Upload.cshtml" />
-      <File FileName="BrandexSalesAdapter/Startup.cs" />
-      <File FileName="BrandexSalesAdapter/appsettings.Development.json" />
-      <File FileName="BrandexSalesAdapter/appsettings.json" />
-      <File FileName="BrandexSalesAdapter/Controllers/CompaniesController.cs" />
-      <File FileName="BrandexSalesAdapter/Services/Companies/ICompaniesService.cs" />
-      <File FileName="BrandexSalesAdapter/Services/Companies/CompaniesService.cs" />
-      <File FileName="BrandexSalesAdapter/Data/Models/Company.cs" />
-      <File FileName="BrandexSalesAdapter/Views/Region/Upload.cshtml" />
-      <File FileName="BrandexSalesAdapter/Views/Region/Import.cshtml" />
-      <File FileName="BrandexSalesAdapter/Views/Region/Index.cshtml" />
-      <File FileName="BrandexSalesAdapter/Controllers/RegionController.cs" />
-      <File FileName="BrandexSalesAdapter/Services/Regions/IRegionsService.cs" />
-      <File FileName="BrandexSalesAdapter/Services/Regions/RegionsService.cs" />
-      <File FileName="BrandexSalesAdapter/Controllers/CitiesController.cs" />
-      <File FileName="BrandexSalesAdapter/Program.cs" />
-      <File FileName="BrandexSalesAdapter/Controllers/BrandexController.cs" />
-      <File FileName="BrandexSalesAdapter/Common/DataConstants.cs" />
-      <File FileName="BrandexSalesAdapter/Data/Models/City.cs" />
-      <File FileName="BrandexSalesAdapter/Services/Products/IProductsService.cs" />
-      <File FileName="BrandexSalesAdapter/Services/Products/ProductsService.cs" />
-      <File FileName="BrandexSalesAdapter/Controllers/PharmacyChainsController.cs" />
-      <File FileName="BrandexSalesAdapter/Controllers/PharmacyDetailsController.cs" Line="313" Column="29" />
-    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
-          <Node name="BrandexSalesAdapter" expanded="True">
-            <Node name="BrandexSalesAdapter.ExcelLogic" expanded="True">
-              <Node name="Common" expanded="True" selected="True" />
-              <Node name="Controllers" expanded="True" />
-              <Node name="Data" expanded="True">
-                <Node name="Confirugations" expanded="True" />
-                <Node name="Enums" expanded="True" />
-                <Node name="Models" expanded="True" />
-              </Node>
-              <Node name="Models" expanded="True">
-                <Node name="Brandex" expanded="True" />
-                <Node name="Cities" expanded="True" />
-              </Node>
-              <Node name="Services" expanded="True">
-                <Node name="PharmacyChains" expanded="True" />
-                <Node name="Products" expanded="True" />
-                <Node name="Regions" expanded="True" />
-                <Node name="Sales" expanded="True" />
-              </Node>
-              <Node name="Views" expanded="True">
-                <Node name="Region" expanded="True" />
-                <Node name="Sopharma" expanded="True" />
-                <Node name="Sting" expanded="True" />
-              </Node>
-              <Node name="appsettings.json" expanded="True" />
-            </Node>
-          </Node>
+          <Node name="BrandexSalesAdapter" expanded="True" selected="True" />
         </State>
       </Pad>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -69,12 +13,14 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <DisabledProjects>
+    <String>BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic.csproj</String>
+  </DisabledProjects>
+  <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.Identity PreferredExecutionTarget="/Applications/Safari.app" />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter/Services/Regions/RegionsService.cs" relfile="BrandexSalesAdapter/Services/Regions/RegionsService.cs" line="34" column="1" />
-      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter/Controllers/RegionController.cs" relfile="BrandexSalesAdapter/Controllers/RegionController.cs" line="37" column="1" />
-    </BreakpointStore>
+    <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter/Services/Regions/RegionsService.cs" relfile="BrandexSalesAdapter/Services/Regions/RegionsService.cs" line="34" column="1" />
+    <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter/Controllers/RegionController.cs" relfile="BrandexSalesAdapter/Controllers/RegionController.cs" line="37" column="1" />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />
 </Properties>
