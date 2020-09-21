@@ -1,0 +1,30 @@
+﻿@model BrandexSalesAdapter.ExcelLogic.Models.Companies.CompanyOutputModel
+@{ ViewData["Title"] = "Details"; }
+<h1>Uploaded Company</h1>
+<div>
+    <hr />
+    <h2>Details</h2>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Company Name
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Name
+        </dd>
+        <dt class="col-sm-2">
+            VAT
+        </dt>
+        <dd class="col-sm-10">
+            @Model.VAT
+        </dd>
+        <dt class="col-sm-2">
+            Owner
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Owner
+        </dd>
+    </dl>
+    <div>
+        <a asp-action="Index">Index</a>
+    </div>
+</div>

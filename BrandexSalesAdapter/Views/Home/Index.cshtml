@@ -1,0 +1,21 @@
+﻿@model BrandexSalesAdapter.ExcelLogic.Models.Sales.SaleFiltersExcelInputModel 
+<h1>Welcome to the future :)</h1>
+<hr />
+<form asp-controller="Home" asp-action="Export">
+    <h2>Generate All</h2>
+    <div>
+        <input type="text" id="date" name="date" placeholder="Format MM/yyyy; Example: 07/2020" size="30"/>
+        <input type="submit" name="Export" value="Generate" id="btnExport"
+               class="btn btn-primary" asp-action="Export" />
+    </div>
+</form>
+<hr />
+<form asp-controller="Home" asp-action="ByCity">
+    <h2>Generate By Region</h2>
+    <p>
+        Region: <select name="regionId" asp-items="@Model.Options"></select>
+        Date: <input type="text" name="date" />
+        <input type="submit" value="Export" />
+    </p>
+</form>
+<hr />
