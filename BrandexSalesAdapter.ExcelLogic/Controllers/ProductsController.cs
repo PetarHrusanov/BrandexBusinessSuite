@@ -14,6 +14,7 @@
     using BrandexSalesAdapter.ExcelLogic.Models.Products;
     using BrandexSalesAdapter.ExcelLogic.Services;
     using BrandexSalesAdapter.ExcelLogic.Services.Products;
+    using Microsoft.AspNetCore.Authorization;
 
     public class ProductsController :Controller
     {
@@ -37,12 +38,15 @@
             this.numbersChecker = numbersChecker;
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();
         }
 
-        public async System.Threading.Tasks.Task<ActionResult> ImportAsync()
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> ImportAsync()
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -231,6 +235,8 @@
 
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(string productName,
             string productShortName,
             double productPrice,

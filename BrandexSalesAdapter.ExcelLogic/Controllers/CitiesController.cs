@@ -14,6 +14,7 @@
     using BrandexSalesAdapter.ExcelLogic.Models;
     using BrandexSalesAdapter.ExcelLogic.Models.Cities;
     using BrandexSalesAdapter.ExcelLogic.Services.Cities;
+    using Microsoft.AspNetCore.Authorization;
 
     public class CitiesController :Controller
     {
@@ -31,11 +32,14 @@
             this.citiesService = citiesService;
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Import(IFormFile ImageFile)
         {
 
@@ -154,6 +158,8 @@
 
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(string cityName)
         {
             if (cityName != null)

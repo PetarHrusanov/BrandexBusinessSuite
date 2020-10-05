@@ -5,6 +5,7 @@
     using BrandexSalesAdapter.ExcelLogic.Data;
     using BrandexSalesAdapter.ExcelLogic.Data.Models;
     using BrandexSalesAdapter.ExcelLogic.Models.Distributor;
+    using Microsoft.AspNetCore.Authorization;
 
     public class DistributorsController :Controller
     {
@@ -19,6 +20,7 @@
 
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             var distributors = context.Distributors.Select(n => n.Name).ToList();
@@ -31,6 +33,8 @@
             return View(distributorsView);
         }
 
+        [Authorize]
+        [HttpPost]
         public async System.Threading.Tasks.Task<IActionResult> ImportAsync(string name)
         {
 

@@ -14,6 +14,7 @@
     using BrandexSalesAdapter.ExcelLogic.Models;
     using BrandexSalesAdapter.ExcelLogic.Models.PharmacyChains;
     using BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains;
+    using Microsoft.AspNetCore.Authorization;
 
     public class PharmacyChainsController : Controller
     {
@@ -33,11 +34,14 @@
 
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Import()
         {
 
@@ -155,6 +159,8 @@
 
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(string pharmacyChainName)
         {
             if (pharmacyChainName != null)

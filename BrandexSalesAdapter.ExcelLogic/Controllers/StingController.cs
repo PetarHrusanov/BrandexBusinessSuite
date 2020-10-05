@@ -18,6 +18,7 @@
     using BrandexSalesAdapter.ExcelLogic.Services.Products;
     using BrandexSalesAdapter.ExcelLogic.Services.Sales;
     using static BrandexSalesAdapter.ExcelLogic.Common.DataConstants.Ditributors;
+    using Microsoft.AspNetCore.Authorization;
 
     public class StingController : Controller
     {
@@ -49,11 +50,14 @@
 
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> ImportAsync(StingInputModel stingInput)
         {
 
@@ -242,6 +246,8 @@
 
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(string pharmacyId, string productId, string date, int count)
         {
             if (await this.salesService.UploadIndividualSale(pharmacyId, productId, date, count, Sting))

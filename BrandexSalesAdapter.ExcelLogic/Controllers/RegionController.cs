@@ -12,6 +12,7 @@
     using BrandexSalesAdapter.ExcelLogic.Models;
     using BrandexSalesAdapter.ExcelLogic.Models.Regions;
     using BrandexSalesAdapter.ExcelLogic.Services.Regions;
+    using Microsoft.AspNetCore.Authorization;
 
     public class RegionController: Controller
     {
@@ -29,11 +30,14 @@
             this.regionService = regionService;
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Import(IFormFile ImageFile)
         {
 
@@ -146,6 +150,8 @@
 
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(string regionName)
         {
             if (await this.regionService.UploadRegion(regionName) != "")

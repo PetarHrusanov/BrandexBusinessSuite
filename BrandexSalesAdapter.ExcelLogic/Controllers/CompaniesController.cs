@@ -14,6 +14,7 @@
     using BrandexSalesAdapter.ExcelLogic.Models.Companies;
     using BrandexSalesAdapter.ExcelLogic.Services;
     using BrandexSalesAdapter.ExcelLogic.Services.Companies;
+    using Microsoft.AspNetCore.Authorization;
 
     public class CompaniesController :Controller
     {
@@ -37,12 +38,15 @@
 
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();
         }
 
-        public async System.Threading.Tasks.Task<ActionResult> ImportAsync()
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> ImportAsync()
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -171,6 +175,8 @@
 
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(string companyName, string vat, string ownerName)
         {
             if (companyName != null)

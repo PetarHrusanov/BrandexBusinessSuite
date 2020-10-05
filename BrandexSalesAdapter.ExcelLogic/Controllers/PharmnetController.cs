@@ -18,6 +18,7 @@
     using BrandexSalesAdapter.ExcelLogic.Services.Products;
     using BrandexSalesAdapter.ExcelLogic.Services.Sales;
     using static BrandexSalesAdapter.ExcelLogic.Common.DataConstants.Ditributors;
+    using Microsoft.AspNetCore.Authorization;
 
     public class PharmnetController : Controller
     {
@@ -49,12 +50,15 @@
 
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();
         }
 
-        public async System.Threading.Tasks.Task<ActionResult> ImportAsync(PharmnetInputModel pharmnetInput)
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> ImportAsync(PharmnetInputModel pharmnetInput)
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -238,6 +242,8 @@
 
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(string pharmacyId, string productId, string date, int count)
         {
             if (await this.salesService.UploadIndividualSale(pharmacyId, productId, date, count, Pharmnet))
