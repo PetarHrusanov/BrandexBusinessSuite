@@ -1,14 +1,15 @@
 namespace BrandexSalesAdapter.ExcelLogic
 {
-
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
+    // Data 
     using BrandexSalesAdapter.ExcelLogic.Data;
+    using BrandexSalesAdapter.ExcelLogic.Models;
+    using BrandexSalesAdapter.ExcelLogic.Data.Models.ApplicationUserModels;
+
+    // Common Services
     using BrandexSalesAdapter.ExcelLogic.Services;
+    using BrandexSalesAdapter.ExcelLogic.Services.Mapping;
+
+    // Business- Specific Services
     using BrandexSalesAdapter.ExcelLogic.Services.Cities;
     using BrandexSalesAdapter.ExcelLogic.Services.Companies;
     using BrandexSalesAdapter.ExcelLogic.Services.Distributor;
@@ -18,38 +19,91 @@ namespace BrandexSalesAdapter.ExcelLogic
     using BrandexSalesAdapter.ExcelLogic.Services.Regions;
     using BrandexSalesAdapter.ExcelLogic.Services.Sales;
 
+    using System.Reflection;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.EntityFrameworkCore;
+    using BrandexSalesAdapter.ExcelLogic.Data.Seeding;
+    using Microsoft.AspNetCore.Identity;
+
     public class Startup
     {
         private readonly IConfiguration configuration;
+        private readonly IHostEnvironment hostingEnvironment;
 
-        public Startup(IConfiguration configuration)
+        public Startup(
+            IConfiguration configuration,
+            IHostEnvironment hostingEnvironment)
         {
             this.configuration = configuration;
+            this.hostingEnvironment = hostingEnvironment;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<SpravkiDbContext>(
-               options => options.UseSqlServer(this.configuration.GetConnectionString("DefaultConnection")));
+                options => options.UseSqlServer(this.configuration.GetConnectionString("DefaultConnection")));
 
-            services
-                .AddTransient<ISalesService, SalesService>()
-                .AddTransient<IProductsService, ProductsService>()
-                .AddTransient<IPharmaciesService, PharmaciesService>()
-                .AddTransient<IDistributorService, DistributorService>()
-                .AddTransient<ICitiesService, CitiesService>()
-                .AddTransient<ICompaniesService, CompaniesService>()
-                .AddTransient<IPharmacyChainsService, PharmacyChainsService>()
-                .AddTransient<IRegionsService, RegionsService>()
-                .AddTransient<INumbersChecker, NumbersChecker>();
+            //services.AddDefaultIdentity
+
+            services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
+                .AddRoles<ApplicationRole>().AddEntityFrameworkStores<SpravkiDbContext>();
+
+            //services.AddScoped<SignInManager<ApplicationUser>, SignInManager<ApplicationUser>>();
+
+            services.Configure<CookiePolicyOptions>(
+                options =>
+                {
+                    options.CheckConsentNeeded = context => true;
+                    options.MinimumSameSitePolicy = SameSiteMode.None;
+                });
 
             services.AddControllersWithViews();
+            services.AddRazorPages();
+
+            services.AddSingleton(this.configuration);
+
+            //services.AddTransient<IAdministrationTextService, AdministrationTextService>();
+
+            services
+                //.AddWebService<SpravkiDbContext>(this.configuration)
+
+                // Business Logic 
+                .AddTransient<ICitiesService, CitiesService>()
+                .AddTransient<ICompaniesService, CompaniesService>()
+                .AddTransient<IDistributorService, DistributorService>()
+                .AddTransient<IPharmaciesService, PharmaciesService>()
+                .AddTransient<IPharmacyChainsService, PharmacyChainsService>()
+                .AddTransient<IProductsService, ProductsService>()
+                .AddTransient<IRegionsService, RegionsService>()
+                .AddTransient<ISalesService, SalesService>()
+                .AddTransient<INumbersChecker, NumbersChecker>()
+
+                .AddControllersWithViews(options => options
+                    .Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+
+
+            services.AddRazorPages();
+            services.AddRouting(options => options.LowercaseUrls = true);
+
+            //services
+            //    .AddRefitClient<IIdentityService>()
+            //    .WithConfiguration(serviceEndpoints.Identity);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
+
+            // Seed data on application startup
             using (var serviceScope = app.ApplicationServices.CreateScope())
             {
                 var dbContext = serviceScope.ServiceProvider.GetRequiredService<SpravkiDbContext>();
@@ -59,21 +113,27 @@ namespace BrandexSalesAdapter.ExcelLogic
                     dbContext.Database.Migrate();
                 }
 
-                //new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
-
-                 else
-                {
-                    app.UseExceptionHandler("/Home/Error");
-                    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                    app.UseHsts();
-                }
+                new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
             }
-           
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                //app.UseDatabaseErrorPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseCookiePolicy();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -81,6 +141,7 @@ namespace BrandexSalesAdapter.ExcelLogic
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
         }
     }

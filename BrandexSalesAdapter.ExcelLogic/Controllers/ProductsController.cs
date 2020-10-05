@@ -1,4 +1,4 @@
-﻿namespace SpravkiFirstDraft.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;

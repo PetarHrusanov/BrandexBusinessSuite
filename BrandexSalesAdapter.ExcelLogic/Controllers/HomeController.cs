@@ -1,4 +1,4 @@
-﻿namespace SpravkiFirstDraft.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -46,7 +46,7 @@
 
         }
 
-        public async Task<IActionResult> IndexAsync()
+        public async Task<IActionResult> Index()
         {
             var inputFilter = new SaleFiltersExcelInputModel();
 

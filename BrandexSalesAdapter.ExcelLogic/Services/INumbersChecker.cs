@@ -1,5 +1,4 @@
-﻿using System;
-namespace BrandexSalesAdapter.ExcelLogic.Services
+﻿namespace BrandexSalesAdapter.ExcelLogic.Services
 {
     public interface INumbersChecker
     {

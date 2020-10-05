@@ -1,26 +1,93 @@
-﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="{2F4DB71A-D889-4470-83B2-091163C0D3BD}|Default">
+﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="Multiple">
   <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.ExcelLogic PreferredExecutionTarget="/Applications/Safari.app" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="BrandexSalesAdapter.ExcelLogic/Areas/Administration/Views/_ViewImports.cshtml">
+    <Files>
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" Line="52" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/City.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Distributor.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/BaseDeletableModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/BaseModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/IAuditInfo.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/IDeletableEntity.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/AutoMapperConfig.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/IHaveCustomMappings.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/IMapFrom.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/IMapTo.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/QueryableMappingExtensions.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Identity/IIdentityService.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/ApplicationUserModels/ApplicationRole.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/ApplicationUserModels/ApplicationUser.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/ApplicationUserModels/IdentityOptionsProvider.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Common/DataConstants.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Infrastructure/Extensions/ApplicationBuilderExtensions.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/SpravkiDbContext.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/CityConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/CompanyConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/DistributorConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/PharmacyChainConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/PharmacyConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/ProductConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/RegionConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/SaleConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/ApplicationUserConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/AdministratorSeeder.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/ApplicationDbContextSeeder.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/ISeeder.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/RolesSeeder.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Common/Constants.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/IdentityController.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_Layout.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Program.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/mono_crash.11a6748113.0.json" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/mono_crash.11a6748113.1.json" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/mono_crash.11a6748113.2.json" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_CookieConsentPartial.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_ValidationScriptsPartial.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/Error.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_LoginPartial.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Import.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Index.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Upload.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/_ViewStart.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/_ViewImports.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Areas/Identity/Pages/_ViewStart.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Areas/Administration/Views/_ViewImports.cshtml" Line="1" Column="52" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Areas/Administration/Views/_ViewStart.cshtml" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
-          <Node name="BrandexSalesAdapter" expanded="True" selected="True" />
+          <Node name="BrandexSalesAdapter" expanded="True">
+            <Node name="BrandexSalesAdapter.ExcelLogic" expanded="True">
+              <Node name="Areas" expanded="True">
+                <Node name="Administration" expanded="True">
+                  <Node name="Views" expanded="True">
+                    <Node name="_ViewImports.cshtml" selected="True" />
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
         </State>
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <DisabledProjects>
     <String>BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic.csproj</String>
+    <String>RecipesRemixed/BrandexSalesAdapter.csproj</String>
   </DisabledProjects>
-  <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.Identity PreferredExecutionTarget="/Applications/Safari.app" />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <Debugger.DebugSourceFolders />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter/Services/Regions/RegionsService.cs" relfile="BrandexSalesAdapter/Services/Regions/RegionsService.cs" line="34" column="1" />
-    <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter/Controllers/RegionController.cs" relfile="BrandexSalesAdapter/Controllers/RegionController.cs" line="37" column="1" />
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MultiItemStartupConfigurations />
+  <MultiItemStartupConfigurations>
+    <MultiItemSolutionRunConfiguration Id="Multiple" Name="Multiple">
+      <Items>
+        <StartupItem ItemId="{2F4DB71A-D889-4470-83B2-091163C0D3BD}" ItemName="BrandexSalesAdapter.ExcelLogic" ConfigurationId="Default" />
+      </Items>
+    </MultiItemSolutionRunConfiguration>
+  </MultiItemStartupConfigurations>
 </Properties>
