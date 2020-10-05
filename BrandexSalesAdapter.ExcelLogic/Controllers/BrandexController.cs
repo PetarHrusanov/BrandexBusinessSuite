@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -20,7 +20,7 @@
     using BrandexSalesAdapter.ExcelLogic.Services.Sales;
     using static Common.DataConstants.Ditributors;
 
-    public class BrandexController : Controller
+    public class BrandexController : HandleController
     {
         private IWebHostEnvironment hostEnvironment;
 
@@ -29,6 +29,9 @@
         private readonly IProductsService productsService;
         private readonly IPharmaciesService pharmaciesService;
         private readonly IDistributorService distributorService;
+
+        // user service
+
 
         // universal Services
         private readonly INumbersChecker numbersChecker;
@@ -50,14 +53,16 @@
             this.productsService = productsService;
             this.pharmaciesService = pharmaciesService;
             this.distributorService = distributorService;
-
+            
         }
 
+        [HttpGet]
         public ActionResult Index()
         {
             return this.View();
         }
 
+        [HttpPost]
         public async Task<ActionResult> Import(BrandexInputModel brandexInput)
         {
 
