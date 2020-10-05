@@ -19,6 +19,7 @@
     using BrandexSalesAdapter.ExcelLogic.Services.Products;
     using BrandexSalesAdapter.ExcelLogic.Services.Sales;
     using static Common.DataConstants.Ditributors;
+    using Microsoft.AspNetCore.Authorization;
 
     public class BrandexController : HandleController
     {
@@ -56,12 +57,14 @@
             
         }
 
+        [Authorize]
         [HttpGet]
         public ActionResult Index()
         {
             return this.View();
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> Import(BrandexInputModel brandexInput)
         {
@@ -252,7 +255,8 @@
 
         }
 
-
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(string pharmacyId, string productId, string date, int count)
         {
             if(await this.salesService.UploadIndividualSale(pharmacyId, productId, date, count, Brandex))

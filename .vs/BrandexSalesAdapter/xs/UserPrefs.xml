@@ -1,9 +1,9 @@
 ﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="Multiple">
   <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.ExcelLogic PreferredExecutionTarget="/Applications/Safari.app" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="BrandexSalesAdapter.ExcelLogic/Areas/Administration/Views/_ViewImports.cshtml">
+  <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" Line="52" Column="1" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" Line="259" Column="18" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/City.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Distributor.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/BaseDeletableModel.cs" />
@@ -36,40 +36,55 @@
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/ISeeder.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/RolesSeeder.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Common/Constants.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/IdentityController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_Layout.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_Layout.cshtml" Line="30" Column="113" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Program.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/mono_crash.11a6748113.0.json" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/mono_crash.11a6748113.1.json" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/mono_crash.11a6748113.2.json" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_CookieConsentPartial.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_ValidationScriptsPartial.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_CookieConsentPartial.cshtml" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_ValidationScriptsPartial.cshtml" Line="1" Column="1" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/Error.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_LoginPartial.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Import.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Index.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_LoginPartial.cshtml" Line="10" Column="118" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Import.cshtml" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Index.cshtml" Line="1" Column="1" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Upload.cshtml" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Views/_ViewStart.cshtml" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Views/_ViewImports.cshtml" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Areas/Identity/Pages/_ViewStart.cshtml" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Areas/Administration/Views/_ViewImports.cshtml" Line="1" Column="52" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Areas/Administration/Views/_ViewStart.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Home/Index.cshtml" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CompaniesController.cs" Line="178" Column="4" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CitiesController.cs" Line="162" Column="19" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/DistributorsController.cs" Line="37" Column="19" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/HomeController.cs" Line="85" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmacyChainsController.cs" Line="163" Column="19" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmacyDetailsController.cs" Line="310" Column="19" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmnetController.cs" Line="246" Column="19" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PhoenixController.cs" Line="233" Column="19" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/ProductsController.cs" Line="239" Column="19" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/RegionController.cs" Line="154" Column="19" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/SopharmaController.cs" Line="228" Column="19" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/StingController.cs" Line="248" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="BrandexSalesAdapter" expanded="True">
             <Node name="BrandexSalesAdapter.ExcelLogic" expanded="True">
-              <Node name="Areas" expanded="True">
-                <Node name="Administration" expanded="True">
-                  <Node name="Views" expanded="True">
-                    <Node name="_ViewImports.cshtml" selected="True" />
-                  </Node>
+              <Node name="Controllers" expanded="True" />
+              <Node name="Views" expanded="True">
+                <Node name="Brandex" expanded="True" />
+                <Node name="Shared" expanded="True">
+                  <Node name="_Layout.cshtml" selected="True" />
                 </Node>
               </Node>
             </Node>
           </Node>
         </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

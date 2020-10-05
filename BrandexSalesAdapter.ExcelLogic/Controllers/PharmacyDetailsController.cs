@@ -20,6 +20,7 @@
     using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
     using BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains;
     using BrandexSalesAdapter.ExcelLogic.Services.Regions;
+    using Microsoft.AspNetCore.Authorization;
 
     public class PharmacyDetailsController : Controller
     {
@@ -56,12 +57,15 @@
 
         }
 
+        [Authorize]
         public IActionResult Index()
         {
             return View();
         }
 
-        public async System.Threading.Tasks.Task<ActionResult> ImportAsync()
+        [Authorize]
+        [HttpPost]
+        public async Task<ActionResult> ImportAsync()
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -302,6 +306,8 @@
             return this.View(pharmacyErrorModel);
         }
 
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(int brandexId,
             string name,
             PharmacyClass pharmacyClass,
