@@ -264,3 +264,6 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/BrandexSalesAdapter.ExcelLogic.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/BrandexSalesAdapter.ExcelLogic.pdb
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/BrandexSalesAdapter.ExcelLogic.genruntimeconfig.cache
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/Razor/Views/Brandex/Check.cshtml.g.cs
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/Razor/Views/Phoenix/Check.cshtml.g.cs
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/BrandexSalesAdapter.ExcelLogic.csprojAssemblyReference.cache

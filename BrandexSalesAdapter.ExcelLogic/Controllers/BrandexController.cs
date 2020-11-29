@@ -257,6 +257,161 @@
 
         [Authorize]
         [HttpPost]
+        public async Task<ActionResult> Check(IFormFile ImageFile)
+        {
+
+            IFormFile file = Request.Form.Files[0];
+
+            string folderName = "UploadExcel";
+
+            string webRootPath = hostEnvironment.WebRootPath;
+
+            string newPath = Path.Combine(webRootPath, folderName);
+
+            var errorDictionary = new Dictionary<int, string>();
+
+            if (!Directory.Exists(newPath))
+
+            {
+                Directory.CreateDirectory(newPath);
+            }
+
+            if (file.Length > 0)
+
+            {
+
+                string sFileExtension = Path.GetExtension(file.FileName).ToLower();
+
+                ISheet sheet;
+
+                string fullPath = Path.Combine(newPath, file.FileName);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+
+                {
+
+                    file.CopyTo(stream);
+
+                    stream.Position = 0;
+
+                    if (sFileExtension == ".xls")
+
+                    {
+
+                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+
+                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+
+                    }
+
+                    else
+
+                    {
+
+                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+
+                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+
+                    }
+
+                    IRow headerRow = sheet.GetRow(0); //Get Header Row
+
+                    int cellCount = headerRow.LastCellNum;
+
+                    for (int j = 0; j < cellCount; j++)
+                    {
+                        ICell cell = headerRow.GetCell(j);
+
+                        if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+
+                    }
+
+                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+
+                    {
+
+                        IRow row = sheet.GetRow(i);
+
+                        if (row == null) continue;
+
+                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+                        for (int j = row.FirstCellNum; j < cellCount; j++)
+
+                        {
+
+                            string currentRow = "";
+
+                            if (row.GetCell(j) != null)
+                            {
+                                currentRow = row.GetCell(j).ToString().TrimEnd();
+                            }
+
+                            if (j > 5)
+                            {
+                                continue;
+                            }
+
+                            switch (j)
+                            {
+                                case 0:
+                                    break;
+
+                                case 1:
+                                    break;
+
+                                case 2:
+                                    break;
+
+                                case 3:
+                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
+                                    {
+                                        if (await this.productsService.ProductIdByDistributor(currentRow, Brandex) == 0)
+                                        {
+                                            errorDictionary[i] = currentRow;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
+
+                                case 4:
+                                    if (currentRow == "" || !this.numbersChecker.NegativeNumberIncludedCheck(currentRow))
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
+
+                                case 5:
+                                    if (!this.numbersChecker.WholeNumberCheck(currentRow)
+                                        || await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Brandex) ==0)
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
+
+                            }
+
+                        }
+                    }
+
+                }
+
+            }
+
+            var brandexOutputModel = new BrandexOutputModel
+            {
+                Errors = errorDictionary
+            };
+
+            return this.View(brandexOutputModel);
+
+        }
+
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult> Upload(string pharmacyId, string productId, string date, int count)
         {
             if(await this.salesService.UploadIndividualSale(pharmacyId, productId, date, count, Brandex))
