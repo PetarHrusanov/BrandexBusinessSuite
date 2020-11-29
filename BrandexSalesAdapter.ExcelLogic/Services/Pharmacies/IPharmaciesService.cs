@@ -13,6 +13,8 @@
 
         Task<int> PharmacyIdByDistributor(string input, string Distributor);
 
+        Task<ICollection<PharmacyDistributorCheck>> PharmacyIdsByDistributorForCheck(string input);
+
         Task<string> NameById(string input, string distributor);
 
         Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime date, int? regionId);

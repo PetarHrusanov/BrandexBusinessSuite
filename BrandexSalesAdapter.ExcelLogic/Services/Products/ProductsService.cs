@@ -94,6 +94,45 @@
             };
         }
 
+        public async Task<ICollection<ProductDistributorCheck>> ProductsIdByDistributorForCheck(string Distributor)
+        {
+            switch (Distributor)
+            {
+                case Brandex:
+                    return await this.db.Products.Where(c => c.BrandexId!=null ).Select(p => new ProductDistributorCheck
+                    {
+                        ProductId = p.Id,
+                        DistributorId = p.BrandexId.ToString()
+                    }).ToListAsync();
+                case Sting:
+                    return await this.db.Products.Where(c => c.StingId != null).Select(p => new ProductDistributorCheck
+                    {
+                        ProductId = p.Id,
+                        DistributorId = p.StingId.ToString()
+                    }).ToListAsync();
+                case Phoenix:
+                    return await this.db.Products.Where(c => c.PhoenixId != null).Select(p => new ProductDistributorCheck
+                    {
+                        ProductId = p.Id,
+                        DistributorId = p.PhoenixId.ToString()
+                    }).ToListAsync();
+                case Pharmnet:
+                    return await this.db.Products.Where(c => c.PharmnetId != null).Select(p => new ProductDistributorCheck
+                    {
+                        ProductId = p.Id,
+                        DistributorId = p.PharmnetId.ToString()
+                    }).ToListAsync();
+                case Sopharma:
+                    return await this.db.Products.Where(c => c.SopharmaId != null).Select(p => new ProductDistributorCheck
+                    {
+                        ProductId = p.Id,
+                        DistributorId = p.SopharmaId.ToString()
+                    }).ToListAsync();
+                default:
+                    return new List<ProductDistributorCheck>();
+            };
+        }
+
         public async Task<string> NameById(string input, string distributor)
         {
             int convertedNumber;

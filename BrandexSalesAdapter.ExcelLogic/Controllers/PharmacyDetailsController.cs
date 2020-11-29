@@ -163,6 +163,9 @@
                                     }
                                     break;
 
+                                case 1:
+                                    break;
+
                                 case 2:
                                     if (currentRow == "")
                                     {
@@ -206,7 +209,6 @@
                                     int chainId = await this.pharmacyChainsService.IdByName(currentRow);
                                     if (chainId!=0)
                                     {
-                                        //int chainId = await this.pharmacyChainsService.IdByName(currentRow);
                                         newPharmacy.PharmacyChainId = chainId;
                                     }
                                     else
@@ -224,13 +226,23 @@
 
                                     if (regionId!=0)
                                     {
-                                        //int regionId = await this.regionsService.IdByName(currentRow);
                                         newPharmacy.RegionId = regionId;
                                     }
                                     else
                                     {
                                         errorDictionary[i] = currentRow;
                                     }
+                                    break;
+
+                                case 10:
+                                    break;
+                                case 11:
+                                    break;
+                                case 12:
+                                    break;
+                                case 13:
+                                    break;
+                                case 14:
                                     break;
 
                                 case 15:
@@ -275,6 +287,11 @@
                                         }
                                         
                                     }
+                                    break;
+
+                                case 19:
+                                    break;
+                                case 20:
                                     break;
 
                                 case 21:

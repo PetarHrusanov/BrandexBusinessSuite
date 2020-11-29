@@ -97,6 +97,7 @@
                 };
         }
 
+       
         public async Task<string> NameById(string input, string distributor)
         {
             int convertedNumber;
@@ -169,5 +170,44 @@
             }
             
         }
-    }
+
+        public async Task<ICollection<PharmacyDistributorCheck>> PharmacyIdsByDistributorForCheck(string distributor)
+        {
+            switch (distributor)
+            {
+                case Brandex:
+                    return await this.db.Pharmacies.Where(c => c.BrandexId != null).Select(p => new PharmacyDistributorCheck
+                    {
+                        PharmacyId = p.Id,
+                        DistributorId = (int)p.BrandexId
+                    }).ToListAsync();
+                case Sting:
+                    return await this.db.Pharmacies.Where(c => c.StingId != null).Select(p => new PharmacyDistributorCheck
+                    {
+                        PharmacyId = p.Id,
+                        DistributorId = (int)p.StingId
+                    }).ToListAsync();
+                case Phoenix:
+                    return await this.db.Pharmacies.Where(c => c.PhoenixId != null).Select(p => new PharmacyDistributorCheck
+                    {
+                        PharmacyId = p.Id,
+                        DistributorId = (int)p.PhoenixId
+                    }).ToListAsync();
+                case Pharmnet:
+                    return await this.db.Pharmacies.Where(c => c.PharmnetId != null).Select(p => new PharmacyDistributorCheck
+                    {
+                        PharmacyId = p.Id,
+                        DistributorId = (int)p.PharmnetId
+                    }).ToListAsync();
+                case Sopharma:
+                    return await this.db.Pharmacies.Where(c => c.SopharmaId != null).Select(p => new PharmacyDistributorCheck
+                    {
+                        PharmacyId = p.Id,
+                        DistributorId = (int)p.SopharmaId
+                    }).ToListAsync();
+                default:
+                    return new List<PharmacyDistributorCheck>();
+            };
+        }
+        }
 }
