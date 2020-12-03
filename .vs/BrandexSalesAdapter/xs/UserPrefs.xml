@@ -1,9 +1,9 @@
-﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="Multiple">
+﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="{7AE6C904-5DCA-4C67-8FC5-4460DB24E45C}|Default">
   <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.ExcelLogic PreferredExecutionTarget="/Applications/Safari.app" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs">
+  <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" Line="52" Column="1" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" Line="51" Column="77" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/City.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Distributor.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/BaseDeletableModel.cs" />
@@ -61,7 +61,7 @@
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmacyChainsController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmacyDetailsController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmnetController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PhoenixController.cs" Line="300" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PhoenixController.cs" Line="1" Column="1" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/ProductsController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/RegionController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/SopharmaController.cs" />
@@ -85,17 +85,17 @@
       <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Sales/ISalesService.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Sales/SalesService.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Sale.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Dockerfile" Line="1" Column="1" />
+      <File FileName=".dockerignore" />
+      <File FileName="docker-compose.yml" Line="21" Column="23" />
+      <File FileName="docker-compose.override.yml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/appsettings.json" />
+      <File FileName="../../../../../../../../Applications/Visual Studio.app/Contents/Resources/lib/monodevelop/AddIns/docker/MonoDevelop.Docker/MSbuild/Sdks/Microsoft.Docker.Sdk/build/Microsoft.VisualStudio.Docker.Compose.targets" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
-          <Node name="BrandexSalesAdapter" expanded="True">
-            <Node name="BrandexSalesAdapter.ExcelLogic" expanded="True">
-              <Node name="Controllers" expanded="True">
-                <Node name="BrandexController.cs" selected="True" />
-              </Node>
-            </Node>
-          </Node>
+          <Node name="BrandexSalesAdapter" expanded="True" selected="True" />
         </State>
       </Pad>
     </Pads>
@@ -107,6 +107,7 @@
   </DisabledProjects>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <Debugger.DebugSourceFolders />
+  <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
