@@ -121,7 +121,6 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/bin/Debug/netcoreapp3.1/mono_crash.11a6748113.0.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/bin/Debug/netcoreapp3.1/mono_crash.11a6748113.1.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/bin/Debug/netcoreapp3.1/mono_crash.11a6748113.2.json
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/bin/Debug/netcoreapp3.1/Properties/launchSettings.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/bin/Debug/netcoreapp3.1/BrandexSalesAdapter.ExcelLogic.StaticWebAssets.xml
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/bin/Debug/netcoreapp3.1/BrandexSalesAdapter.ExcelLogic.deps.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/bin/Debug/netcoreapp3.1/BrandexSalesAdapter.ExcelLogic.runtimeconfig.json
@@ -267,3 +266,4 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/Razor/Views/Brandex/Check.cshtml.g.cs
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/Razor/Views/Phoenix/Check.cshtml.g.cs
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/BrandexSalesAdapter.ExcelLogic.csprojAssemblyReference.cache
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/scopedcss/bundle/BrandexSalesAdapter.ExcelLogic.styles.css

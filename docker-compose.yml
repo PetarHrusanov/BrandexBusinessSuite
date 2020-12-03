@@ -1,0 +1,41 @@
+version: '3.4'
+
+services:
+
+    data:
+        container_name: sqlserver
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        ports:
+            - "1433:1433"
+        environment:
+            - ACCEPT_EULA=Y
+            - SA_PASSWORD=yourStrongPassword12!@
+        volumes:
+            - sqldata:/var/opt/mssql
+        networks:
+            - brandex-sales-network
+
+    brandexsalesadapter.excellogic:
+        image: petarhrusanov/brandexautomationtest
+        build:
+            context: .
+            dockerfile: BrandexSalesAdapter.ExcelLogic/Dockerfile
+        ports:
+            - "5001:80"
+        environment:
+            - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=BrandexTestDatabase;User Id=sa; Password=yourStrongPassword12!@;MultipleActiveResultSets=true
+            - IdentitySettings__AdminPassword=adminpass12!
+        restart: on-failure
+        volumes:
+            - data-protection:/root/.aspnet/DataProtection-Keys
+        networks:
+            - brandex-sales-network
+        depends_on:
+            - data
+
+networks:
+    brandex-sales-network:
+
+volumes:
+    sqldata:
+    data-protection:
