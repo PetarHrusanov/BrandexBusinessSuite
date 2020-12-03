@@ -1,0 +1,42 @@
+networks:
+  brandex-sales-network: {}
+services:
+  brandexsalesadapter.excellogic:
+    build:
+      context: /Users/Petar/Documents/Documents ??? Petar???s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter
+      dockerfile: BrandexSalesAdapter.ExcelLogic/Dockerfile
+    depends_on:
+      data:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Server=sqlserver;Database=BrandexTestDatabase;User
+        Id=sa; Password=yourStrongPassword12!@;MultipleActiveResultSets=true
+      IdentitySettings__AdminPassword: adminpass12!
+    image: petarhrusanov/brandexautomationtest
+    networks:
+      brandex-sales-network: {}
+    ports:
+    - published: 5001
+      target: 80
+    - target: 80
+    restart: on-failure
+    volumes:
+    - data-protection:/root/.aspnet/DataProtection-Keys:rw
+  data:
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: yourStrongPassword12!@
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    networks:
+      brandex-sales-network: {}
+    ports:
+    - published: 1433
+      target: 1433
+    volumes:
+    - sqldata:/var/opt/mssql:rw
+version: '3.4'
+volumes:
+  data-protection: {}
+  sqldata: {}

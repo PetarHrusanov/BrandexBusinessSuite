@@ -1,6 +1,6 @@
 ﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="{7AE6C904-5DCA-4C67-8FC5-4460DB24E45C}|Default">
   <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.ExcelLogic PreferredExecutionTarget="/Applications/Safari.app" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Jenkinsfile.txt">
+  <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" Line="51" Column="77" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" />
@@ -91,15 +91,12 @@
       <File FileName="docker-compose.override.yml" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/appsettings.json" />
       <File FileName="../../../../../../../../Applications/Visual Studio.app/Contents/Resources/lib/monodevelop/AddIns/docker/MonoDevelop.Docker/MSbuild/Sdks/Microsoft.Docker.Sdk/build/Microsoft.VisualStudio.Docker.Compose.targets" />
-      <File FileName="Jenkinsfile.txt" Line="17" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="BrandexSalesAdapter" expanded="True">
-            <Node name="Solution Items" expanded="True">
-              <Node name="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/Jenkinsfile.txt" selected="True" />
-            </Node>
+            <Node name="Solution Items" selected="True" />
           </Node>
         </State>
       </Pad>
