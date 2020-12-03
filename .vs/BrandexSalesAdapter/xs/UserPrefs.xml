@@ -1,6 +1,6 @@
 ﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="{7AE6C904-5DCA-4C67-8FC5-4460DB24E45C}|Default">
   <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.ExcelLogic PreferredExecutionTarget="/Applications/Safari.app" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="BrandexSalesAdapter.ExcelLogic/Startup.cs">
     <Files>
       <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" Line="51" Column="77" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" />
@@ -61,7 +61,7 @@
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmacyChainsController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmacyDetailsController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmnetController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PhoenixController.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PhoenixController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/ProductsController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/RegionController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/SopharmaController.cs" />
@@ -85,9 +85,9 @@
       <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Sales/ISalesService.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Sales/SalesService.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Sale.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Dockerfile" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Dockerfile" />
       <File FileName=".dockerignore" />
-      <File FileName="docker-compose.yml" Line="21" Column="23" />
+      <File FileName="docker-compose.yml" />
       <File FileName="docker-compose.override.yml" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/appsettings.json" />
       <File FileName="../../../../../../../../Applications/Visual Studio.app/Contents/Resources/lib/monodevelop/AddIns/docker/MonoDevelop.Docker/MSbuild/Sdks/Microsoft.Docker.Sdk/build/Microsoft.VisualStudio.Docker.Compose.targets" />
@@ -96,7 +96,9 @@
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="BrandexSalesAdapter" expanded="True">
-            <Node name="Solution Items" selected="True" />
+            <Node name="BrandexSalesAdapter.ExcelLogic" expanded="True">
+              <Node name="Startup.cs" selected="True" />
+            </Node>
           </Node>
         </State>
       </Pad>
