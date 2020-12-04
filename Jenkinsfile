@@ -8,8 +8,8 @@ pipeline {
     }
       stage('Docker Build') {
         steps {
-         (script: 'docker-compose build')     
-         (script: 'docker images -a')
+         ('docker-compose build')     
+         ('docker images -a')
               }
        }
     }
