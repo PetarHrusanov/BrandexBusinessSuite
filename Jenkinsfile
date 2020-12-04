@@ -8,7 +8,7 @@ pipeline {
     }
       stage('Docker Build') {
         steps {
-          sh('/docker-compose.yml build')
+          sh('#!/bin/bash /docker-compose build')
               }
        }
     }
