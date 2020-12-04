@@ -8,8 +8,8 @@ pipeline {
     }
       stage('Docker Build') {
         steps {
-         'docker-compose build'     
-         'docker images -a'
+         docker-compose build     
+         docker images -a
               }
        }
     }
