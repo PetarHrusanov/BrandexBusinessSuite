@@ -8,9 +8,10 @@ pipeline {
     }
       stage('Docker Build') {
         steps {
-         sh "/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin/pwsh -Command \"Get-Host | Select-Object Version\""
-         pwsh(script: 'docker-compose build')
-         pwsh(script: 'docker images -a')
+          node {
+           pwsh(script: 'docker-compose build')
+           pwsh(script: 'docker images -a')
+                }
               }
        }
     }
