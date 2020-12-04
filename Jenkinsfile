@@ -8,6 +8,7 @@ pipeline {
     }
       stage('Docker Build') {
         steps {
+         sh "/usr/local/bin/pwsh -Command \"Get-Host | Select-Object Version\""
          pwsh(script: 'docker-compose build')
          pwsh(script: 'docker images -a')
               }
