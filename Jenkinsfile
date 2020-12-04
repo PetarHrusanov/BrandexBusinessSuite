@@ -8,8 +8,8 @@ pipeline {
     }
       stage('Docker Build') {
         steps {
-         powershell(script: 'docker-compose build')   
-         powershell(script: 'docker images -a')
+         sh 'docker-compose build'   
+         sh 'docker images -a'
               }
        }
     }
