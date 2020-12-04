@@ -8,7 +8,7 @@ pipeline {
     }
       stage('Docker Build') {
         steps {
-         sh "/Users/Petar/.config/powershell/Microsoft.PowerShell_profile.ps1 -Command \"Get-Host | Select-Object Version\""
+         sh "/Users/Petar/.config/powershell -Command \"Get-Host | Select-Object Version\""
          pwsh(script: 'docker-compose build')
          pwsh(script: 'docker images -a')
               }
