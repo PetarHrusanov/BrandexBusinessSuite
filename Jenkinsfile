@@ -8,8 +8,7 @@ pipeline {
     }
       stage('Docker Build') {
         steps {
-          sh "/docker-compose build"   
-          sh "docker images -a"
+          sh('cd relativePathToFolder && chmod +x docker-compose.yml build')
               }
        }
     }
