@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: brandex-database-data
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: brandex-database
+spec:
+  clusterIP: None
+  ports:
+  - port: 1433
+    targetPort: 1433
+  selector:
+    database: brandex
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: brandex-database
+spec:
+  serviceName: brandex-database
+  selector:
+    matchLabels: 
+      database: brandex
+  template:
+    metadata:
+      labels:
+        database: brandex
+        system: brandex
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        fsGroup: 10001
+      containers:
+      - name: brandex-database
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 1433
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: environment-secrets
+              key: brandex-database-sa-password
+        volumeMounts:
+        - name: brandex-database-data
+          mountPath: /var/opt/mssql
+      volumes:
+      - name: brandex-database-data
+        persistentVolumeClaim:
+          claimName: brandex-database-data
