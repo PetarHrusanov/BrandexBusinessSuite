@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-settings
+data:
+  seed-initial-data: "True"
+  notifications-allowed-origins: http://35.187.82.181
+  excel-logic-endpoint: http://brandexsalesadapter-excellogic:5001
+
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: environment-secrets
+data:
+  brandex-database-sa-password: eW91clN0cm9uZ1Bhc3N3b3JkMTIhQA==
+  security-token-secret: UzBNMyBNNEcxQyBVTjFDMFJOUyBHM04zUjRUM0QgVEgxUyBTM0NSM1Q=
+  excel-logic-connection-string: U2VydmVyPXNxbHNlcnZlcjtEYXRhYmFzZT1CcmFuZGV4VGVzdERhdGFiYXNlO1VzZXIgSWQ9c2E7IFBhc3N3b3JkPXlvdXJTdHJvbmdQYXNzd29yZDEyIUA7TXVsdGlwbGVBY3RpdmVSZXN1bHRTZXRzPXRydWU=
+  excel-logic-cron-jobs-connection-string: U2VydmVyPXNxbHNlcnZlcjtEYXRhYmFzZT1CcmFuZGV4VGVzdERhdGFiYXNlO1VzZXIgSWQ9c2E7IFBhc3N3b3JkPXlvdXJTdHJvbmdQYXNzd29yZDEyIUA7TXVsdGlwbGVBY3RpdmVSZXN1bHRTZXRzPXRydWU=
+  admin-password: YWRtaW5wYXNzMTIh
