@@ -23,7 +23,7 @@ pipeline {
     }
     stage('Run Test Application') {
       steps {
-        sh('#!/bin/bash docker-compose up -d')
+        sh('#!/bin/bash /docker-compose up -d')
       }
     }
 
@@ -35,7 +35,7 @@ pipeline {
 
     stage('Stop Test Application') {
       steps {
-        sh('#!/bin/bash docker-compose down')
+        sh('#!/bin/bash /docker-compose down')
         // powershell(script: 'docker volumes prune -f')   		
       }
       post {
