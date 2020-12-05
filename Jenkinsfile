@@ -6,15 +6,15 @@ pipeline {
         sh("#!/bin/bash git pull")
       }
     }
-    stage('Run Unit Tests') {
-      steps {
-        powershell(script: """ 
-          cd Server
-          dotnet test
-          cd ..
-        """)
-      }
-    }
+    // stage('Run Unit Tests') {
+    //   steps {
+    //     powershell(script: """ 
+    //       cd Server
+    //       dotnet test
+    //       cd ..
+    //     """)
+    //   }
+    // }
     stage('Docker Build') {
       steps {
         sh('#!/bin/bash /docker-compose build')
