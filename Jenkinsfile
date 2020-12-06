@@ -65,7 +65,7 @@ pipeline {
     stage('Deploy Development') {
       // when { branch 'main' }
       steps {
-        withKubeConfig([credentialsId: 'DevelopmentServer', serverUrl: 'https://35.187.82.181']) {
+        withKubeConfig([credentialsId: 'c8056e3e-0b35-4e8b-be5b-1a5224f1a9d5', serverUrl: 'http://35.187.82.181']) {
            sh('#!/bin/bash kubectl apply -f ./.k8s/.environment/development.yml')
            sh('#!/bin/bash kubectl apply -f ./.k8s/databases')
            sh('#!/bin/bash kubectl apply -f ./.k8s/clients')
