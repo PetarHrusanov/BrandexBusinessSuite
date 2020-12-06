@@ -36,6 +36,7 @@ pipeline {
     stage('Stop Test Application') {
       steps {
         sh('#!/bin/bash /docker-compose down')
+        
         // powershell(script: 'docker volumes prune -f')   		
       }
       post {
@@ -48,18 +49,18 @@ pipeline {
       }
     }
 
-    // stage('Push Images') {
-    //   when { branch 'main' }
-    //   steps {
-    //     script {
-    //       docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
-    //         def image = docker.image("ivaylokenov/carrentalsystem-identity-service")
-    //         image.push("1.0.${env.BUILD_ID}")
-    //         image.push('latest')
-    //       }
-    //     }
-    //   }
-    // } 
+    stage('Push Images') {
+      when { branch 'main' }
+      steps {
+        script {
+          docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
+            def image = docker.image("petarhrusanov/brandexautomationtest")
+            image.push("1.0.${env.BUILD_ID}")
+            image.push('latest')
+          }
+        }
+      }
+    } 
 
     stage('Deploy Development') {
       when { branch 'main' }
