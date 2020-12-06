@@ -4,6 +4,7 @@ metadata:
   name: environment-settings
 data:
   seed-initial-data: "True"
+  allowed-origins: http://35.187.82.181
   excel-logic-endpoint: http://brandexsalesadapter-excellogic:5001
 
 
