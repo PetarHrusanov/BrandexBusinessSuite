@@ -39,6 +39,13 @@ spec:
         web-client: brandex-client
         system: client
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                web-client: brandex-client
+            topologyKey: "kubernetes.io/hostname"
       containers:
       - name: brandex-client
         image: petarhrusanov/brandexautomationtest:latest
