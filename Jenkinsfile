@@ -51,7 +51,7 @@ pipeline {
     }
 
     stage('Push Images') {
-      when { branch 'main' }
+      // when { branch 'main' }
       steps {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'DockerHub') {
@@ -64,7 +64,7 @@ pipeline {
     } 
 
     stage('Deploy Development') {
-      when { branch 'main' }
+      // when { branch 'main' }
       steps {
         withKubeConfig([credentialsId: 'DevelopmentServer', serverUrl: 'https://35.187.82.181']) {
            sh('#!/bin/bash kubectl apply -f ./.k8s/.environment/development.yml')
