@@ -55,10 +55,25 @@ spec:
             secretKeyRef:
               name: environment-secrets
               key: security-token-secret
+        - name: ApplicationSettings__SeedInitialData
+          valueFrom:
+            configMapKeyRef:
+              name: environment-settings
+              key: seed-initial-data
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: environment-secrets
+              key: brandex-service-connection-string
+        - name: ConnectionStrings__CronJobsConnection
+          valueFrom:
+            secretKeyRef:
+              name: environment-secrets
+              key: brandex-service-cron-jobs-connection-string
         volumeMounts:
-        - name: brandex-client-data
+        - name: brandex-service-data
           mountPath: /root/.aspnet/DataProtection-Keys
       volumes:
-      - name: brandex-client-data
+      - name: brandex-service-data
         persistentVolumeClaim:
-          claimName: brandex-client-data
+          claimName: brandex-service-data
