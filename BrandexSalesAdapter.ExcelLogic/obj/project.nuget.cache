@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "4xSRMl4O1kpEZMMv12+V3pQoRbi1L3+luhmqNPd0NMGNQjWBrYW1QAWs1Oo1/RAZeA8uobKXgaZAH4cg3I6TLA==",
+  "dgSpecHash": "5ow7dOyHU1X5h8G8cJeKysDMC2ciH9JE3zedbhoPvlJXshMbDyAc8flA/KLFyQtywEcNZk3/Yrhvsq45IGoGAg==",
   "success": true,
-  "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/NewName/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/BrandexSalesAdapter.ExcelLogic.csproj",
+  "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/BrandexSalesAdapter.ExcelLogic.csproj",
   "expectedPackageFiles": [
-    "/Users/Petar/.nuget/packages/automapper/10.0.0/automapper.10.0.0.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/automapper/10.1.1/automapper.10.1.1.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/8.1.1/automapper.extensions.microsoft.dependencyinjection.8.1.1.nupkg.sha512",
     "/Users/Petar/.nuget/packages/dotnetcore.npoi/1.2.2/dotnetcore.npoi.1.2.2.nupkg.sha512",
     "/Users/Petar/.nuget/packages/dotnetcore.npoi.core/1.2.2/dotnetcore.npoi.core.1.2.2.nupkg.sha512",
     "/Users/Petar/.nuget/packages/dotnetcore.npoi.openxml4net/1.2.2/dotnetcore.npoi.openxml4net.1.2.2.nupkg.sha512",

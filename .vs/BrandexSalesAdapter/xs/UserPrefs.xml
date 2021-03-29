@@ -1,107 +1,71 @@
-﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="{7AE6C904-5DCA-4C67-8FC5-4460DB24E45C}|Default">
+﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="{2F4DB71A-D889-4470-83B2-091163C0D3BD}|Default">
   <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.ExcelLogic PreferredExecutionTarget="/Applications/Safari.app" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="docker-compose.yml">
+  <MonoDevelop.Ide.Workbench ActiveDocument="BrandexSalesAdapter.ExcelLogic/Startup.cs">
     <Files>
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" Line="51" Column="77" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/ApplicationUserConfiguration.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/CityConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/CompanyConfiguration.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Migrations/SpravkiDbContextModelSnapshot.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/ApplicationUserModels/ApplicationRole.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/ApplicationUserModels/IdentityOptionsProvider.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/City.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Distributor.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/BaseDeletableModel.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/BaseModel.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/IAuditInfo.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Common/IDeletableEntity.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/AutoMapperConfig.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/IHaveCustomMappings.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/IMapFrom.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/IMapTo.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Mapping/QueryableMappingExtensions.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Identity/IIdentityService.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/ApplicationUserModels/ApplicationRole.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/ApplicationUserModels/ApplicationUser.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/ApplicationUserModels/IdentityOptionsProvider.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Common/DataConstants.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Infrastructure/Extensions/ApplicationBuilderExtensions.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/SpravkiDbContext.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/CityConfiguration.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/CompanyConfiguration.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/DistributorConfiguration.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/PharmacyChainConfiguration.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/PharmacyConfiguration.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/ProductConfiguration.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/RegionConfiguration.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/SaleConfiguration.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/ApplicationUserConfiguration.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/AdministratorSeeder.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/ApplicationDbContextSeeder.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/ISeeder.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/RolesSeeder.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Common/Constants.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_Layout.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Program.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/mono_crash.11a6748113.0.json" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/mono_crash.11a6748113.1.json" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/mono_crash.11a6748113.2.json" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_CookieConsentPartial.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_ValidationScriptsPartial.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/Error.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_LoginPartial.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Import.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Index.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Upload.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/_ViewStart.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/_ViewImports.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Areas/Identity/Pages/_ViewStart.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Areas/Administration/Views/_ViewImports.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Areas/Administration/Views/_ViewStart.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Home/Index.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CompaniesController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CitiesController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/DistributorsController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/HomeController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmacyChainsController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmacyDetailsController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmnetController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PhoenixController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/ProductsController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/RegionController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/SopharmaController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/StingController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Brandex/BrandexInputModel.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Brandex/BrandexOutputModel.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/HandleController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Phoenix/Index.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Phoenix/Check.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Pharmacies/PharmacyExcelModel.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Pharmacies/IPharmaciesService.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Pharmacies/PharmacyOutputModel.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Products/IProductsService.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Products/ProductsService.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Pharmacies/PharmaciesService.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Pharmacies/PharmacyDistributorCheck.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Products/ProductInputModel.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Products/ProductOutputModel.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Products/ProductShortOutputModel.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Products/ProductDistributorCheck.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Sales/ISalesService.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Sales/SalesService.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Sale.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Dockerfile" Line="1" Column="1" />
-      <File FileName=".dockerignore" />
-      <File FileName="docker-compose.yml" Line="23" Column="15" />
-      <File FileName="docker-compose.override.yml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/SpravkiDbContext.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" Line="1" Column="1" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/appsettings.json" />
-      <File FileName="../../../../../../../../Applications/Visual Studio.app/Contents/Resources/lib/monodevelop/AddIns/docker/MonoDevelop.Docker/MSbuild/Sdks/Microsoft.Docker.Sdk/build/Microsoft.VisualStudio.Docker.Compose.targets" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/HandleController.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/HomeController.cs" Line="75" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Home/Index.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_Layout.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Program.cs" Line="10" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Region.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/RegionController.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PhoenixController.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmnetController.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/DistributorsController.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Regions/RegionInputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Regions/RegionOutputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Regions/IRegionsService.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Regions/RegionsService.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Sales/SaleInputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Sales/SaleFiltersExcelInputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Sales/SaleOutputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Sales/SalesRegionDateInputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Sales/SaleExcelOutputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CitiesController.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/wwwroot/css/site.css" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/wwwroot/css/site.min.css" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" Line="69" Column="53" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/INumbersChecker.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Map/IMapFrom.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Map/MappingProfile.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Pharmacies/PharmaciesService.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Brandex/BrandexInputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Infrastructure/Extensions/ApplicationBuilderExtensions.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CompaniesController.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/Razor/Views/PharmacyDetails/Index.cshtml.g.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/Razor/Views/Pharmnet/Index.cshtml.g.cs" Line="5" Column="2" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="BrandexSalesAdapter" expanded="True">
-            <Node name="BrandexSalesAdapter.ExcelLogic" expanded="True" />
-            <Node name="docker-compose" expanded="True">
-              <Node name="docker-compose.yml" selected="True" />
+            <Node name="BrandexSalesAdapter.ExcelLogic" expanded="True">
+              <Node name="Controllers" expanded="True" />
+              <Node name="Startup.cs" selected="True" />
             </Node>
           </Node>
         </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
@@ -114,7 +78,9 @@
   <Debugger.DebugSourceFolders />
   <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/HomeController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/HomeController.cs" line="70" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations>
     <MultiItemSolutionRunConfiguration Id="Multiple" Name="Multiple">
