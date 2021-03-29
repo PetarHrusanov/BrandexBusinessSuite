@@ -30,6 +30,8 @@ namespace BrandexSalesAdapter.ExcelLogic
     using Microsoft.EntityFrameworkCore;
     using BrandexSalesAdapter.ExcelLogic.Data.Seeding;
     using Microsoft.AspNetCore.Identity;
+    using BrandexSalesAdapter.ExcelLogic.Models.Map;
+    using System;
 
     public class Startup
     {
@@ -50,26 +52,26 @@ namespace BrandexSalesAdapter.ExcelLogic
             services.AddDbContext<SpravkiDbContext>(
                 options => options.UseSqlServer(this.configuration.GetConnectionString("DefaultConnection")));
 
-            //services.AddDefaultIdentity
-
             services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
                 .AddRoles<ApplicationRole>().AddEntityFrameworkStores<SpravkiDbContext>();
 
-            //services.AddScoped<SignInManager<ApplicationUser>, SignInManager<ApplicationUser>>();
-
-            services.Configure<CookiePolicyOptions>(
-                options =>
-                {
-                    options.CheckConsentNeeded = context => true;
-                    options.MinimumSameSitePolicy = SameSiteMode.None;
-                });
+            //services.Configure<CookiePolicyOptions>(
+            //    options =>
+            //    {
+            //        options.CheckConsentNeeded = context => true;
+            //        options.MinimumSameSitePolicy = SameSiteMode.None;
+            //    });
 
             services.AddControllersWithViews();
             services.AddRazorPages();
 
             services.AddSingleton(this.configuration);
 
-            //services.AddTransient<IAdministrationTextService, AdministrationTextService>();
+            services
+                .AddAutoMapper(
+                    (_, config) => config
+                        .AddProfile(new MappingProfile(Assembly.GetCallingAssembly())),
+                    Array.Empty<Assembly>());
 
             services
                 //.AddWebService<SpravkiDbContext>(this.configuration)
@@ -85,18 +87,16 @@ namespace BrandexSalesAdapter.ExcelLogic
                 .AddTransient<ISalesService, SalesService>()
                 .AddTransient<INumbersChecker, NumbersChecker>()
 
-                .AddControllersWithViews(options => options
-                    .Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+                //.AddControllersWithViews(options => options
+                //    .Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+                ;
 
+            services.AddMvc();
 
-            services.AddRazorPages();
             services.AddRouting(options => options.LowercaseUrls = true);
 
-            //services
-            //    .AddRefitClient<IIdentityService>()
-            //    .WithConfiguration(serviceEndpoints.Identity);
-
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -127,11 +127,26 @@ namespace BrandexSalesAdapter.ExcelLogic
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseCookiePolicy();
+            app
+               //.UseAuthentication()
+               //.UseAuthorization()
+               .UseRouting()
+               .UseCors(options => options
+                   .AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod());
 
-            app.UseRouting();
+            app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
+            //app.UseCookiePolicy();
+
+            //app.UseCors(options => options
+            //        .AllowAnyOrigin()
+            //        .AllowAnyHeader()
+            //        .AllowAnyMethod());
+
+            //app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();

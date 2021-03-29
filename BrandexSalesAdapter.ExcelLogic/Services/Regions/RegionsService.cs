@@ -8,6 +8,7 @@
     using Microsoft.EntityFrameworkCore;
     using BrandexSalesAdapter.ExcelLogic.Data;
     using BrandexSalesAdapter.ExcelLogic.Data.Models;
+    using BrandexSalesAdapter.ExcelLogic.Models.Regions;
 
     public class RegionsService :IRegionsService
     {
@@ -58,6 +59,17 @@
                                       Value = a.Id.ToString(),
                                       Text = a.Name
                                   }).ToListAsync();
+        }
+
+        public async Task<RegionOutputModel[]> AllRegions()
+        {
+            var regionArray = await this.db.Regions.Select(a =>
+                                  new RegionOutputModel
+                                  {
+                                      Id = a.Id,
+                                      Name = a.Name
+                                  }).ToArrayAsync();
+            return regionArray;
         }
     }
 }

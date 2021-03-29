@@ -19,6 +19,7 @@
     using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
     using BrandexSalesAdapter.ExcelLogic.Services.Regions;
     using Microsoft.AspNetCore.Authorization;
+    using BrandexSalesAdapter.ExcelLogic.Models.Regions;
 
     public class HomeController : Controller
     {
@@ -47,7 +48,6 @@
 
         }
 
-        [Authorize]
         public async Task<IActionResult> Index()
         {
             var inputFilter = new SaleFiltersExcelInputModel();
@@ -57,20 +57,34 @@
             return View(inputFilter);
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Export(string date = null)
         {
             return await GenerateSalesFile(date, null);
         }
 
-        [Authorize]
+        // Method Version for Angular Adaptation
         [HttpPost]
-        public async Task<IActionResult> ByCity(int regionId, string date = null)
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> ByCity([FromBody] SalesRegionDateInputModel input)
         {
+            var regionId = input.RegionId;
+            var date = input.Date;
+
             return await GenerateSalesFile(date, regionId);
         }
-        
+
+        // Method Version for Basic Asp Core MVC Logic
+        //[HttpPost]
+        //[IgnoreAntiforgeryToken]
+        //public async Task<IActionResult> ByCity([FromBody] SalesRegionDateInputModel input)
+        //{
+        //    var regionId = input.RegionId;
+        //    var date = input.Date;
+
+        //    return await GenerateSalesFile(date, regionId);
+        //}
+
 
         public IActionResult Privacy()
         {

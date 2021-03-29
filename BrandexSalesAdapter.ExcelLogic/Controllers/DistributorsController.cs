@@ -6,6 +6,7 @@
     using BrandexSalesAdapter.ExcelLogic.Data.Models;
     using BrandexSalesAdapter.ExcelLogic.Models.Distributor;
     using Microsoft.AspNetCore.Authorization;
+    using System.Threading.Tasks;
 
     public class DistributorsController :Controller
     {
@@ -35,7 +36,7 @@
 
         [Authorize]
         [HttpPost]
-        public async System.Threading.Tasks.Task<IActionResult> ImportAsync(string name)
+        public async Task<IActionResult> ImportAsync(string name)
         {
 
             var distributor = new Distributor();

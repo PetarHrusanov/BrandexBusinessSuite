@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using BrandexSalesAdapter.ExcelLogic.Models.Regions;
     using Microsoft.AspNetCore.Mvc.Rendering;
 
     public interface IRegionsService
@@ -13,5 +14,8 @@
         Task<int> IdByName(string regionName);
 
         Task<List<SelectListItem>> RegionsForSelect();
+
+        Task<RegionOutputModel[]> AllRegions();
+
     }
 }
