@@ -1,6 +1,6 @@
 ﻿<Properties GitUserInfo="UsingMD" StartupConfiguration="{2F4DB71A-D889-4470-83B2-091163C0D3BD}|Default">
   <MonoDevelop.Ide.ItemProperties.BrandexSalesAdapter.ExcelLogic PreferredExecutionTarget="/Applications/Safari.app" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="BrandexSalesAdapter.ExcelLogic/Startup.cs">
+  <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/ApplicationUserConfiguration.cs" Line="1" Column="1" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Confirugations/CityConfiguration.cs" />
@@ -18,18 +18,18 @@
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/ISeeder.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Seeding/RolesSeeder.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/SpravkiDbContext.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Startup.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/appsettings.json" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/HandleController.cs" Line="1" Column="1" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/HomeController.cs" Line="75" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/HandleController.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/HomeController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Home/Index.cshtml" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Shared/_Layout.cshtml" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Program.cs" Line="10" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Program.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Data/Models/Region.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/RegionController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PhoenixController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/PharmnetController.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/DistributorsController.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/DistributorsController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Regions/RegionInputModel.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Regions/RegionOutputModel.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Regions/IRegionsService.cs" />
@@ -39,33 +39,45 @@
       <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Sales/SaleOutputModel.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Sales/SalesRegionDateInputModel.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Sales/SaleExcelOutputModel.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CitiesController.cs" Line="1" Column="1" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CitiesController.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/wwwroot/css/site.css" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/wwwroot/css/site.min.css" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" Line="69" Column="53" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" Line="298" Column="1" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Services/INumbersChecker.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Map/IMapFrom.cs" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Map/MappingProfile.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Pharmacies/PharmaciesService.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Services/Pharmacies/PharmaciesService.cs" Line="179" Column="64" />
       <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Brandex/BrandexInputModel.cs" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Infrastructure/Extensions/ApplicationBuilderExtensions.cs" Line="1" Column="1" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CompaniesController.cs" Line="1" Column="1" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/Razor/Views/PharmacyDetails/Index.cshtml.g.cs" Line="1" Column="1" />
-      <File FileName="BrandexSalesAdapter.ExcelLogic/obj/Debug/netcoreapp3.1/Razor/Views/Pharmnet/Index.cshtml.g.cs" Line="5" Column="2" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Infrastructure/Extensions/ApplicationBuilderExtensions.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Controllers/CompaniesController.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Pharmnet/PharmnetInputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Models/Brandex/BrandexOutputModel.cs" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/_ViewStart.cshtml" />
+      <File FileName="BrandexSalesAdapter.ExcelLogic/Views/Brandex/Import.cshtml" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="BrandexSalesAdapter" expanded="True">
             <Node name="BrandexSalesAdapter.ExcelLogic" expanded="True">
+              <Node name="Dependencies" expanded="True">
+                <Node name="PackageDependencies" expanded="True" selected="True" />
+              </Node>
               <Node name="Controllers" expanded="True" />
-              <Node name="Startup.cs" selected="True" />
+              <Node name="Models" expanded="True">
+                <Node name="Brandex" expanded="True" />
+                <Node name="Pharmnet" expanded="True" />
+              </Node>
+              <Node name="Services" expanded="True">
+                <Node name="Pharmacies" expanded="True" />
+                <Node name="Products" expanded="True" />
+              </Node>
+              <Node name="Views" expanded="True">
+                <Node name="Brandex" expanded="True" />
+              </Node>
             </Node>
           </Node>
         </State>
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
@@ -79,7 +91,18 @@
   <MonoDevelop.Ide.ItemProperties.docker-compose PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/HomeController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/HomeController.cs" line="70" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="72" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="79" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="81" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="83" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="107" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="104" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="289" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="296" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="120" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="122" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="124" column="1" />
+      <Breakpoint file="/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" relfile="BrandexSalesAdapter.ExcelLogic/Controllers/BrandexController.cs" line="180" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations>
