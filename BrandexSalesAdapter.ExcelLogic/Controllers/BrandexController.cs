@@ -20,8 +20,9 @@
     using BrandexSalesAdapter.ExcelLogic.Services.Sales;
     using static Common.DataConstants.Ditributors;
     using Microsoft.AspNetCore.Authorization;
+    using Newtonsoft.Json.Linq;
 
-    public class BrandexController : HandleController
+    public class BrandexController : Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
@@ -54,24 +55,63 @@
             this.productsService = productsService;
             this.pharmaciesService = pharmaciesService;
             this.distributorService = distributorService;
-            
+
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public ActionResult Index()
         {
             return this.View();
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost]
-        public async Task<ActionResult> Import(BrandexInputModel brandexInput)
+        [IgnoreAntiforgeryToken]
+        [Consumes("multipart/form-data")]
+        public async Task<BrandexOutputModel> Import([FromForm] BrandexInputModel brandexInput)
         {
 
-            IFormFile file = Request.Form.Files[0];
+            var requestContentType = Request.ContentType;
 
-            DateTime dateForDb = DateTime.ParseExact(brandexInput.Date, "dd-MM-yyyy", null);
+            //var readForAsync = await Request.ReadFormAsync();
+
+            var testcheNaRequest = Request.Body;
+
+            var klosharche = Request.Form["Date"];
+
+            var dict = Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString());
+
+            // previous functioning version
+            //var formCollection = await Request.ReadFormAsync();
+            //var file = formCollection.Files.First();
+            //DateTime dateForDb = DateTime.ParseExact(brandexInput.Date, "dd-MM-yyyy", null);
+
+            //IFormFile file = Request.Form.Files[0];
+
+            //var klosharche = Request.Form.Files;
+
+            // version with BrandexInput
+            string dateFromClient = brandexInput.Date;
+
+            //version with JObject
+            //string dateFromClient = brandexInput["date"].ToString();
+
+            //string dateFromClient = data["date"].ToString();
+
+            //string dateFromClient = dateFromCleintRaw;
+
+            DateTime dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
+
+            // version with BrandexInput
+            IFormFile file = brandexInput.ImageFile;
+
+            //IFormFile file = pfiles[0];
+
+            //version with JObject
+            //IFormFile file = brandexInput["imageFile"].ToObject<IFormFile>();
+
+            //IFormFile file = imageFile;
 
             string folderName = "UploadExcel";
 
@@ -247,11 +287,13 @@
             }
 
             var brandexOutputModel = new BrandexOutputModel {
-                Date = brandexInput.Date,
+                Date = dateFromClient,
                 Errors = errorDictionary
             };
 
-            return this.View(brandexOutputModel);
+            return brandexOutputModel;
+
+            //return this.View(brandexOutputModel);
 
         }
 

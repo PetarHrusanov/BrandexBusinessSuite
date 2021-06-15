@@ -63,6 +63,12 @@ namespace BrandexSalesAdapter.ExcelLogic
             //    });
 
             services.AddControllersWithViews();
+
+            //services.AddControllers(options =>
+            //{
+            //    options.RespectBrowserAcceptHeader = true; // false by default
+            //});
+
             services.AddRazorPages();
 
             services.AddSingleton(this.configuration);
@@ -91,7 +97,9 @@ namespace BrandexSalesAdapter.ExcelLogic
                 //    .Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
                 ;
 
+            services.AddCors();
             services.AddMvc();
+            
 
             services.AddRouting(options => options.LowercaseUrls = true);
 
