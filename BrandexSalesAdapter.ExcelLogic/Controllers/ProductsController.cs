@@ -38,7 +38,7 @@
             this.numbersChecker = numbersChecker;
         }
 
-        [Authorize]
+        //[Authorize]
         public IActionResult Index()
         {
             return View();

@@ -21,7 +21,7 @@
 
         }
 
-        [Authorize]
+        //[Authorize]
         public IActionResult Index()
         {
             var distributors = context.Distributors.Select(n => n.Name).ToList();

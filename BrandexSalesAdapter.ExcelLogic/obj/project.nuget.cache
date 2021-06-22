@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "RENmLIjXUNOf88cUukDhiVuwVGqSsVUUaoQEJlKK36q9bazpl+iH8bPFauNtyRv4qYzHQ6L39OLLvza9wJ2WRw==",
+  "dgSpecHash": "+4ih3NyhwsZcUQOiDew2Awk7w976IiXxtAkuEXVmF2yWcaFVIRApto/vENpWtgPMamnELHSZy7KxMjJlCaAqAg==",
   "success": true,
   "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.ExcelLogic/BrandexSalesAdapter.ExcelLogic.csproj",
   "expectedPackageFiles": [
@@ -57,7 +57,7 @@
     "/usr/local/share/dotnet/sdk/NuGetFallbackFolder/microsoft.netcore.targets/1.1.0/microsoft.netcore.targets.1.1.0.nupkg.sha512",
     "/usr/local/share/dotnet/sdk/NuGetFallbackFolder/microsoft.win32.registry/4.5.0/microsoft.win32.registry.4.5.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/microsoft.win32.systemevents/4.5.0/microsoft.win32.systemevents.4.5.0.nupkg.sha512",
-    "/Users/Petar/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
     "/Users/Petar/.nuget/packages/refit/5.2.1/refit.5.2.1.nupkg.sha512",
     "/Users/Petar/.nuget/packages/refit.httpclientfactory/5.2.1/refit.httpclientfactory.5.2.1.nupkg.sha512",
     "/usr/local/share/dotnet/sdk/NuGetFallbackFolder/runtime.native.system/4.3.0/runtime.native.system.4.3.0.nupkg.sha512",

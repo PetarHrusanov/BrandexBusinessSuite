@@ -32,7 +32,7 @@
             this.citiesService = citiesService;
         }
 
-        [Authorize]
+        //[Authorize]
         public IActionResult Index()
         {
             return View();
