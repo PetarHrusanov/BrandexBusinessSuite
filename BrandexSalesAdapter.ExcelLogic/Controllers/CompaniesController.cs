@@ -38,7 +38,7 @@
 
         }
 
-        [Authorize]
+        //[Authorize]
         public IActionResult Index()
         {
             return View();

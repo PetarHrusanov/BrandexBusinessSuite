@@ -5,12 +5,6 @@
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using NPOI.HSSF.UserModel;
-    using NPOI.SS.UserModel;
-    using NPOI.XSSF.UserModel;
     using BrandexSalesAdapter.ExcelLogic.Models.Brandex;
     using BrandexSalesAdapter.ExcelLogic.Models.Sales;
     using BrandexSalesAdapter.ExcelLogic.Services;
@@ -18,9 +12,15 @@
     using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
     using BrandexSalesAdapter.ExcelLogic.Services.Products;
     using BrandexSalesAdapter.ExcelLogic.Services.Sales;
-    using static Common.DataConstants.Ditributors;
     using Microsoft.AspNetCore.Authorization;
-    using Newtonsoft.Json.Linq;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+    using Newtonsoft.Json;
+    using NPOI.HSSF.UserModel;
+    using NPOI.SS.UserModel;
+    using NPOI.XSSF.UserModel;
+    using static Common.DataConstants.Ditributors;
 
     public class BrandexController : Controller
     {
@@ -69,49 +69,18 @@
         [HttpPost]
         [IgnoreAntiforgeryToken]
         [Consumes("multipart/form-data")]
-        public async Task<BrandexOutputModel> Import([FromForm] BrandexInputModel brandexInput)
+        public async Task<string> Import([FromForm] BrandexInputModel brandexInput)
         {
-
-            var requestContentType = Request.ContentType;
-
-            //var readForAsync = await Request.ReadFormAsync();
-
-            var testcheNaRequest = Request.Body;
-
-            var klosharche = Request.Form["Date"];
-
-            var dict = Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString());
-
-            // previous functioning version
-            //var formCollection = await Request.ReadFormAsync();
-            //var file = formCollection.Files.First();
-            //DateTime dateForDb = DateTime.ParseExact(brandexInput.Date, "dd-MM-yyyy", null);
-
-            //IFormFile file = Request.Form.Files[0];
-
-            //var klosharche = Request.Form.Files;
 
             // version with BrandexInput
             string dateFromClient = brandexInput.Date;
 
-            //version with JObject
-            //string dateFromClient = brandexInput["date"].ToString();
-
-            //string dateFromClient = data["date"].ToString();
-
-            //string dateFromClient = dateFromCleintRaw;
-
             DateTime dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
+
+            string distributorName = brandexInput.Distributor;
 
             // version with BrandexInput
             IFormFile file = brandexInput.ImageFile;
-
-            //IFormFile file = pfiles[0];
-
-            //version with JObject
-            //IFormFile file = brandexInput["imageFile"].ToObject<IFormFile>();
-
-            //IFormFile file = imageFile;
 
             string folderName = "UploadExcel";
 
@@ -202,78 +171,68 @@
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
                             }
 
-                            switch (j)
+                            switch (distributorName)
                             {
-                                case 0:
+                                case BrandexENG:
 
-                                    var currRowDate = DateTime.ParseExact(currentRow, "yyyy-MM", null);
-                                    if (currentRow != null)
+                                    switch (j)
                                     {
-                                        newSale.Date = currRowDate;
+                                        case 0:
+                                            if (ResolveDate(currentRow, Brandex) != null)
+                                            {
+                                                newSale.Date = (DateTime)ResolveDate(currentRow, Brandex);
+                                            }
+
+                                            else
+                                            {
+                                                errorDictionary[i] = currentRow;
+                                            }
+
+                                            break;
+
+                                        case 3:
+
+                                            if (await ResolveProductIDAsync(currentRow, Brandex) != 0)
+                                            {
+                                                newSale.ProductId = (int)await ResolveProductIDAsync(currentRow, Brandex);
+                                            }
+
+                                            else
+                                            {
+                                                errorDictionary[i] = currentRow;
+                                            }
+                                            break;
+                                        case 4:
+                                            if (ResolveSaleCount(currentRow) != null)
+                                            {
+                                                newSale.Count = (int)ResolveSaleCount(currentRow);
+                                            }
+                                            else
+                                            {
+                                                errorDictionary[i] = currentRow;
+                                            }
+                                            break;
+                                        case 5:
+                                            if (await ResolvePharmacyID(currentRow, Brandex) != 0)
+                                            {
+                                                newSale.PharmacyId = await ResolvePharmacyID(currentRow, Brandex);
+                                            }
+                                            else
+                                            {
+                                                errorDictionary[i] = currentRow;
+                                            }
+                                            break;
+
                                     }
+
                                     break;
 
-                                case 3:
-                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
-                                    {
-                                        var producId = await this.productsService.ProductIdByDistributor(currentRow, Brandex);
+                                case SopharmaENG:
 
-                                        if (producId!=0)
-                                        {   
-                                            newSale.ProductId = producId;
-                                        }
-                                        else
-                                        {
-                                            errorDictionary[i] = currentRow;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
+
                                     break;
 
-                                case 4:
-                                    if (currentRow != "")
-                                    {
-                                        if (this.numbersChecker.NegativeNumberIncludedCheck(currentRow))
-                                        {
-                                            int countProduct = int.Parse(currentRow);
-                                            newSale.Count = countProduct;
-                                        }
-                                        else
-                                        {
-                                            errorDictionary[i] = currentRow;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-                                    break;
 
-                                case 5:
-                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
-                                    {
-                                        int rowPharmacytId = int.Parse(currentRow);
-
-                                        var pharmacyId = await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Brandex);
-
-                                        if (await this.pharmaciesService.CheckPharmacyByDistributor(currentRow, Brandex))
-                                        {
-                                            newSale.PharmacyId = pharmacyId;
-                                        }
-
-                                        else
-                                        {
-                                            errorDictionary[i] = currentRow;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-                                    break;
 
                             }
 
@@ -291,7 +250,9 @@
                 Errors = errorDictionary
             };
 
-            return brandexOutputModel;
+            string brandexOutputSerialized = JsonConvert.SerializeObject(brandexOutputModel);
+
+            return brandexOutputSerialized;
 
             //return this.View(brandexOutputModel);
 
@@ -299,7 +260,7 @@
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Check(IFormFile ImageFile)
+        public async Task<string> Check(IFormFile ImageFile)
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -448,7 +409,9 @@
                 Errors = errorDictionary
             };
 
-            return this.View(brandexOutputModel);
+            string brandexOutputSerializsed = JsonConvert.SerializeObject(brandexOutputModel);
+
+            return brandexOutputSerializsed;
 
         }
 
@@ -471,5 +434,74 @@
 
             return Redirect("Index");
         }
+
+        public static DateTime? ResolveDate(string inputDate, string inputDistributor)
+        {
+            switch (inputDistributor)
+            {
+                case Brandex:
+                    return DateTime.ParseExact(inputDate, "yyyy-MM", null);
+                case Phoenix:
+                    return DateTime.Parse(inputDate);
+                case Sopharma:
+                    return DateTime.ParseExact(inputDate, "MM.yyyy", null);
+                default:
+                    return null;
+            }       
+        }
+
+        public async Task<int> ResolveProductIDAsync(string inputProductID, string inputDistributor)
+        {
+
+            if (!numbersChecker.WholeNumberCheck(inputProductID))
+            {
+                return 0;
+            }
+            switch (inputDistributor)
+            {
+                case Brandex:
+                    var producId = await productsService.ProductIdByDistributor(inputProductID, Brandex);
+                    return producId;
+
+            }
+
+                
+
+            return 0;
+        }
+
+        public int? ResolveSaleCount(string inputSaleCount)
+        {
+            if (this.numbersChecker.NegativeNumberIncludedCheck(inputSaleCount))
+            {
+                return int.Parse(inputSaleCount);
+            }
+
+            return null;
+
+        }
+
+        public async Task<int> ResolvePharmacyID(string inputPharmacyID, string inputDistributor)
+        {
+
+            if (this.numbersChecker.WholeNumberCheck(inputPharmacyID))
+            {
+                switch (inputDistributor)
+                {
+                    case Brandex:
+                        if (await this.pharmaciesService.CheckPharmacyByDistributor(inputPharmacyID, Brandex))
+                        {
+                            return await this.pharmaciesService.PharmacyIdByDistributor(inputPharmacyID, Brandex);
+                        }
+
+                        return 0;
+                }
+
+            }
+
+            return 0;
+        }
+
+
     }
 }

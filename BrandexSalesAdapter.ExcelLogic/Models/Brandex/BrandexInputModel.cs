@@ -5,10 +5,13 @@
 
     public class BrandexInputModel
     {
-        [FromForm(Name = "Date")]
+        //[FromForm(Name = "d")]
         public string Date { get; set; }
 
-        [FromForm(Name = "ImageFile")]
+        //[FromForm(Name = "d")]
+        public string Distributor { get; set; }
+
+        //[FromForm(Name = "ImageFile")]
         public IFormFile ImageFile { get; set; }
     }
 }
