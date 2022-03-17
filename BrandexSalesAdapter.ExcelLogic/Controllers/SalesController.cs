@@ -14,8 +14,7 @@
     using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
     using BrandexSalesAdapter.ExcelLogic.Services.Products;
     using BrandexSalesAdapter.ExcelLogic.Services.Sales;
-
-    using Microsoft.AspNetCore.Authorization;
+    
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -23,6 +22,7 @@
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
+    
     using static Common.DataConstants.Ditributors;
     using static Common.DataConstants.ExcelLineErrors;
 
@@ -552,7 +552,7 @@
 
             else
             {
-                errorDictionary[i] = IncorrectDateFormat;
+                errorDictionary[i+1] = IncorrectDateFormat;
             }
 
             int productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor, productIdsForCheck);
@@ -564,7 +564,7 @@
                                 
             else
             {
-                errorDictionary[i] = IncorrectProductId;
+                errorDictionary[i+1] = IncorrectProductId + " "+productRow;
             }
             int pharmacyIdRow = ResolvePharmacyId(row.GetCell(pharmacyIdColumn).ToString()?.TrimEnd(), distributor, pharmacyIdsForCheck);
 
@@ -574,7 +574,7 @@
             }
             else
             {
-                errorDictionary[i] = IncorrectPharmacyId;
+                errorDictionary[i+1] = IncorrectPharmacyId;
             }
             
             var saleCountRow = ResolveSaleCount(row.GetCell(saleCountColumn).ToString()?.TrimEnd());
@@ -586,7 +586,7 @@
 
             else
             {
-                errorDictionary[i] = IncorrectSalesCount;
+                errorDictionary[i+1] = IncorrectSalesCount + " "+saleCountRow;
             }
             
         }
