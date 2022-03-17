@@ -40,7 +40,7 @@
             return View();
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult> Import()
         {
@@ -159,7 +159,7 @@
 
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult> Upload(string pharmacyChainName)
         {

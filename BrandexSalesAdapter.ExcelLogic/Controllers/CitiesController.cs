@@ -38,7 +38,7 @@
             return View();
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult> Import(IFormFile ImageFile)
         {
@@ -158,7 +158,7 @@
 
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult> Upload(string cityName)
         {
@@ -175,6 +175,6 @@
             {
                 return Redirect("Index");
             }
-         }
+        }
     }
 }

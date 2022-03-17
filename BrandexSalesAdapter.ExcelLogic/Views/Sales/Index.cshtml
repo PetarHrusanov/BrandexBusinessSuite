@@ -1,5 +1,5 @@
 ﻿@model BrandexSalesAdapter.ExcelLogic.Models.Brandex.BrandexInputModel
-@using (Html.BeginForm("Check", "Brandex", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Check", "Sales", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     <h1>Check your Input For Error Befor Submitting</h1>
@@ -20,7 +20,7 @@
     </div>
 }
 
-@using (Html.BeginForm("Import", "Brandex", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Import", "Sales", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     <h1>Brandex Input Form</h1>
@@ -49,7 +49,7 @@
     </div>
 }
 
-@using (Html.BeginForm("Upload", "Brandex", FormMethod.Post))
+@using (Html.BeginForm("Upload", "Sales", FormMethod.Post))
 {
     <div class="form-horizontal">
         <hr />

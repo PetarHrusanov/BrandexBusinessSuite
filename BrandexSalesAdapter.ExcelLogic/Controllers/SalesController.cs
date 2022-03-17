@@ -6,12 +6,15 @@
     using System.Linq;
     using System.Threading.Tasks;
     using BrandexSalesAdapter.ExcelLogic.Models.Brandex;
+    using BrandexSalesAdapter.ExcelLogic.Models.Pharmacies;
+    using BrandexSalesAdapter.ExcelLogic.Models.Products;
     using BrandexSalesAdapter.ExcelLogic.Models.Sales;
     using BrandexSalesAdapter.ExcelLogic.Services;
     using BrandexSalesAdapter.ExcelLogic.Services.Distributor;
     using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
     using BrandexSalesAdapter.ExcelLogic.Services.Products;
     using BrandexSalesAdapter.ExcelLogic.Services.Sales;
+
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -21,10 +24,11 @@
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
     using static Common.DataConstants.Ditributors;
+    using static Common.DataConstants.ExcelLineErrors;
 
-    public class BrandexController : Controller
+    public class SalesController : Controller
     {
-        private IWebHostEnvironment hostEnvironment;
+        private readonly IWebHostEnvironment hostEnvironment;
 
         // db Services
         private readonly ISalesService salesService;
@@ -38,7 +42,7 @@
         // universal Services
         private readonly INumbersChecker numbersChecker;
 
-        public BrandexController(
+        public SalesController(
             IWebHostEnvironment hostEnvironment,
             ISalesService salesService,
             INumbersChecker numbersChecker,
@@ -90,6 +94,9 @@
 
             var errorDictionary = new Dictionary<int, string>();
 
+            var pharmacyIdsForCheck = await pharmaciesService.GetPharmaciesCheck();
+            var productIdsForCheck = await productsService.GetProductsCheck();
+
             if (!Directory.Exists(newPath))
 
             {
@@ -100,7 +107,7 @@
 
             {
 
-                string sFileExtension = Path.GetExtension(file.FileName).ToLower();
+                string sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
 
                 ISheet sheet;
 
@@ -110,7 +117,7 @@
 
                 {
 
-                    file.CopyTo(stream);
+                    await file.CopyToAsync(stream);
 
                     stream.Position = 0;
 
@@ -156,89 +163,58 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        var newSale = new SaleInputModel();
-                        newSale.Date = dateForDb;
-
-
-                        for (int j = row.FirstCellNum; j < cellCount; j++)
-
+                        var newSale = new SaleInputModel
                         {
+                            Date = dateForDb
+                        };
+                        
+                        switch (distributorName)
+                        {
+                            case Brandex:
 
-                            string currentRow = "";
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
+                                    errorDictionary, Brandex, 0, 3, 5, 4);
 
-                            if (row.GetCell(j) != null)
-                            {
-                                currentRow = row.GetCell(j).ToString().TrimEnd();
-                            }
+                                await this.salesService.CreateSale(newSale, Brandex);
 
-                            switch (distributorName)
-                            {
-                                case BrandexENG:
+                                break;
+                            
+                            case Phoenix:
+                                
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                    errorDictionary,Phoenix,16,0,2,14);
 
-                                    switch (j)
-                                    {
-                                        case 0:
-                                            if (ResolveDate(currentRow, Brandex) != null)
-                                            {
-                                                newSale.Date = (DateTime)ResolveDate(currentRow, Brandex);
-                                            }
+                                await this.salesService.CreateSale(newSale, Phoenix);
+                                
+                                break;
+                            
+                            case Sting:
+                                
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                    errorDictionary,Sting,0,1,6,11);
 
-                                            else
-                                            {
-                                                errorDictionary[i] = currentRow;
-                                            }
+                                await this.salesService.CreateSale(newSale, Sting);
+                                
+                                break;
+                            
+                            case Pharmnet:
+                                
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                    errorDictionary,Pharmnet,9,2,4,11);
 
-                                            break;
+                                await this.salesService.CreateSale(newSale, Pharmnet);
+                                
+                                break;
+                            
+                            case Sopharma:
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                    errorDictionary,Sopharma,0,2,5,11);
 
-                                        case 3:
-
-                                            if (await ResolveProductIDAsync(currentRow, Brandex) != 0)
-                                            {
-                                                newSale.ProductId = (int)await ResolveProductIDAsync(currentRow, Brandex);
-                                            }
-
-                                            else
-                                            {
-                                                errorDictionary[i] = currentRow;
-                                            }
-                                            break;
-                                        case 4:
-                                            if (ResolveSaleCount(currentRow) != null)
-                                            {
-                                                newSale.Count = (int)ResolveSaleCount(currentRow);
-                                            }
-                                            else
-                                            {
-                                                errorDictionary[i] = currentRow;
-                                            }
-                                            break;
-                                        case 5:
-                                            if (await ResolvePharmacyID(currentRow, Brandex) != 0)
-                                            {
-                                                newSale.PharmacyId = await ResolvePharmacyID(currentRow, Brandex);
-                                            }
-                                            else
-                                            {
-                                                errorDictionary[i] = currentRow;
-                                            }
-                                            break;
-
-                                    }
-
-                                    break;
-
-                                case SopharmaENG:
-
-
-                                    break;
-
-
-
-                            }
-
+                                await this.salesService.CreateSale(newSale, Sopharma);
+                                
+                                break;
+                            
                         }
-
-                        await this.salesService.CreateSale(newSale, Brandex);
                     }
 
                 }
@@ -258,9 +234,9 @@
 
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
-        public async Task<string> Check(IFormFile ImageFile)
+        public async Task<string> Check(IFormFile imageFile)
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -293,7 +269,7 @@
 
                 {
 
-                    file.CopyTo(stream);
+                    await file.CopyToAsync(stream);
 
                     stream.Position = 0;
 
@@ -338,6 +314,8 @@
                         if (row == null) continue;
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+                        
+                        
 
                         for (int j = row.FirstCellNum; j < cellCount; j++)
 
@@ -403,6 +381,8 @@
                 }
 
             }
+            
+           
 
             var brandexOutputModel = new BrandexOutputModel
             {
@@ -415,7 +395,7 @@
 
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult> Upload(string pharmacyId, string productId, string date, int count)
         {
@@ -435,13 +415,22 @@
             return Redirect("Index");
         }
 
-        public static DateTime? ResolveDate(string inputDate, string inputDistributor)
+        private static DateTime? ResolveDate(string inputDate, string inputDistributor)
         {
+            if (inputDate==null)
+            {
+                return null;
+            }
+            
             switch (inputDistributor)
             {
                 case Brandex:
                     return DateTime.ParseExact(inputDate, "yyyy-MM", null);
                 case Phoenix:
+                    return DateTime.Parse(inputDate);
+                case Sting:
+                    return DateTime.ParseExact(inputDate, "yyyy-MM", null);
+                case Pharmnet:
                     return DateTime.Parse(inputDate);
                 case Sopharma:
                     return DateTime.ParseExact(inputDate, "MM.yyyy", null);
@@ -450,28 +439,54 @@
             }       
         }
 
-        public async Task<int> ResolveProductIDAsync(string inputProductID, string inputDistributor)
+        public int ResolveProductId(string inputProductId, string inputDistributor, List<ProductCheckModel> productsToCheck)
         {
-
-            if (!numbersChecker.WholeNumberCheck(inputProductID))
+            if (inputProductId == null)
             {
                 return 0;
             }
+            
+            var productId = 0;
+
+            if (inputDistributor==Sopharma)
+            {
+                productId = productsToCheck.Where(p => p.SopharmaId == inputProductId).Select(p => p.Id).FirstOrDefault();
+                return productId != 0 ? productId : 0;
+            }
+
+            if (!numbersChecker.WholeNumberCheck(inputProductId))
+            {
+                return productId;
+            }
+
+            int inputProductIdInt = int.Parse(inputProductId);
+
             switch (inputDistributor)
             {
                 case Brandex:
-                    var producId = await productsService.ProductIdByDistributor(inputProductID, Brandex);
-                    return producId;
-
+                    productId = productsToCheck.Where(p => p.BrandexId == inputProductIdInt).Select(p => p.Id).FirstOrDefault();
+                    return productId != 0 ? productId : 0;
+                case Phoenix:
+                    productId = productsToCheck.Where(p => p.PhoenixId == inputProductIdInt).Select(p => p.Id).FirstOrDefault();
+                    return productId != 0 ? productId : 0;
+                case Sting:
+                    productId = productsToCheck.Where(p => p.StingId == inputProductIdInt).Select(p => p.Id).FirstOrDefault();
+                    return productId != 0 ? productId : 0;
+                case Pharmnet:
+                    productId = productsToCheck.Where(p => p.PharmnetId == inputProductIdInt).Select(p => p.Id).FirstOrDefault();
+                    return productId != 0 ? productId : 0;
             }
 
-                
-
             return 0;
+            
         }
 
         public int? ResolveSaleCount(string inputSaleCount)
         {
+            if (inputSaleCount==null)
+            {
+                return null;
+            }
             if (this.numbersChecker.NegativeNumberIncludedCheck(inputSaleCount))
             {
                 return int.Parse(inputSaleCount);
@@ -481,27 +496,100 @@
 
         }
 
-        public async Task<int> ResolvePharmacyID(string inputPharmacyID, string inputDistributor)
+        public int ResolvePharmacyId(string inputPharmacyId, string inputDistributor, List<PharmacyCheckModel> pharmaciesToCheck)
         {
-
-            if (this.numbersChecker.WholeNumberCheck(inputPharmacyID))
+            if (inputPharmacyId == null)
             {
+                return 0;
+            }
+
+            var pharmacyId = 0;
+
+            if (this.numbersChecker.WholeNumberCheck(inputPharmacyId))
+            {
+                int inputPharmacyIdInt = int.Parse(inputPharmacyId);
+                
                 switch (inputDistributor)
                 {
                     case Brandex:
-                        if (await this.pharmaciesService.CheckPharmacyByDistributor(inputPharmacyID, Brandex))
-                        {
-                            return await this.pharmaciesService.PharmacyIdByDistributor(inputPharmacyID, Brandex);
-                        }
-
-                        return 0;
+                        pharmacyId = pharmaciesToCheck.Where(p => p.BrandexId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                        return pharmacyId != 0 ? pharmacyId : 0;
+                    case Phoenix:pharmacyId = pharmaciesToCheck.Where(p => p.PhoenixId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                        return pharmacyId != 0 ? pharmacyId : 0;
+                    case Sting:pharmacyId = pharmaciesToCheck.Where(p => p.StingId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                        return pharmacyId != 0 ? pharmacyId : 0;
+                    case Pharmnet:pharmacyId = pharmaciesToCheck.Where(p => p.PharmnetId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                        return pharmacyId != 0 ? pharmacyId : 0;
+                    case Sopharma:pharmacyId = pharmaciesToCheck.Where(p => p.SopharmaId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                        return pharmacyId != 0 ? pharmacyId : 0;
                 }
 
             }
 
-            return 0;
+            return pharmacyId;
         }
+        
+        private void CreateSaleInputModel(
+            List<ProductCheckModel> productIdsForCheck,
+            List<PharmacyCheckModel> pharmacyIdsForCheck,
+            IRow row,
+            int i,
+            SaleInputModel newSale, 
+            Dictionary<int, string> errorDictionary,
+            string distributor,
+            int dateColumn,
+            int productIdColumn,
+            int pharmacyIdColumn,
+            int saleCountColumn)
+        {
+           
+            var dateRow = ResolveDate(row.GetCell(dateColumn).ToString()?.TrimEnd(), distributor); 
+            
+            if (dateRow != null)
+            {
+                newSale.Date = (DateTime)dateRow;
+            }
 
+            else
+            {
+                errorDictionary[i] = IncorrectDateFormat;
+            }
 
+            int productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor, productIdsForCheck);
+
+            if (productRow != 0)
+            {
+                newSale.ProductId = productRow;
+            }
+                                
+            else
+            {
+                errorDictionary[i] = IncorrectProductId;
+            }
+            int pharmacyIdRow = ResolvePharmacyId(row.GetCell(pharmacyIdColumn).ToString()?.TrimEnd(), distributor, pharmacyIdsForCheck);
+
+            if (pharmacyIdRow != 0)
+            {
+                newSale.PharmacyId = pharmacyIdRow;
+            }
+            else
+            {
+                errorDictionary[i] = IncorrectPharmacyId;
+            }
+            
+            var saleCountRow = ResolveSaleCount(row.GetCell(saleCountColumn).ToString()?.TrimEnd());
+
+            if (saleCountRow!=null)
+            {
+                newSale.Count = (int)saleCountRow;
+            }
+
+            else
+            {
+                errorDictionary[i] = IncorrectSalesCount;
+            }
+            
+        }
+        
     }
 }

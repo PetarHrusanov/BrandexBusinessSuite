@@ -37,7 +37,7 @@
     <Folder Include="Services\" />
     <Folder Include="Services\Sales\" />
     <Folder Include="Services\Products\" />
-    <Folder Include="Views\Brandex\" />
+    <Folder Include="Views\Sales\" />
     <Folder Include="Services\Pharmacies\" />
     <Folder Include="Common\" />
     <Folder Include="Services\Distributor\" />

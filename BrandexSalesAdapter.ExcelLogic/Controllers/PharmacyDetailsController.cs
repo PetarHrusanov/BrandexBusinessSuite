@@ -63,7 +63,7 @@
             return View();
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult> ImportAsync()
         {
@@ -323,7 +323,7 @@
             return this.View(pharmacyErrorModel);
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult> Upload(int brandexId,
             string name,
