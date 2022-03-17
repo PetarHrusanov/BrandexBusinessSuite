@@ -7,6 +7,7 @@
     using BrandexSalesAdapter.ExcelLogic.Models.Distributor;
     using Microsoft.AspNetCore.Authorization;
     using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
 
     public class DistributorsController :Controller
     {
@@ -32,6 +33,17 @@
             };
 
             return View(distributorsView);
+        }
+
+        [HttpGet]
+        public async Task<DistributorOutputModel[]> GetDistributors()
+        {
+            return await this.context.Distributors.Select(n => new DistributorOutputModel
+            {
+                Name = n.Name,
+                Id = n.Id
+            }).ToArrayAsync();
+          
         }
 
         [Authorize]

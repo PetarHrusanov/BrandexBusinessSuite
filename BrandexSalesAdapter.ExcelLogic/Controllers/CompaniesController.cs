@@ -44,7 +44,7 @@
             return View();
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult> ImportAsync()
         {
@@ -175,7 +175,7 @@
 
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
         public async Task<ActionResult> Upload(string companyName, string vat, string ownerName)
         {

@@ -41,7 +41,7 @@
         public async Task<RegionOutputModel[]> GetRegions()
         {
             return await regionService.AllRegions();
-    }
+        }
 
         //[Authorize]
         [HttpPost]

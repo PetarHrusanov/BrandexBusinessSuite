@@ -9,6 +9,8 @@
     {
         Task<string> CreateProduct(ProductInputModel productInputModel);
 
+        Task<List<ProductCheckModel>> GetProductsCheck();
+
         Task<bool> CheckProductByDistributor(string input, string distributor);
 
         Task<int> ProductIdByDistributor(string input, string distributor);

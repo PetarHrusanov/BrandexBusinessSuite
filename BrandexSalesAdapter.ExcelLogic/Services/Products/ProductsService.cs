@@ -47,6 +47,19 @@
             }
         }
 
+        public async Task<List<ProductCheckModel>> GetProductsCheck()
+        {
+            return await this.db.Products.Select(p => new ProductCheckModel
+            {
+                Id = p.Id,
+                BrandexId = p.BrandexId,
+                PhoenixId = p.PhoenixId,
+                PharmnetId = p.PharmnetId,
+                StingId = p.StingId,
+                SopharmaId = p.SopharmaId
+            }).ToListAsync();
+        }
+
         public async Task<bool> CheckProductByDistributor(string input, string Distributor)
         {
             int convertedNumber;

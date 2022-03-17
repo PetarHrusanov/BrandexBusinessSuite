@@ -209,5 +209,19 @@
                     return new List<PharmacyDistributorCheck>();
             };
         }
+
+        public async Task<List<PharmacyCheckModel>> GetPharmaciesCheck()
+        {
+            return await this.db.Pharmacies.Select(p => new PharmacyCheckModel
+            {
+                Id = p.Id,
+                BrandexId = p.BrandexId,
+                PhoenixId = p.PhoenixId,
+                PharmnetId = p.PharmnetId,
+                StingId = p.StingId,
+                SopharmaId = p.SopharmaId
+            }).ToListAsync();
+
         }
+    }
 }
