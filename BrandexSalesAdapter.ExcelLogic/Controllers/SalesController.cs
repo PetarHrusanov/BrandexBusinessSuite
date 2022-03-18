@@ -370,7 +370,7 @@
 
         // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Upload(SaleSingleInputModel saleSingleInputModel)
+        public async Task<string> Upload([FromBody]SaleSingleInputModel saleSingleInputModel)
         {
 
             if(await this._salesService.UploadIndividualSale(
@@ -386,12 +386,17 @@
                     PharmacyName = await this._pharmaciesService.NameById(saleSingleInputModel.PharmacyId, saleSingleInputModel.Distributor),
                     Count = saleSingleInputModel.Count,
                     Date = saleSingleInputModel.Date,
-                    DistributorName = saleSingleInputModel.Distributor
+                    Distributor = saleSingleInputModel.Distributor
                 };
-                return this.View(saleOutputModel);
+                
+                string outputSerialized = JsonConvert.SerializeObject(saleOutputModel);
+
+                return outputSerialized;
+                
+                // return this.View(saleOutputModel);
             }
 
-            return Redirect("Index");
+            return "END";
         }
 
         private static DateTime? ResolveDate(string inputDate, string inputDistributor)
