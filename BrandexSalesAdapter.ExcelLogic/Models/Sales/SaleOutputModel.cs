@@ -6,7 +6,7 @@
 
         public string ProductName { get; set; }
 
-        public string DistributorName { get; set; }
+        public string Distributor { get; set; }
 
         public string Date { get; set; }
 

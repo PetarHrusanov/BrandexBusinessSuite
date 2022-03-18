@@ -51,11 +51,9 @@
         {
             DateTime dateForDb = DateTime.ParseExact(date, "dd-MM-yyyy", null);
 
-            int convertedProductId;
-            bool successProduct = int.TryParse(productId, out convertedProductId);
+            bool successProduct = int.TryParse(productId, out var convertedProductId);
 
-            int convertedPharmacyId;
-            bool successPharmacy = int.TryParse(pharmacyId, out convertedPharmacyId);
+            bool successPharmacy = int.TryParse(pharmacyId, out var convertedPharmacyId);
 
             var newSale = new Sale();
 
