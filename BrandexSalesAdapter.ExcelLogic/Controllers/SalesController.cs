@@ -5,7 +5,7 @@
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    using BrandexSalesAdapter.ExcelLogic.Models.Brandex;
+
     using BrandexSalesAdapter.ExcelLogic.Models.Pharmacies;
     using BrandexSalesAdapter.ExcelLogic.Models.Products;
     using BrandexSalesAdapter.ExcelLogic.Models.Sales;
@@ -28,19 +28,19 @@
 
     public class SalesController : Controller
     {
-        private readonly IWebHostEnvironment hostEnvironment;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
-        private readonly ISalesService salesService;
-        private readonly IProductsService productsService;
-        private readonly IPharmaciesService pharmaciesService;
-        private readonly IDistributorService distributorService;
+        private readonly ISalesService _salesService;
+        private readonly IProductsService _productsService;
+        private readonly IPharmaciesService _pharmaciesService;
+        private readonly IDistributorService _distributorService;
 
         // user service
 
 
         // universal Services
-        private readonly INumbersChecker numbersChecker;
+        private readonly INumbersChecker _numbersChecker;
 
         public SalesController(
             IWebHostEnvironment hostEnvironment,
@@ -53,12 +53,12 @@
 
         {
 
-            this.hostEnvironment = hostEnvironment;
-            this.salesService = salesService;
-            this.numbersChecker = numbersChecker;
-            this.productsService = productsService;
-            this.pharmaciesService = pharmaciesService;
-            this.distributorService = distributorService;
+            this._hostEnvironment = hostEnvironment;
+            this._salesService = salesService;
+            this._numbersChecker = numbersChecker;
+            this._productsService = productsService;
+            this._pharmaciesService = pharmaciesService;
+            this._distributorService = distributorService;
 
         }
 
@@ -73,29 +73,27 @@
         [HttpPost]
         [IgnoreAntiforgeryToken]
         [Consumes("multipart/form-data")]
-        public async Task<string> Import([FromForm] BrandexInputModel brandexInput)
+        public async Task<string> Import([FromForm] SalesBulkInputModel salesBulkInput)
         {
-
-            // version with BrandexInput
-            string dateFromClient = brandexInput.Date;
+            
+            string dateFromClient = salesBulkInput.Date;
 
             DateTime dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
 
-            string distributorName = brandexInput.Distributor;
-
-            // version with BrandexInput
-            IFormFile file = brandexInput.ImageFile;
+            string distributorName = salesBulkInput.Distributor;
+            
+            IFormFile file = salesBulkInput.ImageFile;
 
             string folderName = "UploadExcel";
 
-            string webRootPath = hostEnvironment.WebRootPath;
+            string webRootPath = _hostEnvironment.WebRootPath;
 
             string newPath = Path.Combine(webRootPath, folderName);
 
             var errorDictionary = new Dictionary<int, string>();
 
-            var pharmacyIdsForCheck = await pharmaciesService.GetPharmaciesCheck();
-            var productIdsForCheck = await productsService.GetProductsCheck();
+            var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
+            var productIdsForCheck = await _productsService.GetProductsCheck();
 
             if (!Directory.Exists(newPath))
 
@@ -114,7 +112,6 @@
                 string fullPath = Path.Combine(newPath, file.FileName);
 
                 using (var stream = new FileStream(fullPath, FileMode.Create))
-
                 {
 
                     await file.CopyToAsync(stream);
@@ -122,7 +119,6 @@
                     stream.Position = 0;
 
                     if (sFileExtension == ".xls")
-
                     {
 
                         HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
@@ -132,7 +128,6 @@
                     }
 
                     else
-
                     {
 
                         XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
@@ -141,15 +136,156 @@
 
                     }
 
-                    IRow headerRow = sheet.GetRow(0); //Get Header Row
+                    // IRow headerRow = sheet.GetRow(0); //Get Header Row
+                    //
+                    // int cellCount = headerRow.LastCellNum;
+                    //
+                    // for (int j = 0; j < cellCount; j++)
+                    // {
+                    //     ICell cell = headerRow.GetCell(j);
+                    //
+                    //     if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+                    //
+                    // }
 
-                    int cellCount = headerRow.LastCellNum;
-
-                    for (int j = 0; j < cellCount; j++)
+                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
                     {
-                        ICell cell = headerRow.GetCell(j);
 
-                        if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+                        IRow row = sheet.GetRow(i);
+
+                        if (row == null) continue;
+
+                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+                        var newSale = new SaleInputModel
+                        {
+                            Date = dateForDb
+                        };
+                        
+                        switch (distributorName)
+                        {
+                            case Brandex:
+
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
+                                    errorDictionary, Brandex, 0, 3, 5, 4);
+
+                                await this._salesService.CreateSale(newSale, Brandex);
+
+                                break;
+                            
+                            case Phoenix:
+                                
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                    errorDictionary,Phoenix,16,0,2,14);
+
+                                await this._salesService.CreateSale(newSale, Phoenix);
+                                
+                                break;
+                            
+                            case Sting:
+                                
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                    errorDictionary,Sting,0,1,6,11);
+
+                                await this._salesService.CreateSale(newSale, Sting);
+                                
+                                break;
+                            
+                            case Pharmnet:
+                                
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                    errorDictionary,Pharmnet,9,2,4,11);
+
+                                await this._salesService.CreateSale(newSale, Pharmnet);
+                                
+                                break;
+                            
+                            case Sopharma:
+                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                    errorDictionary,Sopharma,0,2,5,11);
+
+                                await this._salesService.CreateSale(newSale, Sopharma);
+                                
+                                break;
+                            
+                        }
+                    }
+
+                }
+
+            }
+
+            var outputModel = new SalesBulkOutputModel {
+                Date = dateFromClient,
+                Errors = errorDictionary
+            };
+
+            string outputSerialized = JsonConvert.SerializeObject(outputModel);
+
+            return outputSerialized;
+
+        }
+
+        // [Authorize]
+        [HttpPost]
+        public async Task<string> Check([FromForm] SalesBulkInputModel salesBulkInput)
+        {
+
+            string dateFromClient = salesBulkInput.Date;
+
+            DateTime dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
+
+            string distributorName = salesBulkInput.Distributor;
+            
+            IFormFile file = salesBulkInput.ImageFile;
+
+            string folderName = "UploadExcel";
+
+            string webRootPath = _hostEnvironment.WebRootPath;
+
+            string newPath = Path.Combine(webRootPath, folderName);
+
+            var errorDictionary = new Dictionary<int, string>();
+
+            var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
+            var productIdsForCheck = await _productsService.GetProductsCheck();
+
+            if (!Directory.Exists(newPath))
+            {
+                Directory.CreateDirectory(newPath);
+            }
+
+            if (file.Length > 0)
+
+            {
+
+                string sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
+
+                string fullPath = Path.Combine(newPath, file.FileName);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+
+                    await file.CopyToAsync(stream);
+
+                    stream.Position = 0;
+
+                    ISheet sheet;
+                    if (sFileExtension == ".xls")
+                    {
+
+                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+
+                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+
+                    }
+
+                    else
+                    {
+
+                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+
+                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
                     }
 
@@ -175,7 +311,7 @@
                                 CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
                                     errorDictionary, Brandex, 0, 3, 5, 4);
 
-                                await this.salesService.CreateSale(newSale, Brandex);
+                                // await this._salesService.CreateSale(newSale, Brandex);
 
                                 break;
                             
@@ -184,7 +320,7 @@
                                 CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
                                     errorDictionary,Phoenix,16,0,2,14);
 
-                                await this.salesService.CreateSale(newSale, Phoenix);
+                                // await this._salesService.CreateSale(newSale, Phoenix);
                                 
                                 break;
                             
@@ -193,7 +329,7 @@
                                 CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
                                     errorDictionary,Sting,0,1,6,11);
 
-                                await this.salesService.CreateSale(newSale, Sting);
+                                // await this._salesService.CreateSale(newSale, Sting);
                                 
                                 break;
                             
@@ -202,7 +338,7 @@
                                 CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
                                     errorDictionary,Pharmnet,9,2,4,11);
 
-                                await this.salesService.CreateSale(newSale, Pharmnet);
+                                // await this._salesService.CreateSale(newSale, Pharmnet);
                                 
                                 break;
                             
@@ -210,7 +346,7 @@
                                 CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
                                     errorDictionary,Sopharma,0,2,5,11);
 
-                                await this.salesService.CreateSale(newSale, Sopharma);
+                                // await this._salesService.CreateSale(newSale, Sopharma);
                                 
                                 break;
                             
@@ -221,193 +357,36 @@
 
             }
 
-            var brandexOutputModel = new BrandexOutputModel {
+            var outputModel = new SalesBulkOutputModel {
                 Date = dateFromClient,
                 Errors = errorDictionary
             };
 
-            string brandexOutputSerialized = JsonConvert.SerializeObject(brandexOutputModel);
+            string outputSerialized = JsonConvert.SerializeObject(outputModel);
 
-            return brandexOutputSerialized;
-
-            //return this.View(brandexOutputModel);
+            return outputSerialized;
 
         }
 
         // [Authorize]
         [HttpPost]
-        public async Task<string> Check(IFormFile imageFile)
+        public async Task<ActionResult> Upload(SaleSingleInputModel saleSingleInputModel)
         {
 
-            IFormFile file = Request.Form.Files[0];
-
-            string folderName = "UploadExcel";
-
-            string webRootPath = hostEnvironment.WebRootPath;
-
-            string newPath = Path.Combine(webRootPath, folderName);
-
-            var errorDictionary = new Dictionary<int, string>();
-
-            if (!Directory.Exists(newPath))
-
-            {
-                Directory.CreateDirectory(newPath);
-            }
-
-            if (file.Length > 0)
-
-            {
-
-                string sFileExtension = Path.GetExtension(file.FileName).ToLower();
-
-                ISheet sheet;
-
-                string fullPath = Path.Combine(newPath, file.FileName);
-
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-
-                {
-
-                    await file.CopyToAsync(stream);
-
-                    stream.Position = 0;
-
-                    if (sFileExtension == ".xls")
-
-                    {
-
-                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-
-                    }
-
-                    else
-
-                    {
-
-                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
-
-                    }
-
-                    IRow headerRow = sheet.GetRow(0); //Get Header Row
-
-                    int cellCount = headerRow.LastCellNum;
-
-                    for (int j = 0; j < cellCount; j++)
-                    {
-                        ICell cell = headerRow.GetCell(j);
-
-                        if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-
-                    }
-
-                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-
-                    {
-
-                        IRow row = sheet.GetRow(i);
-
-                        if (row == null) continue;
-
-                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-                        
-                        
-
-                        for (int j = row.FirstCellNum; j < cellCount; j++)
-
-                        {
-
-                            string currentRow = "";
-
-                            if (row.GetCell(j) != null)
-                            {
-                                currentRow = row.GetCell(j).ToString().TrimEnd();
-                            }
-
-                            if (j > 5)
-                            {
-                                continue;
-                            }
-
-                            switch (j)
-                            {
-                                case 0:
-                                    break;
-
-                                case 1:
-                                    break;
-
-                                case 2:
-                                    break;
-
-                                case 3:
-                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
-                                    {
-                                        if (await this.productsService.ProductIdByDistributor(currentRow, Brandex) == 0)
-                                        {
-                                            errorDictionary[i] = currentRow;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-                                    break;
-
-                                case 4:
-                                    if (currentRow == "" || !this.numbersChecker.NegativeNumberIncludedCheck(currentRow))
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-                                    break;
-
-                                case 5:
-                                    if (!this.numbersChecker.WholeNumberCheck(currentRow)
-                                        || await this.pharmaciesService.PharmacyIdByDistributor(currentRow, Brandex) ==0)
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-                                    break;
-
-                            }
-
-                        }
-                    }
-
-                }
-
-            }
-            
-           
-
-            var brandexOutputModel = new BrandexOutputModel
-            {
-                Errors = errorDictionary
-            };
-
-            string brandexOutputSerializsed = JsonConvert.SerializeObject(brandexOutputModel);
-
-            return brandexOutputSerializsed;
-
-        }
-
-        // [Authorize]
-        [HttpPost]
-        public async Task<ActionResult> Upload(string pharmacyId, string productId, string date, int count)
-        {
-            if(await this.salesService.UploadIndividualSale(pharmacyId, productId, date, count, Brandex))
+            if(await this._salesService.UploadIndividualSale(
+                   saleSingleInputModel.PharmacyId, 
+                   saleSingleInputModel.ProductId, 
+                   saleSingleInputModel.Date, 
+                   saleSingleInputModel.Count, 
+                   saleSingleInputModel.Distributor))
             {
                 var saleOutputModel = new SaleOutputModel
                 {
-                    ProductName = await this.productsService.NameById(productId, Brandex),
-                    PharmacyName = await this.pharmaciesService.NameById(pharmacyId, Brandex),
-                    Count = count,
-                    Date = date,
-                    DistributorName = Brandex
+                    ProductName = await this._productsService.NameById(saleSingleInputModel.ProductId, saleSingleInputModel.Distributor),
+                    PharmacyName = await this._pharmaciesService.NameById(saleSingleInputModel.PharmacyId, saleSingleInputModel.Distributor),
+                    Count = saleSingleInputModel.Count,
+                    Date = saleSingleInputModel.Date,
+                    DistributorName = saleSingleInputModel.Distributor
                 };
                 return this.View(saleOutputModel);
             }
@@ -454,7 +433,7 @@
                 return productId != 0 ? productId : 0;
             }
 
-            if (!numbersChecker.WholeNumberCheck(inputProductId))
+            if (!_numbersChecker.WholeNumberCheck(inputProductId))
             {
                 return productId;
             }
@@ -487,7 +466,7 @@
             {
                 return null;
             }
-            if (this.numbersChecker.NegativeNumberIncludedCheck(inputSaleCount))
+            if (this._numbersChecker.NegativeNumberIncludedCheck(inputSaleCount))
             {
                 return int.Parse(inputSaleCount);
             }
@@ -505,7 +484,7 @@
 
             var pharmacyId = 0;
 
-            if (this.numbersChecker.WholeNumberCheck(inputPharmacyId))
+            if (this._numbersChecker.WholeNumberCheck(inputPharmacyId))
             {
                 int inputPharmacyIdInt = int.Parse(inputPharmacyId);
                 
@@ -586,7 +565,7 @@
 
             else
             {
-                errorDictionary[i+1] = IncorrectSalesCount + " "+saleCountRow;
+                errorDictionary[i+1] = IncorrectSalesCount;
             }
             
         }
