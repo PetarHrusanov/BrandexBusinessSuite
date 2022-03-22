@@ -1,8 +1,11 @@
-namespace BrandexSalesAdapter.ExcelLogic.Models.Pharmacies
+﻿namespace BrandexSalesAdapter.ExcelLogic.Models.Pharmacies
 {
+    using System;
     using BrandexSalesAdapter.ExcelLogic.Data.Enums;
-    public class PharmacyInputModel
+
+    public class PharmacyDbInputModel
     {
+        
         public int BrandexId { get; set; }
 
         public string Name { get; set; }
@@ -11,13 +14,13 @@ namespace BrandexSalesAdapter.ExcelLogic.Models.Pharmacies
 
         public bool Active { get; set; }
 
-        public string CompanyName { get; set; }
+        public int CompanyId { get; set; }
       
-        public string PharmacyChainName { get; set; }
+        public int PharmacyChainId { get; set; }
 
         public string Address { get; set; }
 
-        public string CityName { get; set; }
+        public int CityId { get; set; }
 
         public int? PharmnetId { get; set; }
 
@@ -27,6 +30,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Models.Pharmacies
 
         public int? StingId { get; set; }
 
-        public string RegionName { get; set; }
+        public int RegionId { get; set; }
     }
 }

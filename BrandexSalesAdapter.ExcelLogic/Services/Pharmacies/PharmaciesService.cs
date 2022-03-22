@@ -20,30 +20,30 @@
             this.db = db;
         }
 
-        public async Task<string> CreatePharmacy(PharmacyInputModel pharmacyInputModel)
+        public async Task<string> CreatePharmacy(PharmacyDbInputModel pharmacyDbInputModel)
         {
-            if(pharmacyInputModel.BrandexId!=0 &&
-                pharmacyInputModel.Name!=null &&
-                pharmacyInputModel.PharmacyChainId!= 0 &&
-                pharmacyInputModel.RegionId!= 0 &&
-                pharmacyInputModel.CityId!= 0 &&
-                pharmacyInputModel.CompanyId !=0)
+            if(pharmacyDbInputModel.BrandexId!=0 &&
+                pharmacyDbInputModel.Name!=null &&
+                pharmacyDbInputModel.PharmacyChainId!= 0 &&
+                pharmacyDbInputModel.RegionId!= 0 &&
+                pharmacyDbInputModel.CityId!= 0 &&
+                pharmacyDbInputModel.CompanyId !=0)
             {
                 var pharmacyModel = new Pharmacy
                 {
-                    BrandexId = pharmacyInputModel.BrandexId,
-                    Name = pharmacyInputModel.Name,
-                    Address = pharmacyInputModel.Address,
-                    PharmacyChainId = pharmacyInputModel.PharmacyChainId,
-                    Active = pharmacyInputModel.Active,
-                    CityId = pharmacyInputModel.CityId,
-                    SopharmaId = pharmacyInputModel.SopharmaId,
-                    StingId = pharmacyInputModel.StingId,
-                    PhoenixId = pharmacyInputModel.PhoenixId,
-                    PharmnetId = pharmacyInputModel.PharmnetId,
-                    CompanyId = pharmacyInputModel.CompanyId,
-                    PharmacyClass = pharmacyInputModel.PharmacyClass,
-                    RegionId = pharmacyInputModel.RegionId
+                    BrandexId = pharmacyDbInputModel.BrandexId,
+                    Name = pharmacyDbInputModel.Name,
+                    Address = pharmacyDbInputModel.Address,
+                    PharmacyChainId = pharmacyDbInputModel.PharmacyChainId,
+                    Active = pharmacyDbInputModel.Active,
+                    CityId = pharmacyDbInputModel.CityId,
+                    SopharmaId = pharmacyDbInputModel.SopharmaId,
+                    StingId = pharmacyDbInputModel.StingId,
+                    PhoenixId = pharmacyDbInputModel.PhoenixId,
+                    PharmnetId = pharmacyDbInputModel.PharmnetId,
+                    CompanyId = pharmacyDbInputModel.CompanyId,
+                    PharmacyClass = pharmacyDbInputModel.PharmacyClass,
+                    RegionId = pharmacyDbInputModel.RegionId
 
                 };
 
