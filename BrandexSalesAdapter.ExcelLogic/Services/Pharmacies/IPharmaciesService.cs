@@ -7,7 +7,7 @@
 
     public interface IPharmaciesService
     {
-        Task<string> CreatePharmacy(PharmacyInputModel pharmacyInputModel);
+        Task<string> CreatePharmacy(PharmacyDbInputModel pharmacyDbInputModel);
 
         Task<List<PharmacyCheckModel>> GetPharmaciesCheck();
 

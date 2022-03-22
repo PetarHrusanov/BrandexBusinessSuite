@@ -142,7 +142,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        var newPharmacy = new PharmacyInputModel
+                        var newPharmacy = new PharmacyDbInputModel
                         {
                             PharmacyClass = PharmacyClass.Other,
                             Active = true,
@@ -273,78 +273,98 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
         // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Upload(int brandexId,
-            string name,
-            PharmacyClass pharmacyClass,
-            bool active,
-            string companyName,
-            string pharmacyChainName,
-            string address,
-            string cityName,
-            int? pharmnetId,
-            int? phoenixId,
-            int? sopharmaId,
-            int? stingId,
-            string regionName
+        public async Task<string> Upload([FromBody]PharmacyInputModel pharmacyInputModel
+            // int brandexId,
+            // string name,
+            // PharmacyClass pharmacyClass,
+            // bool active,
+            // string companyName,
+            // string pharmacyChainName,
+            // string address,
+            // string cityName,
+            // int? pharmnetId,
+            // int? phoenixId,
+            // int? sopharmaId,
+            // int? stingId,
+            // string regionName
             )
         {
-            if(brandexId!=0
-                && name!=null
-                && await this._companiesService.CheckCompanyByName(companyName)
-                && await this._pharmacyChainsService.CheckPharmacyChainByName(pharmacyChainName)
-                && await this._citiesService.CheckCityName(cityName)
-                && await this._regionsService.CheckRegionByName(regionName)
-                && address != null)
+
+            // if (pharmacyInputModel.Name != null)
+            // {
+            // }
+            // if (await this._companiesService.CheckCompanyByName(pharmacyInputModel.CompanyName))
+            // {
+            // }
+            // if (await this._pharmacyChainsService.CheckPharmacyChainByName(pharmacyInputModel.PharmacyChainName))
+            // {
+            // }
+            // if (await this._citiesService.CheckCityName(pharmacyInputModel.CityName))
+            // {
+            // }
+            // if (await this._regionsService.CheckRegionByName(pharmacyInputModel.RegionName))
+            // {
+            // }
+            // if (pharmacyInputModel.Address != null)
+            // {
+            // }
+         
+            if(pharmacyInputModel.BrandexId!=0
+               && pharmacyInputModel.Name!=null
+               && await this._companiesService.CheckCompanyByName(pharmacyInputModel.CompanyName)
+               && await this._pharmacyChainsService.CheckPharmacyChainByName(pharmacyInputModel.PharmacyChainName)
+               && await this._citiesService.CheckCityName(pharmacyInputModel.CityName)
+               && await this._regionsService.CheckRegionByName(pharmacyInputModel.RegionName)
+               && pharmacyInputModel.Address != null)
             {
-                var pharmacyInputModel = new PharmacyInputModel
+                var pharmacyDbInputModel = new PharmacyDbInputModel
                 {
-                    BrandexId = brandexId,
-                    Name = name,
-                    PharmacyClass = pharmacyClass,
-                    Active = active,
-                    CompanyId = await this._companiesService.IdByName(companyName),
-                    PharmacyChainId = await this._pharmacyChainsService.IdByName(pharmacyChainName),
-                    Address = address,
-                    CityId = await this._citiesService.IdByName(cityName),
-                    PharmnetId = pharmnetId,
-                    PhoenixId = phoenixId,
-                    SopharmaId = sopharmaId,
-                    StingId = stingId,
-                    RegionId = await this._regionsService.IdByName(regionName)
+                    BrandexId = pharmacyInputModel.BrandexId,
+                    Name = pharmacyInputModel.Name,
+                    PharmacyClass = pharmacyInputModel.PharmacyClass,
+                    Active = pharmacyInputModel.Active,
+                    CompanyId = await this._companiesService.IdByName(pharmacyInputModel.CompanyName),
+                    PharmacyChainId = await this._pharmacyChainsService.IdByName(pharmacyInputModel.PharmacyChainName),
+                    Address = pharmacyInputModel.Address,
+                    CityId = await this._citiesService.IdByName(pharmacyInputModel.CityName),
+                    PharmnetId = pharmacyInputModel.PharmnetId,
+                    PhoenixId = pharmacyInputModel.PhoenixId,
+                    SopharmaId = pharmacyInputModel.SopharmaId,
+                    StingId = pharmacyInputModel.StingId,
+                    RegionId = await this._regionsService.IdByName(pharmacyInputModel.RegionName)
 
                 };
 
-                if(await this._pharmaciesService.CreatePharmacy(pharmacyInputModel) != "")
+                if(await this._pharmaciesService.CreatePharmacy(pharmacyDbInputModel) != "")
                 {
                     var pharmacyOutputModel = new PharmacyOutputModel
                     {
 
-                        Name = name,
-                        PharmacyClass = pharmacyClass.ToString(),
-                        CompanyName = companyName,
-                        PharmacyChainName = pharmacyChainName,
-                        Address = address,
-                        CityName = cityName,
-                        Region = regionName,
-                        BrandexId = brandexId,
-                        PharmnetId = pharmnetId,
-                        PhoenixId = phoenixId,
-                        SopharmaId = sopharmaId,
-                        StingId = stingId
+                        Name = pharmacyInputModel.Name,
+                        PharmacyClass = pharmacyInputModel.PharmacyClass.ToString(),
+                        CompanyName = pharmacyInputModel.CompanyName,
+                        PharmacyChainName = pharmacyInputModel.PharmacyChainName,
+                        Address = pharmacyInputModel.Address,
+                        CityName =pharmacyInputModel.CityName,
+                        Region = pharmacyInputModel.RegionName,
+                        BrandexId = pharmacyInputModel.BrandexId,
+                        PharmnetId = pharmacyInputModel.PharmnetId,
+                        PhoenixId = pharmacyInputModel.PhoenixId,
+                        SopharmaId = pharmacyInputModel.SopharmaId,
+                        StingId = pharmacyInputModel.StingId,
                     };
 
-                    return this.View(pharmacyOutputModel);
+                    string outputSerialized = JsonConvert.SerializeObject(pharmacyOutputModel);
+
+                    return outputSerialized;
 
                 }
-
-                else
-                {
-                    return Redirect("Index");
-                }
+                
             }
 
-            return Redirect("Index");
+            // return Redirect("Index");
 
+            throw new InvalidOperationException();
         }
     }
 }

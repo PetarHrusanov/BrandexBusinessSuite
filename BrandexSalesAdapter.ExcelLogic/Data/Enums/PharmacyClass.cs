@@ -2,11 +2,11 @@
 {
     public enum PharmacyClass
     {
-        A,
-        B,
-        C,
-        D,
-        Storage,
-        Other
+        A = 1,
+        B = 2,
+        C = 3,
+        D = 4,
+        Storage = 5,
+        Other = 6
     }
 }
