@@ -1,9 +1,9 @@
-﻿@using (Html.BeginForm("Import", "Region", FormMethod.Post, new { enctype = "multipart/form-data" }))
+﻿@using (Html.BeginForm("Import", "PharmacyCompanies", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-        <h4>Regions Bulk Import</h4>
+        <h4>Companies Bulk Import</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
@@ -21,15 +21,28 @@
 
 <hr />
 
-@using (Html.BeginForm("Upload", "Region", FormMethod.Post))
+@using (Html.BeginForm("Upload", "PharmacyCompanies", FormMethod.Post))
 {
+    
 <div class="form-horizontal">
-    <h4>Region Manual Import</h4>
+    <h4>Company Manual Import</h4>
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
     <div class="form-group">
         <div class="form-group">
-            <label name="regionName" class="control-label">Region Name</label>
-            <input name="regionName" class="form-control" />
+            <label name="companyName" class="control-label">Company Name</label>
+            <input name="companyName" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="form-group">
+            <label name="vat" class="control-label">VAT</label>
+            <input name="vat" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="form-group">
+            <label name="ownerName" class="control-label">Owner</label>
+            <input name="ownerName" class="form-control" />
         </div>
     </div>
     <div class="form-group">

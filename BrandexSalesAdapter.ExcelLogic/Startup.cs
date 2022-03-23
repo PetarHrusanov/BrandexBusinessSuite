@@ -1,3 +1,5 @@
+using BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies;
+
 namespace BrandexSalesAdapter.ExcelLogic
 {
     // Data 
@@ -11,7 +13,6 @@ namespace BrandexSalesAdapter.ExcelLogic
 
     // Business- Specific Services
     using BrandexSalesAdapter.ExcelLogic.Services.Cities;
-    using BrandexSalesAdapter.ExcelLogic.Services.Companies;
     using BrandexSalesAdapter.ExcelLogic.Services.Distributor;
     using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
     using BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains;
@@ -84,7 +85,7 @@ namespace BrandexSalesAdapter.ExcelLogic
 
                 // Business Logic 
                 .AddTransient<ICitiesService, CitiesService>()
-                .AddTransient<ICompaniesService, CompaniesService>()
+                .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()
                 .AddTransient<IDistributorService, DistributorService>()
                 .AddTransient<IPharmaciesService, PharmaciesService>()
                 .AddTransient<IPharmacyChainsService, PharmacyChainsService>()

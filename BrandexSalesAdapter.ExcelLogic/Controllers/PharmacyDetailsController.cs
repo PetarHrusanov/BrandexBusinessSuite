@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies;
+using Newtonsoft.Json;
 
 namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
@@ -18,7 +19,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using BrandexSalesAdapter.ExcelLogic.Models.Pharmacies;
     using BrandexSalesAdapter.ExcelLogic.Services;
     using BrandexSalesAdapter.ExcelLogic.Services.Cities;
-    using BrandexSalesAdapter.ExcelLogic.Services.Companies;
     using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
     using BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains;
     using BrandexSalesAdapter.ExcelLogic.Services.Regions;
@@ -32,7 +32,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
         // db Services
         private readonly IPharmaciesService _pharmaciesService;
-        private readonly ICompaniesService _companiesService;
+        private readonly IPharmacyCompaniesService _pharmacyCompaniesService;
         private readonly IRegionsService _regionsService;
         private readonly IPharmacyChainsService _pharmacyChainsService;
         private readonly ICitiesService _citiesService; 
@@ -44,7 +44,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             IWebHostEnvironment hostEnvironment,
             INumbersChecker numbersChecker,
             IPharmaciesService pharmaciesService,
-            ICompaniesService companiesService,
+            IPharmacyCompaniesService pharmacyCompaniesService,
             IPharmacyChainsService pharmacyChainsService,
             IRegionsService regionsService,
             ICitiesService citiesService)
@@ -54,7 +54,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             this._hostEnvironment = hostEnvironment;
             this._numbersChecker = numbersChecker;
             this._pharmaciesService = pharmaciesService;
-            this._companiesService = companiesService;
+            this._pharmacyCompaniesService = pharmacyCompaniesService;
             this._pharmacyChainsService = pharmacyChainsService;
             this._regionsService = regionsService;
             this._citiesService = citiesService;
@@ -175,7 +175,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                         }
                         
                         var companyIdRow = row.GetCell(4).ToString()?.TrimEnd();
-                        int companyId = await this._companiesService.IdByName(companyIdRow);
+                        int companyId = await this._pharmacyCompaniesService.IdByName(companyIdRow);
 
                         if (companyId!=0)
                         {
@@ -278,7 +278,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
             if(pharmacyInputModel.BrandexId!=0
                && pharmacyInputModel.Name!=null
-               && await this._companiesService.CheckCompanyByName(pharmacyInputModel.CompanyName)
+               && await this._pharmacyCompaniesService.CheckCompanyByName(pharmacyInputModel.CompanyName)
                && await this._pharmacyChainsService.CheckPharmacyChainByName(pharmacyInputModel.PharmacyChainName)
                && await this._citiesService.CheckCityName(pharmacyInputModel.CityName)
                && await this._regionsService.CheckRegionByName(pharmacyInputModel.RegionName)
@@ -290,7 +290,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                     Name = pharmacyInputModel.Name,
                     PharmacyClass = pharmacyInputModel.PharmacyClass,
                     Active = pharmacyInputModel.Active,
-                    CompanyId = await this._companiesService.IdByName(pharmacyInputModel.CompanyName),
+                    CompanyId = await this._pharmacyCompaniesService.IdByName(pharmacyInputModel.CompanyName),
                     PharmacyChainId = await this._pharmacyChainsService.IdByName(pharmacyInputModel.PharmacyChainName),
                     Address = pharmacyInputModel.Address,
                     CityId = await this._citiesService.IdByName(pharmacyInputModel.CityName),

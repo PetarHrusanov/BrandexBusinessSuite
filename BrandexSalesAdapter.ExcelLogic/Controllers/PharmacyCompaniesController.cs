@@ -1,7 +1,10 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿using BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies;
+
+namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -10,25 +13,35 @@
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
     using BrandexSalesAdapter.ExcelLogic.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.Regions;
-    using BrandexSalesAdapter.ExcelLogic.Services.Regions;
+    using BrandexSalesAdapter.ExcelLogic.Models.Companies;
+    using BrandexSalesAdapter.ExcelLogic.Services;
     using Microsoft.AspNetCore.Authorization;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models;
+    
+    using Newtonsoft.Json;
+    
+    using static Common.InputOutputConstants.SingleStringConstants;
 
-    public class RegionController: Controller
+
+    public class PharmacyCompaniesController :Controller
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
-        private readonly IRegionsService _regionService;
+        private readonly IPharmacyCompaniesService _pharmacyCompaniesService;
 
-        public RegionController(
+        private readonly INumbersChecker _numbersChecker;
+
+        public PharmacyCompaniesController(
             IWebHostEnvironment hostEnvironment,
-            IRegionsService regionService)
+            INumbersChecker numbersChecker,
+            IPharmacyCompaniesService pharmacyCompaniesService)
 
         {
+
             this._hostEnvironment = hostEnvironment;
-            this._regionService = regionService;
+            this._numbersChecker = numbersChecker;
+            this._pharmacyCompaniesService = pharmacyCompaniesService;
+
         }
 
         //[Authorize]
@@ -37,15 +50,9 @@
             return View();
         }
 
-        [HttpGet]
-        public async Task<RegionOutputModel[]> GetRegions()
-        {
-            return await _regionService.AllRegions();
-        }
-
-        //[Authorize]
+        // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Import(IFormFile ImageFile)
+        public async Task<ActionResult> ImportAsync()
         {
 
             IFormFile file = Request.Form.Files[0];
@@ -68,7 +75,6 @@
             }
 
             if (file.Length > 0)
-
             {
 
                 string sFileExtension = Path.GetExtension(file.FileName).ToLower();
@@ -115,6 +121,7 @@
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
+
                     }
 
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
@@ -122,59 +129,73 @@
                     {
 
                         IRow row = sheet.GetRow(i);
-                        
+
+                        if (row == null) continue;
+
+                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+                        var newCompany = new CompanyInputModel();
 
                         for (int j = row.FirstCellNum; j < cellCount; j++)
-
                         {
                             string currentRow = "";
 
                             if (row.GetCell(j) != null)
                             {
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
-                                await this._regionService.UploadRegion(currentRow);
-                            }
-                            else
-                            {
-                                errorDictionary[i] = currentRow;
-                                continue;
                             }
 
+                            switch (j)
+                            {
+                                case 0:
+                                    if (currentRow != null)
+                                    {
+                                        newCompany.Name = currentRow;
+                                    }
+                                    else
+                                    {
+                                        errorDictionary[i] = currentRow;
+                                    }
+                                    break;
+
+                                case 1:
+                                    newCompany.VAT = currentRow;
+                                    break;
+
+                            }
                         }
 
+                        await this._pharmacyCompaniesService.UploadCompany(newCompany);
+                        
+                     
                     }
-
                 }
-
             }
 
-            var citiesErrorModel = new CustomErrorDictionaryOutputModel
+            var errorsCombined = new CustomErrorDictionaryOutputModel
             {
                 Errors = errorDictionary
             };
 
-            return this.View(citiesErrorModel);
+            return this.View(errorsCombined);
 
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Upload(string regionName)
+        public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
         {
-            if (await this._regionService.UploadRegion(regionName) != "")
-            {
-                var regionOutputModel = new RegionOutputModel
-                {
-                    Name = regionName
-                };
+            // if (singleStringInputModel.SingleStringValue != null)
+            // {
+            //     await this._pharmacyCompaniesService.UploadCompany(singleStringInputModel.SingleStringValue);
+            // }
+            
+            string outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
 
-                return this.View(regionOutputModel);
-            }
+            outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
 
-            else
-            {
-                return Redirect("Index");
-            }
+            return outputSerialized;
+            
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Services.Companies
+﻿namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
 {
     using System;
     using System.Linq;
@@ -8,11 +8,11 @@
     using BrandexSalesAdapter.ExcelLogic.Data.Models;
     using BrandexSalesAdapter.ExcelLogic.Models.Companies;
 
-    public class CompaniesService : ICompaniesService
+    public class PharmacyCompaniesService : IPharmacyCompaniesService
     {
         SpravkiDbContext db;
 
-        public CompaniesService(SpravkiDbContext db)
+        public PharmacyCompaniesService(SpravkiDbContext db)
         {
             this.db = db;
         }

@@ -1,9 +1,9 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Services.Companies
+﻿namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
 {
     using System.Threading.Tasks;
     using BrandexSalesAdapter.ExcelLogic.Models.Companies;
 
-    public interface ICompaniesService
+    public interface IPharmacyCompaniesService
     {
         Task<string> UploadCompany(CompanyInputModel company);
 

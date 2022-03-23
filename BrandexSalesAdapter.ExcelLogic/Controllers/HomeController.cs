@@ -5,21 +5,24 @@
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using BrandexSalesAdapter.ExcelLogic.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.Sales;
-    using BrandexSalesAdapter.ExcelLogic.Models.Pharmacies;
+    
+    using Models;
+    using Models.Sales;
+    using Models.Pharmacies;
+    
     using System;
-    using BrandexSalesAdapter.ExcelLogic.Services.Products;
-    using BrandexSalesAdapter.ExcelLogic.Services.Sales;
-    using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
-    using BrandexSalesAdapter.ExcelLogic.Services.Regions;
-    using Microsoft.AspNetCore.Authorization;
-    using BrandexSalesAdapter.ExcelLogic.Models.Regions;
+    
+    using Services.Products;
+    using Services.Sales;
+    using Services.Pharmacies;
+    using Services.Regions;
+
 
     public class HomeController : Controller
     {

@@ -1,41 +1,41 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿using System.Linq;
+using Newtonsoft.Json;
+
+namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Threading.Tasks;
+    
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using BrandexSalesAdapter.ExcelLogic.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.Companies;
-    using BrandexSalesAdapter.ExcelLogic.Services;
-    using BrandexSalesAdapter.ExcelLogic.Services.Companies;
-    using Microsoft.AspNetCore.Authorization;
+    
+    using Models;
+    using Models.Regions;
+    
+    using Services.Regions;
 
-    public class CompaniesController :Controller
+    using static Common.InputOutputConstants.SingleStringConstants;
+
+    public class RegionsController: Controller
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
-        private readonly ICompaniesService _companiesService;
+        private readonly IRegionsService _regionService;
 
-        private readonly INumbersChecker _numbersChecker;
-
-        public CompaniesController(
+        public RegionsController(
             IWebHostEnvironment hostEnvironment,
-            INumbersChecker numbersChecker,
-            ICompaniesService companiesService)
+            IRegionsService regionService)
 
         {
-
             this._hostEnvironment = hostEnvironment;
-            this._numbersChecker = numbersChecker;
-            this._companiesService = companiesService;
-
+            this._regionService = regionService;
         }
 
         //[Authorize]
@@ -44,12 +44,18 @@
             return View();
         }
 
-        // [Authorize]
-        [HttpPost]
-        public async Task<ActionResult> ImportAsync()
+        [HttpGet]
+        public async Task<RegionOutputModel[]> GetRegions()
         {
+            return await _regionService.AllRegions();
+        }
 
-            IFormFile file = Request.Form.Files[0];
+        //[Authorize]
+        [HttpPost]
+        [Consumes("multipart/form-data")]
+        public async Task<string> Import([FromForm]IFormFile file)
+        {
+            
 
             string folderName = "UploadExcel";
 
@@ -69,6 +75,7 @@
             }
 
             if (file.Length > 0)
+
             {
 
                 string sFileExtension = Path.GetExtension(file.FileName).ToLower();
@@ -115,7 +122,6 @@
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
-
                     }
 
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
@@ -128,80 +134,49 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        var newCompany = new CompanyInputModel();
-
-                        for (int j = row.FirstCellNum; j < cellCount; j++)
+                        var regionName = row.GetCell(0).ToString()?.TrimEnd();
+                        if (!string.IsNullOrEmpty(regionName))
                         {
-                            string currentRow = "";
-
-                            if (row.GetCell(j) != null)
-                            {
-                                currentRow = row.GetCell(j).ToString().TrimEnd();
-                            }
-
-                            switch (j)
-                            {
-                                case 0:
-                                    if (currentRow != null)
-                                    {
-                                        newCompany.Name = currentRow;
-                                    }
-                                    else
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-                                    break;
-
-                                case 1:
-                                    newCompany.VAT = currentRow;
-                                    break;
-
-                            }
+                            await this._regionService.UploadRegion(regionName);
                         }
-
-                        await this._companiesService.UploadCompany(newCompany);
                         
-                     
+                        else
+                        {
+                            errorDictionary[i] = "Wrong Region";
+                            continue;
+                        }
+                        
                     }
+
                 }
+
             }
 
-            var errorsCombined = new CustomErrorDictionaryOutputModel
+            var errorModel = new CustomErrorDictionaryOutputModel
             {
                 Errors = errorDictionary
             };
 
-            return this.View(errorsCombined);
+            string outputSerialized = JsonConvert.SerializeObject(errorModel);
+
+            return outputSerialized;
 
         }
 
-        // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Upload(string companyName, string vat, string ownerName)
+        public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
         {
-            if (companyName != null)
+            if (singleStringInputModel.SingleStringValue != null)
             {
-                var inputCity = new CompanyInputModel
-                {
-                    Name = companyName,
-                    VAT = vat,
-                    Owner = ownerName
-                };
-                var companyOutputModel = new CompanyOutputModel
-                {
-                    Name = await _companiesService.UploadCompany(inputCity),
-                    VAT = vat,
-                    Owner = ownerName
-                };
-
-                return this.View(companyOutputModel);
-
+                await this._regionService.UploadRegion(singleStringInputModel.SingleStringValue);
             }
+            
+            string outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
 
-            else
-            {
-                return Redirect("Index");
-            }
+            outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
+
+            return outputSerialized;
+            
         }
     }
 }
