@@ -1,4 +1,6 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿using Newtonsoft.Json;
+
+namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;
@@ -15,13 +17,14 @@
     using BrandexSalesAdapter.ExcelLogic.Models.Cities;
     using BrandexSalesAdapter.ExcelLogic.Services.Cities;
     using Microsoft.AspNetCore.Authorization;
+    using static Common.InputOutputConstants.SingleStringConstants;
 
     public class CitiesController :Controller
     {
         private IWebHostEnvironment hostEnvironment;
 
         // db Services
-        private readonly ICitiesService citiesService;
+        private readonly ICitiesService _citiesService;
 
         public CitiesController(
             IWebHostEnvironment hostEnvironment,
@@ -29,7 +32,7 @@
 
         {
             this.hostEnvironment = hostEnvironment;
-            this.citiesService = citiesService;
+            this._citiesService = citiesService;
         }
 
         //[Authorize]
@@ -40,10 +43,9 @@
 
         // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Import(IFormFile ImageFile)
+        [Consumes("multipart/form-data")]
+        public async Task<string> Import([FromForm]IFormFile file)
         {
-
-            IFormFile file = Request.Form.Files[0];
 
             string folderName = "UploadExcel";
 
@@ -123,26 +125,19 @@
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
                         City newCity = new City();
-
-                        for (int j = row.FirstCellNum; j < cellCount; j++)
-
+                        
+                        var cityRow = row.GetCell(0).ToString()?.TrimEnd();
+                        if (!string.IsNullOrEmpty(cityRow))
                         {
-                            string currentRow = "";
-
-                            if (row.GetCell(j) != null)
-                            {
-                                currentRow = row.GetCell(j).ToString().TrimEnd();
-                                await this.citiesService.UploadCity(currentRow);
-                            }
-
-                            else
-                            {
-                                errorDictionary[i] = currentRow;
-                                continue;
-                            }
-
+                            await this._citiesService.UploadCity(cityRow);
                         }
-                   
+                        
+                        else
+                        {
+                            errorDictionary[i] = "Wrong City";
+                            continue;
+                        }
+
                     }
 
                 }
@@ -154,27 +149,31 @@
                 Errors = errorDictionary
             };
 
-            return this.View(citiesErrorModel);
+            string outputSerialized = JsonConvert.SerializeObject(citiesErrorModel);
+
+            return outputSerialized;
 
         }
 
         // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Upload(string cityName)
+        public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
         {
-            if (cityName != null)
+            if (singleStringInputModel.SingleStringValue != null)
             {
                 var outputCity = new CityOutputModel
                 {
-                    Name = await this.citiesService.UploadCity(cityName)
+                    Name = await this._citiesService.UploadCity(singleStringInputModel.SingleStringValue)
                 };
-                return this.View(outputCity);
+                // return this.View(outputCity);
             }
+            
+            string outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
 
-            else
-            {
-                return Redirect("Index");
-            }
+            outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
+
+            return outputSerialized;
+            
         }
     }
 }

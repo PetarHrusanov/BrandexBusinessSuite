@@ -18,10 +18,10 @@
 
     public class PharmacyChainsController : Controller
     {
-        private IWebHostEnvironment hostEnvironment;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
-        private readonly IPharmacyChainsService pharmacyChainsService;
+        private readonly IPharmacyChainsService _pharmacyChainsService;
 
         public PharmacyChainsController(
             IWebHostEnvironment hostEnvironment,
@@ -29,8 +29,8 @@
 
         {
 
-            this.hostEnvironment = hostEnvironment;
-            this.pharmacyChainsService = pharmacyChainsService;
+            this._hostEnvironment = hostEnvironment;
+            this._pharmacyChainsService = pharmacyChainsService;
 
         }
 
@@ -49,7 +49,7 @@
 
             string folderName = "UploadExcel";
 
-            string webRootPath = hostEnvironment.WebRootPath;
+            string webRootPath = _hostEnvironment.WebRootPath;
 
             string newPath = Path.Combine(webRootPath, folderName);
 
@@ -133,7 +133,7 @@
                             if (row.GetCell(j) != null)
                             {
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
-                                await this.pharmacyChainsService.UploadPharmacyChain(currentRow);
+                                await this._pharmacyChainsService.UploadPharmacyChain(currentRow);
                             }
 
                             else
@@ -165,7 +165,7 @@
         {
             if (pharmacyChainName != null)
             {
-                await this.pharmacyChainsService.UploadPharmacyChain(pharmacyChainName);
+                await this._pharmacyChainsService.UploadPharmacyChain(pharmacyChainName);
                 var pharmacyChainOutputModel = new PharmacyChainOutputModel
                 {
                     Name = pharmacyChainName

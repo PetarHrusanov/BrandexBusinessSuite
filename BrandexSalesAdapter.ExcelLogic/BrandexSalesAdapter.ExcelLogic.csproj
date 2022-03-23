@@ -18,16 +18,12 @@
     <Folder Include="Views\PharmacyChains\" />
     <Folder Include="Views\Companies\" />
     <Folder Include="Views\Products\" />
-    <Folder Include="Views\Phoenix\" />
     <Folder Include="Models\Phoenix\" />
-    <Folder Include="Views\Sopharma\" />
     <Folder Include="Models\Sopharma\" />
     <Folder Include="Models\Distributor\" />
     <Folder Include="Views\Distributors\" />
-    <Folder Include="Views\Pharmnet\" />
     <Folder Include="Models\Pharmnet\" />
     <Folder Include="Models\Sting\" />
-    <Folder Include="Views\Sting\" />
     <Folder Include="Models\Pharmacies\" />
     <Folder Include="Models\Sales\" />
     <Folder Include="Models\Brandex\" />
