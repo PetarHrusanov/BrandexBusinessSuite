@@ -23,13 +23,13 @@
 
     public class HomeController : Controller
     {
-        private IWebHostEnvironment hostEnvironment;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
-        private readonly IProductsService productsService;
-        private readonly ISalesService salesService;
-        private readonly IPharmaciesService pharmaciesService;
-        private readonly IRegionsService regionsService;
+        private readonly IProductsService _productsService;
+        private readonly ISalesService _salesService;
+        private readonly IPharmaciesService _pharmaciesService;
+        private readonly IRegionsService _regionsService;
 
         public HomeController(
             IWebHostEnvironment hostEnvironment,
@@ -40,11 +40,11 @@
 
         {
 
-            this.hostEnvironment = hostEnvironment;
-            this.productsService = productsService;
-            this.salesService = salesService;
-            this.pharmaciesService = pharmaciesService;
-            this.regionsService = regionsService;
+            this._hostEnvironment = hostEnvironment;
+            this._productsService = productsService;
+            this._salesService = salesService;
+            this._pharmaciesService = pharmaciesService;
+            this._regionsService = regionsService;
 
         }
 
@@ -52,7 +52,7 @@
         {
             var inputFilter = new SaleFiltersExcelInputModel();
 
-            inputFilter.Options =  await this.regionsService.RegionsForSelect();
+            inputFilter.Options =  await this._regionsService.RegionsForSelect();
 
             return View(inputFilter);
         }
@@ -99,7 +99,7 @@
 
         private async Task<int> CreateHeaderColumnsAsync(IRow row, int counter)
         {
-            var products = await this.productsService.GetProductsNames();
+            var products = await this._productsService.GetProductsNames();
             row.CreateCell(0).SetCellValue("Pharmacy Name");
             row.CreateCell(1).SetCellValue("Pharmacy Address");
             row.CreateCell(2).SetCellValue("Pharmacy Class");
@@ -121,7 +121,7 @@
 
         private async Task<FileStreamResult> GenerateSalesFile(string date, int? regionId = null)
         {
-            string sWebRootFolder = hostEnvironment.WebRootPath;
+            string sWebRootFolder = _hostEnvironment.WebRootPath;
             string sFileName = @"Sales.xlsx";
 
             string URL = string.Format("{0}://{1}/{2}", Request.Scheme, Request.Host, sFileName);
@@ -141,7 +141,7 @@
 
                 IRow row = excelSheet.CreateRow(0);
 
-                var products = await this.productsService.GetProductsIdPrices();
+                var products = await this._productsService.GetProductsIdPrices();
                 int productCounter = 4;
                 int counter = 1;
 
@@ -154,7 +154,7 @@
                 if (date != null)
                 {
                     var currRowDate = DateTime.ParseExact(date, "MM/yyyy", null);
-                    collectionPhamracies = await this.pharmaciesService.GetPharmaciesExcelModel(currRowDate, regionId);
+                    collectionPhamracies = await this._pharmaciesService.GetPharmaciesExcelModel(currRowDate, regionId);
 
                     foreach (var pharmacy in collectionPhamracies)
                     {
@@ -190,7 +190,7 @@
                     productCounter = 4;
                     foreach (var product in products)
                     {
-                        int sumCount = await this.salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
+                        int sumCount = await this._salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
                         row.CreateCell(productCounter).SetCellValue(sumCount);
                         productCounter++;
                     }
@@ -202,7 +202,7 @@
 
                     foreach (var product in products)
                     {
-                        int sumCount = await this.salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
+                        int sumCount = await this._salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
                         double productRevenue = sumCount * product.Price;
                         row.CreateCell(productCounter).SetCellValue(productRevenue);
                         productCounter++;
@@ -218,12 +218,12 @@
 
                     row.CreateCell(productCounter + 1).SetCellValue("Date");
 
-                    var dates = await this.salesService.GetDistinctDatesByMonths();
+                    var dates = await this._salesService.GetDistinctDatesByMonths();
 
                     foreach (var currentDate in dates)
                     {
                         // da se mahat li tezi bez prodajbi
-                        collectionPhamracies = await this.pharmaciesService.GetPharmaciesExcelModel(currentDate, regionId);
+                        collectionPhamracies = await this._pharmaciesService.GetPharmaciesExcelModel(currentDate, regionId);
 
                         foreach (var pharmacy in collectionPhamracies)
                         {
@@ -263,7 +263,7 @@
                     productCounter = 4;
                     foreach (var product in products)
                     {
-                        int sumCount = await this.salesService.ProductCountSumById(product.Id, regionId);
+                        int sumCount = await this._salesService.ProductCountSumById(product.Id, regionId);
                         row.CreateCell(productCounter).SetCellValue(sumCount);
                         productCounter++;
                     }
@@ -275,7 +275,7 @@
                     productCounter = 4;
                     foreach (var product in products)
                     {
-                        int sumCount = await this.salesService.ProductCountSumById(product.Id, regionId);
+                        int sumCount = await this._salesService.ProductCountSumById(product.Id, regionId);
                         double productRevenue = sumCount * product.Price;
                         row.CreateCell(productCounter).SetCellValue(productRevenue);
                         productCounter++;
@@ -289,7 +289,7 @@
 
             }
 
-            using (var stream = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
+            await using (var stream = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
             {
 
                 await stream.CopyToAsync(memory);

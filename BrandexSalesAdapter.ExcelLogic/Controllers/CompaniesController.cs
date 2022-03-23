@@ -18,12 +18,12 @@
 
     public class CompaniesController :Controller
     {
-        private IWebHostEnvironment hostEnvironment;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
-        private readonly ICompaniesService companiesService;
+        private readonly ICompaniesService _companiesService;
 
-        private readonly INumbersChecker numbersChecker;
+        private readonly INumbersChecker _numbersChecker;
 
         public CompaniesController(
             IWebHostEnvironment hostEnvironment,
@@ -32,9 +32,9 @@
 
         {
 
-            this.hostEnvironment = hostEnvironment;
-            this.numbersChecker = numbersChecker;
-            this.companiesService = companiesService;
+            this._hostEnvironment = hostEnvironment;
+            this._numbersChecker = numbersChecker;
+            this._companiesService = companiesService;
 
         }
 
@@ -53,7 +53,7 @@
 
             string folderName = "UploadExcel";
 
-            string webRootPath = hostEnvironment.WebRootPath;
+            string webRootPath = _hostEnvironment.WebRootPath;
 
             string newPath = Path.Combine(webRootPath, folderName);
 
@@ -159,7 +159,7 @@
                             }
                         }
 
-                        await this.companiesService.UploadCompany(newCompany);
+                        await this._companiesService.UploadCompany(newCompany);
                         
                      
                     }
@@ -189,7 +189,7 @@
                 };
                 var companyOutputModel = new CompanyOutputModel
                 {
-                    Name = await companiesService.UploadCompany(inputCity),
+                    Name = await _companiesService.UploadCompany(inputCity),
                     VAT = vat,
                     Owner = ownerName
                 };

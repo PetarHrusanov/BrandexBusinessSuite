@@ -273,42 +273,9 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
         // [Authorize]
         [HttpPost]
-        public async Task<string> Upload([FromBody]PharmacyInputModel pharmacyInputModel
-            // int brandexId,
-            // string name,
-            // PharmacyClass pharmacyClass,
-            // bool active,
-            // string companyName,
-            // string pharmacyChainName,
-            // string address,
-            // string cityName,
-            // int? pharmnetId,
-            // int? phoenixId,
-            // int? sopharmaId,
-            // int? stingId,
-            // string regionName
-            )
+        public async Task<string> Upload([FromBody]PharmacyInputModel pharmacyInputModel)
         {
 
-            // if (pharmacyInputModel.Name != null)
-            // {
-            // }
-            // if (await this._companiesService.CheckCompanyByName(pharmacyInputModel.CompanyName))
-            // {
-            // }
-            // if (await this._pharmacyChainsService.CheckPharmacyChainByName(pharmacyInputModel.PharmacyChainName))
-            // {
-            // }
-            // if (await this._citiesService.CheckCityName(pharmacyInputModel.CityName))
-            // {
-            // }
-            // if (await this._regionsService.CheckRegionByName(pharmacyInputModel.RegionName))
-            // {
-            // }
-            // if (pharmacyInputModel.Address != null)
-            // {
-            // }
-         
             if(pharmacyInputModel.BrandexId!=0
                && pharmacyInputModel.Name!=null
                && await this._companiesService.CheckCompanyByName(pharmacyInputModel.CompanyName)

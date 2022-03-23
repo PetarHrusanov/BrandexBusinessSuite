@@ -17,18 +17,18 @@
 
     public class RegionController: Controller
     {
-        private IWebHostEnvironment hostEnvironment;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
-        private readonly IRegionsService regionService;
+        private readonly IRegionsService _regionService;
 
         public RegionController(
             IWebHostEnvironment hostEnvironment,
             IRegionsService regionService)
 
         {
-            this.hostEnvironment = hostEnvironment;
-            this.regionService = regionService;
+            this._hostEnvironment = hostEnvironment;
+            this._regionService = regionService;
         }
 
         //[Authorize]
@@ -40,7 +40,7 @@
         [HttpGet]
         public async Task<RegionOutputModel[]> GetRegions()
         {
-            return await regionService.AllRegions();
+            return await _regionService.AllRegions();
         }
 
         //[Authorize]
@@ -52,7 +52,7 @@
 
             string folderName = "UploadExcel";
 
-            string webRootPath = hostEnvironment.WebRootPath;
+            string webRootPath = _hostEnvironment.WebRootPath;
 
             string newPath = Path.Combine(webRootPath, folderName);
 
@@ -132,7 +132,7 @@
                             if (row.GetCell(j) != null)
                             {
                                 currentRow = row.GetCell(j).ToString().TrimEnd();
-                                await this.regionService.UploadRegion(currentRow);
+                                await this._regionService.UploadRegion(currentRow);
                             }
                             else
                             {
@@ -161,7 +161,7 @@
         [HttpPost]
         public async Task<ActionResult> Upload(string regionName)
         {
-            if (await this.regionService.UploadRegion(regionName) != "")
+            if (await this._regionService.UploadRegion(regionName) != "")
             {
                 var regionOutputModel = new RegionOutputModel
                 {

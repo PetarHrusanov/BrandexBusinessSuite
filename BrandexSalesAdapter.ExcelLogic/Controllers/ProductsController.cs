@@ -18,12 +18,12 @@
 
     public class ProductsController :Controller
     {
-        private IWebHostEnvironment hostEnvironment;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
-        private readonly IProductsService productsService;
+        private readonly IProductsService _productsService;
 
-        private readonly INumbersChecker numbersChecker;
+        private readonly INumbersChecker _numbersChecker;
 
 
         public ProductsController(
@@ -33,9 +33,9 @@
 
         {
 
-            this.hostEnvironment = hostEnvironment;
-            this.productsService = productsService;
-            this.numbersChecker = numbersChecker;
+            this._hostEnvironment = hostEnvironment;
+            this._productsService = productsService;
+            this._numbersChecker = numbersChecker;
         }
 
         //[Authorize]
@@ -53,7 +53,7 @@
 
             string folderName = "UploadExcel";
 
-            string webRootPath = hostEnvironment.WebRootPath;
+            string webRootPath = _hostEnvironment.WebRootPath;
 
             string newPath = Path.Combine(webRootPath, folderName);
 
@@ -166,7 +166,7 @@
                                     break;
 
                                 case 2:
-                                    if (this.numbersChecker.WholeNumberCheck(currentRow))
+                                    if (this._numbersChecker.WholeNumberCheck(currentRow))
                                     {
                                         newProduct.BrandexId = int.Parse(currentRow);
                                     }
@@ -205,7 +205,7 @@
                                     break;
 
                                 case 7:
-                                    if (numbersChecker.NegativeNumberIncludedCheck(currentRow))
+                                    if (_numbersChecker.NegativeNumberIncludedCheck(currentRow))
                                     {
                                         newProduct.Price = double.Parse(currentRow);
                                     }
@@ -218,7 +218,7 @@
 
                         }
 
-                        await this.productsService.CreateProduct(newProduct);
+                        await this._productsService.CreateProduct(newProduct);
 
                     }
                     
@@ -263,7 +263,7 @@
                     StingId = stingId
                 };
 
-                if(await this.productsService.CreateProduct(newProduct)!= "")
+                if(await this._productsService.CreateProduct(newProduct)!= "")
                 {
                     var outputProduct = new ProductOutputModel
                     {

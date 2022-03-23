@@ -12,20 +12,20 @@
     public class DistributorsController :Controller
     {
 
-        private readonly SpravkiDbContext context;
+        private readonly SpravkiDbContext _context;
 
         public DistributorsController(SpravkiDbContext context)
 
         {
 
-            this.context = context;
+            this._context = context;
 
         }
 
         //[Authorize]
         public IActionResult Index()
         {
-            var distributors = context.Distributors.Select(n => n.Name).ToList();
+            var distributors = _context.Distributors.Select(n => n.Name).ToList();
 
             var distributorsView = new DistributorsCollectionModel
             {
@@ -38,7 +38,7 @@
         [HttpGet]
         public async Task<DistributorOutputModel[]> GetDistributors()
         {
-            return await this.context.Distributors.Select(n => new DistributorOutputModel
+            return await this._context.Distributors.Select(n => new DistributorOutputModel
             {
                 Name = n.Name,
                 Id = n.Id
@@ -55,8 +55,8 @@
 
             distributor.Name = name;
 
-            await this.context.Distributors.AddAsync(distributor);
-            await this.context.SaveChangesAsync();
+            await this._context.Distributors.AddAsync(distributor);
+            await this._context.SaveChangesAsync();
 
             return this.Redirect("Index");
         }
