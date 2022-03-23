@@ -16,7 +16,7 @@
     <Folder Include="Views\PharmacyDetails\" />
     <Folder Include="Views\Cities\" />
     <Folder Include="Views\PharmacyChains\" />
-    <Folder Include="Views\Companies\" />
+    <Folder Include="Views\PharmacyCompanies\" />
     <Folder Include="Views\Products\" />
     <Folder Include="Models\Phoenix\" />
     <Folder Include="Models\Sopharma\" />
@@ -39,13 +39,13 @@
     <Folder Include="Services\Distributor\" />
     <Folder Include="Services\Cities\" />
     <Folder Include="Models\Cities\" />
-    <Folder Include="Services\Companies\" />
+    <Folder Include="Services\PharmacyCompanies\" />
     <Folder Include="Models\Companies\" />
     <Folder Include="Models\PharmacyChains\" />
     <Folder Include="Services\PharmacyChains\" />
     <Folder Include="Services\Regions\" />
     <Folder Include="Models\Regions\" />
-    <Folder Include="Views\Region\" />
+    <Folder Include="Views\Regions\" />
     <Folder Include="Models\Products\" />
     <Folder Include="Data\Models\Common\" />
     <Folder Include="Areas\Administration\Views\AdministrationTexts\" />

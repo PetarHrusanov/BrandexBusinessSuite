@@ -3,18 +3,23 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
+    
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using BrandexSalesAdapter.ExcelLogic.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.PharmacyChains;
-    using BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains;
-    using Microsoft.AspNetCore.Authorization;
+    
+    using Models;
+    using Services.PharmacyChains;
+    
+    using Newtonsoft.Json;
+    
+    using static Common.InputOutputConstants.SingleStringConstants;
+
 
     public class PharmacyChainsController : Controller
     {
@@ -29,8 +34,8 @@
 
         {
 
-            this._hostEnvironment = hostEnvironment;
-            this._pharmacyChainsService = pharmacyChainsService;
+            _hostEnvironment = hostEnvironment;
+            _pharmacyChainsService = pharmacyChainsService;
 
         }
 
@@ -42,10 +47,9 @@
 
         // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Import()
+        [Consumes("multipart/form-data")]
+        public async Task<string> Import([FromForm]IFormFile file)
         {
-
-            IFormFile file = Request.Form.Files[0];
 
             string folderName = "UploadExcel";
 
@@ -123,25 +127,18 @@
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                        var newPharmacyChain = new PharmacyChainsInputModel();
-
-                        for (int j = row.FirstCellNum; j < cellCount; j++)
-
+                        // Distribut newCity = new City();
+                        
+                        var chainName = row.GetCell(0).ToString()?.TrimEnd();
+                        if (!string.IsNullOrEmpty(chainName))
                         {
-                            string currentRow = "";
-
-                            if (row.GetCell(j) != null)
-                            {
-                                currentRow = row.GetCell(j).ToString().TrimEnd();
-                                await this._pharmacyChainsService.UploadPharmacyChain(currentRow);
-                            }
-
-                            else
-                            {
-                                errorDictionary[i] = currentRow;
-                                continue;
-                            }
-
+                            await this._pharmacyChainsService.UploadPharmacyChain(chainName);
+                        }
+                        
+                        else
+                        {
+                            errorDictionary[i] = "Wrong Pharmacy Chain";
+                            continue;
                         }
 
                     }
@@ -150,34 +147,32 @@
 
             }
 
-            var pharmacyChainsErrorModel = new CustomErrorDictionaryOutputModel
+            var errorModel = new CustomErrorDictionaryOutputModel
             {
                 Errors = errorDictionary
             };
 
-            return this.View(pharmacyChainsErrorModel);
+            string outputSerialized = JsonConvert.SerializeObject(errorModel);
+
+            return outputSerialized;
 
         }
 
         // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Upload(string pharmacyChainName)
+        public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
         {
-            if (pharmacyChainName != null)
+            if (singleStringInputModel.SingleStringValue != null)
             {
-                await this._pharmacyChainsService.UploadPharmacyChain(pharmacyChainName);
-                var pharmacyChainOutputModel = new PharmacyChainOutputModel
-                {
-                    Name = pharmacyChainName
-                };
-
-                return this.View(pharmacyChainOutputModel);
+                await _pharmacyChainsService.UploadPharmacyChain(singleStringInputModel.SingleStringValue);
             }
+            
+            string outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
 
-            else
-            {
-                return Redirect("Index");
-            }
+            outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
+
+            return outputSerialized;
+            
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BrandexSalesAdapter.ExcelLogic.Common;
+using Newtonsoft.Json;
 
 namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
@@ -6,22 +7,23 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.Cities;
-    using BrandexSalesAdapter.ExcelLogic.Services.Cities;
-    using Microsoft.AspNetCore.Authorization;
-    using static Common.InputOutputConstants.SingleStringConstants;
+    
+    using Models;
+    using Services.Cities;
+    
+    using static InputOutputConstants.SingleStringConstants;
 
     public class CitiesController :Controller
     {
-        private IWebHostEnvironment hostEnvironment;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
         private readonly ICitiesService _citiesService;
@@ -31,8 +33,8 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             ICitiesService citiesService)
 
         {
-            this.hostEnvironment = hostEnvironment;
-            this._citiesService = citiesService;
+            _hostEnvironment = hostEnvironment;
+            _citiesService = citiesService;
         }
 
         //[Authorize]
@@ -49,7 +51,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
             string folderName = "UploadExcel";
 
-            string webRootPath = hostEnvironment.WebRootPath;
+            string webRootPath = _hostEnvironment.WebRootPath;
 
             string newPath = Path.Combine(webRootPath, folderName);
 
@@ -123,8 +125,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                         if (row == null) continue;
 
                         if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                        City newCity = new City();
+                        
                         
                         var cityRow = row.GetCell(0).ToString()?.TrimEnd();
                         if (!string.IsNullOrEmpty(cityRow))
@@ -135,7 +136,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                         else
                         {
                             errorDictionary[i] = "Wrong City";
-                            continue;
                         }
 
                     }
@@ -144,12 +144,12 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
             }
 
-            var citiesErrorModel = new CustomErrorDictionaryOutputModel
+            var errorModel = new CustomErrorDictionaryOutputModel
             {
                 Errors = errorDictionary
             };
 
-            string outputSerialized = JsonConvert.SerializeObject(citiesErrorModel);
+            string outputSerialized = JsonConvert.SerializeObject(errorModel);
 
             return outputSerialized;
 
@@ -161,11 +161,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
         {
             if (singleStringInputModel.SingleStringValue != null)
             {
-                var outputCity = new CityOutputModel
-                {
-                    Name = await this._citiesService.UploadCity(singleStringInputModel.SingleStringValue)
-                };
-                // return this.View(outputCity);
+                await _citiesService.UploadCity(singleStringInputModel.SingleStringValue);
             }
             
             string outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
