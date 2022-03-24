@@ -8,20 +8,25 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using BrandexSalesAdapter.ExcelLogic.Data.Enums;
-    using BrandexSalesAdapter.ExcelLogic.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.Pharmacies;
-    using BrandexSalesAdapter.ExcelLogic.Services;
-    using BrandexSalesAdapter.ExcelLogic.Services.Cities;
-    using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
-    using BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains;
-    using BrandexSalesAdapter.ExcelLogic.Services.Regions;
+    
+    using Data.Enums;
+    
+    using Models;
+    using Models.Pharmacies;
+    
+    using Services;
+    using Services.Cities;
+    using Services.Pharmacies;
+    using Services.PharmacyChains;
+    using Services.Regions;
     using Microsoft.AspNetCore.Authorization;
     
     using static Common.DataConstants.ExcelLineErrors;
@@ -127,10 +132,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                         sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
                     }
-
-                    IRow headerRow = sheet.GetRow(0); //Get Header Row
-
-                    int cellCount = headerRow.LastCellNum;
 
                     for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
