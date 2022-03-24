@@ -16,7 +16,6 @@
     <Folder Include="Views\PharmacyDetails\" />
     <Folder Include="Views\Cities\" />
     <Folder Include="Views\PharmacyChains\" />
-    <Folder Include="Views\PharmacyCompanies\" />
     <Folder Include="Views\Products\" />
     <Folder Include="Models\Phoenix\" />
     <Folder Include="Models\Sopharma\" />
@@ -73,5 +72,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Newtonsoft.Json" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\PharmacyCompanies\Import.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyCompanies\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyCompanies\Upload.cshtml" />
   </ItemGroup>
 </Project>
