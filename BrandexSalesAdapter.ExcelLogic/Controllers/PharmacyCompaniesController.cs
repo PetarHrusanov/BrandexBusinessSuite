@@ -1,6 +1,4 @@
-﻿using BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;
@@ -19,14 +17,14 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using Models.PharmacyCompanies;
     
     using Services;
+    using Services.PharmacyCompanies;
+
+    using Newtonsoft.Json;
+
+    using static Common.InputOutputConstants.SingleStringConstants;
     
     using Microsoft.AspNetCore.Authorization;
     
-    using Newtonsoft.Json;
-    
-    using static Common.InputOutputConstants.SingleStringConstants;
-
-
     public class PharmacyCompaniesController :Controller
     {
         private readonly IWebHostEnvironment _hostEnvironment;
@@ -93,9 +91,8 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                 if (sFileExtension == ".xls")
 
                 {
-
+                    
                     HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
                     sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
                 }
@@ -167,14 +164,14 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             return outputSerialized;
             
         }
-
-        // [Authorize]
+        
+        
         [HttpPost]
         public async Task<string> Upload([FromBody]PharmacyCompanyInputModel pharmacyCompanyInputModel)
         {
             if (pharmacyCompanyInputModel.Name != null)
             {
-                await this._pharmacyCompaniesService.UploadCompany(pharmacyCompanyInputModel);
+                await _pharmacyCompaniesService.UploadCompany(pharmacyCompanyInputModel);
             }
 
             var outputModel = new PharmacyCompanyOutputModel();

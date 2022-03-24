@@ -8,7 +8,7 @@
 
         public int ProductId { get; set; }
 
-        public int DistributorId { get; set; }
+        public int? DistributorId { get; set; }
 
         public DateTime Date { get; set; }
 
