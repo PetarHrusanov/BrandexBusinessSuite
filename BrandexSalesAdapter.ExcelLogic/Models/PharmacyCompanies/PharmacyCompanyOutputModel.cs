@@ -1,6 +1,6 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Models.Companies
+﻿namespace BrandexSalesAdapter.ExcelLogic.Models.PharmacyCompanies
 {
-    public class CompanyInputModel
+    public class PharmacyCompanyOutputModel
     {
         public string Name { get; set; }
 

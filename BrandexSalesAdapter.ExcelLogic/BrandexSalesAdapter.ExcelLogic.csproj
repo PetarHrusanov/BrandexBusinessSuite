@@ -40,7 +40,7 @@
     <Folder Include="Services\Cities\" />
     <Folder Include="Models\Cities\" />
     <Folder Include="Services\PharmacyCompanies\" />
-    <Folder Include="Models\Companies\" />
+    <Folder Include="Models\PharmacyCompanies\" />
     <Folder Include="Models\PharmacyChains\" />
     <Folder Include="Services\PharmacyChains\" />
     <Folder Include="Services\Regions\" />

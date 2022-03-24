@@ -1,4 +1,6 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
+﻿using BrandexSalesAdapter.ExcelLogic.Models.PharmacyCompanies;
+
+namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
 {
     using System;
     using System.Linq;
@@ -6,7 +8,6 @@
     using Microsoft.EntityFrameworkCore;
     using BrandexSalesAdapter.ExcelLogic.Data;
     using BrandexSalesAdapter.ExcelLogic.Data.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.Companies;
 
     public class PharmacyCompaniesService : IPharmacyCompaniesService
     {
@@ -17,7 +18,7 @@
             this.db = db;
         }
 
-        public async Task<string> UploadCompany(CompanyInputModel company)
+        public async Task<string> UploadCompany(PharmacyCompanyInputModel company)
         {
             if(company.Name!= null)
             {
