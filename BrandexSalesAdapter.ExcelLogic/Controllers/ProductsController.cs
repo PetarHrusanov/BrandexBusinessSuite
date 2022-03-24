@@ -4,16 +4,22 @@
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
-    using BrandexSalesAdapter.ExcelLogic.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.Products;
-    using BrandexSalesAdapter.ExcelLogic.Services;
-    using BrandexSalesAdapter.ExcelLogic.Services.Products;
+    
+    using Models;
+    using Models.Products;
+    using Services;
+    using Services.Products;
+    
+    using Newtonsoft.Json;
+    
     using Microsoft.AspNetCore.Authorization;
 
     public class ProductsController :Controller
@@ -33,9 +39,9 @@
 
         {
 
-            this._hostEnvironment = hostEnvironment;
-            this._productsService = productsService;
-            this._numbersChecker = numbersChecker;
+            _hostEnvironment = hostEnvironment;
+            _productsService = productsService;
+            _numbersChecker = numbersChecker;
         }
 
         //[Authorize]
@@ -46,12 +52,11 @@
 
         // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> ImportAsync()
+        [Consumes("multipart/form-data")]
+        public async Task<string> Import([FromForm]IFormFile file)
         {
 
-            IFormFile file = Request.Form.Files[0];
-
-            string folderName = "UploadExcel";
+            const string folderName = "UploadExcel";
 
             string webRootPath = _hostEnvironment.WebRootPath;
 
@@ -71,220 +76,218 @@
 
             {
 
-                string sFileExtension = Path.GetExtension(file.FileName).ToLower();
-
-                ISheet sheet;
+                string sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
 
                 string fullPath = Path.Combine(newPath, file.FileName);
 
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                await using var stream = new FileStream(fullPath, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                stream.Position = 0;
+
+                ISheet sheet;
+                if (sFileExtension == ".xls")
 
                 {
 
-                    file.CopyTo(stream);
+                    HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
 
-                    stream.Position = 0;
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
-                    if (sFileExtension == ".xls")
-
-                    {
-
-                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-
-                    }
-
-                    else
-
-                    {
-
-                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
-
-                    }
-
-                    IRow headerRow = sheet.GetRow(0); //Get Header Row
-
-                    int cellCount = headerRow.LastCellNum;
-
-                    for (int j = 0; j < cellCount; j++)
-                    {
-                        ICell cell = headerRow.GetCell(j);
-
-                        if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-
-
-                    }
-
-                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-
-                    {
-
-                        IRow row = sheet.GetRow(i);
-
-                        if (row == null) continue;
-
-                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                        var newProduct = new ProductInputModel();
-
-                        for (int j = row.FirstCellNum; j < cellCount; j++)
-
-                        {
-                            string currentRow = string.Empty;
-
-                            if (row.GetCell(j) != null)
-                            {
-                                currentRow = row.GetCell(j).ToString().TrimEnd();
-                            }
-
-                            switch (j)
-                            {
-                                case 0:
-                                    if(currentRow!= "")
-                                    {
-                                        newProduct.Name = currentRow;
-                                    }
-                                    else
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-             
-                                    break;
-
-                                case 1:
-                                    if (currentRow != "")
-                                    {
-                                        newProduct.ShortName = currentRow;
-                                    }
-                                    else
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-                                    break;
-
-                                case 2:
-                                    if (this._numbersChecker.WholeNumberCheck(currentRow))
-                                    {
-                                        newProduct.BrandexId = int.Parse(currentRow);
-                                    }
-                                    else
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-                                    break;
-
-                                case 3:
-                                    if (currentRow != "")
-                                    {
-                                        newProduct.PhoenixId = int.Parse(currentRow);
-                                    }
-                                    break;
-
-                                case 4:
-                                    if (currentRow != "")
-                                    {
-                                        newProduct.PharmnetId = int.Parse(currentRow);
-                                    }
-                                    break;
-
-                                case 5:
-                                    if (currentRow != "")
-                                    {
-                                        newProduct.StingId = int.Parse(currentRow);
-                                    }
-                                    break;
-
-                                case 6:
-                                    if (currentRow != "")
-                                    {
-                                        newProduct.SopharmaId = currentRow;
-                                    }
-                                    break;
-
-                                case 7:
-                                    if (_numbersChecker.NegativeNumberIncludedCheck(currentRow))
-                                    {
-                                        newProduct.Price = double.Parse(currentRow);
-                                    }
-                                    else
-                                    {
-                                        errorDictionary[i] = currentRow;
-                                    }
-                                    break;
-                            }
-
-                        }
-
-                        await this._productsService.CreateProduct(newProduct);
-
-                    }
-                    
                 }
 
+                else
+
+                {
+
+                    XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+
+                }
+
+                IRow headerRow = sheet.GetRow(0); //Get Header Row
+
+                int cellCount = headerRow.LastCellNum;
+
+                for (int j = 0; j < cellCount; j++)
+                {
+                    ICell cell = headerRow.GetCell(j);
+
+                    if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+
+
+                }
+
+                for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+
+                {
+
+                    IRow row = sheet.GetRow(i);
+
+                    if (row == null) continue;
+
+                    if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+                    var newProduct = new ProductInputModel();
+                    
+                    var nameRow = row.GetCell(0).ToString()?.TrimEnd();
+
+                    if (!string.IsNullOrEmpty(nameRow))
+                    {
+                        newProduct.Name = nameRow;
+                    }
+                    
+                    var nameShortRow = row.GetCell(1).ToString()?.TrimEnd();
+
+                    if (!string.IsNullOrEmpty(nameShortRow))
+                    {
+                        newProduct.ShortName = nameShortRow;
+                    }
+                    
+                    else
+                    {
+                        errorDictionary[i] = "Product name error.";
+                    }
+                    
+                    var brandexId = row.GetCell(2).ToString()?.TrimEnd();
+
+                    if (_numbersChecker.WholeNumberCheck(brandexId))
+                    {
+                        newProduct.BrandexId = int.Parse(brandexId);
+                    }
+                    
+                    else
+                    {
+                        errorDictionary[i] = "Brandex Id error.";
+                    }
+                    
+                    var phoenixId = row.GetCell(3).ToString()?.TrimEnd();
+
+                    if (!string.IsNullOrEmpty(phoenixId))
+                    {
+                        if (_numbersChecker.WholeNumberCheck(phoenixId))
+                        {
+                            newProduct.PhoenixId = int.Parse(phoenixId);
+                        }
+                    
+                        else
+                        {
+                            errorDictionary[i] = "Phoenix Id error.";
+                        }
+                    }
+                    
+                    var pharmnetId = row.GetCell(4).ToString()?.TrimEnd();
+
+                    if (!string.IsNullOrEmpty(pharmnetId))
+                    {
+                        if (_numbersChecker.WholeNumberCheck(pharmnetId))
+                        {
+                            newProduct.PharmnetId = int.Parse(pharmnetId);
+                        }
+                    
+                        else
+                        {
+                            errorDictionary[i] = "Pharmnet Id error.";
+                        }
+                    }
+                    
+                    var stingId = row.GetCell(5).ToString()?.TrimEnd();
+
+                    if (!string.IsNullOrEmpty(stingId))
+                    {
+                        if (_numbersChecker.WholeNumberCheck(stingId))
+                        {
+                            newProduct.StingId = int.Parse(stingId);
+                        }
+                    
+                        else
+                        {
+                            errorDictionary[i] = "Sting Id error.";
+                        }
+                    }
+
+                    var sopharmaId = row.GetCell(5).ToString()?.TrimEnd();
+
+                    if (!string.IsNullOrEmpty(sopharmaId))
+                    {
+                        newProduct.SopharmaId = sopharmaId;
+                    }
+                    
+                    var priceRow = row.GetCell(5).ToString()?.TrimEnd();
+
+                    if (_numbersChecker.WholeNumberCheck(priceRow))
+                    {
+                        newProduct.Price = int.Parse(priceRow);
+                    }
+                    
+                    else
+                    {
+                        errorDictionary[i] = "Price error.";
+                    }
+
+                    await this._productsService.CreateProduct(newProduct);
+
+                }
             }
 
-            var productsErrorModel = new CustomErrorDictionaryOutputModel
+            var errorModel = new CustomErrorDictionaryOutputModel
             {
                 Errors = errorDictionary
             };
 
-            return this.View(productsErrorModel);
+            string outputSerialized = JsonConvert.SerializeObject(errorModel);
+
+            return outputSerialized;
 
         }
 
         // [Authorize]
         [HttpPost]
-        public async Task<ActionResult> Upload(string productName,
-            string productShortName,
-            double productPrice,
-            int brandexId,
-            int? pharmnetId,
-            int? phoenixId,
-            string sopharmaId,
-            int? stingId)
+        public async Task<string> Upload([FromBody]ProductInputModel productInputModel)
         {
-            if (productName != null &&
-                productShortName != null &&
-                productPrice != 0 &&
-                brandexId != 0)
+
+            var outputProduct = new ProductOutputModel();
+            
+            if (!string.IsNullOrEmpty(productInputModel.Name) &&
+                !string.IsNullOrEmpty(productInputModel.ShortName) && 
+                productInputModel.Price != 0 && 
+                productInputModel.BrandexId != 0)
             {
                 var newProduct = new ProductInputModel
                 {
-                    Name = productName,
-                    ShortName = productShortName,
-                    Price = productPrice,
-                    BrandexId = brandexId,
-                    PharmnetId = pharmnetId,
-                    PhoenixId = phoenixId,
-                    SopharmaId = sopharmaId,
-                    StingId = stingId
+                    Name = productInputModel.Name,
+                    ShortName = productInputModel.ShortName,
+                    Price = productInputModel.Price,
+                    BrandexId = productInputModel.BrandexId,
+                    PharmnetId = productInputModel.PharmnetId,
+                    PhoenixId = productInputModel.PhoenixId,
+                    SopharmaId = productInputModel.SopharmaId,
+                    StingId = productInputModel.StingId
                 };
 
                 if(await this._productsService.CreateProduct(newProduct)!= "")
                 {
-                    var outputProduct = new ProductOutputModel
+                    outputProduct = new ProductOutputModel
                     {
-                        Name = productName,
-                        ShortName = productShortName,
-                        Price = productPrice,
-                        BrandexId = brandexId
+                        Name = productInputModel.Name,
+                        ShortName = productInputModel.ShortName,
+                        Price = productInputModel.Price,
+                        BrandexId = productInputModel.BrandexId,
+                        SopharmaId = productInputModel.SopharmaId,
+                        PharmnetId = productInputModel.PharmnetId,
+                        PhoenixId = productInputModel.PhoenixId,
+                        StingId = productInputModel.StingId,
+                        
                     };
-
-                    return this.View(outputProduct);
                 }
-                else
-                {
-                    return Redirect("Index");
-                }
+                
             }
+            
+            var outputSerialized = JsonConvert.SerializeObject(outputProduct);
 
-            else
-            {
-                return Redirect("Index");
-            }
+            return outputSerialized;
+            
         }
     }
 }
