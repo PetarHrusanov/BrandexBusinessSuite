@@ -716,25 +716,13 @@
             int pharmacyIdColumn,
             int saleCountColumn)
         {
-
-
-            var dateRow = row.GetCell(dateColumn).ToString()?.TrimEnd();
             
-            if (dateRow != null)
+            var dateRow = row.GetCell(dateColumn);
+            
+            if (dateRow.CellType == CellType.Numeric)
             {
-                var date = ResolveDate(dateRow, distributor);
-                if (date != null) newSale.Date = (DateTime)date;
-                
-                // else
-                // {
-                //     errorDictionary[i+1] = IncorrectDateFormat;
-                // }
+                newSale.Date = DateTime.FromOADate(dateRow.NumericCellValue);
             }
-            
-            // else
-            // {
-            //     errorDictionary[i+1] = IncorrectDateFormat;
-            // }
 
             int productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor, productIdsForCheck);
 
