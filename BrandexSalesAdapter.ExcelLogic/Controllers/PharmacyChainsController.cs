@@ -38,12 +38,7 @@
             _pharmacyChainsService = pharmacyChainsService;
 
         }
-
-        //[Authorize]
-        public IActionResult Index()
-        {
-            return View();
-        }
+        
 
         // [Authorize]
         [HttpPost]
@@ -124,21 +119,20 @@
                         IRow row = sheet.GetRow(i);
 
                         if (row == null) continue;
-
-                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                        // Distribut newCity = new City();
                         
-                        var chainName = row.GetCell(0).ToString()?.TrimEnd();
-                        if (!string.IsNullOrEmpty(chainName))
+                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+                        
+                        
+                        var chainName = row.GetCell(0);
+                        if (chainName!=null)
                         {
-                            await this._pharmacyChainsService.UploadPharmacyChain(chainName);
+                            await _pharmacyChainsService.UploadPharmacyChain(chainName.ToString()?.TrimEnd());
                         }
                         
                         else
                         {
                             errorDictionary[i] = "Wrong Pharmacy Chain";
-                            continue;
+                            
                         }
 
                     }

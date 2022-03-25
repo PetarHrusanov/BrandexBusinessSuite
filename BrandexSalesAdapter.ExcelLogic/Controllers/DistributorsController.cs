@@ -5,10 +5,11 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Linq;
     using Microsoft.AspNetCore.Mvc;
+    
     using Data;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models;
+    using Data.Models;
     using Models.Distributor;
-    using Microsoft.AspNetCore.Authorization;
+    
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     
@@ -23,19 +24,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
         {
             _context = context;
-        }
-
-        //[Authorize]
-        public IActionResult Index()
-        {
-            var distributors = _context.Distributors.Select(n => n.Name).ToList();
-
-            var distributorsView = new DistributorsCollectionModel
-            {
-                Distributors = distributors
-            };
-
-            return View(distributorsView);
         }
 
         [HttpGet]

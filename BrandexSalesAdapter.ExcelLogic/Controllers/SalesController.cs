@@ -6,22 +6,25 @@
     using System.Linq;
     using System.Threading.Tasks;
 
-    using BrandexSalesAdapter.ExcelLogic.Models.Pharmacies;
-    using BrandexSalesAdapter.ExcelLogic.Models.Products;
-    using BrandexSalesAdapter.ExcelLogic.Models.Sales;
-    using BrandexSalesAdapter.ExcelLogic.Services;
-    using BrandexSalesAdapter.ExcelLogic.Services.Distributor;
-    using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
-    using BrandexSalesAdapter.ExcelLogic.Services.Products;
-    using BrandexSalesAdapter.ExcelLogic.Services.Sales;
-    
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    
     using Newtonsoft.Json;
+    
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
     using NPOI.XSSF.UserModel;
+    
+    using Models.Pharmacies;
+    using Models.Products;
+    using Models.Sales;
+    
+    using Services;
+    using Services.Distributor;
+    using Services.Pharmacies;
+    using Services.Products;
+    using Services.Sales;
     
     using static Common.DataConstants.Ditributors;
     using static Common.DataConstants.ExcelLineErrors;
@@ -52,13 +55,12 @@
             )
 
         {
-
-            this._hostEnvironment = hostEnvironment;
-            this._salesService = salesService;
-            this._numbersChecker = numbersChecker;
-            this._productsService = productsService;
-            this._pharmaciesService = pharmaciesService;
-            this._distributorService = distributorService;
+            _hostEnvironment = hostEnvironment;
+            _salesService = salesService;
+            _numbersChecker = numbersChecker;
+            _productsService = productsService;
+            _pharmaciesService = pharmaciesService;
+            _distributorService = distributorService;
 
         }
 
@@ -79,13 +81,9 @@
             string sWebRootFolder = _hostEnvironment.WebRootPath;
             string sFileName = @"Sales.xlsx";
 
-            var URL = string.Format("{0}://{1}/{2}", Request.Scheme, Request.Host, sFileName);
-
-            FileInfo file = new FileInfo(Path.Combine(sWebRootFolder, sFileName));
-
             var memory = new MemoryStream();
 
-            using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
+            await using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
             {
 
                 List<PharmacyExcelModel> collectionPharmacies;
@@ -146,7 +144,7 @@
                     productCounter = 4;
                     foreach (var product in products)
                     {
-                        int sumCount = await this._salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
+                        int sumCount = await _salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
                         row.CreateCell(productCounter).SetCellValue(sumCount);
                         productCounter++;
                     }
