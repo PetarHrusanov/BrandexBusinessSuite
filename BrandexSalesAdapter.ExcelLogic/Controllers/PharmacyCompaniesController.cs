@@ -46,12 +46,7 @@
             _pharmacyCompaniesService = pharmacyCompaniesService;
 
         }
-
-        //[Authorize]
-        public IActionResult Index()
-        {
-            return View();
-        }
+        
 
         // [Authorize]
         [HttpPost]
@@ -143,10 +138,13 @@
                         errorDictionary[i] = "Company name error";
                         continue;
                     }
-                    
-                    var vatRow = row.GetCell(0).ToString()?.TrimEnd();
 
-                    newCompany.VAT = vatRow;
+                    var vatRow = row.GetCell(1);
+                    if (vatRow!=null)
+                    {
+                        newCompany.VAT = vatRow.ToString()?.TrimEnd();
+                    }
+                    
 
                     await _pharmacyCompaniesService.UploadCompany(newCompany);
                         

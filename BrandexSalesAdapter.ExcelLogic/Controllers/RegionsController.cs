@@ -37,12 +37,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             this._hostEnvironment = hostEnvironment;
             this._regionService = regionService;
         }
-
-        //[Authorize]
-        public IActionResult Index()
-        {
-            return View();
-        }
+        
 
         [HttpGet]
         public async Task<RegionOutputModel[]> GetRegions()

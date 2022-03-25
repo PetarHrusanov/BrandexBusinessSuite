@@ -32,7 +32,7 @@
             {
                 JsonConvert
                     .DeserializeObject<List<string>>(exception.Content)
-                    .ForEach(error => this.ModelState.AddModelError(string.Empty, error));
+                    ?.ForEach(error => this.ModelState.AddModelError(string.Empty, error));
             }
             else
             {

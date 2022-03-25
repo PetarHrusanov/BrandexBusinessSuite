@@ -37,12 +37,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             _citiesService = citiesService;
         }
 
-        //[Authorize]
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         // [Authorize]
         [HttpPost]
         [Consumes("multipart/form-data")]

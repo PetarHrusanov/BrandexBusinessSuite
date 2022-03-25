@@ -14,13 +14,10 @@
     <Folder Include="Data\Migrations\" />
     <Folder Include="wwwroot\UploadExcel\" />
     <Folder Include="Views\PharmacyDetails\" />
-    <Folder Include="Views\Cities\" />
-    <Folder Include="Views\PharmacyChains\" />
     <Folder Include="Views\Products\" />
     <Folder Include="Models\Phoenix\" />
     <Folder Include="Models\Sopharma\" />
     <Folder Include="Models\Distributor\" />
-    <Folder Include="Views\Distributors\" />
     <Folder Include="Models\Pharmnet\" />
     <Folder Include="Models\Sting\" />
     <Folder Include="Models\Pharmacies\" />
@@ -44,7 +41,6 @@
     <Folder Include="Services\PharmacyChains\" />
     <Folder Include="Services\Regions\" />
     <Folder Include="Models\Regions\" />
-    <Folder Include="Views\Regions\" />
     <Folder Include="Models\Products\" />
     <Folder Include="Data\Models\Common\" />
     <Folder Include="Areas\Administration\Views\AdministrationTexts\" />
@@ -77,5 +73,15 @@
     <_ContentIncludedByDefault Remove="Views\PharmacyCompanies\Import.cshtml" />
     <_ContentIncludedByDefault Remove="Views\PharmacyCompanies\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Views\PharmacyCompanies\Upload.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Cities\Import.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Cities\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Cities\Upload.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Distributors\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyChains\Import.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyChains\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyChains\Upload.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Regions\Import.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Regions\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Regions\Upload.cshtml" />
   </ItemGroup>
 </Project>

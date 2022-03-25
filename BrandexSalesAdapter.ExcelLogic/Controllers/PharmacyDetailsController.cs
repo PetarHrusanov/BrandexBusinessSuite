@@ -1,7 +1,4 @@
-﻿using BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies;
-using Newtonsoft.Json;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -27,6 +24,10 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using Services.Pharmacies;
     using Services.PharmacyChains;
     using Services.Regions;
+    using Services.PharmacyCompanies;
+    
+    using Newtonsoft.Json;
+    
     using Microsoft.AspNetCore.Authorization;
     
     using static Common.DataConstants.ExcelLineErrors;
@@ -40,7 +41,21 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
         private readonly IPharmacyCompaniesService _pharmacyCompaniesService;
         private readonly IRegionsService _regionsService;
         private readonly IPharmacyChainsService _pharmacyChainsService;
-        private readonly ICitiesService _citiesService; 
+        private readonly ICitiesService _citiesService;
+
+        private const int BrandexIdColumn = 19;
+        private const int NameColumn = 4;
+        private const int PharmacyClassColumn = 1;
+        private const int ActiveColumn = 2;
+        private const int PharmacyCompanyColumn = 3;
+        private const int PharmacyChainColumn = 5;
+        private const int AddressColumn = 6;
+        private const int CityColumn = 20;
+        private const int PharmnetIdColumn = 14;
+        private const int PhoenixIdColumn = 15;
+        private const int SopharmaIdColumn = 16;
+        private const int StingIdColumn = 17;
+        private const int RegionColumn = 8;
 
         // universal Services
         private readonly INumbersChecker _numbersChecker;
@@ -55,14 +70,13 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             ICitiesService citiesService)
 
         {
-
-            this._hostEnvironment = hostEnvironment;
-            this._numbersChecker = numbersChecker;
-            this._pharmaciesService = pharmaciesService;
-            this._pharmacyCompaniesService = pharmacyCompaniesService;
-            this._pharmacyChainsService = pharmacyChainsService;
-            this._regionsService = regionsService;
-            this._citiesService = citiesService;
+            _hostEnvironment = hostEnvironment;
+            _numbersChecker = numbersChecker;
+            _pharmaciesService = pharmaciesService;
+            _pharmacyCompaniesService = pharmacyCompaniesService;
+            _pharmacyChainsService = pharmacyChainsService;
+            _regionsService = regionsService;
+            _citiesService = citiesService;
 
         }
 
@@ -70,6 +84,202 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+        
+                // [Authorize]
+        [HttpPost]
+        [Consumes("multipart/form-data")]
+        public async Task<string> Check([FromForm]IFormFile file)
+        {
+
+            // IFormFile file = Request.Form.Files[0];
+
+            string folderName = "UploadExcel";
+
+            string webRootPath = _hostEnvironment.WebRootPath;
+
+            string newPath = Path.Combine(webRootPath, folderName);
+
+            var errorDictionary = new Dictionary<int, string>();
+
+            if (!Directory.Exists(newPath))
+
+            {
+
+                Directory.CreateDirectory(newPath);
+
+            }
+
+            if (file.Length > 0)
+
+            {
+
+                string sFileExtension = Path.GetExtension(file.FileName)!.ToLower();
+
+                string fullPath = Path.Combine(newPath, file.FileName);
+
+                await using var stream = new FileStream(fullPath, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                stream.Position = 0;
+
+                ISheet sheet;
+                if (sFileExtension == ".xls")
+
+                {
+
+                    HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+
+                }
+
+                else
+
+                {
+
+                    XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+
+                }
+
+                for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+
+                {
+
+                    var row = sheet.GetRow(i);
+
+                    if (row == null) continue;
+
+                    if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+                    var newPharmacy = new PharmacyDbInputModel
+                    {
+                        PharmacyClass = PharmacyClass.Other,
+                        Active = true,
+                        Name = row.GetCell(NameColumn).ToString()?.TrimEnd(),
+                        Address = row.GetCell(AddressColumn).ToString()?.TrimEnd(),
+                        PharmacyChainId = await this._pharmacyChainsService.IdByName(string.Empty)
+                    };
+
+                    var brandexId = row.GetCell(BrandexIdColumn).ToString()?.TrimEnd();
+                        
+                    if (_numbersChecker.WholeNumberCheck(brandexId))
+                    {
+                        newPharmacy.BrandexId = int.Parse(brandexId);
+                    }
+                    else
+                    {
+                        errorDictionary[i+1] = IncorrectPharmacyId;
+                    }
+                        
+                    var pharmacyClass = row.GetCell(PharmacyClassColumn).ToString()?.TrimEnd();
+                        
+                    if (pharmacyClass != "")
+                        newPharmacy.PharmacyClass =
+                            (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass, true);
+                        
+                    var pharmacyActive = row.GetCell(ActiveColumn).ToString()?.TrimEnd();
+
+                    if (pharmacyActive != null && pharmacyActive[0] == '0')
+                    {
+                        newPharmacy.Active = false;
+                    }
+                        
+                    var companyIdRow = row.GetCell(PharmacyCompanyColumn).ToString()?.TrimEnd();
+                    var companyId = await _pharmacyCompaniesService.IdByName(companyIdRow);
+
+                    if (companyId!=0)
+                    {
+                        newPharmacy.CompanyId = companyId;
+                            
+                    }
+                    else
+                    {
+                        errorDictionary[i+1] = "COMPANY ID";
+                    }
+                        
+                    var chainIdRow = row.GetCell(PharmacyChainColumn).ToString()?.TrimEnd();
+                    var chainId = await _pharmacyChainsService.IdByName(chainIdRow);
+                    if (chainId!=0)
+                    {
+                        newPharmacy.PharmacyChainId = chainId;
+                    }
+                    else
+                    {
+                        errorDictionary[i+1] = "PHARMACY CHAIN ID";
+                    }
+                        
+                    var regionIdRow = row.GetCell(RegionColumn).ToString()?.TrimEnd();
+                        
+                    int regionId = await _regionsService.IdByName(regionIdRow);
+
+                    if (regionId!=0)
+                    {
+                        newPharmacy.RegionId = regionId;
+                    }
+                    else
+                    {
+                        errorDictionary[i+1] = "REGION ID";
+                    }
+                        
+                    var pharmnetIdRow = row.GetCell(PharmnetIdColumn).ToString()?.TrimEnd();
+
+                    if(pharmnetIdRow != null && int.TryParse(pharmnetIdRow, out var pharmnetId))
+                    {
+                        newPharmacy.PharmnetId = pharmnetId;
+                    }
+                        
+                    var phoenixIdRow = row.GetCell(PhoenixIdColumn).ToString()?.TrimEnd();
+
+                    if(phoenixIdRow != null && int.TryParse(phoenixIdRow, out var phoenixId))
+                    {
+                        newPharmacy.PhoenixId = phoenixId;
+                    }
+                        
+                    var sopharmaIdRow = row.GetCell(SopharmaIdColumn).ToString()?.TrimEnd();
+
+                    if(sopharmaIdRow != null && int.TryParse(sopharmaIdRow, out var sopharmaId))
+                    {
+                        newPharmacy.SopharmaId = sopharmaId;
+                    }
+                        
+                    var stingIdRow = row.GetCell(StingIdColumn).ToString()?.TrimEnd();
+
+                    if(stingIdRow != null && int.TryParse(stingIdRow, out var stingId))
+                    {
+                        newPharmacy.StingId = stingId;
+                    }
+                        
+                    var cityIdRow = row.GetCell(CityColumn).ToString()?.TrimEnd();
+                    var cityId = await this._citiesService.IdByName(cityIdRow.ToUpper());
+
+                    if (cityId != 0)
+                    {
+                        newPharmacy.CityId = cityId;
+                    }
+                            
+                    else
+                    {
+                        errorDictionary[i+1] = "Wrong City ID";
+                    }
+
+                    // await _pharmaciesService.CreatePharmacy(newPharmacy);
+
+                }
+            }
+
+            var pharmacyErrorModel = new CustomErrorDictionaryOutputModel
+            {
+                Errors = errorDictionary
+            };
+            
+            string outputSerialized = JsonConvert.SerializeObject(pharmacyErrorModel);
+
+            return outputSerialized;
+
+            // return this.View(pharmacyErrorModel);
         }
 
         // [Authorize]
@@ -104,159 +314,154 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
                 string fullPath = Path.Combine(newPath, file.FileName);
 
-                await using (var stream = new FileStream(fullPath, FileMode.Create))
+                await using var stream = new FileStream(fullPath, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                stream.Position = 0;
+
+                ISheet sheet;
+                if (sFileExtension == ".xls")
 
                 {
 
-                    await file.CopyToAsync(stream);
+                    HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
 
-                    stream.Position = 0;
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
-                    ISheet sheet;
-                    if (sFileExtension == ".xls")
+                }
 
+                else
+
+                {
+
+                    XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+
+                }
+
+                for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+
+                {
+
+                    var row = sheet.GetRow(i);
+
+                    if (row == null) continue;
+
+                    if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+                    var newPharmacy = new PharmacyDbInputModel
                     {
+                        PharmacyClass = PharmacyClass.Other,
+                        Active = true,
+                        Name = row.GetCell(NameColumn).ToString()?.TrimEnd(),
+                        Address = row.GetCell(AddressColumn).ToString()?.TrimEnd(),
+                    };
 
-                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-
+                    var brandexId = row.GetCell(BrandexIdColumn).ToString()?.TrimEnd();
+                        
+                    if (_numbersChecker.WholeNumberCheck(brandexId))
+                    {
+                        newPharmacy.BrandexId = int.Parse(brandexId);
                     }
-
                     else
-
                     {
+                        errorDictionary[i+1] = IncorrectPharmacyId;
+                    }
+                        
+                    var pharmacyClass = row.GetCell(PharmacyClassColumn).ToString()?.TrimEnd();
+                        
+                    if (pharmacyClass != "")
+                        newPharmacy.PharmacyClass =
+                            (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass, true);
+                        
+                    var pharmacyActive = row.GetCell(ActiveColumn).ToString()?.TrimEnd();
 
-                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+                    if (pharmacyActive != null && pharmacyActive[0] == '0')
+                    {
+                        newPharmacy.Active = false;
+                    }
+                        
+                    var companyIdRow = row.GetCell(PharmacyCompanyColumn).ToString()?.TrimEnd();
+                    var companyId = await _pharmacyCompaniesService.IdByName(companyIdRow);
 
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+                    if (companyId!=0)
+                    {
+                        newPharmacy.CompanyId = companyId;
+                            
+                    }
+                    else
+                    {
+                        errorDictionary[i+1] = "COMPANY ID";
+                    }
+                        
+                    var chainIdRow = row.GetCell(PharmacyChainColumn).ToString()?.TrimEnd();
+                    var chainId = await _pharmacyChainsService.IdByName(chainIdRow);
+                    
+                    if (chainId!=0)
+                    {
+                        newPharmacy.PharmacyChainId = chainId;
+                    }
+                    else
+                    {
+                        errorDictionary[i+1] = "PHARMACY CHAIN ID";
+                    }
+                        
+                    var regionIdRow = row.GetCell(RegionColumn).ToString()?.TrimEnd();
+                    int regionId = await _regionsService.IdByName(regionIdRow);
+                    
+                    if (regionId!=0)
+                    {
+                        newPharmacy.RegionId = regionId;
+                    }
+                    else
+                    {
+                        errorDictionary[i+1] = "REGION ID";
+                    }
+                        
+                    var pharmnetIdRow = row.GetCell(PharmnetIdColumn).ToString()?.TrimEnd();
+                    
+                    if(pharmnetIdRow != null && int.TryParse(pharmnetIdRow, out var pharmnetId))
+                    {
+                        newPharmacy.PharmnetId = pharmnetId;
+                    }
+                        
+                    var phoenixIdRow = row.GetCell(PhoenixIdColumn).ToString()?.TrimEnd();
 
+                    if(phoenixIdRow != null && int.TryParse(phoenixIdRow, out var phoenixId))
+                    {
+                        newPharmacy.PhoenixId = phoenixId;
+                    }
+                        
+                    var sopharmaIdRow = row.GetCell(SopharmaIdColumn).ToString()?.TrimEnd();
+
+                    if(sopharmaIdRow != null && int.TryParse(sopharmaIdRow, out var sopharmaId))
+                    {
+                        newPharmacy.SopharmaId = sopharmaId;
+                    }
+                        
+                    var stingIdRow = row.GetCell(StingIdColumn).ToString()?.TrimEnd();
+
+                    if(stingIdRow != null && int.TryParse(stingIdRow, out var stingId))
+                    {
+                        newPharmacy.StingId = stingId;
+                    }
+                        
+                    var cityIdRow = row.GetCell(CityColumn).ToString()?.TrimEnd();
+                    var cityId = await _citiesService.IdByName(cityIdRow.ToUpper());
+
+                    if (cityId != 0)
+                    {
+                        newPharmacy.CityId = cityId;
+                    }
+                            
+                    else
+                    {
+                        errorDictionary[i+1] = "Wrong City ID";
                     }
 
-                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+                    await _pharmaciesService.CreatePharmacy(newPharmacy);
 
-                    {
-
-                        IRow row = sheet.GetRow(i);
-
-                        if (row == null) continue;
-
-                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                        var newPharmacy = new PharmacyDbInputModel
-                        {
-                            PharmacyClass = PharmacyClass.Other,
-                            Active = true,
-                            Name = row.GetCell(5).ToString()?.TrimEnd(),
-                            Address = row.GetCell(7).ToString()?.TrimEnd(),
-                        };
-
-                        var brandexId = row.GetCell(0).ToString()?.TrimEnd();
-                        
-                        if (_numbersChecker.WholeNumberCheck(brandexId))
-                        {
-                            newPharmacy.BrandexId = int.Parse(brandexId);
-                        }
-                        else
-                        {
-                            errorDictionary[i+1] = IncorrectPharmacyId;
-                        }
-                        
-                        var pharmacyClass = row.GetCell(2).ToString()?.TrimEnd();
-                        
-                        if (pharmacyClass != "")
-                            newPharmacy.PharmacyClass =
-                                (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass, true);
-                        
-                        var pharmacyActive = row.GetCell(3).ToString()?.TrimEnd();
-
-                        if (pharmacyActive != null && pharmacyActive[0] == '0')
-                        {
-                            newPharmacy.Active = false;
-                        }
-                        
-                        var companyIdRow = row.GetCell(4).ToString()?.TrimEnd();
-                        int companyId = await this._pharmacyCompaniesService.IdByName(companyIdRow);
-
-                        if (companyId!=0)
-                        {
-                            newPharmacy.CompanyId = companyId;
-                            
-                        }
-                        else
-                        {
-                            errorDictionary[i+1] = "COMPANY ID";
-                        }
-                        
-                        var chainIdRow = row.GetCell(6).ToString()?.TrimEnd();
-                        
-                        var chainId = await this._pharmacyChainsService.IdByName(chainIdRow);
-                        if (chainId!=0)
-                        {
-                            newPharmacy.PharmacyChainId = chainId;
-                        }
-                        else
-                        {
-                            errorDictionary[i+1] = "PHARMACY CHAIN ID";
-                        }
-                        
-                        var regionIdRow = row.GetCell(9).ToString()?.TrimEnd();
-                        
-                        int regionId = await this._regionsService.IdByName(regionIdRow);
-
-                        if (regionId!=0)
-                        {
-                            newPharmacy.RegionId = regionId;
-                        }
-                        else
-                        {
-                            errorDictionary[i+1] = "REGION ID";
-                        }
-                        
-                        var pharmnetIdRow = row.GetCell(15).ToString()?.TrimEnd();
-
-                        if(pharmnetIdRow != null && int.TryParse(pharmnetIdRow, out var pharmnetId))
-                        {
-                            newPharmacy.PharmnetId = pharmnetId;
-                        }
-                        
-                        var phoenixIdRow = row.GetCell(16).ToString()?.TrimEnd();
-
-                        if(phoenixIdRow != null && int.TryParse(phoenixIdRow, out var phoenixId))
-                        {
-                            newPharmacy.PhoenixId = phoenixId;
-                        }
-                        
-                        var sopharmaIdRow = row.GetCell(17).ToString()?.TrimEnd();
-
-                        if(sopharmaIdRow != null && int.TryParse(sopharmaIdRow, out var sopharmaId))
-                        {
-                            newPharmacy.SopharmaId = sopharmaId;
-                        }
-                        
-                        var stingIdRow = row.GetCell(18).ToString()?.TrimEnd();
-
-                        if(stingIdRow != null && int.TryParse(stingIdRow, out var stingId))
-                        {
-                            newPharmacy.StingId = stingId;
-                        }
-                        
-                        var cityIdRow = row.GetCell(21).ToString()?.TrimEnd();
-                        var cityId = await this._citiesService.IdByName(cityIdRow);
-
-                        if (cityId != 0)
-                        {
-                            newPharmacy.CityId = cityId;
-                        }
-                            
-                        else
-                        {
-                            errorDictionary[i+1] = "Wrong City ID";
-                        }
-
-                        await this._pharmaciesService.CreatePharmacy(newPharmacy);
-
-                    }   
                 }
             }
 
@@ -268,8 +473,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             string outputSerialized = JsonConvert.SerializeObject(pharmacyErrorModel);
 
             return outputSerialized;
-
-            // return this.View(pharmacyErrorModel);
+            
         }
 
         // [Authorize]
@@ -279,10 +483,10 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
             if(pharmacyInputModel.BrandexId!=0
                && pharmacyInputModel.Name!=null
-               && await this._pharmacyCompaniesService.CheckCompanyByName(pharmacyInputModel.CompanyName)
-               && await this._pharmacyChainsService.CheckPharmacyChainByName(pharmacyInputModel.PharmacyChainName)
-               && await this._citiesService.CheckCityName(pharmacyInputModel.CityName)
-               && await this._regionsService.CheckRegionByName(pharmacyInputModel.RegionName)
+               && await _pharmacyCompaniesService.CheckCompanyByName(pharmacyInputModel.CompanyName)
+               && await _pharmacyChainsService.CheckPharmacyChainByName(pharmacyInputModel.PharmacyChainName)
+               && await _citiesService.CheckCityName(pharmacyInputModel.CityName)
+               && await _regionsService.CheckRegionByName(pharmacyInputModel.RegionName)
                && pharmacyInputModel.Address != null)
             {
                 var pharmacyDbInputModel = new PharmacyDbInputModel
@@ -291,19 +495,19 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                     Name = pharmacyInputModel.Name,
                     PharmacyClass = pharmacyInputModel.PharmacyClass,
                     Active = pharmacyInputModel.Active,
-                    CompanyId = await this._pharmacyCompaniesService.IdByName(pharmacyInputModel.CompanyName),
-                    PharmacyChainId = await this._pharmacyChainsService.IdByName(pharmacyInputModel.PharmacyChainName),
+                    CompanyId = await _pharmacyCompaniesService.IdByName(pharmacyInputModel.CompanyName),
+                    PharmacyChainId = await _pharmacyChainsService.IdByName(pharmacyInputModel.PharmacyChainName),
                     Address = pharmacyInputModel.Address,
-                    CityId = await this._citiesService.IdByName(pharmacyInputModel.CityName),
+                    CityId = await _citiesService.IdByName(pharmacyInputModel.CityName),
                     PharmnetId = pharmacyInputModel.PharmnetId,
                     PhoenixId = pharmacyInputModel.PhoenixId,
                     SopharmaId = pharmacyInputModel.SopharmaId,
                     StingId = pharmacyInputModel.StingId,
-                    RegionId = await this._regionsService.IdByName(pharmacyInputModel.RegionName)
+                    RegionId = await _regionsService.IdByName(pharmacyInputModel.RegionName)
 
                 };
 
-                if(await this._pharmaciesService.CreatePharmacy(pharmacyDbInputModel) != "")
+                if(await _pharmaciesService.CreatePharmacy(pharmacyDbInputModel) != "")
                 {
                     var pharmacyOutputModel = new PharmacyOutputModel
                     {
@@ -329,8 +533,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                 }
                 
             }
-
-            // return Redirect("Index");
 
             throw new InvalidOperationException();
         }
