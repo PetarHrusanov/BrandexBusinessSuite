@@ -1,7 +1,4 @@
-﻿using BrandexSalesAdapter.ExcelLogic.Models;
-using Newtonsoft.Json;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Linq;
     using Microsoft.AspNetCore.Mvc;
@@ -9,11 +6,13 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using Data;
     using Data.Models;
     using Models.Distributor;
+    using Models;
     
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     
     using static Common.InputOutputConstants.SingleStringConstants;
+    using Newtonsoft.Json;
 
     public class DistributorsController :Controller
     {
@@ -49,7 +48,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             await _context.Distributors.AddAsync(distributor);
             await _context.SaveChangesAsync();
 
-            string outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
+            var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
 
             outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
 

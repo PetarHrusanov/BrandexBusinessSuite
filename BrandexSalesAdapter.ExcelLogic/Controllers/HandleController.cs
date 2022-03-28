@@ -3,10 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using AutoMapper;
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
-    using BrandexSalesAdapter.ExcelLogic.Services.Identity;
     using Refit;
 
     public abstract class HandleController : Controller

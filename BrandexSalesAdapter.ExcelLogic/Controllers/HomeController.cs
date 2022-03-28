@@ -52,9 +52,10 @@
 
         public async Task<IActionResult> Index()
         {
-            var inputFilter = new SaleFiltersExcelInputModel();
-
-            inputFilter.Options =  await _regionsService.RegionsForSelect();
+            var inputFilter = new SaleFiltersExcelInputModel
+            {
+                Options = await _regionsService.RegionsForSelect()
+            };
 
             return View(inputFilter);
         }
@@ -139,7 +140,7 @@
             string sWebRootFolder = _hostEnvironment.WebRootPath;
             string sFileName = @"Sales.xlsx";
 
-            var URL = string.Format("{0}://{1}/{2}", Request.Scheme, Request.Host, sFileName);
+            var URL = $"{Request.Scheme}://{Request.Host}/{sFileName}";
 
             FileInfo file = new FileInfo(Path.Combine(sWebRootFolder, sFileName));
 
@@ -218,8 +219,8 @@
 
                     foreach (var product in products)
                     {
-                        int sumCount = await this._salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
-                        double productRevenue = sumCount * product.Price;
+                        var sumCount = await _salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
+                        var productRevenue = sumCount * product.Price;
                         row.CreateCell(productCounter).SetCellValue(productRevenue);
                         productCounter++;
                     }
@@ -333,7 +334,7 @@
 
             var memory = new MemoryStream();
 
-            using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
+            await using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
             {
 
                 List<PharmacyExcelModel> collectionPharmacies;

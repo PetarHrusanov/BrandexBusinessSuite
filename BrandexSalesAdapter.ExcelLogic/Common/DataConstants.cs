@@ -37,6 +37,24 @@
             public const string IncorrectProductId = "Incorrect product id.";
             public const string IncorrectPharmacyId = "Incorrect pharmacy id.";
             public const string IncorrectSalesCount = "Incorrect sales count.";
+
+            public const string IncorrectPharmacyCompanyId = "Incorrect pharmacy company ID.";
+            public const string IncorrectPharmacyChainId = "Incorrect pharmacy chain ID.";
+            public const string IncorrectRegionId = "Incorrect region ID.";
+            public const string IncorrectCityId = "Incorrect city ID.";
+            
+            public const string IncorrectCityName = "Incorrect city name.";
+            public const string IncorrectPharmacyChainName = "Incorrect pharmacy chain name.";
+            public const string IncorrectPharmacyCompanyName = "Incorrect pharmacy company name.";
+            public const string IncorrectRegion = "Incorrect region.";
+            
+            public const string IncorrectPrice = "Incorrect price.";
+            
+            public const string IncorrectProductBrandexId = "Incorrect product Brandex Id.";
+            public const string IncorrectProductPhoenixId = "Incorrect product Phoenix Id.";
+            public const string IncorrectProductPharmnetId = "Incorrect product Pharmnet Id.";
+            public const string IncorrectProductSopharmaId = "Incorrect product Sopharma Id.";
+            public const string IncorrectProductStingId = "Incorrect product Sting Id.";
         }
         
     }

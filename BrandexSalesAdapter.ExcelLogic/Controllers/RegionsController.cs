@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using Newtonsoft.Json;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;
@@ -19,8 +16,12 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using Models.Regions;
     
     using Services.Regions;
+    
+    using System.Linq;
+    using Newtonsoft.Json;
 
     using static Common.InputOutputConstants.SingleStringConstants;
+    using static Common.DataConstants.ExcelLineErrors;
 
     public class RegionsController: Controller
     {
@@ -34,8 +35,8 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             IRegionsService regionService)
 
         {
-            this._hostEnvironment = hostEnvironment;
-            this._regionService = regionService;
+            _hostEnvironment = hostEnvironment;
+            _regionService = regionService;
         }
         
 
@@ -52,11 +53,11 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
         {
             
 
-            string folderName = "UploadExcel";
+            var folderName = "UploadExcel";
 
-            string webRootPath = _hostEnvironment.WebRootPath;
+            var webRootPath = _hostEnvironment.WebRootPath;
 
-            string newPath = Path.Combine(webRootPath, folderName);
+            var newPath = Path.Combine(webRootPath, folderName);
 
             var errorDictionary = new Dictionary<int, string>();
 
@@ -73,25 +74,23 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
             {
 
-                string sFileExtension = Path.GetExtension(file.FileName).ToLower();
+                var sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
 
-                ISheet sheet;
-
-                string fullPath = Path.Combine(newPath, file.FileName);
-
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-
+                if (file.FileName != null)
                 {
+                    var fullPath = Path.Combine(newPath, file.FileName);
 
-                    file.CopyTo(stream);
+                    await using var stream = new FileStream(fullPath, FileMode.Create);
+                    await file.CopyToAsync(stream);
 
                     stream.Position = 0;
 
+                    ISheet sheet;
                     if (sFileExtension == ".xls")
 
                     {
 
-                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+                        var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
 
                         sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
@@ -101,7 +100,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
                     {
 
-                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+                        var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
 
                         sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
@@ -111,19 +110,19 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
                     int cellCount = headerRow.LastCellNum;
 
-                    for (int j = 0; j < cellCount; j++)
+                    for (var j = 0; j < cellCount; j++)
                     {
-                        ICell cell = headerRow.GetCell(j);
+                        var cell = headerRow.GetCell(j);
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
                     }
 
-                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+                    for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
                     {
 
-                        IRow row = sheet.GetRow(i);
+                        var row = sheet.GetRow(i);
 
                         if (row == null) continue;
 
@@ -132,19 +131,16 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                         var regionName = row.GetCell(0).ToString()?.TrimEnd();
                         if (!string.IsNullOrEmpty(regionName))
                         {
-                            await this._regionService.UploadRegion(regionName);
+                            await _regionService.UploadRegion(regionName);
                         }
                         
                         else
                         {
-                            errorDictionary[i] = "Wrong Region";
-                            continue;
+                            errorDictionary[i+1] = IncorrectRegion;
                         }
                         
                     }
-
                 }
-
             }
 
             var errorModel = new CustomErrorDictionaryOutputModel
@@ -163,7 +159,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
         {
             if (singleStringInputModel.SingleStringValue != null)
             {
-                await this._regionService.UploadRegion(singleStringInputModel.SingleStringValue);
+                await _regionService.UploadRegion(singleStringInputModel.SingleStringValue);
             }
             
             string outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
