@@ -1,7 +1,4 @@
-﻿using BrandexSalesAdapter.ExcelLogic.Common;
-using Newtonsoft.Json;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;
@@ -18,8 +15,10 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     
     using Models;
     using Services.Cities;
+    using Newtonsoft.Json;
     
-    using static InputOutputConstants.SingleStringConstants;
+    using static Common.InputOutputConstants.SingleStringConstants;
+    using static Common.DataConstants.ExcelLineErrors;
 
     public class CitiesController :Controller
     {
@@ -64,25 +63,23 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
             {
 
-                string sFileExtension = Path.GetExtension(file.FileName).ToLower();
+                var sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
 
-                ISheet sheet;
-
-                string fullPath = Path.Combine(newPath, file.FileName);
-
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-
+                if (file.FileName != null)
                 {
+                    var fullPath = Path.Combine(newPath, file.FileName);
 
-                    file.CopyTo(stream);
+                    await using var stream = new FileStream(fullPath, FileMode.Create);
+                    await file.CopyToAsync(stream);
 
                     stream.Position = 0;
 
+                    ISheet sheet;
                     if (sFileExtension == ".xls")
 
                     {
 
-                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+                        var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
 
                         sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
@@ -92,25 +89,25 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
                     {
 
-                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+                        var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
 
                         sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
                     }
 
-                    IRow headerRow = sheet.GetRow(0); //Get Header Row
+                    var headerRow = sheet.GetRow(0); //Get Header Row
 
                     int cellCount = headerRow.LastCellNum;
 
-                    for (int j = 0; j < cellCount; j++)
+                    for (var j = 0; j < cellCount; j++)
                     {
-                        ICell cell = headerRow.GetCell(j);
+                        var cell = headerRow.GetCell(j);
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
                     }
 
-                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+                    for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
                     {
 
@@ -124,18 +121,16 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                         var cityRow = row.GetCell(0).ToString()?.TrimEnd();
                         if (!string.IsNullOrEmpty(cityRow))
                         {
-                            await this._citiesService.UploadCity(cityRow);
+                            await _citiesService.UploadCity(cityRow);
                         }
                         
                         else
                         {
-                            errorDictionary[i] = "Wrong City";
+                            errorDictionary[i+1] = IncorrectCityName;
                         }
 
                     }
-
                 }
-
             }
 
             var errorModel = new CustomErrorDictionaryOutputModel
@@ -143,7 +138,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                 Errors = errorDictionary
             };
 
-            string outputSerialized = JsonConvert.SerializeObject(errorModel);
+            var outputSerialized = JsonConvert.SerializeObject(errorModel);
 
             return outputSerialized;
 
@@ -158,7 +153,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                 await _citiesService.UploadCity(singleStringInputModel.SingleStringValue);
             }
             
-            string outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
+            var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
 
             outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
 

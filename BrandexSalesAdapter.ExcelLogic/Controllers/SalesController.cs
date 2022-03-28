@@ -38,8 +38,12 @@
         private readonly IProductsService _productsService;
         private readonly IPharmaciesService _pharmaciesService;
         private readonly IDistributorService _distributorService;
-
-        // user service
+        
+        
+        // private const int BrandexDateColumn = 0;
+        // private const int BrandexProductIdColumn = 2;
+        // private const int BrandexCountColumn = 3;
+        // private const int BrandexPharmacyIdColumn = ;
 
 
         // universal Services
@@ -98,7 +102,7 @@
                 int productCounter = 4;
                 int counter = 1;
 
-                int currentProduct = 0;
+                var currentProduct = 0;
                 
                 double allSalesSum = 0;
                 double rowSum = 0;
@@ -254,8 +258,8 @@
 
             return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
         }
-
-        //[Authorize]
+        
+        
         [HttpPost]
         [IgnoreAntiforgeryToken]
         [Consumes("multipart/form-data")]
@@ -264,11 +268,11 @@
             
             string dateFromClient = salesBulkInput.Date;
 
-            DateTime dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
+            var dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
 
-            string distributorName = salesBulkInput.Distributor;
+            var distributorName = salesBulkInput.Distributor;
             
-            IFormFile file = salesBulkInput.ImageFile;
+            var file = salesBulkInput.ImageFile;
 
             string folderName = "UploadExcel";
 
@@ -291,114 +295,97 @@
 
             {
 
-                string sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
+                var sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
 
                 ISheet sheet;
 
-                string fullPath = Path.Combine(newPath, file.FileName);
+                var fullPath = Path.Combine(newPath, file.FileName);
 
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                await using var stream = new FileStream(fullPath, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                stream.Position = 0;
+
+                if (sFileExtension == ".xls")
                 {
 
-                    await file.CopyToAsync(stream);
+                    var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
 
-                    stream.Position = 0;
-
-                    if (sFileExtension == ".xls")
-                    {
-
-                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-
-                    }
-
-                    else
-                    {
-
-                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
-
-                    }
-
-                    // IRow headerRow = sheet.GetRow(0); //Get Header Row
-                    //
-                    // int cellCount = headerRow.LastCellNum;
-                    //
-                    // for (int j = 0; j < cellCount; j++)
-                    // {
-                    //     ICell cell = headerRow.GetCell(j);
-                    //
-                    //     if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-                    //
-                    // }
-
-                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-                    {
-
-                        IRow row = sheet.GetRow(i);
-
-                        if (row == null) continue;
-
-                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                        var newSale = new SaleInputModel
-                        {
-                            Date = dateForDb
-                        };
-                        
-                        switch (distributorName)
-                        {
-                            case Brandex:
-
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
-                                    errorDictionary, Brandex, 0, 3, 5, 4);
-
-                                await this._salesService.CreateSale(newSale, Brandex);
-
-                                break;
-                            
-                            case Phoenix:
-                                
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                                    errorDictionary,Phoenix,16,0,2,14);
-
-                                await this._salesService.CreateSale(newSale, Phoenix);
-                                
-                                break;
-                            
-                            case Sting:
-                                
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                                    errorDictionary,Sting,0,1,6,11);
-
-                                await this._salesService.CreateSale(newSale, Sting);
-                                
-                                break;
-                            
-                            case Pharmnet:
-                                
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                                    errorDictionary,Pharmnet,9,2,4,11);
-
-                                await this._salesService.CreateSale(newSale, Pharmnet);
-                                
-                                break;
-                            
-                            case Sopharma:
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                                    errorDictionary,Sopharma,0,2,5,11);
-
-                                await this._salesService.CreateSale(newSale, Sopharma);
-                                
-                                break;
-                            
-                        }
-                    }
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
                 }
 
+                else
+                {
+
+                    var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+
+                }
+
+                for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+                {
+
+                    var row = sheet.GetRow(i);
+
+                    if (row == null) continue;
+
+                    if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+                    var newSale = new SaleInputModel
+                    {
+                        Date = dateForDb
+                    };
+                        
+                    switch (distributorName)
+                    {
+                        case Brandex:
+
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
+                                errorDictionary, Brandex, 0, 3, 5, 4);
+
+                            await _salesService.CreateSale(newSale, Brandex);
+
+                            break;
+                            
+                        case Phoenix:
+                                
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                errorDictionary,Phoenix,16,0,2,14);
+
+                            await _salesService.CreateSale(newSale, Phoenix);
+                                
+                            break;
+                            
+                        case Sting:
+                                
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                errorDictionary,Sting,0,1,6,11);
+
+                            await _salesService.CreateSale(newSale, Sting);
+                                
+                            break;
+                            
+                        case Pharmnet:
+                                
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                errorDictionary,Pharmnet,9,2,4,11);
+
+                            await _salesService.CreateSale(newSale, Pharmnet);
+                                
+                            break;
+                            
+                        case Sopharma:
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                errorDictionary,Sopharma,0,2,5,11);
+
+                            await _salesService.CreateSale(newSale, Sopharma);
+                                
+                            break;
+                            
+                    }
+                }
             }
 
             var outputModel = new SalesBulkOutputModel {
@@ -406,7 +393,7 @@
                 Errors = errorDictionary
             };
 
-            string outputSerialized = JsonConvert.SerializeObject(outputModel);
+            var outputSerialized = JsonConvert.SerializeObject(outputModel);
 
             return outputSerialized;
 
@@ -451,103 +438,91 @@
 
                 string fullPath = Path.Combine(newPath, file.FileName);
 
-                using (var stream = new FileStream(fullPath, FileMode.Create))
+                await using var stream = new FileStream(fullPath, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                stream.Position = 0;
+
+                ISheet sheet;
+                if (sFileExtension == ".xls")
                 {
 
-                    await file.CopyToAsync(stream);
+                    var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
 
-                    stream.Position = 0;
-
-                    ISheet sheet;
-                    if (sFileExtension == ".xls")
-                    {
-
-                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-
-                    }
-
-                    else
-                    {
-
-                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
-                        sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
-
-                    }
-
-                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-
-                    {
-
-                        IRow row = sheet.GetRow(i);
-
-                        if (row == null) continue;
-
-                        if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                        var newSale = new SaleInputModel
-                        {
-                            Date = dateForDb
-                        };
-                        
-                        switch (distributorName)
-                        {
-                            case Brandex:
-
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
-                                    errorDictionary, Brandex, 0, 3, 5, 4);
-
-                                // await this._salesService.CreateSale(newSale, Brandex);
-
-                                break;
-                            
-                            case Phoenix:
-                                
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                                    errorDictionary,Phoenix,16,0,2,14);
-
-                                // await this._salesService.CreateSale(newSale, Phoenix);
-                                
-                                break;
-                            
-                            case Sting:
-                                
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                                    errorDictionary,Sting,0,1,6,11);
-
-                                // await this._salesService.CreateSale(newSale, Sting);
-                                
-                                break;
-                            
-                            case Pharmnet:
-                                
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                                    errorDictionary,Pharmnet,9,2,4,11);
-
-                                // await this._salesService.CreateSale(newSale, Pharmnet);
-                                
-                                break;
-                            
-                            case Sopharma:
-                                CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                                    errorDictionary,Sopharma,0,2,5,11);
-
-                                // await this._salesService.CreateSale(newSale, Sopharma);
-                                
-                                break;
-                            
-                        }
-                    }
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
                 }
 
+                else
+                {
+
+                    var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+
+                }
+
+                for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+
+                {
+
+                    var row = sheet.GetRow(i);
+
+                    if (row == null) continue;
+
+                    if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+                    var newSale = new SaleInputModel
+                    {
+                        Date = dateForDb
+                    };
+                        
+                    switch (distributorName)
+                    {
+                        case Brandex:
+
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
+                                errorDictionary, Brandex, 0, 3, 5, 4);
+
+                            break;
+                            
+                        case Phoenix:
+                                
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                errorDictionary,Phoenix,16,0,2,14);
+
+                            break;
+                            
+                        case Sting:
+                                
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                errorDictionary,Sting,0,1,6,11);
+
+                            break;
+                            
+                        case Pharmnet:
+                                
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                errorDictionary,Pharmnet,9,2,4,11);
+
+                            break;
+                            
+                        case Sopharma:
+                            CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
+                                errorDictionary,Sopharma,0,2,5,11);
+
+                            break;
+                            
+                    }
+                }
             }
 
-            var outputModel = new SalesBulkOutputModel {
+            var outputModel = new SalesBulkOutputModel
+            {
                 Date = dateFromClient,
-                Errors = errorDictionary
+                Errors = errorDictionary,
+                ErrorsArray = errorDictionary.Keys.ToArray()
+
             };
 
             string outputSerialized = JsonConvert.SerializeObject(outputModel);
@@ -561,7 +536,7 @@
         public async Task<string> Upload([FromBody]SaleSingleInputModel saleSingleInputModel)
         {
 
-            if(await this._salesService.UploadIndividualSale(
+            if(await _salesService.UploadIndividualSale(
                    saleSingleInputModel.PharmacyId, 
                    saleSingleInputModel.ProductId, 
                    saleSingleInputModel.Date, 
@@ -570,18 +545,16 @@
             {
                 var saleOutputModel = new SaleOutputModel
                 {
-                    ProductName = await this._productsService.NameById(saleSingleInputModel.ProductId, saleSingleInputModel.Distributor),
-                    PharmacyName = await this._pharmaciesService.NameById(saleSingleInputModel.PharmacyId, saleSingleInputModel.Distributor),
+                    ProductName = await _productsService.NameById(saleSingleInputModel.ProductId, saleSingleInputModel.Distributor),
+                    PharmacyName = await _pharmaciesService.NameById(saleSingleInputModel.PharmacyId, saleSingleInputModel.Distributor),
                     Count = saleSingleInputModel.Count,
                     Date = saleSingleInputModel.Date,
                     Distributor = saleSingleInputModel.Distributor
                 };
                 
-                string outputSerialized = JsonConvert.SerializeObject(saleOutputModel);
+                var outputSerialized = JsonConvert.SerializeObject(saleOutputModel);
 
                 return outputSerialized;
-                
-                // return this.View(saleOutputModel);
             }
 
             return "END";
@@ -659,7 +632,7 @@
             {
                 return null;
             }
-            if (this._numbersChecker.NegativeNumberIncludedCheck(inputSaleCount))
+            if (_numbersChecker.NegativeNumberIncludedCheck(inputSaleCount))
             {
                 return int.Parse(inputSaleCount);
             }
@@ -677,25 +650,22 @@
 
             var pharmacyId = 0;
 
-            if (this._numbersChecker.WholeNumberCheck(inputPharmacyId))
-            {
-                int inputPharmacyIdInt = int.Parse(inputPharmacyId);
+            if (!_numbersChecker.WholeNumberCheck(inputPharmacyId)) return pharmacyId;
+            var inputPharmacyIdInt = int.Parse(inputPharmacyId);
                 
-                switch (inputDistributor)
-                {
-                    case Brandex:
-                        pharmacyId = pharmaciesToCheck.Where(p => p.BrandexId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
-                        return pharmacyId != 0 ? pharmacyId : 0;
-                    case Phoenix:pharmacyId = pharmaciesToCheck.Where(p => p.PhoenixId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
-                        return pharmacyId != 0 ? pharmacyId : 0;
-                    case Sting:pharmacyId = pharmaciesToCheck.Where(p => p.StingId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
-                        return pharmacyId != 0 ? pharmacyId : 0;
-                    case Pharmnet:pharmacyId = pharmaciesToCheck.Where(p => p.PharmnetId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
-                        return pharmacyId != 0 ? pharmacyId : 0;
-                    case Sopharma:pharmacyId = pharmaciesToCheck.Where(p => p.SopharmaId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
-                        return pharmacyId != 0 ? pharmacyId : 0;
-                }
-
+            switch (inputDistributor)
+            {
+                case Brandex:
+                    pharmacyId = pharmaciesToCheck.Where(p => p.BrandexId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                    return pharmacyId != 0 ? pharmacyId : 0;
+                case Phoenix:pharmacyId = pharmaciesToCheck.Where(p => p.PhoenixId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                    return pharmacyId != 0 ? pharmacyId : 0;
+                case Sting:pharmacyId = pharmaciesToCheck.Where(p => p.StingId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                    return pharmacyId != 0 ? pharmacyId : 0;
+                case Pharmnet:pharmacyId = pharmaciesToCheck.Where(p => p.PharmnetId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                    return pharmacyId != 0 ? pharmacyId : 0;
+                case Sopharma:pharmacyId = pharmaciesToCheck.Where(p => p.SopharmaId == inputPharmacyIdInt).Select(p => p.Id).FirstOrDefault();
+                    return pharmacyId != 0 ? pharmacyId : 0;
             }
 
             return pharmacyId;
@@ -722,7 +692,7 @@
                 newSale.Date = DateTime.FromOADate(dateRow.NumericCellValue);
             }
 
-            int productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor, productIdsForCheck);
+            var productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor, productIdsForCheck);
 
             if (productRow != 0)
             {

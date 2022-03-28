@@ -19,6 +19,7 @@
     using Newtonsoft.Json;
     
     using static Common.InputOutputConstants.SingleStringConstants;
+    using static Common.DataConstants.ExcelLineErrors;
 
 
     public class PharmacyChainsController : Controller
@@ -46,11 +47,11 @@
         public async Task<string> Import([FromForm]IFormFile file)
         {
 
-            string folderName = "UploadExcel";
+            const string folderName = "UploadExcel";
 
-            string webRootPath = _hostEnvironment.WebRootPath;
+            var webRootPath = _hostEnvironment.WebRootPath;
 
-            string newPath = Path.Combine(webRootPath, folderName);
+            var newPath = Path.Combine(webRootPath, folderName);
 
             var errorDictionary = new Dictionary<int, string>();
 
@@ -66,25 +67,23 @@
 
             {
 
-                string sFileExtension = Path.GetExtension(file.FileName).ToLower();
+                string sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
 
-                ISheet sheet;
-
-                string fullPath = Path.Combine(newPath, file.FileName);
-
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-
+                if (file.FileName != null)
                 {
+                    string fullPath = Path.Combine(newPath, file.FileName);
 
-                    file.CopyTo(stream);
+                    await using var stream = new FileStream(fullPath, FileMode.Create);
+                    await file.CopyToAsync(stream);
 
                     stream.Position = 0;
 
+                    ISheet sheet;
                     if (sFileExtension == ".xls")
 
                     {
 
-                        HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+                        var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
 
                         sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
@@ -94,29 +93,29 @@
 
                     {
 
-                        XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+                        var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
 
                         sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
                     }
 
-                    IRow headerRow = sheet.GetRow(0); //Get Header Row
+                    var headerRow = sheet.GetRow(0); //Get Header Row
 
                     int cellCount = headerRow.LastCellNum;
 
-                    for (int j = 0; j < cellCount; j++)
+                    for (var j = 0; j < cellCount; j++)
                     {
-                        ICell cell = headerRow.GetCell(j);
+                        var cell = headerRow.GetCell(j);
 
                         if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
                     }
 
-                    for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+                    for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
 
                     {
 
-                        IRow row = sheet.GetRow(i);
+                        var row = sheet.GetRow(i);
 
                         if (row == null) continue;
                         
@@ -131,14 +130,12 @@
                         
                         else
                         {
-                            errorDictionary[i] = "Wrong Pharmacy Chain";
+                            errorDictionary[i+1] = IncorrectPharmacyChainName;
                             
                         }
 
                     }
-
                 }
-
             }
 
             var errorModel = new CustomErrorDictionaryOutputModel
@@ -146,7 +143,7 @@
                 Errors = errorDictionary
             };
 
-            string outputSerialized = JsonConvert.SerializeObject(errorModel);
+            var outputSerialized = JsonConvert.SerializeObject(errorModel);
 
             return outputSerialized;
 
