@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Globalization;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -391,12 +388,25 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                 }
             }
 
-            var outputModel = new SalesBulkOutputModel {
+            var arrayWithSubtractedNumbersForPython = new List<int>();
+            
+            
+            foreach(KeyValuePair<int, string> entry in errorDictionary)
+            {
+                (arrayWithSubtractedNumbersForPython).Add(entry.Key - 2);
+            }
+                
+
+
+            var outputModel = new SalesBulkOutputModel
+            {
                 Date = dateFromClient,
-                Errors = errorDictionary
+                Errors = errorDictionary,
+                ErrorsArray = arrayWithSubtractedNumbersForPython.ToArray()
+
             };
 
-            var outputSerialized = JsonConvert.SerializeObject(outputModel);
+            string outputSerialized = JsonConvert.SerializeObject(outputModel);
 
             return outputSerialized;
 
