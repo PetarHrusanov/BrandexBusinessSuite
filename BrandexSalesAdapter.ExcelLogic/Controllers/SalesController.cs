@@ -1,4 +1,7 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿using System.Collections;
+using System.Globalization;
+
+namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -40,10 +43,10 @@
         private readonly IDistributorService _distributorService;
         
         
-        // private const int BrandexDateColumn = 0;
-        // private const int BrandexProductIdColumn = 2;
-        // private const int BrandexCountColumn = 3;
-        // private const int BrandexPharmacyIdColumn = ;
+        private const int BrandexDateColumn = 0;
+        private const int BrandexProductIdColumn = 1;
+        private const int BrandexCountColumn = 2;
+        private const int BrandexPharmacyIdColumn = 3;
 
 
         // universal Services
@@ -343,7 +346,7 @@
                         case Brandex:
 
                             CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
-                                errorDictionary, Brandex, 0, 3, 5, 4);
+                                errorDictionary, Brandex, BrandexDateColumn, BrandexProductIdColumn, BrandexPharmacyIdColumn, BrandexCountColumn);
 
                             await _salesService.CreateSale(newSale, Brandex);
 
@@ -482,7 +485,7 @@
                         case Brandex:
 
                             CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
-                                errorDictionary, Brandex, 0, 3, 5, 4);
+                                errorDictionary, Brandex, BrandexDateColumn, BrandexProductIdColumn, BrandexPharmacyIdColumn, BrandexCountColumn);
 
                             break;
                             
@@ -517,11 +520,21 @@
                 }
             }
 
+            var arrayWithSubtractedNumbersForPython = new List<int>();
+            
+            
+            foreach(KeyValuePair<int, string> entry in errorDictionary)
+            {
+                (arrayWithSubtractedNumbersForPython).Add(entry.Key - 2);
+            }
+                
+
+
             var outputModel = new SalesBulkOutputModel
             {
                 Date = dateFromClient,
                 Errors = errorDictionary,
-                ErrorsArray = errorDictionary.Keys.ToArray()
+                ErrorsArray = arrayWithSubtractedNumbersForPython.ToArray()
 
             };
 
@@ -714,18 +727,22 @@
                 errorDictionary[i+1] = IncorrectPharmacyId;
             }
             
-            var saleCountRow = ResolveSaleCount(row.GetCell(saleCountColumn).ToString()?.TrimEnd());
+            // var saleCountRow = ResolveSaleCount(row.GetCell(saleCountColumn).ToString()?.TrimEnd());
 
+            var saleCountRow = row.GetCell(saleCountColumn);
             if (saleCountRow!=null)
             {
-                newSale.Count = (int)saleCountRow;
+                if (int.TryParse(saleCountRow.ToString()?.TrimEnd(), out var saleCountInt))
+                {
+                    newSale.Count = saleCountInt;
+                }
+                
+                else
+                {
+                    errorDictionary[i+1] = IncorrectSalesCount;
+                }
             }
 
-            else
-            {
-                errorDictionary[i+1] = IncorrectSalesCount;
-            }
-            
         }
         
         private async Task<int> CreateHeaderColumnsAsync(IRow row, int counter)
