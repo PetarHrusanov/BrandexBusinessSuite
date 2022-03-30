@@ -2,21 +2,76 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Linq;
     using System.Threading.Tasks;
+    
     using Microsoft.EntityFrameworkCore;
-    using BrandexSalesAdapter.ExcelLogic.Data;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.Sales;
+    using Microsoft.Data.SqlClient;
+
+    using Data;
+    using Data.Models;
+    using Models.Sales;
+    
+    using Microsoft.Extensions.Configuration;
+    
+    
     using static Common.DataConstants.Ditributors;
+    using static Common.DataConstants.SalesColumns;
+
 
     public class SalesService :ISalesService
     {
         SpravkiDbContext db;
+        private readonly IConfiguration _configuration;
 
-        public SalesService(SpravkiDbContext db)
+        public SalesService(SpravkiDbContext db, IConfiguration configuration)
         {
             this.db = db;
+            _configuration = configuration;
+
+        }
+
+        public async Task UploadBulk(List<SaleInputModel> sales)
+        {
+            var table = new DataTable();
+            table.TableName = Sales;
+
+            table.Columns.Add(PharmacyId, typeof(string));
+            table.Columns.Add(ProductId, typeof(int));
+            table.Columns.Add(DistributorId, typeof(int));
+            table.Columns.Add(Date, typeof(DateTime));
+            table.Columns.Add(Count, typeof(int));
+
+            foreach (var sale in sales)
+            {
+                var row = table.NewRow();
+                row[PharmacyId] = sale.PharmacyId;
+                row[ProductId] = sale.ProductId;
+                row[DistributorId] = sale.DistributorId;
+                row[Date] = sale.Date;
+                row[Count] = sale.Count;
+                table.Rows.Add(row);
+            }
+
+            string connection = _configuration.GetConnectionString("DefaultConnection");
+            
+            var con = new SqlConnection(connection);
+            
+            var objbulk = new SqlBulkCopy(con);  
+            
+            objbulk.DestinationTableName = "Sales";
+            
+            objbulk.ColumnMappings.Add(PharmacyId, PharmacyId);   
+            objbulk.ColumnMappings.Add(ProductId, ProductId);  
+            objbulk.ColumnMappings.Add(DistributorId, DistributorId);  
+            objbulk.ColumnMappings.Add(Date, Date);
+            objbulk.ColumnMappings.Add(Count, Count);  
+    
+            con.Open();
+            await objbulk.WriteToServerAsync(table);  
+            con.Close();  
+            
         }
 
         public async Task CreateSale(SaleInputModel sale, string distributor)

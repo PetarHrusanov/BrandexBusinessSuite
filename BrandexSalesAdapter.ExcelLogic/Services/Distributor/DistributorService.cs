@@ -2,8 +2,10 @@
 {
     using System.Linq;
     using System.Threading.Tasks;
+    
     using Microsoft.EntityFrameworkCore;
-    using BrandexSalesAdapter.ExcelLogic.Data;
+    
+    using Data;
 
     public class DistributorService :IDistributorService
     {
@@ -16,12 +18,12 @@
 
         public async Task<bool> CheckDistributor(string input)
         {
-            return await this.db.Distributors.Where(d => d.Name == input).AnyAsync();
+            return await db.Distributors.Where(d => d.Name == input).AnyAsync();
         }
 
         public async Task<int> IdByName(string input)
         {
-            return await this.db.Distributors.Where(d => d.Name == input).Select(d => d.Id).FirstOrDefaultAsync();
+            return await db.Distributors.Where(d => d.Name == input).Select(d => d.Id).FirstOrDefaultAsync();
         }
     }
 }
