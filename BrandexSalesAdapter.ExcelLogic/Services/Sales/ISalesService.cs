@@ -7,6 +7,9 @@
 
     public interface ISalesService
     {
+
+        Task UploadBulk(List<SaleInputModel> sales);
+        
         Task CreateSale(SaleInputModel sale, string distributor);
 
         Task<bool> UploadIndividualSale(string pharmacyId, string productId, string date, int count, string distributor);

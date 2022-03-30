@@ -9,7 +9,7 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    
+
     using Newtonsoft.Json;
     
     using NPOI.HSSF.UserModel;
@@ -94,9 +94,9 @@
 
                 IWorkbook workbook = new XSSFWorkbook();
 
-                ISheet excelSheet = workbook.CreateSheet("sales");
+                var excelSheet = workbook.CreateSheet("sales");
 
-                IRow row = excelSheet.CreateRow(0);
+                var row = excelSheet.CreateRow(0);
 
                 var products = await this._productsService.GetProductsIdPrices();
                 int productCounter = 4;
@@ -266,7 +266,7 @@
         public async Task<string> Import([FromForm] SalesBulkInputModel salesBulkInput)
         {
             
-            string dateFromClient = salesBulkInput.Date;
+            var dateFromClient = salesBulkInput.Date;
 
             var dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
 
@@ -274,13 +274,15 @@
             
             var file = salesBulkInput.ImageFile;
 
-            string folderName = "UploadExcel";
+            var folderName = "UploadExcel";
 
-            string webRootPath = _hostEnvironment.WebRootPath;
+            var webRootPath = _hostEnvironment.WebRootPath;
 
-            string newPath = Path.Combine(webRootPath, folderName);
+            var newPath = Path.Combine(webRootPath, folderName);
 
             var errorDictionary = new Dictionary<int, string>();
+
+            var validSalesList = new List<SaleInputModel>();
 
             var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
             var productIdsForCheck = await _productsService.GetProductsCheck();
@@ -335,7 +337,8 @@
 
                     var newSale = new SaleInputModel
                     {
-                        Date = dateForDb
+                        Date = dateForDb,
+                        DistributorId = await _distributorService.IdByName(salesBulkInput.Distributor)
                     };
                         
                     switch (distributorName)
@@ -345,7 +348,7 @@
                             CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
                                 errorDictionary, Brandex, BrandexDateColumn, BrandexProductIdColumn, BrandexPharmacyIdColumn, BrandexCountColumn);
 
-                            await _salesService.CreateSale(newSale, Brandex);
+                            // await _salesService.CreateSale(newSale, Brandex);
 
                             break;
                             
@@ -354,7 +357,7 @@
                             CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
                                 errorDictionary,Phoenix,16,0,2,14);
 
-                            await _salesService.CreateSale(newSale, Phoenix);
+                            // await _salesService.CreateSale(newSale, Phoenix);
                                 
                             break;
                             
@@ -363,7 +366,7 @@
                             CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
                                 errorDictionary,Sting,0,1,6,11);
 
-                            await _salesService.CreateSale(newSale, Sting);
+                            // await _salesService.CreateSale(newSale, Sting);
                                 
                             break;
                             
@@ -372,7 +375,7 @@
                             CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
                                 errorDictionary,Pharmnet,9,2,4,11);
 
-                            await _salesService.CreateSale(newSale, Pharmnet);
+                            // await _salesService.CreateSale(newSale, Pharmnet);
                                 
                             break;
                             
@@ -380,23 +383,31 @@
                             CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
                                 errorDictionary,Sopharma,0,2,5,11);
 
-                            await _salesService.CreateSale(newSale, Sopharma);
+                            // await _salesService.CreateSale(newSale, Sopharma);
                                 
                             break;
                             
+                    }
+
+                    if (newSale.PharmacyId != 0
+                        && newSale.ProductId != 0
+                        && newSale.Count != 0
+                        && newSale.DistributorId != 0)
+                    {
+                        validSalesList.Add(newSale);
                     }
                 }
             }
 
             var arrayWithSubtractedNumbersForPython = new List<int>();
+
+
+            await _salesService.UploadBulk(validSalesList);
             
-            
-            foreach(KeyValuePair<int, string> entry in errorDictionary)
+            foreach(var entry in errorDictionary)
             {
                 (arrayWithSubtractedNumbersForPython).Add(entry.Key - 2);
             }
-                
-
 
             var outputModel = new SalesBulkOutputModel
             {
@@ -406,7 +417,7 @@
 
             };
 
-            string outputSerialized = JsonConvert.SerializeObject(outputModel);
+            var outputSerialized = JsonConvert.SerializeObject(outputModel);
 
             return outputSerialized;
 
@@ -757,7 +768,7 @@
         
         private async Task<int> CreateHeaderColumnsAsync(IRow row, int counter)
         {
-            var products = await this._productsService.GetProductsNames();
+            var products = await _productsService.GetProductsNames();
             row.CreateCell(0).SetCellValue("Pharmacy Name");
             row.CreateCell(1).SetCellValue("Pharmacy Address");
             row.CreateCell(2).SetCellValue("Pharmacy Class");

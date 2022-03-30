@@ -57,67 +57,73 @@
             }
         }
 
-        public async Task<bool> CheckPharmacyByDistributor(string input, string Distributor)
+        public async Task<bool> CheckPharmacyByDistributor(string input, string distributor)
         {
             int convertedNumber = int.Parse(input);
-            switch (Distributor)
+            switch (distributor)
             {
                 case Brandex:
-                    return await this.db.Pharmacies.Where(c => c.BrandexId == convertedNumber).AnyAsync();
+                    return await db.Pharmacies.Where(c => c.BrandexId == convertedNumber).AnyAsync();
                 case Sting:
-                    return await this.db.Pharmacies.Where(c => c.StingId == convertedNumber).AnyAsync();
+                    return await db.Pharmacies.Where(c => c.StingId == convertedNumber).AnyAsync();
                 case Phoenix:
-                    return await this.db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).AnyAsync();
+                    return await db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).AnyAsync();
                 case Pharmnet:
-                    return await this.db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).AnyAsync();
+                    return await db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).AnyAsync();
                 case Sopharma:
-                    return await this.db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).AnyAsync();
+                    return await db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).AnyAsync();
                 default:
                     return false;
             }
         }
 
-        public async Task<int> PharmacyIdByDistributor(string input, string Distributor)
+        public async Task<int> PharmacyIdByDistributor(string input, string distributor)
         {
                 int convertedNumber = int.Parse(input);
-                switch (Distributor)
+                switch (distributor)
                 {
                     case Brandex:
-                        return await this.db.Pharmacies.Where(c => c.BrandexId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
+                        return await db.Pharmacies.Where(c => c.BrandexId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
                     case Sting:
-                        return await this.db.Pharmacies.Where(c => c.StingId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
+                        return await db.Pharmacies.Where(c => c.StingId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
                     case Phoenix:
-                        return await this.db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
+                        return await db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
                     case Pharmnet:
-                        return await this.db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
+                        return await db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
                     case Sopharma:
-                        return await this.db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
+                        return await db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
                     default:
                         return 0;
                 };
         }
 
-       
+
         public async Task<string> NameById(string input, string distributor)
         {
-            int convertedNumber;
-            bool success = int.TryParse(input, out convertedNumber);
+            var success = int.TryParse(input, out var convertedNumber);
 
             switch (distributor)
             {
                 case Brandex:
-                    return await this.db.Pharmacies.Where(c => c.BrandexId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                    return await db.Pharmacies.Where(c => c.BrandexId == convertedNumber).Select(p => p.Name)
+                        .FirstOrDefaultAsync();
                 case Sting:
-                    return await this.db.Pharmacies.Where(c => c.StingId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                    return await db.Pharmacies.Where(c => c.StingId == convertedNumber).Select(p => p.Name)
+                        .FirstOrDefaultAsync();
                 case Phoenix:
-                    return await this.db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                    return await db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).Select(p => p.Name)
+                        .FirstOrDefaultAsync();
                 case Pharmnet:
-                    return await this.db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                    return await db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).Select(p => p.Name)
+                        .FirstOrDefaultAsync();
                 case Sopharma:
-                    return await this.db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
+                    return await db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).Select(p => p.Name)
+                        .FirstOrDefaultAsync();
                 default:
                     return "";
-            };
+            }
+
+            ;
         }
 
         public async Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime date, int? regionId)

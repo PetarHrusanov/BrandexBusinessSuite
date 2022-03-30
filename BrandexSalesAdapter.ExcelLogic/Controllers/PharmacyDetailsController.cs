@@ -332,7 +332,7 @@
 
                 {
 
-                    XSSFWorkbook hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+                    var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
 
                     sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
@@ -390,7 +390,7 @@
                     }
                     else
                     {
-                        errorDictionary[i+1] = "COMPANY ID";
+                        errorDictionary[i+1] = IncorrectPharmacyCompanyId;
                     }
                         
                     var chainIdRow = row.GetCell(PharmacyChainColumn).ToString()?.TrimEnd();
@@ -402,7 +402,7 @@
                     }
                     else
                     {
-                        errorDictionary[i+1] = "PHARMACY CHAIN ID";
+                        errorDictionary[i+1] = IncorrectPharmacyChainId;
                     }
                         
                     var regionIdRow = row.GetCell(RegionColumn).ToString()?.TrimEnd();
@@ -414,7 +414,7 @@
                     }
                     else
                     {
-                        errorDictionary[i+1] = "REGION ID";
+                        errorDictionary[i+1] = IncorrectRegion;
                     }
                         
                     var pharmnetIdRow = row.GetCell(PharmnetIdColumn).ToString()?.TrimEnd();
@@ -455,7 +455,7 @@
                             
                     else
                     {
-                        errorDictionary[i+1] = "Wrong City ID";
+                        errorDictionary[i+1] = IncorrectCityName;
                     }
 
                     await _pharmaciesService.CreatePharmacy(newPharmacy);

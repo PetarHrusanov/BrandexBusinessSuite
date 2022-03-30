@@ -1,57 +1,54 @@
-using BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies;
-
 namespace BrandexSalesAdapter.ExcelLogic
 {
     // Data 
-    using BrandexSalesAdapter.ExcelLogic.Data;
-    using BrandexSalesAdapter.ExcelLogic.Models;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models.ApplicationUserModels;
+    using Data;
+    using Models;
+    using Data.Models.ApplicationUserModels;
 
     // Common Services
-    using BrandexSalesAdapter.ExcelLogic.Services;
-    using BrandexSalesAdapter.ExcelLogic.Services.Mapping;
+    using Services;
+    using Services.Mapping;
 
     // Business- Specific Services
-    using BrandexSalesAdapter.ExcelLogic.Services.Cities;
-    using BrandexSalesAdapter.ExcelLogic.Services.Distributor;
-    using BrandexSalesAdapter.ExcelLogic.Services.Pharmacies;
-    using BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains;
-    using BrandexSalesAdapter.ExcelLogic.Services.Products;
-    using BrandexSalesAdapter.ExcelLogic.Services.Regions;
-    using BrandexSalesAdapter.ExcelLogic.Services.Sales;
-
+    using Services.Cities;
+    using Services.Distributor;
+    using Services.Pharmacies;
+    using Services.PharmacyChains;
+    using Services.Products;
+    using Services.Regions;
+    using Services.Sales;
+    using Services.PharmacyCompanies;
     using System.Reflection;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc;
+    
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
-    using BrandexSalesAdapter.ExcelLogic.Data.Seeding;
-    using Microsoft.AspNetCore.Identity;
-    using BrandexSalesAdapter.ExcelLogic.Models.Map;
+    
+    using Data.Seeding;
+    using Models.Map;
     using System;
 
     public class Startup
     {
-        private readonly IConfiguration configuration;
-        private readonly IHostEnvironment hostingEnvironment;
+        private readonly IConfiguration _configuration;
+        private readonly IHostEnvironment _hostingEnvironment;
 
         public Startup(
             IConfiguration configuration,
             IHostEnvironment hostingEnvironment)
         {
-            this.configuration = configuration;
-            this.hostingEnvironment = hostingEnvironment;
+            _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<SpravkiDbContext>(
-                options => options.UseSqlServer(this.configuration.GetConnectionString("DefaultConnection")));
+                options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
                 .AddRoles<ApplicationRole>().AddEntityFrameworkStores<SpravkiDbContext>();
@@ -72,7 +69,7 @@ namespace BrandexSalesAdapter.ExcelLogic
 
             services.AddRazorPages();
 
-            services.AddSingleton(this.configuration);
+            services.AddSingleton(this._configuration);
 
             services
                 .AddAutoMapper(
@@ -81,8 +78,6 @@ namespace BrandexSalesAdapter.ExcelLogic
                     Array.Empty<Assembly>());
 
             services
-                //.AddWebService<SpravkiDbContext>(this.configuration)
-
                 // Business Logic 
                 .AddTransient<ICitiesService, CitiesService>()
                 .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()
@@ -92,11 +87,7 @@ namespace BrandexSalesAdapter.ExcelLogic
                 .AddTransient<IProductsService, ProductsService>()
                 .AddTransient<IRegionsService, RegionsService>()
                 .AddTransient<ISalesService, SalesService>()
-                .AddTransient<INumbersChecker, NumbersChecker>()
-
-                //.AddControllersWithViews(options => options
-                //    .Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
-                ;
+                .AddTransient<INumbersChecker, NumbersChecker>();
 
             services.AddCors();
             services.AddMvc();
@@ -128,7 +119,6 @@ namespace BrandexSalesAdapter.ExcelLogic
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                //app.UseDatabaseErrorPage();
             }
             else
             {
@@ -148,12 +138,8 @@ namespace BrandexSalesAdapter.ExcelLogic
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
+            
             //app.UseCookiePolicy();
-
-            //app.UseCors(options => options
-            //        .AllowAnyOrigin()
-            //        .AllowAnyHeader()
-            //        .AllowAnyMethod());
 
             //app.UseRouting();
 

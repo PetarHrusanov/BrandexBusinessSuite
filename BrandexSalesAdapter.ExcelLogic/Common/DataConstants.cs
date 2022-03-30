@@ -16,6 +16,16 @@
             public const string BrandexENG = "Brandex";
             public const string PharmnetENG = "Pharmnet";
         }
+
+        public class SalesColumns
+        {
+            public const string Sales = "Sales";
+            public const string PharmacyId = "PharmacyId";
+            public const string ProductId = "ProductId";
+            public const string DistributorId = "DistributorId";
+            public const string Date = "Date";
+            public const string Count = "Count";
+        }
         
         public class Regions
         {
