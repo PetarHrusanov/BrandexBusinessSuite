@@ -9,6 +9,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Models.Sales
 
         public int Count { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
     }
 }

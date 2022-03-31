@@ -69,17 +69,18 @@
         }
 
         //[Authorize]
-        [HttpGet]
-        public ActionResult Index()
-        {
-            return this.View();
-        }
+        // [HttpGet]
+        // public ActionResult Index()
+        // {
+        //     return this.View();
+        // }
         
         [HttpPost]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Generate([FromBody] SalesRegionDateInputModel inputModel)
         {
-            var date = inputModel.Date;
+            var dateBeginString = inputModel.DateBegin;
+            var dateEndString = inputModel.DateEnd;
             var regionId = inputModel.RegionId;
             
             string sWebRootFolder = _hostEnvironment.WebRootPath;
@@ -98,7 +99,7 @@
 
                 var row = excelSheet.CreateRow(0);
 
-                var products = await this._productsService.GetProductsIdPrices();
+                var products = await _productsService.GetProductsIdPrices();
                 int productCounter = 4;
                 int counter = 1;
 
@@ -109,10 +110,15 @@
 
                 productCounter = await CreateHeaderColumnsAsync(row, productCounter);
 
-                if (date != null)
+                if (dateBeginString != null || dateEndString!=null)
                 {
-                    var currRowDate = DateTime.ParseExact(date, "MM/yyyy", null);
-                    collectionPharmacies = await this._pharmaciesService.GetPharmaciesExcelModel(currRowDate, regionId);
+                    var dateBegin = DateTime.ParseExact(dateBeginString, "dd/MM/yyyy", null);
+                    var dateEnd = DateTime.ParseExact(dateEndString, "dd/MM/yyyy", null);
+                    
+                    
+                    
+                    
+                    collectionPharmacies = await _pharmaciesService.GetPharmaciesExcelModel(dateBegin, dateEnd, regionId);
 
                     foreach (var pharmacy in collectionPharmacies)
                     {
@@ -148,7 +154,7 @@
                     productCounter = 4;
                     foreach (var product in products)
                     {
-                        int sumCount = await _salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
+                        int sumCount = await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, regionId);
                         row.CreateCell(productCounter).SetCellValue(sumCount);
                         productCounter++;
                     }
@@ -160,7 +166,7 @@
 
                     foreach (var product in products)
                     {
-                        int sumCount = await this._salesService.ProductCountSumByIdDate(product.Id, currRowDate, regionId);
+                        int sumCount = await this._salesService.ProductCountSumByIdDate(product.Id, dateBegin, regionId);
                         double productRevenue = sumCount * product.Price;
                         row.CreateCell(productCounter).SetCellValue(productRevenue);
                         productCounter++;
@@ -177,11 +183,14 @@
                     row.CreateCell(productCounter + 1).SetCellValue("Date");
 
                     var dates = await this._salesService.GetDistinctDatesByMonths();
+                    
+                    var dateBegin = DateTime.ParseExact(dateBeginString, "dd/MM/yyyy", null);
+                    var dateEnd = DateTime.ParseExact(dateEndString, "dd/MM/yyyy", null);
 
                     foreach (var currentDate in dates)
                     {
                         // da se mahat li tezi bez prodajbi
-                        collectionPharmacies = await this._pharmaciesService.GetPharmaciesExcelModel(currentDate, regionId);
+                        collectionPharmacies = await this._pharmaciesService.GetPharmaciesExcelModel(dateBegin, dateEnd, regionId);
 
                         foreach (var pharmacy in collectionPharmacies)
                         {
