@@ -12,17 +12,17 @@
 
         Task<List<PharmacyCheckModel>> GetPharmaciesCheck();
 
-        Task<bool> CheckPharmacyByDistributor(string input, string Distributor);
-
-        Task<int> PharmacyIdByDistributor(string input, string Distributor);
-
-        Task<ICollection<PharmacyDistributorCheck>> PharmacyIdsByDistributorForCheck(string input);
-
         Task<string> NameById(string input, string distributor);
 
-        Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime date, int? regionId);
+        Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime? dateBegin, DateTime? dateEnd, int? regionId);
 
         Task Update(List<PharmacyDbInputModel> pharmacies);
+        
+        // Task<bool> CheckPharmacyByDistributor(string input, string Distributor);
+
+        // Task<int> PharmacyIdByDistributor(string input, string Distributor);
+
+        // Task<ICollection<PharmacyDistributorCheck>> PharmacyIdsByDistributorForCheck(string input);
 
     }
 }
