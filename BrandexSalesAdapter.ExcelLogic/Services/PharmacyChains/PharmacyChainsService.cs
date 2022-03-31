@@ -1,4 +1,7 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains
+﻿using System.Collections.Generic;
+using BrandexSalesAdapter.ExcelLogic.Models.PharmacyChains;
+
+namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains
 {
     using System;
     using System.Linq;
@@ -46,6 +49,15 @@
         {
             return await db.PharmacyChains.Where(x => x.Name.ToLower().TrimEnd() == pharmacyChainName.ToLower().TrimEnd())
                                     .Select(x => x.Id).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<PharmacyChainCheckModel>> GetPharmacyChainsCheck()
+        {
+            return await db.PharmacyChains.Select(p => new PharmacyChainCheckModel()
+            {
+                Id = p.Id,
+                Name = p.Name
+            }).ToListAsync();
         }
     }
 }

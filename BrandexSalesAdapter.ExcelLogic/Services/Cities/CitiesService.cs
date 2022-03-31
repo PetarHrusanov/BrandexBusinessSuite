@@ -6,6 +6,9 @@
     using Microsoft.EntityFrameworkCore;
     using BrandexSalesAdapter.ExcelLogic.Data;
     using BrandexSalesAdapter.ExcelLogic.Data.Models;
+    
+    using System.Collections.Generic;
+    using BrandexSalesAdapter.ExcelLogic.Models.Cities;
 
     public class CitiesService :ICitiesService
     {
@@ -26,6 +29,15 @@
         {
             return db.Cities.Where(x => x.Name.ToLower().TrimEnd().Contains(companyName.ToLower().TrimEnd()))
                                     .Select(x => x.Id).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<CityCheckModel>> GetCitiesCheck()
+        {
+            return await db.Cities.Select(p => new CityCheckModel()
+            {
+                Id = p.Id,
+                Name = p.Name
+            }).ToListAsync();
         }
 
         public async Task<string> UploadCity(string city)

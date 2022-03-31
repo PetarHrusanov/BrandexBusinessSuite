@@ -1,8 +1,8 @@
-﻿using BrandexSalesAdapter.ExcelLogic.Models.PharmacyCompanies;
-
-namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
+﻿namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
 {
     using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using BrandexSalesAdapter.ExcelLogic.Models.PharmacyCompanies;
 
     public interface IPharmacyCompaniesService
     {
@@ -11,5 +11,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
         Task<bool> CheckCompanyByName(string companyName);
 
         Task<int> IdByName(string companyName);
+        
+        Task<List<PharmacyCompanyCheckModel>> GetPharmacyCompaniesCheck();
     }
 }

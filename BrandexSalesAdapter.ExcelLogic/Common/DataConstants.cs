@@ -26,6 +26,25 @@
             public const string Date = "Date";
             public const string Count = "Count";
         }
+
+        public class PharmacyColumns
+        {
+            public const string Pharmacies = "Pharmacies";
+            public const string BrandexId = "BrandexId";
+            public const string Name = "Name";
+            public const string PharmacyClass = "PharmacyClass";
+            public const string Active = "Active";
+            public const string CompanyId = "CompanyId";
+            public const string PharmacyChainId = "PharmacyChainId";
+            public const string Address = "Address";
+            public const string CityId = "CityId";
+            public const string PharmnetId = "PharmnetId";
+            public const string PhoenixId = "PhoenixId";
+            public const string SopharmaId = "SopharmaId";
+            public const string StingId = "StingId";
+            public const string RegionId = "RegionId";
+            
+        }
         
         public class Regions
         {
