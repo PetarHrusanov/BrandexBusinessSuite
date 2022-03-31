@@ -1,4 +1,5 @@
-﻿using BrandexSalesAdapter.ExcelLogic.Models.PharmacyCompanies;
+﻿using System.Collections.Generic;
+using BrandexSalesAdapter.ExcelLogic.Models.PharmacyCompanies;
 
 namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
 {
@@ -53,6 +54,16 @@ namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
                                    .TrimEnd().Contains(companyName.ToLower().TrimEnd()))
                                    .Select(x => x.Id).FirstOrDefaultAsync();
             return companyId;
+        }
+
+        public async Task<List<PharmacyCompanyCheckModel>> GetPharmacyCompaniesCheck()
+        {
+            return await db.Companies.Select(p => new PharmacyCompanyCheckModel()
+            {
+                Id = p.Id,
+                Name = p.Name,
+                VAT = p.VAT
+            }).ToListAsync();
         }
     }
 }

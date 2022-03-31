@@ -4,20 +4,101 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    
     using Microsoft.EntityFrameworkCore;
-    using BrandexSalesAdapter.ExcelLogic.Data;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models;
-    using BrandexSalesAdapter.ExcelLogic.Models.Pharmacies;
-    using BrandexSalesAdapter.ExcelLogic.Models.Sales;
-    using static Common.DataConstants.Ditributors;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Data.SqlClient;
+    
+    using System.Data;
+    using Data;
+    using Data.Models;
 
-    public class PharmaciesService :IPharmaciesService
+    using Models.Pharmacies;
+    using Models.Sales;
+
+    using static Common.DataConstants.Ditributors;
+    using static Common.DataConstants.PharmacyColumns;
+
+    public class PharmaciesService : IPharmaciesService
     {
         SpravkiDbContext db;
+        private readonly IConfiguration _configuration;
 
-        public PharmaciesService(SpravkiDbContext db)
+        public PharmaciesService(SpravkiDbContext db, IConfiguration configuration)
         {
             this.db = db;
+            _configuration = configuration;
+
+        }
+
+        public async Task UploadBulk(List<PharmacyDbInputModel> pharmacies)
+        {
+            var table = new DataTable();
+            table.TableName = Pharmacies;
+            
+            table.Columns.Add(BrandexId);
+            table.Columns.Add(Name);
+            table.Columns.Add(PharmacyClass, typeof(int));
+            table.Columns.Add(Active, typeof(bool));
+            table.Columns.Add(CompanyId);
+            table.Columns.Add(PharmacyChainId);
+            table.Columns.Add(Address);
+            table.Columns.Add(CityId);
+            table.Columns.Add(PharmnetId);
+            table.Columns.Add(PhoenixId);
+            table.Columns.Add(SopharmaId);
+            table.Columns.Add(StingId);
+            table.Columns.Add(RegionId);
+
+            foreach (var pharmacy in pharmacies)
+            {
+                var row = table.NewRow();
+                row[BrandexId] = pharmacy.BrandexId;
+                row[Name] = pharmacy.Name;
+                row[PharmacyClass] = pharmacy.PharmacyClass;
+                row[Active] = pharmacy.Active;
+                row[CompanyId] = pharmacy.CompanyId;
+                row[PharmacyChainId] = pharmacy.PharmacyChainId;
+                row[Address] = pharmacy.Address;
+                row[CityId] = pharmacy.CityId;
+
+                row[PharmnetId] = pharmacy.PharmnetId;
+                row[PhoenixId] = pharmacy.PhoenixId;
+                row[SopharmaId] = pharmacy.SopharmaId;
+                row[StingId] = pharmacy.StingId;
+                
+                row[RegionId] = pharmacy.RegionId;
+                table.Rows.Add(row);
+            }
+            
+            
+            
+            string connection = _configuration.GetConnectionString("DefaultConnection");
+            
+            var con = new SqlConnection(connection);
+            
+            var objbulk = new SqlBulkCopy(con);  
+            
+            objbulk.DestinationTableName = Pharmacies;
+            
+            objbulk.ColumnMappings.Add(BrandexId, BrandexId);
+            objbulk.ColumnMappings.Add(Name, Name); 
+            objbulk.ColumnMappings.Add(PharmacyClass, PharmacyClass); 
+            objbulk.ColumnMappings.Add(Active, Active); 
+            objbulk.ColumnMappings.Add(CompanyId, CompanyId); 
+            objbulk.ColumnMappings.Add(PharmacyChainId, PharmacyChainId); 
+            objbulk.ColumnMappings.Add(Address, Address); 
+            objbulk.ColumnMappings.Add(CityId, CityId); 
+            objbulk.ColumnMappings.Add(PharmnetId, PharmnetId);
+            objbulk.ColumnMappings.Add(PhoenixId, PhoenixId); 
+            objbulk.ColumnMappings.Add(SopharmaId, SopharmaId); 
+            objbulk.ColumnMappings.Add(StingId, StingId); 
+            objbulk.ColumnMappings.Add(RegionId, RegionId); 
+            
+            con.Open();
+            await objbulk.WriteToServerAsync(table);  
+            con.Close(); 
+            
         }
 
         public async Task<string> CreatePharmacy(PharmacyDbInputModel pharmacyDbInputModel)
@@ -175,6 +256,30 @@
                 }).ToListAsync();
             }
             
+        }
+
+        public async Task Update(List<PharmacyDbInputModel> pharmacies)
+        {
+            foreach (var pharmacy in pharmacies)
+            {
+                var pharmacyDb = await db.Pharmacies.Where(p => p.BrandexId == pharmacy.BrandexId)
+                    .FirstOrDefaultAsync();
+
+                pharmacyDb.Name = pharmacy.Name;
+                pharmacyDb.PharmacyClass = pharmacy.PharmacyClass;
+                pharmacyDb.Active = pharmacy.Active;
+                pharmacyDb.CompanyId  = pharmacy.CompanyId;
+                pharmacyDb.PharmacyChainId  = pharmacy.PharmacyChainId;
+                pharmacyDb.Address  = pharmacy.Address;
+                pharmacyDb.CityId  = pharmacy.CityId;
+                pharmacyDb.PharmnetId  = pharmacy.PharmnetId;
+                pharmacyDb.PhoenixId  = pharmacy.PhoenixId;
+                pharmacyDb.SopharmaId  = pharmacy.SopharmaId;
+                pharmacyDb.StingId  = pharmacy.StingId;
+                pharmacyDb.RegionId  = pharmacy.RegionId;
+                
+                await db.SaveChangesAsync();
+            }
         }
 
         public async Task<ICollection<PharmacyDistributorCheck>> PharmacyIdsByDistributorForCheck(string distributor)

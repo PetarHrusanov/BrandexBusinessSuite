@@ -2,6 +2,9 @@
 {
     using System;
     using System.Threading.Tasks;
+    
+    using System.Collections.Generic;
+    using BrandexSalesAdapter.ExcelLogic.Models.PharmacyChains;
 
     public interface IPharmacyChainsService
     {
@@ -10,5 +13,7 @@
         Task<bool> CheckPharmacyChainByName(string companyName);
 
         Task<int> IdByName(string companyName);
+        
+        Task<List<PharmacyChainCheckModel>> GetPharmacyChainsCheck();
     }
 }
