@@ -12,6 +12,7 @@
     <Folder Include="Data\Enums\" />
     <Folder Include="Data\Confirugations\" />
     <Folder Include="Data\Migrations\" />
+    <Folder Include="wwwroot\UploadExcel" />
     <Folder Include="wwwroot\UploadExcel\" />
     <Folder Include="Views\PharmacyDetails\" />
     <Folder Include="Views\Products\" />
