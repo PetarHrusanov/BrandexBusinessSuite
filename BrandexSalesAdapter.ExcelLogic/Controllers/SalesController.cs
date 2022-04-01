@@ -1,4 +1,6 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿using System.Globalization;
+
+namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -44,6 +46,8 @@
         private const int BrandexProductIdColumn = 1;
         private const int BrandexCountColumn = 2;
         private const int BrandexPharmacyIdColumn = 3;
+        
+        private const int ProductCounter = 4;
 
 
         // universal Services
@@ -77,179 +81,79 @@
         
         [HttpPost]
         [IgnoreAntiforgeryToken]
-        public async Task<IActionResult> Generate([FromBody] SalesRegionDateInputModel inputModel)
+        public async Task<IActionResult> GenerateSummed([FromBody] SalesRegionDateInputModel inputModel)
         {
             var dateBeginString = inputModel.DateBegin;
             var dateEndString = inputModel.DateEnd;
+
+            DateTime.TryParseExact(dateBeginString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None,
+                out var dateBegin);
+            
+            if (!DateTime.TryParseExact(dateEndString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateEnd))
+            {
+                dateEnd = DateTime.MaxValue;
+            }
+            
             var regionId = inputModel.RegionId;
             
-            string sWebRootFolder = _hostEnvironment.WebRootPath;
-            string sFileName = @"Sales.xlsx";
+            var sWebRootFolder = _hostEnvironment.WebRootPath;
+            var sFileName = @"Sales.xlsx";
 
             var memory = new MemoryStream();
 
             await using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
             {
-
-                List<PharmacyExcelModel> collectionPharmacies;
-
                 IWorkbook workbook = new XSSFWorkbook();
 
                 var excelSheet = workbook.CreateSheet("sales");
 
                 var row = excelSheet.CreateRow(0);
-
-                var products = await _productsService.GetProductsIdPrices();
-                int productCounter = 4;
-                int counter = 1;
-
-                var currentProduct = 0;
                 
-                double allSalesSum = 0;
-                double rowSum = 0;
-
-                productCounter = await CreateHeaderColumnsAsync(row, productCounter);
-
-                if (dateBeginString != null || dateEndString!=null)
+                var products = await _productsService.GetProductsIdPrices();
+                
+                
+                foreach (var product in products)
                 {
-                    var dateBegin = DateTime.ParseExact(dateBeginString, "dd/MM/yyyy", null);
-                    var dateEnd = DateTime.ParseExact(dateEndString, "dd/MM/yyyy", null);
-                    
-                    
-                    
-                    
-                    collectionPharmacies = await _pharmaciesService.GetPharmaciesExcelModel(dateBegin, dateEnd, regionId);
-
-                    foreach (var pharmacy in collectionPharmacies)
-                    {
-                        row = excelSheet.CreateRow(counter);
-                        rowSum = 0;
-
-                        row.CreateCell(0).SetCellValue(pharmacy.Name);
-                        row.CreateCell(1).SetCellValue(pharmacy.Address);
-                        row.CreateCell(2).SetCellValue(pharmacy.PharmacyClass.ToString());
-                        row.CreateCell(3).SetCellValue(pharmacy.Region);
-
-                        productCounter = 4;
-                        currentProduct = 0;
-
-                        foreach (var product in products)
-                        {
-                            int sumCount = pharmacy.Sales.Where(i => i.ProductId == product.Id).Sum(b => b.Count);
-                            rowSum += sumCount * product.Price;
-                            allSalesSum += rowSum;
-                            row.CreateCell(productCounter).SetCellValue(sumCount);
-                            productCounter++;
-                            currentProduct++;
-                        }
-
-                        row.CreateCell(productCounter).SetCellValue(rowSum);
-
-                        counter++;
-
-                    }
-
-                    row = excelSheet.CreateRow(counter);
-
-                    productCounter = 4;
-                    foreach (var product in products)
-                    {
-                        int sumCount = await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, regionId);
-                        row.CreateCell(productCounter).SetCellValue(sumCount);
-                        productCounter++;
-                    }
-
-                    counter++;
-                    row = excelSheet.CreateRow(counter);
-
-                    productCounter = 4;
-
-                    foreach (var product in products)
-                    {
-                        int sumCount = await this._salesService.ProductCountSumByIdDate(product.Id, dateBegin, regionId);
-                        double productRevenue = sumCount * product.Price;
-                        row.CreateCell(productCounter).SetCellValue(productRevenue);
-                        productCounter++;
-                    }
-
-                    row.CreateCell(productCounter).SetCellValue(allSalesSum);
-
-
+                    var sumCount = await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
+                    row.CreateCell(ProductCounter +row.Cells.Count()).SetCellValue(sumCount);
+      
+                }
+                
+                row = excelSheet.CreateRow(excelSheet.LastRowNum+1);
+                
+                foreach (var product in products)
+                {
+                    var sumCount = await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
+                    var productRevenue = sumCount * product.Price;
+                    row.CreateCell(row.Cells.Count()+ProductCounter).SetCellValue(productRevenue);
                 }
 
-                else
+
+                row = excelSheet.CreateRow(excelSheet.LastRowNum+1);
+
+                await CreateHeaderColumnsAsync(row);
+
+                var collectionPharmacies = await _pharmaciesService.GetPharmaciesExcelModel(dateBegin, dateEnd, regionId);
+
+                foreach (var pharmacy in collectionPharmacies)
                 {
+                    row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
 
-                    row.CreateCell(productCounter + 1).SetCellValue("Date");
+                    row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Name);
+                    row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Address);
+                    row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.PharmacyClass.ToString());
+                    row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Region);
 
-                    var dates = await this._salesService.GetDistinctDatesByMonths();
-                    
-                    var dateBegin = DateTime.ParseExact(dateBeginString, "dd/MM/yyyy", null);
-                    var dateEnd = DateTime.ParseExact(dateEndString, "dd/MM/yyyy", null);
 
-                    foreach (var currentDate in dates)
-                    {
-                        // da se mahat li tezi bez prodajbi
-                        collectionPharmacies = await this._pharmaciesService.GetPharmaciesExcelModel(dateBegin, dateEnd, regionId);
-
-                        foreach (var pharmacy in collectionPharmacies)
-                        {
-                            rowSum = 0;
-
-                            row = excelSheet.CreateRow(counter);
-
-                            row.CreateCell(0).SetCellValue(pharmacy.Name);
-                            row.CreateCell(1).SetCellValue(pharmacy.Address);
-                            row.CreateCell(2).SetCellValue(pharmacy.PharmacyClass.ToString());
-                            row.CreateCell(3).SetCellValue(pharmacy.Region);
-
-                            productCounter = 4;
-
-                            currentProduct = 0;
-
-                            foreach (var product in products)
-                            {
-                                int sumCount = pharmacy.Sales.Where(i => i.ProductId == product.Id).Sum(b => b.Count);
-                                rowSum += sumCount * product.Price;
-                                allSalesSum += sumCount * product.Price;
-                                row.CreateCell(productCounter).SetCellValue(sumCount);
-                                productCounter++;
-                                currentProduct++;
-                            }
-
-                            row.CreateCell(productCounter).SetCellValue(rowSum);
-                            row.CreateCell(productCounter + 1).SetCellValue(currentDate.ToString());
-
-                            counter++;
-
-                        }
-                    }
-
-                    row = excelSheet.CreateRow(counter);
-
-                    productCounter = 4;
                     foreach (var product in products)
                     {
-                        int sumCount = await this._salesService.ProductCountSumById(product.Id, regionId);
-                        row.CreateCell(productCounter).SetCellValue(sumCount);
-                        productCounter++;
+                        int sumCount = pharmacy.Sales.Where(i => i.ProductId == product.Id).Sum(b => b.Count);
+
+                        row.CreateCell(row.Cells.Count()).SetCellValue(sumCount);
                     }
 
-                    counter++;
-                    row = excelSheet.CreateRow(counter);
-
-
-                    productCounter = 4;
-                    foreach (var product in products)
-                    {
-                        int sumCount = await this._salesService.ProductCountSumById(product.Id, regionId);
-                        double productRevenue = sumCount * product.Price;
-                        row.CreateCell(productCounter).SetCellValue(productRevenue);
-                        productCounter++;
-                    }
-
-                    row.CreateCell(productCounter).SetCellValue(allSalesSum);
-
+                    row.CreateCell(row.Cells.Count())
+                        .SetCellValue(pharmacy.Sales.Select(p => p.ProductPrice * p.Count).Sum());
                 }
 
                 workbook.Write(fs);
@@ -268,6 +172,117 @@
             return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
         }
         
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> GenerateSeparated([FromBody] SalesRegionDateInputModel inputModel)
+        {
+            var dateBeginString = inputModel.DateBegin;
+            var dateEndString = inputModel.DateEnd;
+
+            DateTime.TryParseExact(dateBeginString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None,
+                out var dateBegin);
+            
+            
+            if (!DateTime.TryParseExact(dateEndString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateEnd))
+            {
+                dateEnd = DateTime.MaxValue;
+            }
+            
+            var regionId = inputModel.RegionId;
+            
+            var sWebRootFolder = _hostEnvironment.WebRootPath;
+            var sFileName = @"Sales.xlsx";
+
+            var memory = new MemoryStream();
+
+            await using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create,
+                             FileAccess.Write))
+            {
+
+                List<PharmacyExcelModel> collectionPharmacies;
+
+                IWorkbook workbook = new XSSFWorkbook();
+
+                var excelSheet = workbook.CreateSheet("sales");
+
+                var row = excelSheet.CreateRow(0);
+
+                var products = await _productsService.GetProductsIdPrices();
+
+
+                foreach (var product in products)
+                {
+                    var sumCount =
+                        await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
+                    row.CreateCell(ProductCounter + row.Cells.Count()).SetCellValue(sumCount);
+
+                }
+
+                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+
+                foreach (var product in products)
+                {
+                    var sumCount =
+                        await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
+                    var productRevenue = sumCount * product.Price;
+                    row.CreateCell(row.Cells.Count() + ProductCounter).SetCellValue(productRevenue);
+                }
+
+
+                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+
+                await CreateHeaderColumnsAsync(row);
+
+                row.CreateCell(row.Cells.Count()).SetCellValue("Date");
+
+                var dates = await _salesService.GetDistinctDatesByMonths();
+
+                foreach (var currentDate in dates)
+                {
+                    collectionPharmacies = await _pharmaciesService.GetPharmaciesExcelModel(dateBegin, dateEnd, regionId);
+
+                    foreach (var pharmacy in collectionPharmacies)
+                    {
+
+                        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+
+                        row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Name);
+                        row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Address);
+                        row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.PharmacyClass.ToString());
+                        row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Region);
+
+
+                        foreach (var product in products)
+                        {
+                            int sumCount = pharmacy.Sales
+                                .Where(i => i.ProductId == product.Id && i.Date==currentDate)
+                                .Sum(b => b.Count);
+
+                            row.CreateCell(row.Cells.Count()).SetCellValue(sumCount);
+                        }
+
+                        row.CreateCell(row.Cells.Count())
+                            .SetCellValue(pharmacy.Sales.Select(p => p.ProductPrice * p.Count).Sum());
+                        
+                        row.CreateCell(row.Cells.Count()).SetCellValue(currentDate.ToString("yyyy/MM/dd"));
+                    }
+                }
+
+                workbook.Write(fs);
+
+            }
+
+            await using (var stream = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
+            {
+
+                await stream.CopyToAsync(memory);
+
+            }
+
+            memory.Position = 0;
+
+            return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
+        }
         
         [HttpPost]
         [IgnoreAntiforgeryToken]
@@ -602,30 +617,7 @@
 
             return "END";
         }
-
-        private static DateTime? ResolveDate(string? inputDate, string inputDistributor)
-        {
-            if (inputDate==null)
-            {
-                return null;
-            }
-            
-            switch (inputDistributor)
-            {
-                case Brandex:
-                    return DateTime.ParseExact(inputDate, "yyyy-MM", null);
-                case Phoenix:
-                    return DateTime.Parse(inputDate);
-                case Sting:
-                    return DateTime.ParseExact(inputDate, "yyyy-MM", null);
-                case Pharmnet:
-                    return DateTime.Parse(inputDate);
-                case Sopharma:
-                    return DateTime.ParseExact(inputDate, "MM.yyyy", null);
-                default:
-                    return null;
-            }       
-        }
+        
 
         public int ResolveProductId(string inputProductId, string inputDistributor, List<ProductCheckModel> productsToCheck)
         {
@@ -775,7 +767,7 @@
 
         }
         
-        private async Task<int> CreateHeaderColumnsAsync(IRow row, int counter)
+        private async Task CreateHeaderColumnsAsync(IRow row)
         {
             var products = await _productsService.GetProductsNames();
             row.CreateCell(0).SetCellValue("Pharmacy Name");
@@ -783,17 +775,19 @@
             row.CreateCell(2).SetCellValue("Pharmacy Class");
             row.CreateCell(3).SetCellValue("Region");
 
+            // int cellsCount = row.Cells.Count();
+
             foreach (var product in products)
             {
 
 
-                row.CreateCell(counter).SetCellValue(product);
-                counter++;
+                row.CreateCell(row.Cells.Count()).SetCellValue(product);
+                // counter++;
             }
 
-            row.CreateCell(counter).SetCellValue("SumSale");
+            row.CreateCell(row.Cells.Count()).SetCellValue("SumSale");
 
-            return counter;
+            // return counter;
         }
         
     }
