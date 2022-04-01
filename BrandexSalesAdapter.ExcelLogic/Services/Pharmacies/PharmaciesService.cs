@@ -186,6 +186,7 @@
                                 Name = s.Product.Name,
                                 ProductId = s.ProductId,
                                 Count = s.Count,
+                                ProductPrice = s.Product.Price
                                 // Date = date
                             }).ToList()
                 }).ToListAsync();
@@ -204,6 +205,7 @@
                         Name = s.Product.Name,
                         ProductId = s.ProductId,
                         Count = s.Count,
+                        ProductPrice = s.Product.Price
                         // Date = date
                     }).ToList()
             }).ToListAsync();

@@ -16,7 +16,7 @@
 
         Task<int> ProductCountSumById(int productId, int? regionId);
 
-        Task<int> ProductCountSumByIdDate(int productId, DateTime dateTime, int? regionId);
+        Task<int> ProductCountSumByIdDate(int productId, DateTime? dateBegin, DateTime? dateEnd, int? regionId);
 
         Task<List<DateTime>> GetDistinctDatesByMonths();
 

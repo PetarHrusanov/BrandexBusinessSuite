@@ -116,67 +116,73 @@
             switch (distributor)
             {
                 case Brandex:
-                    if (await this.db.Products.Where(c => c.BrandexId == convertedProductId).AnyAsync()
-                        && await this.db.Pharmacies.Where(c=> c.BrandexId == convertedPharmacyId).AnyAsync())
+                    if (await db.Products.Where(c => c.BrandexId == convertedProductId).AnyAsync()
+                        && await db.Pharmacies.Where(c => c.BrandexId == convertedPharmacyId).AnyAsync())
                     {
-                        newSale.ProductId = await this.db.Products
+                        newSale.ProductId = await db.Products
                             .Where(c => c.BrandexId == convertedProductId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
-                        newSale.PharmacyId = await this.db.Pharmacies
+                        newSale.PharmacyId = await db.Pharmacies
                             .Where(c => c.BrandexId == convertedPharmacyId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
                         newSale.Date = dateForDb;
                         newSale.Count = count;
-                        newSale.DistributorId = await this.db.Distributors
+                        newSale.DistributorId = await db.Distributors
                             .Where(d => d.Name == distributor)
                             .Select(d => d.Id)
                             .FirstOrDefaultAsync();
 
-                        await this.db.Sales.AddAsync(newSale);
-                        await this.db.SaveChangesAsync();
+                        await db.Sales.AddAsync(newSale);
+                        await db.SaveChangesAsync();
 
                         return true;
                     }
-                    else return false;
+                    else
+                    {
+                        return false;
+                    }
 
                 case Sting:
-                    if (await this.db.Products.Where(c => c.StingId == convertedProductId).AnyAsync()
-                        && await this.db.Pharmacies.Where(c => c.StingId == convertedPharmacyId).AnyAsync())
+                    if (await db.Products.Where(c => c.StingId == convertedProductId).AnyAsync()
+                        && await db.Pharmacies.Where(c => c.StingId == convertedPharmacyId).AnyAsync())
                     {
-                        newSale.ProductId = await this.db.Products
+                        newSale.ProductId = await db.Products
                             .Where(c => c.StingId == convertedProductId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
-                        newSale.PharmacyId = await this.db.Pharmacies
+                        newSale.PharmacyId = await db.Pharmacies
                             .Where(c => c.StingId == convertedPharmacyId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
                         newSale.Date = dateForDb;
                         newSale.Count = count;
-                        newSale.DistributorId = await this.db.Distributors
+                        newSale.DistributorId = await db.Distributors
                             .Where(d => d.Name == distributor)
                             .Select(d => d.Id)
                             .FirstOrDefaultAsync();
 
-                        await this.db.Sales.AddAsync(newSale);
-                        await this.db.SaveChangesAsync();
+                        await db.Sales.AddAsync(newSale);
+                        await db.SaveChangesAsync();
 
                         return true;
                     }
-                    else return false;
+                    else
+                    {
+                        return false;
+                    }
 
                 case Phoenix:
-                    if (await this.db.Products.Where(c => c.PhoenixId == convertedProductId).AnyAsync()
-                        && await this.db.Pharmacies.Where(c => c.PhoenixId == convertedPharmacyId).AnyAsync())
+                    if (await db.Products.Where(c => c.PhoenixId == convertedProductId).AnyAsync()
+                        && await db.Pharmacies.Where(c => c.PhoenixId == convertedPharmacyId).AnyAsync())
                     {
-                        newSale.ProductId = await this.db.Products
+                        newSale.ProductId = await db.Products
                             .Where(c => c.PhoenixId == convertedProductId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
 
-                        newSale.PharmacyId = await this.db.Pharmacies
+                        newSale.PharmacyId = await db.Pharmacies
                             .Where(c => c.PhoenixId == convertedPharmacyId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
@@ -185,28 +191,31 @@
 
                         newSale.Count = count;
 
-                        newSale.DistributorId = await this.db.Distributors
+                        newSale.DistributorId = await db.Distributors
                             .Where(d => d.Name == distributor)
                             .Select(d => d.Id)
                             .FirstOrDefaultAsync();
 
-                        await this.db.Sales.AddAsync(newSale);
-                        await this.db.SaveChangesAsync();
+                        await db.Sales.AddAsync(newSale);
+                        await db.SaveChangesAsync();
 
                         return true;
                     }
-                    else return false;
+                    else
+                    {
+                        return false;
+                    }
 
                 case Pharmnet:
-                    if (await this.db.Products.Where(c => c.PharmnetId == convertedProductId).AnyAsync()
-                        && await this.db.Pharmacies.Where(c => c.PharmnetId == convertedPharmacyId).AnyAsync())
+                    if (await db.Products.Where(c => c.PharmnetId == convertedProductId).AnyAsync()
+                        && await db.Pharmacies.Where(c => c.PharmnetId == convertedPharmacyId).AnyAsync())
                     {
-                        newSale.ProductId = await this.db.Products
+                        newSale.ProductId = await db.Products
                             .Where(c => c.PharmnetId == convertedProductId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
 
-                        newSale.PharmacyId = await this.db.Pharmacies
+                        newSale.PharmacyId = await db.Pharmacies
                             .Where(c => c.PharmnetId == convertedPharmacyId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
@@ -215,28 +224,31 @@
 
                         newSale.Count = count;
 
-                        newSale.DistributorId = await this.db.Distributors
+                        newSale.DistributorId = await db.Distributors
                             .Where(d => d.Name == distributor)
                             .Select(d => d.Id)
                             .FirstOrDefaultAsync();
 
-                        await this.db.Sales.AddAsync(newSale);
-                        await this.db.SaveChangesAsync();
+                        await db.Sales.AddAsync(newSale);
+                        await db.SaveChangesAsync();
 
                         return true;
                     }
-                    else return false;
+                    else
+                    {
+                        return false;
+                    }
 
                 case Sopharma:
-                    if (await this.db.Products.Where(c => c.SopharmaId == productId).AnyAsync()
-                        && await this.db.Pharmacies.Where(c => c.SopharmaId == convertedPharmacyId).AnyAsync())
+                    if (await db.Products.Where(c => c.SopharmaId == productId).AnyAsync()
+                        && await db.Pharmacies.Where(c => c.SopharmaId == convertedPharmacyId).AnyAsync())
                     {
-                        newSale.ProductId = await this.db.Products
+                        newSale.ProductId = await db.Products
                             .Where(c => c.SopharmaId == productId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
 
-                        newSale.PharmacyId = await this.db.Pharmacies
+                        newSale.PharmacyId = await db.Pharmacies
                             .Where(c => c.SopharmaId == convertedPharmacyId)
                             .Select(p => p.Id)
                             .FirstOrDefaultAsync();
@@ -245,13 +257,13 @@
 
                         newSale.Count = count;
 
-                        newSale.DistributorId = await this.db.Distributors
+                        newSale.DistributorId = await db.Distributors
                             .Where(d => d.Name == distributor)
                             .Select(d => d.Id)
                             .FirstOrDefaultAsync();
 
-                        await this.db.Sales.AddAsync(newSale);
-                        await this.db.SaveChangesAsync();
+                        await db.Sales.AddAsync(newSale);
+                        await db.SaveChangesAsync();
 
                         return true;
                     }
@@ -265,6 +277,8 @@
 
         public async Task<int> ProductCountSumById(int productId, int? regionId=null)
         {
+            // var kurcho = db.Sales.Where(s => s.PharmacyId == 2).Select(p => p.Product.Price * p.Count).Sum();
+            
             if (regionId != null)
             {
                 return await this.db.Sales
@@ -275,25 +289,27 @@
             {
                 return await this.db.Sales.Where(p => p.ProductId == productId).SumAsync(c => c.Count);
             }
-            
 
         }
 
-        public async Task<int> ProductCountSumByIdDate(int productId, DateTime dateTime, int? regionId)
+        public async Task<int> ProductCountSumByIdDate(int productId, DateTime? dateBegin, DateTime? dateEnd, int? regionId)
         {
+
+            dateBegin ??= DateTime.MinValue;
+            dateEnd ??= DateTime.MaxValue;
+            
             if (regionId != null)
             {
-                return await this.db.Sales
+                return await db.Sales
                     .Where(p => p.Pharmacy.RegionId == regionId)
-                    .Where(d => d.Date.Month == dateTime.Month && d.Date.Year == dateTime.Year)
+                    .Where(d => d.Date >= dateBegin && d.Date <= dateEnd)
                     .Where(p => p.ProductId == productId).SumAsync(c => c.Count);
             }
-            else
-            {
-                return await this.db.Sales
-                    .Where(d => d.Date.Month == dateTime.Month && d.Date.Year == dateTime.Year)
-                    .Where(p => p.ProductId == productId).SumAsync(c => c.Count);
-            }
+            
+            return await db.Sales
+                .Where(d => d.Date >= dateBegin && d.Date <= dateEnd)
+                .Where(p => p.ProductId == productId).SumAsync(c => c.Count);
+            
         }
 
         public async Task<List<DateTime>> GetDistinctDatesByMonths()
