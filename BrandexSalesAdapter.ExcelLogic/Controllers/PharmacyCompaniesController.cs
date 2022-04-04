@@ -31,18 +31,15 @@
 
         // db Services
         private readonly IPharmacyCompaniesService _pharmacyCompaniesService;
-
-        private readonly INumbersChecker _numbersChecker;
+        
 
         public PharmacyCompaniesController(
             IWebHostEnvironment hostEnvironment,
-            INumbersChecker numbersChecker,
             IPharmacyCompaniesService pharmacyCompaniesService)
 
         {
 
             _hostEnvironment = hostEnvironment;
-            _numbersChecker = numbersChecker;
             _pharmacyCompaniesService = pharmacyCompaniesService;
 
         }
@@ -61,6 +58,9 @@
             var newPath = Path.Combine(webRootPath, folderName);
 
             var errorDictionary = new Dictionary<int, string>();
+
+            var pharmacyCompaniesCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesCheck();
+            var validPharmacyCompanyNames = new List<PharmacyCompanyInputModel>();
 
 
             if (!Directory.Exists(newPath))
@@ -146,12 +146,17 @@
                         {
                             newCompany.VAT = vatRow.ToString()?.TrimEnd();
                         }
-                    
 
-                        await _pharmacyCompaniesService.UploadCompany(newCompany);
-                        
-                     
+                        if ( newCompany.Name!=null)
+                        {
+                            validPharmacyCompanyNames.Add(newCompany);
+                        }
+
                     }
+
+                    await _pharmacyCompaniesService.UploadBulk(validPharmacyCompanyNames);
+
+
                 }
             }
 

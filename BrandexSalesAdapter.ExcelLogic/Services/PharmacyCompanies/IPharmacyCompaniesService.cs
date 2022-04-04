@@ -6,6 +6,7 @@
 
     public interface IPharmacyCompaniesService
     {
+        Task UploadBulk(List<PharmacyCompanyInputModel> pharmacyCompanies);
         Task<string> UploadCompany(PharmacyCompanyInputModel company);
 
         Task<bool> CheckCompanyByName(string companyName);
