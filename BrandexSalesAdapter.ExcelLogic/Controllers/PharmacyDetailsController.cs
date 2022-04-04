@@ -419,7 +419,7 @@
 
             var companyIdRow = row.GetCell(PharmacyCompanyColumn).ToString()?.TrimEnd();
             var companyId = pharmacyCompanyIdsForCheck
-                .Where(p => p.Name == companyIdRow)
+                .Where(p => companyIdRow != null && p.Name == companyIdRow.ToUpper())
                 .Select(p => p.Id)
                 .FirstOrDefault();
 

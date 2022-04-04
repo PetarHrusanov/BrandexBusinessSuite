@@ -58,6 +58,14 @@
             public const string Name = "Name";
         }
         
+        public class PharmacyCompaniesColumns
+        {
+            public const string PharmacyCompanies = "Companies";
+            public const string Name = "Name";
+            public const string Owner = "Owner";
+            public const string VAT = "VAT";
+        }
+        
         public class Regions
         {
             // public const string Burgas = "БУРГАС";
