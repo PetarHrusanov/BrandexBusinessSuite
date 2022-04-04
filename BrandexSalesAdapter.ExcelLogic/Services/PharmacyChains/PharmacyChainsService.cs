@@ -1,22 +1,63 @@
-﻿using System.Collections.Generic;
-using BrandexSalesAdapter.ExcelLogic.Models.PharmacyChains;
-
-namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains
+﻿namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyChains
 {
-    using System;
+    
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using System.Data;
+    
     using Microsoft.EntityFrameworkCore;
-    using BrandexSalesAdapter.ExcelLogic.Data;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models;
+    using Microsoft.Extensions.Configuration;
+    using Data;
+    
+   
+    using Models.PharmacyChains;
+    using Microsoft.Data.SqlClient;
+    
+    using Data.Models;
+    
+    using static Common.DataConstants.PharmacyChainsColumns;
+
 
     public class PharmacyChainsService : IPharmacyChainsService
     {
         SpravkiDbContext db;
+        private readonly IConfiguration _configuration;
 
-        public PharmacyChainsService(SpravkiDbContext db)
+        public PharmacyChainsService(SpravkiDbContext db , IConfiguration configuration)
         {
             this.db = db;
+            _configuration = configuration;
+        }
+        
+        public async Task UploadBulk(List<string> pharmacyChains)
+        {
+            var table = new DataTable();
+            table.TableName = PharmacyChains;
+            
+            table.Columns.Add(Name, typeof(string));
+            
+            foreach (var pharmacyChain in pharmacyChains)
+            {
+                var row = table.NewRow();
+                row[Name] = pharmacyChain;
+                table.Rows.Add(row);
+            }
+
+            string connection = _configuration.GetConnectionString("DefaultConnection");
+            
+            var con = new SqlConnection(connection);
+            
+            var objbulk = new SqlBulkCopy(con);  
+            
+            objbulk.DestinationTableName = PharmacyChains;
+            
+            objbulk.ColumnMappings.Add(Name, Name);
+
+            con.Open();
+            await objbulk.WriteToServerAsync(table);  
+            con.Close();  
+            
         }
 
         public async Task<string> UploadPharmacyChain(string chainName)

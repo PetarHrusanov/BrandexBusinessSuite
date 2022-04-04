@@ -52,6 +52,12 @@
             public const string Name = "Name";
         }
         
+        public class PharmacyChainsColumns
+        {
+            public const string PharmacyChains = "PharmacyChains";
+            public const string Name = "Name";
+        }
+        
         public class Regions
         {
             // public const string Burgas = "БУРГАС";
