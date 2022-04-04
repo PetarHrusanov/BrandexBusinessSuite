@@ -8,6 +8,7 @@
 
     public interface IPharmacyChainsService
     {
+        Task UploadBulk(List<string> pharmacyChain);
         Task<string> UploadPharmacyChain(string chainName);
 
         Task<bool> CheckPharmacyChainByName(string companyName);

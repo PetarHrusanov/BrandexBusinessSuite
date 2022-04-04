@@ -1,5 +1,6 @@
 ﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -55,6 +56,9 @@
 
             var errorDictionary = new Dictionary<int, string>();
 
+            var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
+            var uniquePharmacyChains = new List<string>();
+
             if (!Directory.Exists(newPath))
 
             {
@@ -67,11 +71,11 @@
 
             {
 
-                string sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
+                var sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
 
                 if (file.FileName != null)
                 {
-                    string fullPath = Path.Combine(newPath, file.FileName);
+                    var fullPath = Path.Combine(newPath, file.FileName);
 
                     await using var stream = new FileStream(fullPath, FileMode.Create);
                     await file.CopyToAsync(stream);
@@ -125,7 +129,14 @@
                         var chainName = row.GetCell(0);
                         if (chainName!=null)
                         {
-                            await _pharmacyChainsService.UploadPharmacyChain(chainName.ToString()?.TrimEnd());
+                            var chainNameString = chainName.ToString().ToUpper().TrimEnd();
+                            
+                            if (pharmacyChainsCheck.All(c => !string.Equals(c.Name, chainNameString, StringComparison.CurrentCultureIgnoreCase)))
+                            {
+                                uniquePharmacyChains.Add(chainNameString);
+                            }
+                            
+                            // await _pharmacyChainsService.UploadPharmacyChain(chainName.ToString()?.TrimEnd());
                         }
                         
                         else
@@ -135,6 +146,8 @@
                         }
 
                     }
+                    
+                    await _pharmacyChainsService.UploadBulk(uniquePharmacyChains);
                 }
             }
 

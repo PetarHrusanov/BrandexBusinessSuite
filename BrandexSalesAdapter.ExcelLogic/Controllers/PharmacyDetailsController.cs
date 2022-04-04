@@ -434,7 +434,7 @@
 
             var chainIdRow = row.GetCell(PharmacyChainColumn).ToString()?.TrimEnd();
             var chainId = pharmacyChainsIdsForCheck
-                .Where(p => p.Name == chainIdRow)
+                .Where(p => p.Name == chainIdRow.ToUpper().TrimEnd())
                 .Select(p => p.Id)
                 .FirstOrDefault();
 
