@@ -1,6 +1,7 @@
 ﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
+    using System;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
@@ -50,6 +51,10 @@
 
             var errorDictionary = new Dictionary<int, string>();
 
+            var citiesCheck = await _citiesService.GetCitiesCheck();
+
+            var uniqueCities = new List<string>();
+
 
             if (!Directory.Exists(newPath))
 
@@ -60,7 +65,6 @@
             }
 
             if (file.Length > 0)
-
             {
 
                 var sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
@@ -108,7 +112,6 @@
                     }
 
                     for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-
                     {
 
                         IRow row = sheet.GetRow(i);
@@ -121,7 +124,11 @@
                         var cityRow = row.GetCell(0).ToString()?.TrimEnd();
                         if (!string.IsNullOrEmpty(cityRow))
                         {
-                            await _citiesService.UploadCity(cityRow);
+                            if (citiesCheck.All(c => !string.Equals(c.Name, cityRow, StringComparison.CurrentCultureIgnoreCase)))
+                            {
+                                uniqueCities.Add(cityRow.ToUpper());
+                            }
+                            
                         }
                         
                         else
@@ -130,6 +137,9 @@
                         }
 
                     }
+
+                    await _citiesService.UploadBulk(uniqueCities);
+
                 }
             }
 

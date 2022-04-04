@@ -194,6 +194,8 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             var sFileName = @"Sales.xlsx";
 
             var memory = new MemoryStream();
+            
+            var products = await _productsService.GetProductsIdPrices();
 
             await using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create,
                              FileAccess.Write))
@@ -206,9 +208,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
                 var excelSheet = workbook.CreateSheet("sales");
 
                 var row = excelSheet.CreateRow(0);
-
-                var products = await _productsService.GetProductsIdPrices();
-
 
                 foreach (var product in products)
                 {

@@ -8,9 +8,12 @@
 
     public interface ICitiesService
     {
+        
+        Task UploadBulk(List<string> cities);
+        
         Task<string> UploadCity(string city);
 
-        Task<bool> CheckCityName(string companyName);
+        Task<bool> CheckCityName(string cityName);
 
         Task<int> IdByName(string companyName);
 

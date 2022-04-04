@@ -10,11 +10,11 @@
             public const string Brandex = "БРАНДЕКС";
             public const string Pharmnet = "ФАРМНЕТ";
 
-            public const string SopharmaENG = "Sopharma";
-            public const string PhoenixENG = "Phoenix";
-            public const string StingENG = "Sting";
-            public const string BrandexENG = "Brandex";
-            public const string PharmnetENG = "Pharmnet";
+            public const string SopharmaEng = "Sopharma";
+            public const string PhoenixEng = "Phoenix";
+            public const string StingEng = "Sting";
+            public const string BrandexEng = "Brandex";
+            public const string PharmnetEng = "Pharmnet";
         }
 
         public class SalesColumns
@@ -44,6 +44,12 @@
             public const string StingId = "StingId";
             public const string RegionId = "RegionId";
             
+        }
+        
+        public class CitiesColumns
+        {
+            public const string Cities = "Cities";
+            public const string Name = "Name";
         }
         
         public class Regions
