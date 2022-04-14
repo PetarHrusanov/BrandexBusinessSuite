@@ -1,9 +1,5 @@
-﻿@using BrandexSalesAdapter.ExcelLogic.Data.Models.ApplicationUserModels
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManag
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,22 +22,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Sales" asp-action="Index">Brandex</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Phoenix" asp-action="Index">Phoenix</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Sopharma" asp-action="Index">Sopharma</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Pharmnet" asp-action="Index">Pharmnet</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Sting" asp-action="Index">Sting</a>
-                        </li>
+             
 
                         @*<li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
@@ -50,13 +31,7 @@
                         <li class="nav-item dropdown">
                             <a href="#" class="dropdown-toggle text-dark" data-toggle="dropdown" role="button" aria-expanded="false">Regular Datasets<span class="fa fa-caret-down"></span></a>
                             <ul class="dropdown-menu" role="menu">
-                                <li><a class="nav-link text-dark" asp-area="" asp-controller="PharmacyDetails" asp-action="Index">PharmacyDetails</a></li>
-                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Cities" asp-action="Index">Cities</a></li>
-                                <li><a class="nav-link text-dark" asp-area="" asp-controller="PharmacyChains" asp-action="Index">PharmacyChains</a></li>
-                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Products</a></li>
-                                <li><a class="nav-link text-dark" asp-area="" asp-controller="PharmacyCompanies" asp-action="Index">Companies</a></li>
-                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Distributors" asp-action="Index">Distributors</a></li>
-                                <li><a class="nav-link text-dark" asp-area="" asp-controller="Regions" asp-action="Index">Region</a></li>
+                  
 
                             </ul>
                         </li>
@@ -74,7 +49,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; @DateTime.Now.Year - Brandex Sales Adapter - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; @DateTime.Now.Year - Brandex Sales Adapter">Privacy<
         </div>
     </footer>
 

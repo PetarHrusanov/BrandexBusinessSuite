@@ -1,4 +1,6 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿using System;
+
+namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;
@@ -60,8 +62,9 @@
             var errorDictionary = new Dictionary<int, string>();
 
             var pharmacyCompaniesCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesCheck();
+            
             var validPharmacyCompanyNames = new List<PharmacyCompanyInputModel>();
-
+            var pharmacyCompaniesEditted = new List<PharmacyCompanyInputModel>();
 
             if (!Directory.Exists(newPath))
             {
@@ -146,11 +149,14 @@
                         {
                             newCompany.VAT = vatRow.ToString()?.TrimEnd();
                         }
+                        
+                        // Consider implementing check for Company changes, but clean ERP database first.
 
-                        if ( newCompany.Name!=null)
+                        if (pharmacyCompaniesCheck.All(p => !string.Equals(p.Name.TrimEnd(), newCompany.Name, StringComparison.InvariantCultureIgnoreCase)))
                         {
                             validPharmacyCompanyNames.Add(newCompany);
                         }
+                        
 
                     }
 
