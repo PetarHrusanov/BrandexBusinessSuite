@@ -9,8 +9,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Data;
-    
-   
+
     using Models.PharmacyChains;
     using Microsoft.Data.SqlClient;
     
@@ -62,22 +61,16 @@
 
         public async Task<string> UploadPharmacyChain(string chainName)
         {
-            if (chainName != null)
+            // if (chainName == null) return "";
+            var chainInput = new PharmacyChain
             {
-                var chainInput = new PharmacyChain
-                {
-                    Name = chainName
-                };
+                Name = chainName
+            };
 
-                await this.db.PharmacyChains.AddAsync(chainInput);
-                await this.db.SaveChangesAsync();
-                return chainName;
+            await db.PharmacyChains.AddAsync(chainInput);
+            await db.SaveChangesAsync();
+            return chainName;
 
-            }
-            else
-            {
-                return "";
-            }
         }
 
         public async Task<bool> CheckPharmacyChainByName(string pharmacyChainName)
