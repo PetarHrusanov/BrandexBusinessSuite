@@ -47,8 +47,8 @@
 
         private const int BrandexIdColumn = 19;
         private const int NameColumn = 4;
-        private const int PharmacyClassColumn = 1;
-        private const int ActiveColumn = 2;
+        private const int PharmacyClassColumn = 2;
+        private const int ActiveColumn = 1;
         private const int PharmacyCompanyColumn = 3;
         private const int PharmacyChainColumn = 5;
         private const int AddressColumn = 6;
@@ -101,7 +101,6 @@
             var pharmacyCompaniesIdsForCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesCheck();
             var pharmacyChainsIdsForCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
             var regionIdsForCheck = await _regionsService.AllRegions();
-            
 
             if (!Directory.Exists(newPath))
 
@@ -205,7 +204,7 @@
             
             var validPharmacyList = new List<PharmacyDbInputModel>();
             
-            var pharmaciesEdditted = new List<PharmacyDbInputModel>();
+            var pharmaciesEdited = new List<PharmacyDbInputModel>();
             
             var citiesIdsForCheck = await _citiesService.GetCitiesCheck();
             var pharmacyCompaniesIdsForCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesCheck();
@@ -290,7 +289,7 @@
                     
                     if (pharmacyIdsForCheck.Any(p=> p.BrandexId == newPharmacy.BrandexId))
                     {
-                        pharmaciesEdditted.Add(newPharmacy);
+                        pharmaciesEdited.Add(newPharmacy);
                     }
                     else
                     {
@@ -304,7 +303,7 @@
 
             await _pharmaciesService.UploadBulk(validPharmacyList);
 
-            await _pharmaciesService.Update(pharmaciesEdditted);
+            await _pharmaciesService.Update(pharmaciesEdited);
 
             var pharmacyErrorModel = new CustomErrorDictionaryOutputModel
             {
@@ -412,7 +411,10 @@
 
             if (pharmacyClass!=null)
             {
-                newPharmacy.PharmacyClass = (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass.ToString()!.TrimEnd(), true);
+                if (!string.IsNullOrWhiteSpace(pharmacyClass.ToString()!.TrimEnd()))
+                {
+                    newPharmacy.PharmacyClass = (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass.ToString()!.TrimEnd(), true);   
+                }
             }
 
             var pharmacyActive = row.GetCell(ActiveColumn);
