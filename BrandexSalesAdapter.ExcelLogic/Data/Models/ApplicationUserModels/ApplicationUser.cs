@@ -9,10 +9,10 @@
     {
         public ApplicationUser()
         {
-            this.Id = Guid.NewGuid().ToString();
-            this.Roles = new HashSet<IdentityUserRole<string>>();
-            this.Claims = new HashSet<IdentityUserClaim<string>>();
-            this.Logins = new HashSet<IdentityUserLogin<string>>();
+            Id = Guid.NewGuid().ToString();
+            Roles = new HashSet<IdentityUserRole<string>>();
+            Claims = new HashSet<IdentityUserClaim<string>>();
+            Logins = new HashSet<IdentityUserLogin<string>>();
         }
 
         // Audit info

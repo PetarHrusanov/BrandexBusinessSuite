@@ -1,12 +1,12 @@
 ﻿namespace BrandexSalesAdapter.ExcelLogic.Data
 {
     using Microsoft.EntityFrameworkCore;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models.ApplicationUserModels;
+    using Models;
+    using Models.ApplicationUserModels;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using System.Reflection;
     using System.Linq;
-    using BrandexSalesAdapter.ExcelLogic.Data.Models.Common;
+    using Models.Common;
     using System;
     using System.Threading.Tasks;
     using System.Threading;

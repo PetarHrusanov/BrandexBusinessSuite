@@ -1,4 +1,6 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿using BrandexSalesAdapter.Controllers;
+
+namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System;
