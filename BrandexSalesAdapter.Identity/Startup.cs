@@ -1,7 +1,9 @@
+using BrandexSalesAdapter.Services.Data;
+
 namespace BrandexSalesAdapter.Identity
 {
     using BrandexSalesAdapter.Infrastructure;
-    using BrandexSalesAdapter.Services.Data;
+    using BrandexSalesAdapter.Services;
     using Data;
     using Infrastructure;
     using Microsoft.AspNetCore.Builder;
@@ -18,12 +20,7 @@ namespace BrandexSalesAdapter.Identity
 
         public void ConfigureServices(IServiceCollection services)
             => services
-                .Configure<IdentitySettings>(
-                    this.Configuration.GetSection(nameof(IdentitySettings)),
-                    config => config.BindNonPublicProperties = true)
-                .AddWebService<IdentityDbContext>(
-                    this.Configuration,
-                    messagingHealthChecks: false)
+                .AddWebService<IdentityDbContext>(this.Configuration)
                 .AddUserStorage()
                 .AddTransient<IDataSeeder, IdentityDataSeeder>()
                 .AddTransient<IIdentityService, IdentityService>()
