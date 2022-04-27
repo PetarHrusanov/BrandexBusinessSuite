@@ -1,7 +1,10 @@
 ﻿namespace BrandexSalesAdapter.Identity.Infrastructure
 {
-    using Data;
-    using Data.Models;
+    using BrandexSalesAdapter.Identity.Data;
+    using BrandexSalesAdapter.Identity.Data.Models;
+
+    
+
     using Microsoft.AspNetCore.Identity;
     using Microsoft.Extensions.DependencyInjection;
 

@@ -1,11 +1,14 @@
 ﻿namespace BrandexSalesAdapter.Infrastructure
 {
+    using HealthChecks.UI.Client;
     using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Diagnostics.HealthChecks;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Services.Data;
+    using Services;
+    using BrandexSalesAdapter.Services.Data;
 
     public static class ApplicationBuilderExtensions
     {
@@ -19,6 +22,7 @@
             }
 
             app
+                .UseHttpsRedirection()
                 .UseRouting()
                 .UseCors(options => options
                     .AllowAnyOrigin()
@@ -26,9 +30,15 @@
                     .AllowAnyMethod())
                 .UseAuthentication()
                 .UseAuthorization()
-                .UseEndpoints(endpoints => endpoints
-                    .MapHealthChecks()
-                    .MapControllers());
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapHealthChecks("/health", new HealthCheckOptions
+                    {
+                        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                    });
+
+                    endpoints.MapControllers();
+                });
 
             return app;
         }
@@ -40,9 +50,8 @@
             var serviceProvider = serviceScope.ServiceProvider;
 
             var db = serviceProvider.GetRequiredService<DbContext>();
-            // db.Database.EnsureDeleted();
+
             db.Database.Migrate();
-            db.Database.EnsureCreated();
 
             var seeders = serviceProvider.GetServices<IDataSeeder>();
 
