@@ -53,23 +53,12 @@ namespace BrandexSalesAdapter.ExcelLogic
             services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
                 .AddRoles<ApplicationRole>().AddEntityFrameworkStores<SpravkiDbContext>();
 
-            //services.Configure<CookiePolicyOptions>(
-            //    options =>
-            //    {
-            //        options.CheckConsentNeeded = context => true;
-            //        options.MinimumSameSitePolicy = SameSiteMode.None;
-            //    });
-
+          
             services.AddControllersWithViews();
-
-            //services.AddControllers(options =>
-            //{
-            //    options.RespectBrowserAcceptHeader = true; // false by default
-            //});
 
             services.AddRazorPages();
 
-            services.AddSingleton(this._configuration);
+            services.AddSingleton(_configuration);
 
             services
                 .AddAutoMapper(
@@ -112,8 +101,6 @@ namespace BrandexSalesAdapter.ExcelLogic
                 {
                     dbContext.Database.Migrate();
                 }
-                
-                // dbContext.Database.Migrate();
 
                 new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
             }
