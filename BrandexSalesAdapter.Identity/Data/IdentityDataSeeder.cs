@@ -31,7 +31,7 @@
                 {
                     var adminRole = new IdentityRole(Constants.AdministratorRoleName);
 
-                    await this.roleManager.CreateAsync(adminRole);
+                    await roleManager.CreateAsync(adminRole);
 
                     var adminUser = new User
                     {
