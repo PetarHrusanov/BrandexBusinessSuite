@@ -2,6 +2,7 @@
 {
     using BrandexSalesAdapter.Identity.Data;
     using BrandexSalesAdapter.Identity.Data.Models;
+    using BrandexSalesAdapter.Identity.Data.Models;
 
     
 
@@ -14,7 +15,7 @@
             this IServiceCollection services)
         {
             services
-                .AddIdentity<User, IdentityRole>(options =>
+                .AddIdentity<ApplicationUser, IdentityRole>(options =>
                     {
                         options.Password.RequiredLength = 6;
                         options.Password.RequireDigit = false;
@@ -22,7 +23,7 @@
                         options.Password.RequireNonAlphanumeric = false;
                         options.Password.RequireUppercase = false;
                     })
-                    .AddEntityFrameworkStores<IdentityDbContext>();
+                    .AddEntityFrameworkStores<ApplicationUsersDbContext>();
 
             return services;
         }
