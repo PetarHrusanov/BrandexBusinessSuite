@@ -107,3 +107,10 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/net6.0/ref/BrandexSalesAdapter.Identity.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/net6.0/BrandexSalesAdapter.Identity.pdb
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/net6.0/BrandexSalesAdapter.Identity.genruntimeconfig.cache
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/BrandexSalesAdapter.Identity.staticwebassets.runtime.json
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Cryptography.Internal.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Identity.UI.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.FileProviders.Embedded.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.Identity.Core.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.Identity.Stores.dll
