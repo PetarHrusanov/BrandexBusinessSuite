@@ -3,7 +3,6 @@ namespace BrandexSalesAdapter.ExcelLogic
     // Data 
     using Data;
     using Models;
-    using Data.Models.ApplicationUserModels;
 
     // Common Services
     using Services;
@@ -27,6 +26,9 @@ namespace BrandexSalesAdapter.ExcelLogic
     using Microsoft.Extensions.Hosting;
     using Microsoft.EntityFrameworkCore;
     
+    using BrandexSalesAdapter.Services.Identity;
+    using BrandexSalesAdapter.Infrastructure;
+    
     using Data.Seeding;
     using Models.Map;
     using System;
@@ -47,27 +49,33 @@ namespace BrandexSalesAdapter.ExcelLogic
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<SpravkiDbContext>(
-                options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
-                .AddRoles<ApplicationRole>().AddEntityFrameworkStores<SpravkiDbContext>();
+            services.AddWebService<SpravkiDbContext>(_configuration);
+
+            // services.AddDbContext<SpravkiDbContext>(
+            //     options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+
+            // services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
+            //     .AddRoles<ApplicationRole>().AddEntityFrameworkStores<SpravkiDbContext>();
 
           
-            services.AddControllersWithViews();
+            // services.AddControllersWithViews();
 
             services.AddRazorPages();
 
-            services.AddSingleton(_configuration);
+            // services.AddSingleton(_configuration);
+            
+            // services
+            //     .AddHttpContextAccessor()
+            //     .AddScoped<ICurrentUserService, CurrentUserService>();
+
+            // services
+            //     .AddAutoMapper(
+            //         (_, config) => config
+            //             .AddProfile(new MappingProfile(Assembly.GetCallingAssembly())),
+            //         Array.Empty<Assembly>());
 
             services
-                .AddAutoMapper(
-                    (_, config) => config
-                        .AddProfile(new MappingProfile(Assembly.GetCallingAssembly())),
-                    Array.Empty<Assembly>());
-
-            services
-                // Business Logic 
                 .AddTransient<ICitiesService, CitiesService>()
                 .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()
                 .AddTransient<IDistributorService, DistributorService>()
@@ -79,15 +87,12 @@ namespace BrandexSalesAdapter.ExcelLogic
                 .AddTransient<INumbersChecker, NumbersChecker>();
 
             services.AddCors();
-            services.AddMvc();
-            
 
             services.AddRouting(options => options.LowercaseUrls = true);
 
         }
 
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
@@ -116,9 +121,7 @@ namespace BrandexSalesAdapter.ExcelLogic
             }
 
             app
-               //.UseAuthentication()
-               //.UseAuthorization()
-               .UseRouting()
+                .UseRouting()
                .UseCors(options => options
                    .AllowAnyOrigin()
                    .AllowAnyHeader()
@@ -128,9 +131,6 @@ namespace BrandexSalesAdapter.ExcelLogic
 
             app.UseStaticFiles();
             
-            //app.UseCookiePolicy();
-
-            //app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();

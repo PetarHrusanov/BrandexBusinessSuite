@@ -5,6 +5,6 @@
 
     public interface ITokenGeneratorService
     {
-        string GenerateToken(User user, IEnumerable<string> roles = null);
+        string GenerateToken(ApplicationUser user, IEnumerable<string> roles = null);
     }
 }

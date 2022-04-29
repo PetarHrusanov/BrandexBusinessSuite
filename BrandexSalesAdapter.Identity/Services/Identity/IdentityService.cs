@@ -1,85 +1,75 @@
-﻿namespace BrandexSalesAdapter.Identity.Services.Identity
+﻿namespace BrandexSalesAdapter.Identity.Services.Identity;
+
+using System.Linq;
+using System.Threading.Tasks;
+using BrandexSalesAdapter.Services;
+using Data.Models;
+using Microsoft.AspNetCore.Identity;
+using Models.Identity;
+
+public class IdentityService : IIdentityService
 {
-    using System.Linq;
-    using System.Threading.Tasks;
-    using BrandexSalesAdapter.Services;
-    using Data.Models;
-    using Microsoft.AspNetCore.Identity;
-    using Models.Identity;
+    private const string InvalidErrorMessage = "Invalid credentials.";
 
-    public class IdentityService : IIdentityService
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ITokenGeneratorService _jwtTokenGenerator;
+
+    public IdentityService(
+        UserManager<ApplicationUser> userManager,
+        ITokenGeneratorService jwtTokenGenerator)
     {
-        private const string InvalidErrorMessage = "Invalid credentials.";
+        _userManager = userManager;
+        _jwtTokenGenerator = jwtTokenGenerator;
+    }
 
-        private readonly UserManager<User> userManager;
-        private readonly ITokenGeneratorService jwtTokenGenerator;
-
-        public IdentityService(
-            UserManager<User> userManager, 
-            ITokenGeneratorService jwtTokenGenerator)
+    public async Task<Result<ApplicationUser>> Register(UserInputModel userInput)
+    {
+        var user = new ApplicationUser
         {
-            this.userManager = userManager;
-            this.jwtTokenGenerator = jwtTokenGenerator;
-        }
+            Email = userInput.Email,
+            UserName = userInput.Email
+        };
 
-        public async Task<Result<User>> Register(UserInputModel userInput)
-        {
-            var user = new User
-            {
-                Email = userInput.Email,
-                UserName = userInput.Email
-            };
+        var identityResult = await _userManager.CreateAsync(user, userInput.Password);
 
-            var identityResult = await this.userManager.CreateAsync(user, userInput.Password);
+        var errors = identityResult.Errors.Select(e => e.Description);
 
-            var errors = identityResult.Errors.Select(e => e.Description);
+        return identityResult.Succeeded
+            ? Result<ApplicationUser>.SuccessWith(user)
+            : Result<ApplicationUser>.Failure(errors);
+    }
 
-            return identityResult.Succeeded
-                ? Result<User>.SuccessWith(user)
-                : Result<User>.Failure(errors);
-        }
+    public async Task<Result<UserOutputModel>> Login(UserInputModel userInput)
+    {
+        var user = await _userManager.FindByEmailAsync(userInput.Email);
+        if (user == null) return InvalidErrorMessage;
 
-        public async Task<Result<UserOutputModel>> Login(UserInputModel userInput)
-        {
-            var user = await this.userManager.FindByEmailAsync(userInput.Email);
-            if (user == null)
-            {
-                return InvalidErrorMessage;
-            }
+        var passwordValid = await _userManager.CheckPasswordAsync(user, userInput.Password);
+        if (!passwordValid) return InvalidErrorMessage;
 
-            var passwordValid = await this.userManager.CheckPasswordAsync(user, userInput.Password);
-            if (!passwordValid)
-            {
-                return InvalidErrorMessage;
-            }
+        var roles = await _userManager.GetRolesAsync(user);
 
-            var roles = await this.userManager.GetRolesAsync(user);
+        var token = _jwtTokenGenerator.GenerateToken(user, roles);
 
-            var token = this.jwtTokenGenerator.GenerateToken(user, roles);
+        return new UserOutputModel(token);
+    }
 
-            return new UserOutputModel(token);
-        }
+    public async Task<Result> ChangePassword(
+        string userId,
+        ChangePasswordInputModel changePasswordInput)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return InvalidErrorMessage;
 
-        public async Task<Result> ChangePassword(
-            string userId, 
-            ChangePasswordInputModel changePasswordInput)
-        {
-            var user = await this.userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return InvalidErrorMessage;
-            }
+        var identityResult = await _userManager.ChangePasswordAsync(
+            user,
+            changePasswordInput.CurrentPassword,
+            changePasswordInput.NewPassword);
 
-            var identityResult = await this.userManager.ChangePasswordAsync(
-                user,
-                changePasswordInput.CurrentPassword,
-                changePasswordInput.NewPassword);
+        var errors = identityResult.Errors.Select(e => e.Description);
 
-            var errors = identityResult.Errors.Select(e => e.Description);
-
-            return identityResult.Succeeded
-                ? Result.Success
-                : Result.Failure(errors);
-        }
+        return identityResult.Succeeded
+            ? Result.Success
+            : Result.Failure(errors);
     }
 }
