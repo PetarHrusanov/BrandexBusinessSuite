@@ -12,26 +12,26 @@
 
     public class TokenGeneratorService : ITokenGeneratorService
     {
-        private readonly ApplicationSettings applicationSettings;
+        private readonly ApplicationSettings _applicationSettings;
 
-        public TokenGeneratorService(IOptions<ApplicationSettings> applicationSettings) 
-            => this.applicationSettings = applicationSettings.Value;
+        public TokenGeneratorService(IOptions<ApplicationSettings> applicationSettings)
+        {
+            _applicationSettings = applicationSettings.Value;
+        }
 
-        public string GenerateToken(User user, IEnumerable<string> roles = null)
+        public string GenerateToken(ApplicationUser user, IEnumerable<string> roles = null)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(this.applicationSettings.Secret);
+            // var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
+            var key = Encoding.ASCII.GetBytes("S4F3 SP4C3 SP4C3 3XPLOR4TI0N QUEST SUC3SS");
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.Email)
+                new(ClaimTypes.NameIdentifier, user.Id),
+                new(ClaimTypes.Name, user.Email)
             };
 
-            if (roles != null)
-            {
-                claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-            }
+            if (roles != null) claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

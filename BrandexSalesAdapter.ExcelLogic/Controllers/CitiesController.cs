@@ -1,4 +1,5 @@
 ﻿using BrandexSalesAdapter.Controllers;
+using BrandexSalesAdapter.Services.Identity;
 
 namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
@@ -11,6 +12,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authorization;
     
     using NPOI.HSSF.UserModel;
     using NPOI.SS.UserModel;
@@ -29,14 +31,20 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
         // db Services
         private readonly ICitiesService _citiesService;
+        
+        private readonly ICurrentUserService _currentUser;
 
         public CitiesController(
             IWebHostEnvironment hostEnvironment,
-            ICitiesService citiesService)
+            ICitiesService citiesService,
+            ICurrentUserService currentUser
+            
+            )
 
         {
             _hostEnvironment = hostEnvironment;
             _citiesService = citiesService;
+            _currentUser = currentUser;
         }
 
         // [Authorize]
@@ -156,7 +164,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
 
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
         {

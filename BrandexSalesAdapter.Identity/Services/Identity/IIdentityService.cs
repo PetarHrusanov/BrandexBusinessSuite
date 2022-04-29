@@ -7,7 +7,7 @@
 
     public interface IIdentityService
     {
-        Task<Result<User>> Register(UserInputModel userInput);
+        Task<Result<ApplicationUser>> Register(UserInputModel userInput);
 
         Task<Result<UserOutputModel>> Login(UserInputModel userInput);
 

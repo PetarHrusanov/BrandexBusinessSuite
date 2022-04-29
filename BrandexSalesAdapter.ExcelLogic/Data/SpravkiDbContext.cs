@@ -1,17 +1,17 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Data
+﻿using BrandexSalesAdapter.Data.Models.Common;
+
+namespace BrandexSalesAdapter.ExcelLogic.Data
 {
     using Microsoft.EntityFrameworkCore;
     using Models;
-    using Models.ApplicationUserModels;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using System.Reflection;
     using System.Linq;
-    using Models.Common;
     using System;
     using System.Threading.Tasks;
     using System.Threading;
 
-    public class SpravkiDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
+    public class SpravkiDbContext : DbContext
     {
      
         public SpravkiDbContext(DbContextOptions<SpravkiDbContext> options)

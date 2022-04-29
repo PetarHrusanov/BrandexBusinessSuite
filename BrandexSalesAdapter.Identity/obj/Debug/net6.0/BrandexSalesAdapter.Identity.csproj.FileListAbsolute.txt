@@ -1,5 +1,6 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/appsettings.Development.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/appsettings.json
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/BrandexSalesAdapter.Identity.staticwebassets.runtime.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/BrandexSalesAdapter.Identity
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/BrandexSalesAdapter.Identity.deps.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/BrandexSalesAdapter.Identity.runtimeconfig.json
@@ -24,7 +25,10 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/MassTransit.ExtensionsDependencyInjectionIntegration.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/MassTransit.RabbitMqTransport.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Cryptography.Internal.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Identity.UI.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Bcl.AsyncInterfaces.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Data.SqlClient.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.EntityFrameworkCore.dll
@@ -33,7 +37,10 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.EntityFrameworkCore.Relational.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.EntityFrameworkCore.SqlServer.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.Caching.Memory.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.FileProviders.Embedded.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.Http.Polly.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.Identity.Core.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.Identity.Stores.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Identity.Client.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Identity.Client.Extensions.Msal.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.IdentityModel.JsonWebTokens.dll
@@ -107,10 +114,3 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/net6.0/ref/BrandexSalesAdapter.Identity.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/net6.0/BrandexSalesAdapter.Identity.pdb
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/obj/Debug/net6.0/BrandexSalesAdapter.Identity.genruntimeconfig.cache
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/BrandexSalesAdapter.Identity.staticwebassets.runtime.json
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Cryptography.Internal.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.AspNetCore.Identity.UI.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.FileProviders.Embedded.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.Identity.Core.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Identity/bin/Debug/net6.0/Microsoft.Extensions.Identity.Stores.dll

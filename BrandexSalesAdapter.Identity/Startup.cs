@@ -1,5 +1,6 @@
 using BrandexSalesAdapter.Identity.Data.Models;
 using BrandexSalesAdapter.Identity.Infrastructure;
+using BrandexSalesAdapter.Services.Identity;
 using Microsoft.AspNetCore.Identity;
 
 namespace BrandexSalesAdapter.Identity
@@ -71,6 +72,17 @@ namespace BrandexSalesAdapter.Identity
             
             // services.AddIdentity<ApplicationUser, IdentityRole>()
             //     .AddEntityFrameworkStores<ApplicationUsersDbContext>();
+
+            services
+                // Business Logic 
+                .AddTransient<IIdentityService, IdentityService>()
+                .AddTransient<ITokenGeneratorService, TokenGeneratorService>();
+            // .AddTransient<ICurrentTokenService, TokenGeneratorService>();
+            
+            services
+                .AddHttpContextAccessor()
+                .AddScoped<ICurrentUserService, CurrentUserService>();
+            
 
             services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
 
