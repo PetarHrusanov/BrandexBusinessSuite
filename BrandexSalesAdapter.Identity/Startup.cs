@@ -1,5 +1,6 @@
 using BrandexSalesAdapter.Identity.Data.Models;
 using BrandexSalesAdapter.Identity.Infrastructure;
+using BrandexSalesAdapter.Infrastructure;
 using BrandexSalesAdapter.Services.Identity;
 using Microsoft.AspNetCore.Identity;
 
@@ -31,32 +32,36 @@ namespace BrandexSalesAdapter.Identity
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationUsersDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-            });
 
-            services
-                .AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(cfg =>
-                {
-                    cfg.RequireHttpsMetadata = true;
-                    cfg.SaveToken = true;
-                    cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
-                    {
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("placeholder-key-that-is-long-enough-for-sha256")),
-                        ValidateAudience = false,
-                        ValidateIssuer = false,
-                        ValidateLifetime = false,
-                        RequireExpirationTime = false,
-                        ClockSkew = TimeSpan.Zero,
-                        ValidateIssuerSigningKey = true
-                    };
-                });
+            services.AddWebService<ApplicationUsersDbContext>(Configuration);
+            
+            
+            // services.AddDbContext<ApplicationUsersDbContext>(options =>
+            // {
+            //     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            // });
+
+            // services
+            //     .AddAuthentication(options =>
+            //     {
+            //         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //     })
+            //     .AddJwtBearer(cfg =>
+            //     {
+            //         cfg.RequireHttpsMetadata = true;
+            //         cfg.SaveToken = true;
+            //         cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+            //         {
+            //             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("placeholder-key-that-is-long-enough-for-sha256")),
+            //             ValidateAudience = false,
+            //             ValidateIssuer = false,
+            //             ValidateLifetime = false,
+            //             RequireExpirationTime = false,
+            //             ClockSkew = TimeSpan.Zero,
+            //             ValidateIssuerSigningKey = true
+            //         };
+            //     });
 
             // services.AddUserStorage();
             
@@ -74,19 +79,14 @@ namespace BrandexSalesAdapter.Identity
             //     .AddEntityFrameworkStores<ApplicationUsersDbContext>();
 
             services
-                // Business Logic 
                 .AddTransient<IIdentityService, IdentityService>()
                 .AddTransient<ITokenGeneratorService, TokenGeneratorService>();
-            // .AddTransient<ICurrentTokenService, TokenGeneratorService>();
-            
-            services
-                .AddHttpContextAccessor()
-                .AddScoped<ICurrentUserService, CurrentUserService>();
-            
 
-            services.AddScoped<ITokenGeneratorService, TokenGeneratorService>();
+            // services
+            //     .AddHttpContextAccessor()
+            //     .AddScoped<ICurrentUserService, CurrentUserService>();
 
-            services.AddControllers();
+            // services.AddControllers();
         }
             // => services
             //     .AddWebService<ApplicationUsersDbContext>(this.Configuration)
@@ -97,60 +97,64 @@ namespace BrandexSalesAdapter.Identity
 
             public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
             {
-                AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
-
-                // Seed data on application startup
-                using (var serviceScope = app.ApplicationServices.CreateScope())
-                {
-                    var dbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationUsersDbContext>();
-
-                    // dbContext.Database.Migrate();
-                    
-                    if (env.IsDevelopment())
-                    {
-                        dbContext.Database.Migrate();
-                    }
-
-                    new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
-                }
-
-                if (env.IsDevelopment())
-                {
-                    app.UseDeveloperExceptionPage();
-                }
-                else
-                {
-                    app.UseExceptionHandler("/Home/Error");
-                    app.UseHsts();
-                }
-
-                app
-                    //.UseAuthentication()
-                    //.UseAuthorization()
-                    .UseRouting()
-                    .UseCors(options => options
-                        .AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod());
-
-                app.UseHttpsRedirection();
-
-                app.UseStaticFiles();
-            
-                //app.UseCookiePolicy();
-
-                //app.UseRouting();
-
-                app.UseAuthentication();
-                app.UseAuthorization();
-
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllerRoute(
-                        name: "default",
-                        pattern: "{controller=Home}/{action=Index}/{id?}");
-                    endpoints.MapRazorPages();
-                });
+                
+                app.UseWebService(env)
+                    .Initialize();
+                
+                // AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
+                //
+                // // Seed data on application startup
+                // using (var serviceScope = app.ApplicationServices.CreateScope())
+                // {
+                //     var dbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationUsersDbContext>();
+                //
+                //     // dbContext.Database.Migrate();
+                //     
+                //     if (env.IsDevelopment())
+                //     {
+                //         dbContext.Database.Migrate();
+                //     }
+                //
+                //     new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
+                // }
+                //
+                // if (env.IsDevelopment())
+                // {
+                //     app.UseDeveloperExceptionPage();
+                // }
+                // else
+                // {
+                //     app.UseExceptionHandler("/Home/Error");
+                //     app.UseHsts();
+                // }
+                //
+                // app
+                //     //.UseAuthentication()
+                //     //.UseAuthorization()
+                //     .UseRouting()
+                //     .UseCors(options => options
+                //         .AllowAnyOrigin()
+                //         .AllowAnyHeader()
+                //         .AllowAnyMethod());
+                //
+                // app.UseHttpsRedirection();
+                //
+                // app.UseStaticFiles();
+                //
+                // //app.UseCookiePolicy();
+                //
+                // //app.UseRouting();
+                //
+                // app.UseAuthentication();
+                // app.UseAuthorization();
+                //
+                // app.UseEndpoints(endpoints =>
+                // {
+                //     endpoints.MapControllerRoute(
+                //         name: "default",
+                //         pattern: "{controller=Home}/{action=Index}/{id?}");
+                //     endpoints.MapRazorPages();
+                // });
             }
     }
 }

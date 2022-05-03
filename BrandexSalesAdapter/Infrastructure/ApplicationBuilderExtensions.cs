@@ -32,12 +32,17 @@
                 .UseAuthorization()
                 .UseEndpoints(endpoints =>
                 {
-                    endpoints.MapHealthChecks("/health", new HealthCheckOptions
-                    {
-                        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                    });
-
-                    endpoints.MapControllers();
+                    
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller=Home}/{action=Index}/{id?}");
+                    endpoints.MapRazorPages();
+                    // endpoints.MapHealthChecks("/health", new HealthCheckOptions
+                    // {
+                    //     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                    // });
+                    //
+                    // endpoints.MapControllers();
                 });
 
             return app;

@@ -22,8 +22,7 @@
         public string GenerateToken(ApplicationUser user, IEnumerable<string> roles = null)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            // var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
-            var key = Encoding.ASCII.GetBytes("S4F3 SP4C3 SP4C3 3XPLOR4TI0N QUEST SUC3SS");
+            var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
 
             var claims = new List<Claim>
             {

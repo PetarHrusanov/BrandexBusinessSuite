@@ -26,12 +26,9 @@ namespace BrandexSalesAdapter.ExcelLogic
     using Microsoft.Extensions.Hosting;
     using Microsoft.EntityFrameworkCore;
     
-    using BrandexSalesAdapter.Services.Identity;
     using BrandexSalesAdapter.Infrastructure;
     
     using Data.Seeding;
-    using Models.Map;
-    using System;
 
     public class Startup
     {
@@ -88,60 +85,65 @@ namespace BrandexSalesAdapter.ExcelLogic
 
             services.AddCors();
 
-            services.AddRouting(options => options.LowercaseUrls = true);
+            // services.AddRouting(options => options.LowercaseUrls = true);
 
         }
 
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
-
-            // Seed data on application startup
-            using (var serviceScope = app.ApplicationServices.CreateScope())
-            {
-                var dbContext = serviceScope.ServiceProvider.GetRequiredService<SpravkiDbContext>();
-
-                if (env.IsDevelopment())
-                {
-                    dbContext.Database.Migrate();
-                }
-
-                new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
-            }
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
-
-            app
-                .UseRouting()
-               .UseCors(options => options
-                   .AllowAnyOrigin()
-                   .AllowAnyHeader()
-                   .AllowAnyMethod());
-
-            app.UseHttpsRedirection();
-
-            app.UseStaticFiles();
             
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapRazorPages();
-            });
+            app
+                .UseWebService(env)
+                .Initialize();
+            
+            // AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
+            //
+            // // Seed data on application startup
+            // using (var serviceScope = app.ApplicationServices.CreateScope())
+            // {
+            //     var dbContext = serviceScope.ServiceProvider.GetRequiredService<SpravkiDbContext>();
+            //
+            //     if (env.IsDevelopment())
+            //     {
+            //         dbContext.Database.Migrate();
+            //     }
+            //
+            //     new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
+            // }
+            //
+            // if (env.IsDevelopment())
+            // {
+            //     app.UseDeveloperExceptionPage();
+            // }
+            // else
+            // {
+            //     app.UseExceptionHandler("/Home/Error");
+            //     app.UseHsts();
+            // }
+            //
+            // app
+            //     .UseRouting()
+            //    .UseCors(options => options
+            //        .AllowAnyOrigin()
+            //        .AllowAnyHeader()
+            //        .AllowAnyMethod());
+            //
+            // app.UseHttpsRedirection();
+            //
+            // app.UseStaticFiles();
+            //
+            //
+            // app.UseAuthentication();
+            // app.UseAuthorization();
+            //
+            // app.UseEndpoints(endpoints =>
+            // {
+            //     endpoints.MapControllerRoute(
+            //         name: "default",
+            //         pattern: "{controller=Home}/{action=Index}/{id?}");
+            //     endpoints.MapRazorPages();
+            // });
         }
     }
 }

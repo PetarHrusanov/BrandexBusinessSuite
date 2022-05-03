@@ -1,7 +1,4 @@
-﻿using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Services.Identity;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System;
@@ -24,8 +21,10 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     
     using static Common.InputOutputConstants.SingleStringConstants;
     using static Common.DataConstants.ExcelLineErrors;
+    
+    using BrandexSalesAdapter.Services.Identity;
 
-    public class CitiesController :Controller
+    public class CitiesController :ControllerBase
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -163,9 +162,9 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
             return outputSerialized;
 
         }
-
-        [Authorize]
+        
         [HttpPost]
+        // [Authorize]
         public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
         {
             if (singleStringInputModel.SingleStringValue != null)
