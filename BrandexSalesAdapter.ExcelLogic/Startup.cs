@@ -47,14 +47,13 @@ namespace BrandexSalesAdapter.ExcelLogic
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddWebService<SpravkiDbContext>(_configuration);
-
+            services.AddWebService<SpravkiDbContext>(_configuration)
+                .AddRazorPages();
+            
             // services.AddDbContext<SpravkiDbContext>(
             //     options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
             
             // services.AddControllersWithViews();
-
-            services.AddRazorPages();
 
             // services.AddSingleton(_configuration);
             

@@ -9,6 +9,7 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+
     using Microsoft.AspNetCore.Authorization;
     
     using NPOI.HSSF.UserModel;
@@ -23,6 +24,7 @@
     using static Common.DataConstants.ExcelLineErrors;
     
     using BrandexSalesAdapter.Services.Identity;
+    using BrandexSalesAdapter.Infrastructure;
 
     public class CitiesController :ControllerBase
     {
@@ -164,6 +166,7 @@
         }
         
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         // [Authorize]
         public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
         {

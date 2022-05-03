@@ -71,12 +71,6 @@ namespace BrandexSalesAdapter.Identity
             
             services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
                 .AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationUsersDbContext>();
-            
-            // services.AddIdentityCore<ApplicationUser>().AddRoles<IdentityRole>()
-            //     .AddEntityFrameworkStores<ApplicationUsersDbContext>();
-            
-            // services.AddIdentity<ApplicationUser, IdentityRole>()
-            //     .AddEntityFrameworkStores<ApplicationUsersDbContext>();
 
             services
                 .AddTransient<IIdentityService, IdentityService>()
