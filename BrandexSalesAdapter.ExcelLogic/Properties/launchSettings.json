@@ -1,23 +1,9 @@
 {
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:16000",
-      "sslPort": 0
-    }
-  },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
     "BrandexSalesAdapter.ExcelLogic": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "applicationUrl": "http://localhost:15001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
