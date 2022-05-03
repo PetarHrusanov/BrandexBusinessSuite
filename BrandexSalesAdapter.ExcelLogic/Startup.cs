@@ -51,11 +51,7 @@ namespace BrandexSalesAdapter.ExcelLogic
 
             // services.AddDbContext<SpravkiDbContext>(
             //     options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
-
-            // services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
-            //     .AddRoles<ApplicationRole>().AddEntityFrameworkStores<SpravkiDbContext>();
-
-          
+            
             // services.AddControllersWithViews();
 
             services.AddRazorPages();
