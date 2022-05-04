@@ -93,6 +93,8 @@
     <_ContentIncludedByDefault Remove="Areas\Administration\Views\_ViewImports.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Administration\Views\_ViewStart.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ViewStart.cshtml" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\site.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\site.min.js" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BrandexSalesAdapter\BrandexSalesAdapter.csproj" />
