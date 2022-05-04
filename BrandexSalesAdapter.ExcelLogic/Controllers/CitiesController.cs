@@ -23,29 +23,26 @@
     using static Common.InputOutputConstants.SingleStringConstants;
     using static Common.DataConstants.ExcelLineErrors;
     
-    using BrandexSalesAdapter.Services.Identity;
-    using BrandexSalesAdapter.Infrastructure;
+    using BrandexSalesAdapter.Controllers;
 
-    public class CitiesController :ControllerBase
+    using static BrandexSalesAdapter.Common.Constants;
+
+    public class CitiesController :AdministrationController
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 
         // db Services
         private readonly ICitiesService _citiesService;
-        
-        private readonly ICurrentUserService _currentUser;
 
         public CitiesController(
             IWebHostEnvironment hostEnvironment,
-            ICitiesService citiesService,
-            ICurrentUserService currentUser
-            
-            )
+            ICitiesService citiesService
+
+        )
 
         {
             _hostEnvironment = hostEnvironment;
             _citiesService = citiesService;
-            _currentUser = currentUser;
         }
 
         // [Authorize]
@@ -166,8 +163,7 @@
         }
         
         [HttpPost]
-        [Authorize(Roles = "Administrator")]
-        // [Authorize]
+        [Authorize(Roles = AdministratorRoleName)]
         public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
         {
             if (singleStringInputModel.SingleStringValue != null)

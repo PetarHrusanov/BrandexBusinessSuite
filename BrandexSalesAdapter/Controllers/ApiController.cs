@@ -3,7 +3,7 @@ namespace BrandexSalesAdapter.Controllers
     using Microsoft.AspNetCore.Mvc;
 
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     public abstract class ApiController : ControllerBase
     {
         public const string PathSeparator = "/";

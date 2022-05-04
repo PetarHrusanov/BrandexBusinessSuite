@@ -47,25 +47,7 @@ namespace BrandexSalesAdapter.ExcelLogic
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddWebService<SpravkiDbContext>(_configuration)
-                .AddRazorPages();
-            
-            // services.AddDbContext<SpravkiDbContext>(
-            //     options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
-            
-            // services.AddControllersWithViews();
-
-            // services.AddSingleton(_configuration);
-            
-            // services
-            //     .AddHttpContextAccessor()
-            //     .AddScoped<ICurrentUserService, CurrentUserService>();
-
-            // services
-            //     .AddAutoMapper(
-            //         (_, config) => config
-            //             .AddProfile(new MappingProfile(Assembly.GetCallingAssembly())),
-            //         Array.Empty<Assembly>());
+            services.AddWebService<SpravkiDbContext>(_configuration);
 
             services
                 .AddTransient<ICitiesService, CitiesService>()
@@ -80,8 +62,6 @@ namespace BrandexSalesAdapter.ExcelLogic
 
             services.AddCors();
 
-            // services.AddRouting(options => options.LowercaseUrls = true);
-
         }
 
         
@@ -92,53 +72,6 @@ namespace BrandexSalesAdapter.ExcelLogic
                 .UseWebService(env)
                 .Initialize();
             
-            // AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
-            //
-            // // Seed data on application startup
-            // using (var serviceScope = app.ApplicationServices.CreateScope())
-            // {
-            //     var dbContext = serviceScope.ServiceProvider.GetRequiredService<SpravkiDbContext>();
-            //
-            //     if (env.IsDevelopment())
-            //     {
-            //         dbContext.Database.Migrate();
-            //     }
-            //
-            //     new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
-            // }
-            //
-            // if (env.IsDevelopment())
-            // {
-            //     app.UseDeveloperExceptionPage();
-            // }
-            // else
-            // {
-            //     app.UseExceptionHandler("/Home/Error");
-            //     app.UseHsts();
-            // }
-            //
-            // app
-            //     .UseRouting()
-            //    .UseCors(options => options
-            //        .AllowAnyOrigin()
-            //        .AllowAnyHeader()
-            //        .AllowAnyMethod());
-            //
-            // app.UseHttpsRedirection();
-            //
-            // app.UseStaticFiles();
-            //
-            //
-            // app.UseAuthentication();
-            // app.UseAuthorization();
-            //
-            // app.UseEndpoints(endpoints =>
-            // {
-            //     endpoints.MapControllerRoute(
-            //         name: "default",
-            //         pattern: "{controller=Home}/{action=Index}/{id?}");
-            //     endpoints.MapRazorPages();
-            // });
         }
     }
 }

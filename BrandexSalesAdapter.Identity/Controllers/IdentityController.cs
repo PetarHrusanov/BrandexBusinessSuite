@@ -21,7 +21,6 @@ namespace BrandexSalesAdapter.Identity.Controllers
         }
 
         [HttpPost]
-        [Route(nameof(Register))]
         public async Task<ActionResult<UserOutputModel>> Register(UserInputModel input)
         {
             var result = await _identity.Register(input);
@@ -32,7 +31,6 @@ namespace BrandexSalesAdapter.Identity.Controllers
         }
 
         [HttpPost]
-        [Route(nameof(Login))]
         public async Task<ActionResult<UserOutputModel>> Login(UserInputModel input)
         {
             var result = await _identity.Login(input);

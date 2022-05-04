@@ -29,8 +29,10 @@
     
     using static Common.DataConstants.Ditributors;
     using static Common.DataConstants.ExcelLineErrors;
+    
+    using BrandexSalesAdapter.Controllers;
 
-    public class SalesController : Controller
+    public class SalesController : AdministrationController
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -70,13 +72,7 @@
             _distributorService = distributorService;
 
         }
-
-        //[Authorize]
-        // [HttpGet]
-        // public ActionResult Index()
-        // {
-        //     return this.View();
-        // }
+        
         
         [HttpPost]
         [IgnoreAntiforgeryToken]
@@ -772,20 +768,15 @@
             row.CreateCell(1).SetCellValue("Pharmacy Address");
             row.CreateCell(2).SetCellValue("Pharmacy Class");
             row.CreateCell(3).SetCellValue("Region");
-
-            // int cellsCount = row.Cells.Count();
+            
 
             foreach (var product in products)
             {
-
-
                 row.CreateCell(row.Cells.Count()).SetCellValue(product);
-                // counter++;
             }
 
             row.CreateCell(row.Cells.Count()).SetCellValue("SumSale");
-
-            // return counter;
+            
         }
         
     }

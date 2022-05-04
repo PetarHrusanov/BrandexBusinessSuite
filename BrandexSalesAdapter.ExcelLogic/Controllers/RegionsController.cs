@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Threading.Tasks;
+    using System.Linq;
     
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -17,13 +18,14 @@
     
     using Services.Regions;
     
-    using System.Linq;
     using Newtonsoft.Json;
 
     using static Common.InputOutputConstants.SingleStringConstants;
     using static Common.DataConstants.ExcelLineErrors;
+    
+    using BrandexSalesAdapter.Controllers;
 
-    public class RegionsController: Controller
+    public class RegionsController: AdministrationController
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 

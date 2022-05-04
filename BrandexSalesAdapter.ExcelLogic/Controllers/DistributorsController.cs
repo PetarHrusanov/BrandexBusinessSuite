@@ -2,25 +2,28 @@
 {
     using System.Linq;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    
+    using Newtonsoft.Json;
     
     using Data;
     using Data.Models;
+    
     using Models.Distributor;
     using Models;
     
     using System.Threading.Tasks;
-    using Microsoft.EntityFrameworkCore;
-    
-    using static Common.InputOutputConstants.SingleStringConstants;
-    using Newtonsoft.Json;
 
-    public class DistributorsController :Controller
+    using static Common.InputOutputConstants.SingleStringConstants;
+
+    using BrandexSalesAdapter.Controllers;
+
+    public class DistributorsController :AdministrationController
     {
 
         private readonly SpravkiDbContext _context;
 
         public DistributorsController(SpravkiDbContext context)
-
         {
             _context = context;
         }
