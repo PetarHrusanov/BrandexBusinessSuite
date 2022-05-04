@@ -1,12 +1,11 @@
-﻿using System;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    
+    using System;
+
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
@@ -18,7 +17,6 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using Models;
     using Models.PharmacyCompanies;
     
-    using Services;
     using Services.PharmacyCompanies;
 
     using Newtonsoft.Json;
@@ -26,8 +24,10 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
     using static Common.InputOutputConstants.SingleStringConstants;
     using static Common.DataConstants.ExcelLineErrors;
     
+    using BrandexSalesAdapter.Controllers;
     
-    public class PharmacyCompaniesController :Controller
+    
+    public class PharmacyCompaniesController :AdministrationController
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 

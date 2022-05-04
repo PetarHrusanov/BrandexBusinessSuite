@@ -33,8 +33,10 @@
     using Newtonsoft.Json;
 
     using static Common.DataConstants.ExcelLineErrors;
+    
+    using BrandexSalesAdapter.Controllers;
 
-    public class PharmacyDetailsController : Controller
+    public class PharmacyDetailsController : AdministrationController
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -77,13 +79,8 @@
             _citiesService = citiesService;
 
         }
-        
-        public IActionResult Index()
-        {
-            return View();
-        }
-        
-        
+
+
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<string> Check([FromForm]IFormFile file)

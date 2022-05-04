@@ -19,11 +19,13 @@
     
     using Newtonsoft.Json;
     
+    using BrandexSalesAdapter.Controllers;
+    
     using static Common.InputOutputConstants.SingleStringConstants;
     using static Common.DataConstants.ExcelLineErrors;
 
 
-    public class PharmacyChainsController : Controller
+    public class PharmacyChainsController : AdministrationController
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -41,8 +43,6 @@
 
         }
         
-
-        // [Authorize]
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<string> Import([FromForm]IFormFile file)
@@ -60,11 +60,8 @@
             var uniquePharmacyChains = new List<string>();
 
             if (!Directory.Exists(newPath))
-
             {
-
                 Directory.CreateDirectory(newPath);
-
             }
 
             if (file.Length > 0)
@@ -94,7 +91,6 @@
                     }
 
                     else
-
                     {
 
                         var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
@@ -136,7 +132,6 @@
                                 uniquePharmacyChains.Add(chainNameString);
                             }
                             
-                            // await _pharmacyChainsService.UploadPharmacyChain(chainName.ToString()?.TrimEnd());
                         }
                         
                         else

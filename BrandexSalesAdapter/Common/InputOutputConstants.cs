@@ -1,4 +1,4 @@
-namespace BrandexSalesAdapter.ExcelLogic.Common
+namespace BrandexSalesAdapter.Common
 {
     public class InputOutputConstants
     {

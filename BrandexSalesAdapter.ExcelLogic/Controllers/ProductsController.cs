@@ -21,8 +21,10 @@
     using Newtonsoft.Json;
     
     using static Common.DataConstants.ExcelLineErrors;
+    
+    using BrandexSalesAdapter.Controllers;
 
-    public class ProductsController :Controller
+    public class ProductsController :AdministrationController
     {
         private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -44,12 +46,6 @@
             _numbersChecker = numbersChecker;
         }
 
-        //[Authorize]
-        public IActionResult Index()
-        {
-            return View();
-        }
-        
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<string> Import([FromForm]IFormFile file)

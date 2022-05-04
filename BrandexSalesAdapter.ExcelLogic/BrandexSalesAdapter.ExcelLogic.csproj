@@ -16,8 +16,6 @@
     <Folder Include="Data\Migrations\" />
     <Folder Include="wwwroot\UploadExcel" />
     <Folder Include="wwwroot\UploadExcel\" />
-    <Folder Include="Views\PharmacyDetails\" />
-    <Folder Include="Views\Products\" />
     <Folder Include="Models\Phoenix\" />
     <Folder Include="Models\Sopharma\" />
     <Folder Include="Models\Distributor\" />
@@ -28,13 +26,10 @@
     <Folder Include="Models\Brandex\" />
     <Folder Include="Models\Common\" />
     <Folder Include="Models\Enums\" />
-    <Folder Include="Infrastructure\" />
     <Folder Include="Services\" />
     <Folder Include="Services\Sales\" />
     <Folder Include="Services\Products\" />
-    <Folder Include="Views\Sales\" />
     <Folder Include="Services\Pharmacies\" />
-    <Folder Include="Common\" />
     <Folder Include="Services\Distributor\" />
     <Folder Include="Services\Cities\" />
     <Folder Include="Models\Cities\" />
@@ -45,7 +40,6 @@
     <Folder Include="Services\Regions\" />
     <Folder Include="Models\Regions\" />
     <Folder Include="Models\Products\" />
-    <Folder Include="Areas\Administration\Views\AdministrationTexts\" />
     <Folder Include="Models\Map\" />
   </ItemGroup>
   <ItemGroup>
@@ -96,6 +90,9 @@
     <_ContentIncludedByDefault Remove="Views\Regions\Import.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Regions\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Regions\Upload.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Administration\Views\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Administration\Views\_ViewStart.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ViewStart.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BrandexSalesAdapter\BrandexSalesAdapter.csproj" />
