@@ -1,61 +1,60 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers;
+
+using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+    
+using Newtonsoft.Json;
+    
+using Data;
+using Data.Models;
+    
+using Models.Distributor;
+using Models;
+    
+using System.Threading.Tasks;
+
+using static Common.InputOutputConstants.SingleStringConstants;
+
+using BrandexSalesAdapter.Controllers;
+
+public class DistributorsController :AdministrationController
 {
-    using System.Linq;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
-    
-    using Newtonsoft.Json;
-    
-    using Data;
-    using Data.Models;
-    
-    using Models.Distributor;
-    using Models;
-    
-    using System.Threading.Tasks;
 
-    using static Common.InputOutputConstants.SingleStringConstants;
+    private readonly SpravkiDbContext _context;
 
-    using BrandexSalesAdapter.Controllers;
+    public DistributorsController(SpravkiDbContext context)
+    {
+        _context = context;
+    }
 
-    public class DistributorsController :AdministrationController
+    [HttpGet]
+    public async Task<DistributorOutputModel[]> GetDistributors()
+    {
+        return await _context.Distributors.Select(n => new DistributorOutputModel
+        {
+            Name = n.Name,
+            Id = n.Id
+        }).ToArrayAsync();
+          
+    }
+        
+    [HttpPost]
+    public async Task<string> Import([FromBody]SingleStringInputModel singleStringInputModel)
     {
 
-        private readonly SpravkiDbContext _context;
-
-        public DistributorsController(SpravkiDbContext context)
+        var distributor = new Distributor
         {
-            _context = context;
-        }
+            Name = singleStringInputModel.SingleStringValue
+        };
 
-        [HttpGet]
-        public async Task<DistributorOutputModel[]> GetDistributors()
-        {
-            return await _context.Distributors.Select(n => new DistributorOutputModel
-            {
-                Name = n.Name,
-                Id = n.Id
-            }).ToArrayAsync();
-          
-        }
-        
-        [HttpPost]
-        public async Task<string> Import([FromBody]SingleStringInputModel singleStringInputModel)
-        {
+        await _context.Distributors.AddAsync(distributor);
+        await _context.SaveChangesAsync();
 
-            var distributor = new Distributor
-            {
-                Name = singleStringInputModel.SingleStringValue
-            };
+        var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
 
-            await _context.Distributors.AddAsync(distributor);
-            await _context.SaveChangesAsync();
+        outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
 
-            var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
-
-            outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
-
-            return outputSerialized;
-        }
+        return outputSerialized;
     }
 }
