@@ -1,5 +1,3 @@
-using BrandexSalesAdapter.Models;
-
 namespace BrandexSalesAdapter.MarketingAnalysis.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
@@ -11,23 +9,28 @@ using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 
 using BrandexSalesAdapter.Controllers;
+using BrandexSalesAdapter.Infrastructure;
+using BrandexSalesAdapter.MarketingAnalysis.Data.Enums;
+using BrandexSalesAdapter.MarketingAnalysis.Models.AdMedias;
+using BrandexSalesAdapter.MarketingAnalysis.Services.AdMedias;
+using BrandexSalesAdapter.Models;
+
 
 public class AdMediaController : ApiController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 
     // db Services
-    // private readonly ICitiesService _citiesService;
+    private readonly IAdMediasService _adMediasService;
 
     public AdMediaController(
-        IWebHostEnvironment hostEnvironment
-        // ICitiesService citiesService
-        
+        IWebHostEnvironment hostEnvironment,
+            IAdMediasService adMediasService
     )
 
     {
         _hostEnvironment = hostEnvironment;
-        // _citiesService = citiesService;
+        _adMediasService = adMediasService;
     }
 
     [HttpPost]
@@ -35,25 +38,14 @@ public class AdMediaController : ApiController
     public async Task<string> Import([FromForm] IFormFile file)
     {
 
-        string folderName = "UploadExcel";
-
-        string webRootPath = _hostEnvironment.WebRootPath;
-
-        string newPath = Path.Combine(webRootPath, folderName);
+        string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
         var errorDictionary = new Dictionary<int, string>();
 
         // var citiesCheck = await _citiesService.GetCitiesCheck();
 
-        var uniqueCities = new List<string>();
+        var uniqueMedias = new List<AdMediaInputModel>();
         
-        if (!Directory.Exists(newPath))
-
-        {
-
-            Directory.CreateDirectory(newPath);
-
-        }
 
         if (file.Length > 0)
         {
@@ -111,9 +103,25 @@ public class AdMediaController : ApiController
 
                     if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
+                    var newAdMedia = new AdMediaInputModel();
 
-                    var cityRow = row.GetCell(0).ToString()?.TrimEnd();
-                    if (!string.IsNullOrEmpty(cityRow))
+                    var nameRow = row.GetCell(0);
+
+                    if (nameRow!=null)
+                    {
+                        newAdMedia.Name = nameRow.ToString()?.TrimEnd() ?? throw new InvalidOperationException();
+                    }
+                    
+                    var typeRow = row.GetCell(1);
+                    
+                    if (typeRow!=null)
+                    {
+                        newAdMedia.MediaType = (MediaType)Enum.Parse(typeof(MediaType), typeRow.ToString()!.TrimEnd(), true);
+                    }
+                    
+                    
+                    
+                    if (newAdMedia.Name!=null && newAdMedia.MediaType !=null)
                     {
                         // if (citiesCheck.All(c =>
                         //         !string.Equals(c.Name, cityRow, StringComparison.CurrentCultureIgnoreCase)))
@@ -121,6 +129,7 @@ public class AdMediaController : ApiController
                         //     uniqueCities.Add(cityRow.ToUpper());
                         // }
 
+                        uniqueMedias.Add(newAdMedia);
                     }
 
                     else
@@ -130,7 +139,7 @@ public class AdMediaController : ApiController
 
                 }
 
-                // await _citiesService.UploadBulk(uniqueCities);
+                await _adMediasService.UploadBulk(uniqueMedias);
 
             }
         }

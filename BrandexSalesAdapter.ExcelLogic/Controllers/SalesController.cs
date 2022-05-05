@@ -27,8 +27,8 @@ using Services.Pharmacies;
 using Services.Products;
 using Services.Sales;
     
-using static Common.DataConstants.Ditributors;
-using static Common.DataConstants.ExcelLineErrors;
+using static Common.ExcelDataConstants.Ditributors;
+using static Common.ExcelDataConstants.ExcelLineErrors;
     
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Infrastructure;

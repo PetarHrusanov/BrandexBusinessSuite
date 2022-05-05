@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "7OeGGaqBVIiKf4AqoQlBVxbja/v/n0fwFH2jMIIFwHc=",
+  "Hash": "7Fa2+d5A6PYla+7jGL/SxOq9n59nPCLudLvd+Ya1H7U=",
   "Source": "BrandexSalesAdapter.MarketingAnalysis",
   "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
   "Mode": "Default",
@@ -15,5 +15,23 @@
       "Pattern": "**"
     }
   ],
-  "Assets": []
+  "Assets": [
+    {
+      "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/UploadExcel/TestFakeMarketing.xlsx",
+      "SourceId": "BrandexSalesAdapter.MarketingAnalysis",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/",
+      "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
+      "RelativePath": "UploadExcel/TestFakeMarketing.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/UploadExcel/TestFakeMarketing.xlsx"
+    }
+  ]
 }

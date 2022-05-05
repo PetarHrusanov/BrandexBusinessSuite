@@ -15,7 +15,7 @@
     
     using Data.Models;
     
-    using static Common.DataConstants.PharmacyChainsColumns;
+    using static Common.ExcelDataConstants.PharmacyChainsColumns;
 
 
     public class PharmacyChainsService : IPharmacyChainsService

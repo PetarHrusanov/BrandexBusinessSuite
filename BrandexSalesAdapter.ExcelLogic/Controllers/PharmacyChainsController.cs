@@ -25,7 +25,7 @@ using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
     
 using static Common.InputOutputConstants.SingleStringConstants;
-using static Common.DataConstants.ExcelLineErrors;
+using static Common.ExcelDataConstants.ExcelLineErrors;
 
 
 public class PharmacyChainsController : AdministrationController
@@ -57,88 +57,76 @@ public class PharmacyChainsController : AdministrationController
 
         var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
         var uniquePharmacyChains = new List<string>();
-        
+
 
         if (file.Length > 0)
-
         {
-
             var sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
 
-            if (file.FileName != null)
+
+            var fullPath = Path.Combine(newPath, file.FileName);
+
+            await using var stream = new FileStream(fullPath, FileMode.Create);
+            await file.CopyToAsync(stream);
+
+            stream.Position = 0;
+
+            ISheet sheet;
+            if (sFileExtension == ".xls")
+
             {
-                var fullPath = Path.Combine(newPath, file.FileName);
+                var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
 
-                await using var stream = new FileStream(fullPath, FileMode.Create);
-                await file.CopyToAsync(stream);
+                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+            }
 
-                stream.Position = 0;
+            else
+            {
+                var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
 
-                ISheet sheet;
-                if (sFileExtension == ".xls")
+                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+            }
 
+            var headerRow = sheet.GetRow(0); //Get Header Row
+
+            int cellCount = headerRow.LastCellNum;
+
+            for (var j = 0; j < cellCount; j++)
+            {
+                var cell = headerRow.GetCell(j);
+
+                if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+            }
+
+            for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+
+            {
+                var row = sheet.GetRow(i);
+
+                if (row == null) continue;
+
+                if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+
+                var chainName = row.GetCell(0);
+                if (chainName != null)
                 {
+                    var chainNameString = chainName.ToString().ToUpper().TrimEnd();
 
-                    var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
-                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-
+                    if (pharmacyChainsCheck.All(c =>
+                            !string.Equals(c.Name, chainNameString, StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        uniquePharmacyChains.Add(chainNameString);
+                    }
                 }
 
                 else
                 {
-
-                    var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
-                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
-
+                    errorDictionary[i + 1] = IncorrectPharmacyChainName;
                 }
-
-                var headerRow = sheet.GetRow(0); //Get Header Row
-
-                int cellCount = headerRow.LastCellNum;
-
-                for (var j = 0; j < cellCount; j++)
-                {
-                    var cell = headerRow.GetCell(j);
-
-                    if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-
-                }
-
-                for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-
-                {
-
-                    var row = sheet.GetRow(i);
-
-                    if (row == null) continue;
-                        
-                    if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-                        
-                        
-                    var chainName = row.GetCell(0);
-                    if (chainName!=null)
-                    {
-                        var chainNameString = chainName.ToString().ToUpper().TrimEnd();
-                            
-                        if (pharmacyChainsCheck.All(c => !string.Equals(c.Name, chainNameString, StringComparison.CurrentCultureIgnoreCase)))
-                        {
-                            uniquePharmacyChains.Add(chainNameString);
-                        }
-                            
-                    }
-                        
-                    else
-                    {
-                        errorDictionary[i+1] = IncorrectPharmacyChainName;
-                            
-                    }
-
-                }
-                    
-                await _pharmacyChainsService.UploadBulk(uniquePharmacyChains);
             }
+
+            await _pharmacyChainsService.UploadBulk(uniquePharmacyChains);
         }
 
         var errorModel = new CustomErrorDictionaryOutputModel

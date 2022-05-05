@@ -7,5 +7,8 @@
 
         public const string UploadExcel = "UploadExcel";
 
+        public const string CreatedOn = "CreatedOn";
+        public const string IsDeleted = "IsDeleted";
+
     }
 }

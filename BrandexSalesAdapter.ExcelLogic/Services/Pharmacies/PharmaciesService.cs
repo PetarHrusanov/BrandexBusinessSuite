@@ -16,8 +16,8 @@
     using Models.Pharmacies;
     using Models.Sales;
 
-    using static Common.DataConstants.Ditributors;
-    using static Common.DataConstants.PharmacyColumns;
+    using static Common.ExcelDataConstants.Ditributors;
+    using static Common.ExcelDataConstants.PharmacyColumns;
 
     public class PharmaciesService : IPharmaciesService
     {
