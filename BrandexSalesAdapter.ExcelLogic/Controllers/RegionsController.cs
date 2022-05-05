@@ -1,4 +1,7 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers
+﻿using BrandexSalesAdapter.Infrastructure;
+using BrandexSalesAdapter.Models;
+
+namespace BrandexSalesAdapter.ExcelLogic.Controllers
 {
     using System.Collections.Generic;
     using System.IO;
@@ -55,22 +58,9 @@
         {
             
 
-            var folderName = "UploadExcel";
-
-            var webRootPath = _hostEnvironment.WebRootPath;
-
-            var newPath = Path.Combine(webRootPath, folderName);
+            string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
             var errorDictionary = new Dictionary<int, string>();
-
-
-            if (!Directory.Exists(newPath))
-
-            {
-
-                Directory.CreateDirectory(newPath);
-
-            }
 
             if (file.Length > 0)
 

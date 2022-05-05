@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Models
+﻿namespace BrandexSalesAdapter.Models
 {
     using System;
     using System.Collections.Generic;

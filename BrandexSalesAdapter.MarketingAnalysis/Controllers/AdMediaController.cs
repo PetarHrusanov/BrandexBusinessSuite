@@ -1,65 +1,59 @@
-﻿using BrandexSalesAdapter.Infrastructure;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers;
-
-using System.Collections.Generic;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-    
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-    
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-    
-using Models;
-using Services.Cities;
-using Newtonsoft.Json;
-    
-using static Common.InputOutputConstants.SingleStringConstants;
-using static Common.DataConstants.ExcelLineErrors;
-    
-using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
 
-using static BrandexSalesAdapter.Common.Constants;
+namespace BrandexSalesAdapter.MarketingAnalysis.Controllers;
 
-public class CitiesController :AdministrationController
+using Microsoft.AspNetCore.Mvc;
+
+using Newtonsoft.Json;
+using NPOI.XSSF.UserModel;
+
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+
+using BrandexSalesAdapter.Controllers;
+
+public class AdMediaController : ApiController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 
     // db Services
-    private readonly ICitiesService _citiesService;
+    // private readonly ICitiesService _citiesService;
 
-    public CitiesController(
-        IWebHostEnvironment hostEnvironment,
-        ICitiesService citiesService
-
+    public AdMediaController(
+        IWebHostEnvironment hostEnvironment
+        // ICitiesService citiesService
+        
     )
 
     {
         _hostEnvironment = hostEnvironment;
-        _citiesService = citiesService;
+        // _citiesService = citiesService;
     }
-        
+
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<string> Import([FromForm]IFormFile file)
+    public async Task<string> Import([FromForm] IFormFile file)
     {
 
-        string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        string folderName = "UploadExcel";
+
+        string webRootPath = _hostEnvironment.WebRootPath;
+
+        string newPath = Path.Combine(webRootPath, folderName);
 
         var errorDictionary = new Dictionary<int, string>();
 
-        var citiesCheck = await _citiesService.GetCitiesCheck();
+        // var citiesCheck = await _citiesService.GetCitiesCheck();
 
         var uniqueCities = new List<string>();
         
+        if (!Directory.Exists(newPath))
+
+        {
+
+            Directory.CreateDirectory(newPath);
+
+        }
 
         if (file.Length > 0)
         {
@@ -116,26 +110,27 @@ public class CitiesController :AdministrationController
                     if (row == null) continue;
 
                     if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-                        
-                        
+
+
                     var cityRow = row.GetCell(0).ToString()?.TrimEnd();
                     if (!string.IsNullOrEmpty(cityRow))
                     {
-                        if (citiesCheck.All(c => !string.Equals(c.Name, cityRow, StringComparison.CurrentCultureIgnoreCase)))
-                        {
-                            uniqueCities.Add(cityRow.ToUpper());
-                        }
-                            
+                        // if (citiesCheck.All(c =>
+                        //         !string.Equals(c.Name, cityRow, StringComparison.CurrentCultureIgnoreCase)))
+                        // {
+                        //     uniqueCities.Add(cityRow.ToUpper());
+                        // }
+
                     }
-                        
+
                     else
                     {
-                        errorDictionary[i+1] = IncorrectCityName;
+                        // errorDictionary[i + 1] = IncorrectCityName;
                     }
 
                 }
 
-                await _citiesService.UploadBulk(uniqueCities);
+                // await _citiesService.UploadBulk(uniqueCities);
 
             }
         }
@@ -150,21 +145,21 @@ public class CitiesController :AdministrationController
         return outputSerialized;
 
     }
-        
-    [HttpPost]
-    [Authorize(Roles = AdministratorRoleName)]
-    public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
-    {
-        if (singleStringInputModel.SingleStringValue != null)
-        {
-            await _citiesService.UploadCity(singleStringInputModel.SingleStringValue);
-        }
-            
-        var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
 
-        outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
+    // [HttpPost]
+    // public async Task<string> Upload([FromBody] SingleStringInputModel singleStringInputModel)
+    // {
+    //     if (singleStringInputModel.SingleStringValue != null)
+    //     {
+    //         await _citiesService.UploadCity(singleStringInputModel.SingleStringValue);
+    //     }
+    //
+    //     var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
+    //
+    //     outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
+    //
+    //     return outputSerialized;
+    //
+    // }
 
-        return outputSerialized;
-            
-    }
 }

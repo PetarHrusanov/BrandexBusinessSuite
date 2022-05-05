@@ -1,11 +1,19 @@
 {
   "Version": 1,
-  "Hash": "Yf5aondwfPh54V61dq+0OSngAyyLe3skXe3G1Vi2jO4=",
+  "Hash": "7OeGGaqBVIiKf4AqoQlBVxbja/v/n0fwFH2jMIIFwHc=",
   "Source": "BrandexSalesAdapter.MarketingAnalysis",
   "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "BrandexSalesAdapter.MarketingAnalysis/wwwroot",
+      "Source": "BrandexSalesAdapter.MarketingAnalysis",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/",
+      "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
+      "Pattern": "**"
+    }
+  ],
   "Assets": []
 }
