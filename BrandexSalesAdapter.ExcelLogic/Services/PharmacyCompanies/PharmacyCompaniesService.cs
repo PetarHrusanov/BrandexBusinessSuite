@@ -15,7 +15,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Services.PharmacyCompanies
     using Models.PharmacyCompanies;
     using Microsoft.Data.SqlClient;
     
-    using static Common.DataConstants.PharmacyCompaniesColumns;
+    using static Common.ExcelDataConstants.PharmacyCompaniesColumns;
 
     public class PharmacyCompaniesService : IPharmacyCompaniesService
     {

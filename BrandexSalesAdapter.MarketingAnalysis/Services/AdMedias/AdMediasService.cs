@@ -1,7 +1,13 @@
-using BrandexSalesAdapter.MarketingAnalysis.Data;
+namespace BrandexSalesAdapter.MarketingAnalysis.Services.AdMedias;
+
+using System.Data;
+using Data;
 using BrandexSalesAdapter.MarketingAnalysis.Models.AdMedias;
 
-namespace BrandexSalesAdapter.MarketingAnalysis.Services.AdMedias;
+using Microsoft.Data.SqlClient;
+
+using static Common.MarketingDataConstants;
+using static Common.Constants;
 
 public class AdMediasService :IAdMediasService
 {
@@ -15,9 +21,44 @@ public class AdMediasService :IAdMediasService
         _configuration = configuration;
     }
     
-    public Task UploadBulk(List<AdMediaInputModel> medias)
+    public async Task UploadBulk(List<AdMediaInputModel> medias)
     {
-        throw new NotImplementedException();
+        var table = new DataTable();
+        table.TableName = AdMedias;
+            
+        table.Columns.Add(Name, typeof(string));
+        table.Columns.Add(MediaType, typeof(int));
+        table.Columns.Add(CreatedOn);
+        table.Columns.Add(IsDeleted, typeof(bool));
+            
+        foreach (var media in medias)
+        {
+            var row = table.NewRow();
+            row[Name] = media.Name;
+            row[MediaType] = media.MediaType;
+            row[CreatedOn] = DateTime.Now;
+            row[IsDeleted] = false;
+            
+            table.Rows.Add(row);
+        }
+
+        string connection = _configuration.GetConnectionString("DefaultConnection");
+            
+        var con = new SqlConnection(connection);
+            
+        var objbulk = new SqlBulkCopy(con);  
+            
+        objbulk.DestinationTableName = AdMedias;
+            
+        objbulk.ColumnMappings.Add(Name, Name);
+        objbulk.ColumnMappings.Add(MediaType, MediaType);
+        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
+        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
+
+        con.Open();
+        await objbulk.WriteToServerAsync(table);  
+        con.Close();  
+        
     }
 
     public Task<string> UploadSingle(string media)

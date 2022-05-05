@@ -16,8 +16,8 @@
     using Microsoft.Extensions.Configuration;
     
     
-    using static Common.DataConstants.Ditributors;
-    using static Common.DataConstants.SalesColumns;
+    using static Common.ExcelDataConstants.Ditributors;
+    using static Common.ExcelDataConstants.SalesColumns;
 
 
     public class SalesService :ISalesService

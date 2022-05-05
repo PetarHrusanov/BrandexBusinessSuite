@@ -1,5 +1,6 @@
 ﻿namespace BrandexSalesAdapter.ExcelLogic.Services.Cities;
 
+using System;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +14,8 @@ using Data;
 using BrandexSalesAdapter.ExcelLogic.Data.Models;
 using BrandexSalesAdapter.ExcelLogic.Models.Cities;
 
-using static Common.DataConstants.CitiesColumns;
+using static Common.ExcelDataConstants.CitiesColumns;
+using static  Common.Constants;
 
 public class CitiesService :ICitiesService
 {
@@ -32,11 +34,17 @@ public class CitiesService :ICitiesService
         table.TableName = Cities;
             
         table.Columns.Add(Name, typeof(string));
+        
+        table.Columns.Add(CreatedOn, typeof(string));
             
         foreach (var city in cities)
         {
             var row = table.NewRow();
             row[Name] = city;
+            
+            row[CreatedOn] = DateTime.Now;
+            
+            
             table.Rows.Add(row);
         }
 
@@ -49,6 +57,7 @@ public class CitiesService :ICitiesService
         objbulk.DestinationTableName = Cities;
             
         objbulk.ColumnMappings.Add(Name, Name);
+        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
 
         con.Open();
         await objbulk.WriteToServerAsync(table);  

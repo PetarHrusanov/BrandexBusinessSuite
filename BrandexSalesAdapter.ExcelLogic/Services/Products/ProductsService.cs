@@ -7,7 +7,7 @@
     using BrandexSalesAdapter.ExcelLogic.Data;
     using BrandexSalesAdapter.ExcelLogic.Data.Models;
     using BrandexSalesAdapter.ExcelLogic.Models.Products;
-    using static Common.DataConstants.Ditributors;
+    using static Common.ExcelDataConstants.Ditributors;
 
     public class ProductsService : IProductsService
     {

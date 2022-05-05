@@ -30,7 +30,7 @@ using Services.PharmacyCompanies;
 
 using Newtonsoft.Json;
 
-using static Common.DataConstants.ExcelLineErrors;
+using static Common.ExcelDataConstants.ExcelLineErrors;
     
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
