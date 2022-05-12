@@ -1,29 +1,27 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Services.Distributor
+﻿namespace BrandexSalesAdapter.ExcelLogic.Services.Distributor;
+
+using System.Linq;
+using System.Threading.Tasks;
+
+using Microsoft.EntityFrameworkCore;
+using Data;
+
+public class DistributorService :IDistributorService
 {
-    using System.Linq;
-    using System.Threading.Tasks;
-    
-    using Microsoft.EntityFrameworkCore;
-    
-    using Data;
+    SpravkiDbContext db;
 
-    public class DistributorService :IDistributorService
+    public DistributorService(SpravkiDbContext db)
+    { 
+        this.db = db;
+    }
+
+    public async Task<bool> CheckDistributor(string input)
     {
-        SpravkiDbContext db;
+        return await db.Distributors.Where(d => d.Name == input).AnyAsync();
+    }
 
-        public DistributorService(SpravkiDbContext db)
-        { 
-            this.db = db;
-        }
-
-        public async Task<bool> CheckDistributor(string input)
-        {
-            return await db.Distributors.Where(d => d.Name == input).AnyAsync();
-        }
-
-        public async Task<int> IdByName(string input)
-        {
-            return await db.Distributors.Where(d => d.Name == input).Select(d => d.Id).FirstOrDefaultAsync();
-        }
+    public async Task<int> IdByName(string input)
+    {
+        return await db.Distributors.Where(d => d.Name == input).Select(d => d.Id).FirstOrDefaultAsync();
     }
 }

@@ -35,7 +35,8 @@ public class CitiesService :ICitiesService
             
         table.Columns.Add(Name, typeof(string));
         
-        table.Columns.Add(CreatedOn, typeof(string));
+        table.Columns.Add(CreatedOn);
+        table.Columns.Add(IsDeleted, typeof(bool));
             
         foreach (var city in cities)
         {
@@ -43,7 +44,7 @@ public class CitiesService :ICitiesService
             row[Name] = city;
             
             row[CreatedOn] = DateTime.Now;
-            
+            row[IsDeleted] = false;
             
             table.Rows.Add(row);
         }
@@ -57,7 +58,9 @@ public class CitiesService :ICitiesService
         objbulk.DestinationTableName = Cities;
             
         objbulk.ColumnMappings.Add(Name, Name);
+        
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
+        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
 
         con.Open();
         await objbulk.WriteToServerAsync(table);  

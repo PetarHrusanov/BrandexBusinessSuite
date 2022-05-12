@@ -1,28 +1,26 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Services.Products
+﻿namespace BrandexSalesAdapter.ExcelLogic.Services.Products;
+
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using BrandexSalesAdapter.ExcelLogic.Models.Products;
+
+public interface IProductsService
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using BrandexSalesAdapter.ExcelLogic.Models.Products;
+    Task<string> CreateProduct(ProductInputModel productInputModel);
 
-    public interface IProductsService
-    {
-        Task<string> CreateProduct(ProductInputModel productInputModel);
+    Task<List<ProductCheckModel>> GetProductsCheck();
 
-        Task<List<ProductCheckModel>> GetProductsCheck();
+    Task<bool> CheckProductByDistributor(string input, string distributor);
 
-        Task<bool> CheckProductByDistributor(string input, string distributor);
+    Task<int> ProductIdByDistributor(string input, string distributor);
 
-        Task<int> ProductIdByDistributor(string input, string distributor);
+    Task<ICollection<ProductDistributorCheck>> ProductsIdByDistributorForCheck(string input);
 
-        Task<ICollection<ProductDistributorCheck>> ProductsIdByDistributorForCheck(string input);
+    Task<string> NameById(string input, string distributor);
 
-        Task<string> NameById(string input, string distributor);
+    Task<IEnumerable<string>> GetProductsNames();
 
-        Task<IEnumerable<string>> GetProductsNames();
+    Task<IEnumerable<int>> GetProductsId();
 
-        Task<IEnumerable<int>> GetProductsId();
-
-        Task<IEnumerable<ProductShortOutputModel>> GetProductsIdPrices();
-    }
+    Task<IEnumerable<ProductShortOutputModel>> GetProductsIdPrices();
 }

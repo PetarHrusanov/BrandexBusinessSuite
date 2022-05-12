@@ -2,37 +2,37 @@ namespace BrandexSalesAdapter.MarketingAnalysis.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Newtonsoft.Json;
-using NPOI.XSSF.UserModel;
-
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+
+using Newtonsoft.Json;
 
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
 
 using Infrastructure;
-using Data.Enums;
 using Models.AdMedias;
-using Services.AdMedias;
+using Models.Products;
+using Services.Products;
 
-public class AdMediaController : ApiController
+public class ProductController :ApiController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 
     // db Services
-    private readonly IAdMediasService _adMediasService;
+    private readonly IProductsService _productsService;
 
-    public AdMediaController(
+    public ProductController(
         IWebHostEnvironment hostEnvironment,
-            IAdMediasService adMediasService
+        IProductsService productsService
     )
 
     {
         _hostEnvironment = hostEnvironment;
-        _adMediasService = adMediasService;
+        _productsService = productsService;
     }
-
+    
     [HttpPost]
     [Consumes("multipart/form-data")]
     public async Task<string> Import([FromForm] IFormFile file)
@@ -42,10 +42,9 @@ public class AdMediaController : ApiController
 
         var errorDictionary = new Dictionary<int, string>();
 
-        var adMediasCheck = await _adMediasService.GetCheckModels();
+        // var adMediasCheck = await _adMediasService.GetCheckModels();
 
-        var uniqueMedias = new List<AdMediaInputModel>();
-        
+        var uniqueProducts = new List<ProductInputModel>();
 
         if (file.Length > 0)
         {
@@ -72,11 +71,9 @@ public class AdMediaController : ApiController
                 }
 
                 else
-
                 {
 
                     var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
                     sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
                 }
@@ -102,31 +99,33 @@ public class AdMediaController : ApiController
 
                     if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                    var newAdMedia = new AdMediaInputModel();
+                    var newProduct = new ProductInputModel();
 
                     var nameRow = row.GetCell(0);
 
                     if (nameRow!=null)
                     {
-                        newAdMedia.Name = nameRow.ToString()?.TrimEnd().ToUpper() ?? throw new InvalidOperationException();
+                        newProduct.Name = nameRow.ToString()?.TrimEnd().ToUpper() ?? throw new InvalidOperationException();
                     }
                     
-                    var typeRow = row.GetCell(1);
-                    
-                    if (typeRow!=null)
+                    var shortNameRow = row.GetCell(1);
+
+                    if (shortNameRow!=null)
                     {
-                        newAdMedia.MediaType = (MediaType)Enum.Parse(typeof(MediaType), typeRow.ToString()!.TrimEnd(), true);
+                        newProduct.ShortName = shortNameRow.ToString()?.TrimEnd().ToUpper() ?? throw new InvalidOperationException();
                     }
                     
                     
                     
-                    if (newAdMedia.Name!=null && newAdMedia.MediaType !=null)
+                    if (newProduct.Name!=null && newProduct.ShortName !=null)
                     {
-                        if (adMediasCheck.All(c =>
-                                !string.Equals(c.Name, newAdMedia.Name, StringComparison.CurrentCultureIgnoreCase)))
-                        {
-                            uniqueMedias.Add(newAdMedia);
-                        }
+                        // if (adMediasCheck.All(c =>
+                        //         !string.Equals(c.Name, newAdMedia.Name, StringComparison.CurrentCultureIgnoreCase)))
+                        // {
+                        //     uniqueProducts.Add(newAdMedia);
+                        // }
+                        
+                        uniqueProducts.Add(newProduct);
                         
                     }
 
@@ -137,7 +136,7 @@ public class AdMediaController : ApiController
 
                 }
 
-                await _adMediasService.UploadBulk(uniqueMedias);
+                await _productsService.UploadBulk(uniqueProducts);
 
             }
         }
@@ -152,21 +151,5 @@ public class AdMediaController : ApiController
         return outputSerialized;
 
     }
-
-    // [HttpPost]
-    // public async Task<string> Upload([FromBody] SingleStringInputModel singleStringInputModel)
-    // {
-    //     if (singleStringInputModel.SingleStringValue != null)
-    //     {
-    //         await _citiesService.UploadCity(singleStringInputModel.SingleStringValue);
-    //     }
-    //
-    //     var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
-    //
-    //     outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
-    //
-    //     return outputSerialized;
-    //
-    // }
-
+    
 }
