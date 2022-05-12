@@ -3,10 +3,13 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    
     using Microsoft.EntityFrameworkCore;
+    
     using BrandexSalesAdapter.ExcelLogic.Data;
     using BrandexSalesAdapter.ExcelLogic.Data.Models;
     using BrandexSalesAdapter.ExcelLogic.Models.Products;
+    
     using static Common.ExcelDataConstants.Ditributors;
 
     public class ProductsService : IProductsService
@@ -21,9 +24,9 @@
         public async Task<string> CreateProduct(ProductInputModel productInputModel)
         {
             if(productInputModel.BrandexId!= 0 &&
-                productInputModel.Name != null &&
-                productInputModel.ShortName != null &&
-                productInputModel.Price != 0)
+               productInputModel.Name != null &&
+               productInputModel.ShortName != null &&
+               productInputModel.Price != 0)
             {
                 var productDBModel = new Product
                 {
@@ -37,14 +40,12 @@
                     StingId = productInputModel.StingId
                 };
 
-                await this.db.Products.AddAsync(productDBModel);
-                await this.db.SaveChangesAsync();
+                await db.Products.AddAsync(productDBModel);
+                await db.SaveChangesAsync();
                 return productDBModel.Name;
             }
-            else
-            {
-                return "";
-            }
+
+            return "";
         }
 
         public async Task<List<ProductCheckModel>> GetProductsCheck()
@@ -137,24 +138,28 @@
 
         public async Task<string> NameById(string input, string distributor)
         {
-            int convertedNumber;
-            bool success = int.TryParse(input, out convertedNumber);
+            bool unused = int.TryParse(input, out var convertedNumber);
 
-            switch (distributor)
+            return distributor switch
             {
-                case Brandex:
-                    return await this.db.Products.Where(c => c.BrandexId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
-                case Sting:
-                    return await this.db.Products.Where(c => c.StingId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
-                case Phoenix:
-                    return await this.db.Products.Where(c => c.PhoenixId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
-                case Pharmnet:
-                    return await this.db.Products.Where(c => c.PharmnetId == convertedNumber).Select(p => p.Name).FirstOrDefaultAsync();
-                case Sopharma:
-                    return await this.db.Products.Where(c => c.SopharmaId == input).Select(p => p.Name).FirstOrDefaultAsync();
-                default:
-                    return "";
+                Brandex => await db.Products.Where(c => c.BrandexId == convertedNumber)
+                    .Select(p => p.Name)
+                    .FirstOrDefaultAsync(),
+                Sting => await db.Products.Where(c => c.StingId == convertedNumber)
+                    .Select(p => p.Name)
+                    .FirstOrDefaultAsync(),
+                Phoenix => await db.Products.Where(c => c.PhoenixId == convertedNumber)
+                    .Select(p => p.Name)
+                    .FirstOrDefaultAsync(),
+                Pharmnet => await db.Products.Where(c => c.PharmnetId == convertedNumber)
+                    .Select(p => p.Name)
+                    .FirstOrDefaultAsync(),
+                Sopharma => await db.Products.Where(c => c.SopharmaId == input)
+                    .Select(p => p.Name)
+                    .FirstOrDefaultAsync(),
+                _ => ""
             };
+            ;
         }
 
         public async Task<IEnumerable<string>> GetProductsNames()

@@ -1,5 +1,6 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/appsettings.Development.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/appsettings.json
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/BrandexSalesAdapter.MarketingAnalysis.staticwebassets.runtime.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/BrandexSalesAdapter.MarketingAnalysis
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/BrandexSalesAdapter.MarketingAnalysis.deps.json
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/BrandexSalesAdapter.MarketingAnalysis.runtimeconfig.json
@@ -14,6 +15,10 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Automatonymous.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Azure.Core.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Azure.Identity.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/NPOI.OOXML.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/NPOI.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/NPOI.OpenXml4Net.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/NPOI.OpenXmlFormats.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/GreenPipes.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Hangfire.AspNetCore.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Hangfire.Core.dll
@@ -47,6 +52,7 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Polly.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Polly.Extensions.Http.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/RabbitMQ.Client.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/ICSharpCode.SharpZipLib.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Swashbuckle.AspNetCore.Swagger.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Swashbuckle.AspNetCore.SwaggerGen.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/Swashbuckle.AspNetCore.SwaggerUI.dll
@@ -105,9 +111,3 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/obj/Debug/net6.0/ref/BrandexSalesAdapter.MarketingAnalysis.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/obj/Debug/net6.0/BrandexSalesAdapter.MarketingAnalysis.pdb
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/obj/Debug/net6.0/BrandexSalesAdapter.MarketingAnalysis.genruntimeconfig.cache
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/BrandexSalesAdapter.MarketingAnalysis.staticwebassets.runtime.json
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/NPOI.OOXML.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/NPOI.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/NPOI.OpenXml4Net.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/NPOI.OpenXmlFormats.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/bin/Debug/net6.0/ICSharpCode.SharpZipLib.dll

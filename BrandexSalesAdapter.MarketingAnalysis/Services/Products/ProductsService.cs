@@ -1,41 +1,45 @@
-namespace BrandexSalesAdapter.MarketingAnalysis.Services.AdMedias;
+namespace BrandexSalesAdapter.MarketingAnalysis.Services.Products;
 
-using System.Data;
-using Data;
-using BrandexSalesAdapter.MarketingAnalysis.Models.AdMedias;
+using BrandexSalesAdapter.MarketingAnalysis.Models.Products;
+using BrandexSalesAdapter.MarketingAnalysis.Data;
 
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 
 using static Common.MarketingDataConstants;
 using static Common.Constants;
 
-public class AdMediasService :IAdMediasService
+using System.Data;
+
+public class ProductsService :IProductsService
 {
+    
     private MarketingAnalysisDbContext db;
     private readonly IConfiguration _configuration;
     
-    public AdMediasService(MarketingAnalysisDbContext db, IConfiguration configuration)
+    public ProductsService(MarketingAnalysisDbContext db, IConfiguration configuration)
     {
         this.db = db;
         _configuration = configuration;
     }
     
-    public async Task UploadBulk(List<AdMediaInputModel> medias)
+    public async Task UploadBulk(List<ProductInputModel> products)
     {
         var table = new DataTable();
-        table.TableName = AdMedias;
+        table.TableName = Products;
             
         table.Columns.Add(Name, typeof(string));
+        table.Columns.Add(ShortName, typeof(string));
+        
         table.Columns.Add(MediaType, typeof(int));
         table.Columns.Add(CreatedOn);
         table.Columns.Add(IsDeleted, typeof(bool));
             
-        foreach (var media in medias)
+        foreach (var product in products)
         {
             var row = table.NewRow();
-            row[Name] = media.Name;
-            row[MediaType] = media.MediaType;
+            row[Name] = product.Name;
+            row[ShortName] = product.ShortName;
+            
             row[CreatedOn] = DateTime.Now;
             row[IsDeleted] = false;
             
@@ -48,41 +52,41 @@ public class AdMediasService :IAdMediasService
             
         var objbulk = new SqlBulkCopy(con);  
             
-        objbulk.DestinationTableName = AdMedias;
+        objbulk.DestinationTableName = Products;
             
         objbulk.ColumnMappings.Add(Name, Name);
-        objbulk.ColumnMappings.Add(MediaType, MediaType);
+        objbulk.ColumnMappings.Add(ShortName, ShortName);
+        
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
         objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
 
         con.Open();
         await objbulk.WriteToServerAsync(table);  
-        con.Close();  
-        
+        con.Close();
     }
 
-    public Task<string> UploadSingle(string media)
+    public Task<string> CreateProduct(ProductInputModel productInputModel)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> CheckByName(string mediaName)
+    public Task<List<ProductCheckModel>> GetProductsCheck()
     {
         throw new NotImplementedException();
     }
 
-    public Task<int> IdByName(string mediaName)
+    public Task<string> NameById(string input, string distributor)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<List<AdMediaCheckModel>> GetCheckModels()
+    public Task<IEnumerable<string>> GetProductsNames()
     {
-        return await db.AdMedias.Select(p => new AdMediaCheckModel()
-        {
-            Id = p.Id,
-            Name = p.Name,
-            MediaType = p.MediaType
-        }).ToListAsync();
+        throw new NotImplementedException();
+    }
+
+    public Task<IEnumerable<int>> GetProductsId()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,29 +1,24 @@
 namespace BrandexSalesAdapter.MarketingAnalysis.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
-
-using Newtonsoft.Json;
-using NPOI.XSSF.UserModel;
-
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-
 using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Models;
-
 using Infrastructure;
-using Data.Enums;
 using Models.AdMedias;
 using Services.AdMedias;
+using BrandexSalesAdapter.Models;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 
-public class AdMediaController : ApiController
+public class MarketingActivityController : ApiController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 
     // db Services
     private readonly IAdMediasService _adMediasService;
 
-    public AdMediaController(
+    public MarketingActivityController(
         IWebHostEnvironment hostEnvironment,
             IAdMediasService adMediasService
     )
@@ -115,7 +110,7 @@ public class AdMediaController : ApiController
                     
                     if (typeRow!=null)
                     {
-                        newAdMedia.MediaType = (MediaType)Enum.Parse(typeof(MediaType), typeRow.ToString()!.TrimEnd(), true);
+                        // newAdMedia.MediaType = (MediaType)Enum.Parse(typeof(MediaType), typeRow.ToString()!.TrimEnd(), true);
                     }
                     
                     
@@ -168,5 +163,4 @@ public class AdMediaController : ApiController
     //     return outputSerialized;
     //
     // }
-
 }

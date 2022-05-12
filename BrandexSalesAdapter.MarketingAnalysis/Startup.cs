@@ -1,9 +1,9 @@
-using BrandexSalesAdapter.MarketingAnalysis.Services.AdMedias;
-
 namespace BrandexSalesAdapter.MarketingAnalysis;
 
-using BrandexSalesAdapter.Infrastructure;
-using BrandexSalesAdapter.MarketingAnalysis.Data;
+using Services.AdMedias;
+using Services.Products;
+using Infrastructure;
+using Data;
 
 public class Startup
 {
@@ -17,7 +17,9 @@ public class Startup
         services.AddWebService<MarketingAnalysisDbContext>(Configuration);
 
         services
-            .AddTransient<IAdMediasService, AdMediasService>();
+            .AddTransient<IAdMediasService, AdMediasService>()
+            .AddTransient<IProductsService, ProductsService>()
+            ;
         
         services.AddCors();
 

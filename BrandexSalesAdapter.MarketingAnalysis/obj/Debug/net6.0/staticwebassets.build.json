@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "7Fa2+d5A6PYla+7jGL/SxOq9n59nPCLudLvd+Ya1H7U=",
+  "Hash": "kcAsf35P+3pG4q9/7YXgSAjIDMkzgBUzyNXv5byTDfg=",
   "Source": "BrandexSalesAdapter.MarketingAnalysis",
   "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
   "Mode": "Default",
@@ -32,6 +32,40 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/UploadExcel/TestFakeMarketing.xlsx"
+    },
+    {
+      "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/UploadExcel/маркетинг_медии.xlsx",
+      "SourceId": "BrandexSalesAdapter.MarketingAnalysis",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/",
+      "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
+      "RelativePath": "UploadExcel/маркетинг_медии.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/UploadExcel/маркетинг_медии.xlsx"
+    },
+    {
+      "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/UploadExcel/Педалче.xlsx",
+      "SourceId": "BrandexSalesAdapter.MarketingAnalysis",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/",
+      "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
+      "RelativePath": "UploadExcel/Педалче.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/UploadExcel/Педалче.xlsx"
     }
   ]
 }
