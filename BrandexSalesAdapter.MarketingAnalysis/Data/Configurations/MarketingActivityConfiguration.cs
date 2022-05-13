@@ -13,6 +13,10 @@ public class MarketingActivityConfiguration : IEntityTypeConfiguration<Marketing
             .HasKey(c => c.Id);
 
         builder
+            .Property(p => p.Price)
+            .HasColumnType("decimal(18,4)");
+
+        builder
             .HasOne(c => c.Product)
             .WithMany(s => s.MarketingActivities)
             .HasForeignKey(s => s.ProductId);

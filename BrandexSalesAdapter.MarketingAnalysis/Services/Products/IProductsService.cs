@@ -9,7 +9,7 @@ public interface IProductsService
     
     Task<string> CreateProduct(ProductInputModel productInputModel);
 
-    Task<List<ProductCheckModel>> GetProductsCheck();
+    Task<List<ProductCheckModel>> GetCheckModels();
 
     Task<string> NameById(string input, string distributor);
 

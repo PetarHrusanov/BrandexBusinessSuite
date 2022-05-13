@@ -12,7 +12,6 @@ using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
 
 using Infrastructure;
-using Models.AdMedias;
 using Models.Products;
 using Services.Products;
 
@@ -42,7 +41,7 @@ public class ProductController :ApiController
 
         var errorDictionary = new Dictionary<int, string>();
 
-        // var adMediasCheck = await _adMediasService.GetCheckModels();
+        var productsCheck = await _productsService.GetCheckModels();
 
         var uniqueProducts = new List<ProductInputModel>();
 
@@ -119,14 +118,11 @@ public class ProductController :ApiController
                     
                     if (newProduct.Name!=null && newProduct.ShortName !=null)
                     {
-                        // if (adMediasCheck.All(c =>
-                        //         !string.Equals(c.Name, newAdMedia.Name, StringComparison.CurrentCultureIgnoreCase)))
-                        // {
-                        //     uniqueProducts.Add(newAdMedia);
-                        // }
-                        
-                        uniqueProducts.Add(newProduct);
-                        
+                        if (productsCheck.All(c =>
+                                !string.Equals(c.Name, newProduct.Name, StringComparison.CurrentCultureIgnoreCase)))
+                        {
+                            uniqueProducts.Add(newProduct);
+                        }
                     }
 
                     else
