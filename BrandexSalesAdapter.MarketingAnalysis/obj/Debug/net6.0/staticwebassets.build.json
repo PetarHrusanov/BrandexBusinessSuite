@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "kcAsf35P+3pG4q9/7YXgSAjIDMkzgBUzyNXv5byTDfg=",
+  "Hash": "/LRt8NRwuceGaGuarZBEeZQSU7vzXI+/Y5DOJIcw6rA=",
   "Source": "BrandexSalesAdapter.MarketingAnalysis",
   "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
   "Mode": "Default",
@@ -16,6 +16,23 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/UploadExcel/Press_Plan_2021.xlsx",
+      "SourceId": "BrandexSalesAdapter.MarketingAnalysis",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/",
+      "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
+      "RelativePath": "UploadExcel/Press_Plan_2021.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/UploadExcel/Press_Plan_2021.xlsx"
+    },
     {
       "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/UploadExcel/TestFakeMarketing.xlsx",
       "SourceId": "BrandexSalesAdapter.MarketingAnalysis",
@@ -66,6 +83,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/UploadExcel/Педалче.xlsx"
+    },
+    {
+      "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/UploadExcel/Продукти_маркетинг.xlsx",
+      "SourceId": "BrandexSalesAdapter.MarketingAnalysis",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/wwwroot/",
+      "BasePath": "_content/BrandexSalesAdapter.MarketingAnalysis",
+      "RelativePath": "UploadExcel/Продукти_маркетинг.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/UploadExcel/Продукти_маркетинг.xlsx"
     }
   ]
 }

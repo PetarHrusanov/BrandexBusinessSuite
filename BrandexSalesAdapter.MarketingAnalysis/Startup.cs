@@ -1,3 +1,5 @@
+using BrandexSalesAdapter.MarketingAnalysis.Services.MarketingActivities;
+
 namespace BrandexSalesAdapter.MarketingAnalysis;
 
 using Services.AdMedias;
@@ -19,6 +21,7 @@ public class Startup
         services
             .AddTransient<IAdMediasService, AdMediasService>()
             .AddTransient<IProductsService, ProductsService>()
+            .AddTransient<IMarketingActivitesService, MarketingActivitiesService>()
             ;
         
         services.AddCors();

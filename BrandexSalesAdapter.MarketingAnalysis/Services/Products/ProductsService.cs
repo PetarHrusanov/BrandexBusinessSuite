@@ -1,14 +1,15 @@
 namespace BrandexSalesAdapter.MarketingAnalysis.Services.Products;
 
+using System.Data;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+
 using BrandexSalesAdapter.MarketingAnalysis.Models.Products;
 using BrandexSalesAdapter.MarketingAnalysis.Data;
 
-using Microsoft.Data.SqlClient;
-
 using static Common.MarketingDataConstants;
 using static Common.Constants;
-
-using System.Data;
 
 public class ProductsService :IProductsService
 {
@@ -70,9 +71,14 @@ public class ProductsService :IProductsService
         throw new NotImplementedException();
     }
 
-    public Task<List<ProductCheckModel>> GetProductsCheck()
+    public async Task<List<ProductCheckModel>> GetCheckModels()
     {
-        throw new NotImplementedException();
+        return await db.Products.Select(p => new ProductCheckModel()
+        {
+            Id = p.Id,
+            Name = p.Name,
+            ShortName = p.ShortName
+        }).ToListAsync();
     }
 
     public Task<string> NameById(string input, string distributor)

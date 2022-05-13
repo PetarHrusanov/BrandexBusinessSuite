@@ -1,45 +1,69 @@
 namespace BrandexSalesAdapter.MarketingAnalysis.Controllers;
 
-using BrandexSalesAdapter.Controllers;
-using Infrastructure;
-using Models.AdMedias;
-using Services.AdMedias;
-using BrandexSalesAdapter.Models;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
+
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+
+using BrandexSalesAdapter.Controllers;
+using BrandexSalesAdapter.Models;
+
+using Models.MarketingActivities;
+using Services.MarketingActivities;
+using Services.Products;
+using Infrastructure;
+using Services.AdMedias;
 
 public class MarketingActivityController : ApiController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 
     // db Services
+    private readonly IMarketingActivitesService _marketingActivitesService;
+    private readonly IProductsService _productsService;
     private readonly IAdMediasService _adMediasService;
 
     public MarketingActivityController(
         IWebHostEnvironment hostEnvironment,
-            IAdMediasService adMediasService
+        IMarketingActivitesService marketingActivitesService,
+        IProductsService productsService,
+        IAdMediasService adMediasService
     )
 
     {
         _hostEnvironment = hostEnvironment;
+        _marketingActivitesService = marketingActivitesService;
+        _productsService = productsService;
         _adMediasService = adMediasService;
     }
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<string> Import([FromForm] IFormFile file)
+    public async Task<string> Import([FromForm] MarketingBulkInputModel marketingBulkInputModel)
     {
+        
+        string dateFromClient = marketingBulkInputModel.Date;
+
+        DateTime dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
+
+        string sheetName = marketingBulkInputModel.Sheet;
+            
+        IFormFile file = marketingBulkInputModel.ImageFile;
+        
 
         string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
         var errorDictionary = new Dictionary<int, string>();
 
-        var adMediasCheck = await _adMediasService.GetCheckModels();
+        // var adMediasCheck = await _marketingActivitesService.GetCheckModels();
 
-        var uniqueMedias = new List<AdMediaInputModel>();
+        var marketingActivities = new List<MarketingActivityInputModel>();
+
+        var products = await _productsService.GetCheckModels();
+        var adMedias = await _adMediasService.GetCheckModels();
         
 
         if (file.Length > 0)
@@ -67,12 +91,11 @@ public class MarketingActivityController : ApiController
                 }
 
                 else
-
                 {
 
                     var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
 
-                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+                    sheet = hssfwb.GetSheet(sheetName); //get first sheet from workbook   
 
                 }
 
@@ -97,32 +120,46 @@ public class MarketingActivityController : ApiController
 
                     if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-                    var newAdMedia = new AdMediaInputModel();
+                    var sumRow = row.GetCell(6);
 
-                    var nameRow = row.GetCell(0);
+                    if (sumRow!=null & decimal.TryParse(sumRow.ToString().TrimEnd(), out var sum))
+                    {
+                        var marketingActivityInput = new MarketingActivityInputModel();
 
-                    if (nameRow!=null)
-                    {
-                        newAdMedia.Name = nameRow.ToString()?.TrimEnd().ToUpper() ?? throw new InvalidOperationException();
-                    }
-                    
-                    var typeRow = row.GetCell(1);
-                    
-                    if (typeRow!=null)
-                    {
-                        // newAdMedia.MediaType = (MediaType)Enum.Parse(typeof(MediaType), typeRow.ToString()!.TrimEnd(), true);
-                    }
-                    
-                    
-                    
-                    if (newAdMedia.Name!=null && newAdMedia.MediaType !=null)
-                    {
-                        if (adMediasCheck.All(c =>
-                                !string.Equals(c.Name, newAdMedia.Name, StringComparison.CurrentCultureIgnoreCase)))
-                        {
-                            uniqueMedias.Add(newAdMedia);
-                        }
+                        marketingActivityInput.Price = sum;
                         
+                        // marketingActivityInput.
+
+                        var productRow = row.GetCell(0);
+
+                        if (productRow == null) throw new ArgumentException("GRESHNO ID BRAT");
+                        
+                        marketingActivityInput.ProductId = products
+                            .Where(p => p.Name == productRow.ToString()!.TrimEnd().ToUpper())
+                            .Select(p => p.Id)
+                            .FirstOrDefault();
+                        
+                        var adMediaRow = row.GetCell(1);
+
+                        if (adMediaRow == null) throw new ArgumentException("GRESHNO ID BRAT");
+                        
+                        marketingActivityInput.AdMediaId = adMedias
+                            .Where(p => p.Name == adMediaRow.ToString()!.TrimEnd().ToUpper())
+                            .Select(p => p.Id)
+                            .FirstOrDefault();
+                            
+                        var descriptionRow = row.GetCell(5);
+
+                        if (descriptionRow == null) throw new ArgumentException("GRESHNO ID BRAT");
+
+                        marketingActivityInput.Description = descriptionRow.ToString()!.TrimEnd();
+
+                        marketingActivityInput.Date = dateForDb;
+                        
+                        
+                        
+                        marketingActivities.Add(marketingActivityInput);
+
                     }
 
                     else
@@ -132,7 +169,7 @@ public class MarketingActivityController : ApiController
 
                 }
 
-                await _adMediasService.UploadBulk(uniqueMedias);
+                await _marketingActivitesService.UploadBulk(marketingActivities);
 
             }
         }
