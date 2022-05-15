@@ -1,0 +1,54 @@
+{
+  "Version": 1,
+  "Hash": "Qch3DPZmggxuYjzBM/71gPRrGFDcBh1M5TxSnPnV6m0=",
+  "Source": "BrandexSalesAdapter.Accounting",
+  "BasePath": "_content/BrandexSalesAdapter.Accounting",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "BrandexSalesAdapter.Accounting/wwwroot",
+      "Source": "BrandexSalesAdapter.Accounting",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Accounting/wwwroot/",
+      "BasePath": "_content/BrandexSalesAdapter.Accounting",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Accounting/wwwroot/.DS_Store",
+      "SourceId": "BrandexSalesAdapter.Accounting",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Accounting/wwwroot/",
+      "BasePath": "_content/BrandexSalesAdapter.Accounting",
+      "RelativePath": ".DS_Store",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/.DS_Store"
+    },
+    {
+      "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Accounting/wwwroot/UploadExcel/2022-05-10T07-08 Transaction #5018559291594644-9749365.pdf",
+      "SourceId": "BrandexSalesAdapter.Accounting",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.Accounting/wwwroot/",
+      "BasePath": "_content/BrandexSalesAdapter.Accounting",
+      "RelativePath": "UploadExcel/2022-05-10T07-08 Transaction #5018559291594644-9749365.pdf",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/UploadExcel/2022-05-10T07-08 Transaction #5018559291594644-9749365.pdf"
+    }
+  ]
+}
