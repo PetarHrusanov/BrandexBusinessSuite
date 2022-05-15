@@ -54,7 +54,7 @@ public class MarketingActivityController : ApiController
         IFormFile file = marketingBulkInputModel.ImageFile;
         
 
-        string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
         var errorDictionary = new Dictionary<int, string>();
 
@@ -122,7 +122,16 @@ public class MarketingActivityController : ApiController
 
                     var sumRow = row.GetCell(6);
 
-                    if (sumRow!=null & decimal.TryParse(sumRow.ToString().TrimEnd(), out var sum))
+                    if (sumRow == null) continue;
+                    
+                    var sumString = sumRow.ToString()!.TrimEnd();
+                    
+                    var productRow = row.GetCell(0);
+                    if (productRow == null) continue;
+
+                    var productString = productRow.ToString()!.TrimEnd().ToUpper();
+
+                    if (!string.IsNullOrEmpty(sumString) & decimal.TryParse(sumString, out var sum) & !string.IsNullOrEmpty(productString))
                     {
                         var marketingActivityInput = new MarketingActivityInputModel();
 
@@ -130,12 +139,8 @@ public class MarketingActivityController : ApiController
                         
                         // marketingActivityInput.
 
-                        var productRow = row.GetCell(0);
-
-                        if (productRow == null) throw new ArgumentException("GRESHNO ID BRAT");
-                        
                         marketingActivityInput.ProductId = products
-                            .Where(p => p.Name == productRow.ToString()!.TrimEnd().ToUpper())
+                            .Where(p => p.Name == productString)
                             .Select(p => p.Id)
                             .FirstOrDefault();
                         
@@ -155,9 +160,7 @@ public class MarketingActivityController : ApiController
                         marketingActivityInput.Description = descriptionRow.ToString()!.TrimEnd();
 
                         marketingActivityInput.Date = dateForDb;
-                        
-                        
-                        
+
                         marketingActivities.Add(marketingActivityInput);
 
                     }

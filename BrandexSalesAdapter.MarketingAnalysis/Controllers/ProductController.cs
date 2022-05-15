@@ -37,7 +37,7 @@ public class ProductController :ApiController
     public async Task<string> Import([FromForm] IFormFile file)
     {
 
-        string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
         var errorDictionary = new Dictionary<int, string>();
 
@@ -115,14 +115,10 @@ public class ProductController :ApiController
                     }
                     
                     
-                    
-                    if (newProduct.Name!=null && newProduct.ShortName !=null)
+                    if (productsCheck.All(c =>
+                            !string.Equals(c.Name, newProduct.Name, StringComparison.CurrentCultureIgnoreCase)))
                     {
-                        if (productsCheck.All(c =>
-                                !string.Equals(c.Name, newProduct.Name, StringComparison.CurrentCultureIgnoreCase)))
-                        {
-                            uniqueProducts.Add(newProduct);
-                        }
+                        uniqueProducts.Add(newProduct);
                     }
 
                     else

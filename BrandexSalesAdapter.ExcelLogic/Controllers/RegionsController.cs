@@ -58,7 +58,7 @@ namespace BrandexSalesAdapter.ExcelLogic.Controllers
         {
             
 
-            string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+            string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
             var errorDictionary = new Dictionary<int, string>();
 

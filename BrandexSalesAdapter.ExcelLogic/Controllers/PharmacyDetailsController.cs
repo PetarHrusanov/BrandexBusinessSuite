@@ -86,7 +86,7 @@ public class PharmacyDetailsController : AdministrationController
     public async Task<string> Check([FromForm]IFormFile file)
     {
             
-        string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
         var errorDictionary = new Dictionary<int, string>();
             
