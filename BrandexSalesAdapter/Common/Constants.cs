@@ -8,6 +8,7 @@
         public const string DefaultConnection = "DefaultConnection";
 
         public const string UploadExcel = "UploadExcel";
+        public const string UploadPdf = "UploadPdf";
 
         public const string CreatedOn = "CreatedOn";
         public const string IsDeleted = "IsDeleted";

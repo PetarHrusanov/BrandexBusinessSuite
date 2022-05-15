@@ -38,7 +38,7 @@ public class AdMediaController : ApiController
     public async Task<string> Import([FromForm] IFormFile file)
     {
 
-        string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
         var errorDictionary = new Dictionary<int, string>();
 

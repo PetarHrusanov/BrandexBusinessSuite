@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.Identit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.MarketingAnalysis", "BrandexSalesAdapter.MarketingAnalysis\BrandexSalesAdapter.MarketingAnalysis.csproj", "{40A69A05-37ED-4DF9-AE8C-022694E38E78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.Accounting", "BrandexSalesAdapter.Accounting\BrandexSalesAdapter.Accounting.csproj", "{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,5 +33,9 @@ Global
 		{40A69A05-37ED-4DF9-AE8C-022694E38E78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40A69A05-37ED-4DF9-AE8C-022694E38E78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40A69A05-37ED-4DF9-AE8C-022694E38E78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

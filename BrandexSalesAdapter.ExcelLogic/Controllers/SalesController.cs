@@ -299,7 +299,7 @@ public class SalesController : AdministrationController
         //
         // var newPath = Path.Combine(webRootPath, folderName);
         
-        string newPath = CreateExcelFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
         var errorDictionary = new Dictionary<int, string>();
 
