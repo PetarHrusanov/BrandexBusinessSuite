@@ -93,6 +93,7 @@ public class SalesController : AdministrationController
         var regionId = inputModel.RegionId;
             
         var sWebRootFolder = _hostEnvironment.WebRootPath;
+        
         var sFileName = @"Sales.xlsx";
 
         var memory = new MemoryStream();
