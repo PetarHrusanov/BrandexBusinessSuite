@@ -2,9 +2,12 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 using BrandexSalesAdapter.Services;
 using Data.Models;
-using Microsoft.AspNetCore.Identity;
 using Models.Identity;
 
 public class IdentityService : IIdentityService
@@ -12,13 +15,16 @@ public class IdentityService : IIdentityService
     private const string InvalidErrorMessage = "Invalid credentials.";
 
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly ITokenGeneratorService _jwtTokenGenerator;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
+        RoleManager<ApplicationRole> roleManager,
         ITokenGeneratorService jwtTokenGenerator)
     {
         _userManager = userManager;
+        _roleManager = roleManager;
         _jwtTokenGenerator = jwtTokenGenerator;
     }
 
@@ -39,6 +45,19 @@ public class IdentityService : IIdentityService
             : Result<ApplicationUser>.Failure(errors);
     }
 
+    public async Task RegisterWithRole(UserWithRoleInputModel userInput)
+    {
+        var user = new ApplicationUser
+        {
+            UserName = userInput.Email,
+            Email = userInput.Email
+        };
+
+        await _userManager.CreateAsync(user, userInput.Password);
+
+        await _userManager.AddToRoleAsync(user, userInput.Role);
+    }
+
     public async Task<Result<UserOutputModel>> Login(UserInputModel userInput)
     {
         var user = await _userManager.FindByEmailAsync(userInput.Email);
@@ -52,6 +71,25 @@ public class IdentityService : IIdentityService
         var token = _jwtTokenGenerator.GenerateToken(user, roles);
 
         return new UserOutputModel(token);
+    }
+
+    public async Task CreateRole(string input)
+    {
+
+        if (!await _roleManager.RoleExistsAsync(input))
+        { 
+            await _roleManager.CreateAsync(new ApplicationRole(input));
+        }
+        
+        // var roleStore = new RoleStore<IdentityRole>(new ApplicationUsersDbContext());
+        // var roleManager = new RoleManager<IdentityRole>(roleStore);
+        // if(!await roleManager.RoleExistsAsync("YourRoleName"))
+        //     await roleManager.CreateAsync(new IdentityRole("YourRoleName"));
+    }
+
+    public async Task<string[]> GetRoles()
+    {
+        return await _roleManager.Roles.Select(r => r.Name).ToArrayAsync();
     }
 
     public async Task<Result> ChangePassword(

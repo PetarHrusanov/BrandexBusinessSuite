@@ -1,4 +1,8 @@
+using BrandexSalesAdapter.Identity.Data;
 using BrandexSalesAdapter.Infrastructure;
+using BrandexSalesAdapter.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BrandexSalesAdapter.Identity.Controllers;
 
@@ -33,6 +37,52 @@ public class IdentityController : ApiController
         // if (!result.Succeeded) return BadRequest(result.Errors);
         
     }
+    
+    [HttpPost]
+    [AuthorizeAdministrator]
+    public async Task RegisterUserWithRole(UserWithRoleInputModel userWithRoleInputModel)
+    {
+        await _identity.RegisterWithRole(userWithRoleInputModel);
+        
+        
+
+        // if (!result.Succeeded) return BadRequest(result.Errors);
+        
+    }
+    
+    [HttpPost]
+    [AuthorizeAdministrator]
+    public async Task CreateRole([FromBody]SingleStringInputModel singleStringInputModel)
+    {
+        await _identity.CreateRole(singleStringInputModel.SingleStringValue);
+
+        // var roleStore = new RoleStore<IdentityRole>(new ApplicationUsersDbContext());
+        // var roleManager = new RoleManager<IdentityRole>(roleStore);
+        // if(!await roleManager.RoleExistsAsync("YourRoleName"))
+        //     await roleManager.CreateAsync(new IdentityRole("YourRoleName"));
+
+
+        // if (!result.Succeeded) return BadRequest(result.Errors);
+
+    }
+    
+    [HttpGet]
+    [AuthorizeAdministrator]
+    public async Task<string[] > GetRoles()
+    {
+        return await _identity.GetRoles();
+
+        // var roleStore = new RoleStore<IdentityRole>(new ApplicationUsersDbContext());
+        // var roleManager = new RoleManager<IdentityRole>(roleStore);
+        // if(!await roleManager.RoleExistsAsync("YourRoleName"))
+        //     await roleManager.CreateAsync(new IdentityRole("YourRoleName"));
+
+
+        // if (!result.Succeeded) return BadRequest(result.Errors);
+
+    }
+    
+    
     
     // public async Task<ActionResult<UserOutputModel>> Register(UserInputModel input)
     // {

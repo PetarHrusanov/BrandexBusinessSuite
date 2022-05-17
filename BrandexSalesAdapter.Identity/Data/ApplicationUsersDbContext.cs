@@ -11,6 +11,7 @@ namespace BrandexSalesAdapter.Identity.Data
         public ApplicationUsersDbContext(DbContextOptions<ApplicationUsersDbContext> options)
             : base(options)
         {
+            
         }
         
         protected override void OnModelCreating(ModelBuilder builder)
