@@ -1,22 +1,23 @@
 namespace BrandexSalesAdapter.Accounting.Controllers;
 
 using System.IO;
-using BrandexSalesAdapter.Controllers;
-
-using Infrastructure;
-
-using static Common.ProductConstants;
-
+using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using iTextSharp.text.pdf;
-using Microsoft.AspNetCore.Mvc;
-using iTextSharp.text.pdf.parser;
-using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Authorization;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.parser;
+
+using BrandexSalesAdapter.Controllers;
+using Infrastructure;
+
+using static Common.ProductConstants;
+using static  Common.Constants;
 
 
 public class FacebookCountingController : ApiController
@@ -30,7 +31,7 @@ public class FacebookCountingController : ApiController
     }
 
     [HttpPost]
-    [AllowAnonymous]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ConvertPdfForAccounting([FromForm] IFormFile file)

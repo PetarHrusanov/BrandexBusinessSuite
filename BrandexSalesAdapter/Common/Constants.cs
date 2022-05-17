@@ -3,6 +3,8 @@
     public class Constants
     {
         public const string AdministratorRoleName = "Administrator";
+        public const string AccountantRoleName = "Accountant";
+        
         public const string AppName = "Brandex Sales Adapter";
 
         public const string DefaultConnection = "DefaultConnection";

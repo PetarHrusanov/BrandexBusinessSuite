@@ -44,8 +44,6 @@ public class IdentityController : ApiController
     {
         await _identity.RegisterWithRole(userWithRoleInputModel);
         
-        
-
         // if (!result.Succeeded) return BadRequest(result.Errors);
         
     }
