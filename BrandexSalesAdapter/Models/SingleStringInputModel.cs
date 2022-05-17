@@ -1,4 +1,4 @@
-namespace BrandexSalesAdapter.ExcelLogic.Models
+namespace BrandexSalesAdapter.Models
 {
     public class SingleStringInputModel
     {

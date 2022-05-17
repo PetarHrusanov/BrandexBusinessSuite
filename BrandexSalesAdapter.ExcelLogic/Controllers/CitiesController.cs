@@ -1,6 +1,4 @@
-﻿using BrandexSalesAdapter.Infrastructure;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers;
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers;
 
 using System.Collections.Generic;
 using System;
@@ -26,6 +24,8 @@ using static Common.ExcelDataConstants.ExcelLineErrors;
     
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
+using Infrastructure;
+
 
 using static BrandexSalesAdapter.Common.Constants;
 

@@ -1,4 +1,6 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers;
+﻿using BrandexSalesAdapter.Models;
+
+namespace BrandexSalesAdapter.ExcelLogic.Controllers;
 
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;

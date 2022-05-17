@@ -33,7 +33,7 @@ public class FacebookCountingController : ApiController
     [AllowAnonymous]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> Convert([FromForm] IFormFile file)
+    public async Task<IActionResult> ConvertPdfForAccounting([FromForm] IFormFile file)
     {
 
         double euroRate = 1.9894;
@@ -171,8 +171,8 @@ public class FacebookCountingController : ApiController
         return productsPrices;
 
     }
-    
-    public static void RenameKey<TKey, TValue>(IDictionary<TKey, TValue> dic,
+
+    private static void RenameKey<TKey, TValue>(IDictionary<TKey, TValue> dic,
         TKey fromKey, TKey toKey)
     {
         TValue value = dic[fromKey];
