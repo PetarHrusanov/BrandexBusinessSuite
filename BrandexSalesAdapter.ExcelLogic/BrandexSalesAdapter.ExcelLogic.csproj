@@ -4,6 +4,7 @@
 <!--    <TargetFramework>netcoreapp3.1</TargetFramework>-->
     <TargetFramework>net6.0</TargetFramework>
     <DockerComposeProjectPath>../docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'BrandexSalesAdapter.ExcelLogic' " />
