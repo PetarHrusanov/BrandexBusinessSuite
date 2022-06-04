@@ -80,10 +80,11 @@ public class Startup
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // services.AddAuthentication();
+        
+        services.AddCors();
 
         services.AddControllers();
         
-        services.AddCors();
 
     }
 

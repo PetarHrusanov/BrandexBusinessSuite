@@ -14,18 +14,16 @@ using Microsoft.AspNetCore.Authorization;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-    
-using Models;
-using Services.Cities;
+
 using Newtonsoft.Json;
-    
-using static Common.InputOutputConstants.SingleStringConstants;
-using static Common.ExcelDataConstants.ExcelLineErrors;
-    
+
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
 using Infrastructure;
+using Services.Cities;
 
+using static Common.InputOutputConstants.SingleStringConstants;
+using static Common.ExcelDataConstants.ExcelLineErrors;
 
 using static BrandexSalesAdapter.Common.Constants;
 
@@ -81,17 +79,14 @@ public class CitiesController :AdministrationController
                 {
 
                     var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
                     sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
                 }
 
                 else
-
                 {
 
                     var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
                     sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
                 }

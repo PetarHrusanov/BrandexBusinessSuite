@@ -1,24 +1,21 @@
-﻿using BrandexSalesAdapter.Models;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers;
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers;
 
 using System.Linq;
+using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
     
 using Newtonsoft.Json;
-    
-using Data;
-using Data.Models;
-    
-using Models.Distributor;
-using Models;
-    
-using System.Threading.Tasks;
-
-using static Common.InputOutputConstants.SingleStringConstants;
 
 using BrandexSalesAdapter.Controllers;
+using BrandexSalesAdapter.Models;
+
+using Data;
+using Data.Models;
+using Models.Distributor;
+
+using static Common.InputOutputConstants.SingleStringConstants;
 
 public class DistributorsController :AdministrationController
 {

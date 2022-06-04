@@ -56,7 +56,7 @@ public class Startup
             .AddTransient<ISalesService, SalesService>()
             .AddTransient<INumbersChecker, NumbersChecker>();
 
-        services.AddCors();
+        // services.AddCors();
 
     }
 

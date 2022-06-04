@@ -1,6 +1,4 @@
-﻿using BrandexSalesAdapter.Infrastructure;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers;
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers;
 
 using System;
 using System.Collections.Generic;
@@ -15,15 +13,14 @@ using Microsoft.AspNetCore.Mvc;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-    
-using Models;
-using Services.PharmacyChains;
-    
+
 using Newtonsoft.Json;
-    
+
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
-    
+using Infrastructure;
+using Services.PharmacyChains;
+
 using static Common.InputOutputConstants.SingleStringConstants;
 using static Common.ExcelDataConstants.ExcelLineErrors;
 
