@@ -17,7 +17,7 @@ using Services.Products;
 using Infrastructure;
 using Services.AdMedias;
 
-public class MarketingActivityController : ApiController
+public class MarketingActivityController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 
