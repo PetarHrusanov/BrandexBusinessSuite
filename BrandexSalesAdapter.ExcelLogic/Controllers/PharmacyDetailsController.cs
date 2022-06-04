@@ -13,8 +13,14 @@ using Microsoft.AspNetCore.Mvc;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+
+using Newtonsoft.Json;
     
 using Data.Enums;
+
+using BrandexSalesAdapter.Controllers;
+using BrandexSalesAdapter.Models;
+using BrandexSalesAdapter.Infrastructure;
 
 using Models.Pharmacies;
 using Models.Cities;
@@ -28,13 +34,7 @@ using Services.PharmacyChains;
 using Services.Regions;
 using Services.PharmacyCompanies;
 
-using Newtonsoft.Json;
-
 using static Common.ExcelDataConstants.ExcelLineErrors;
-    
-using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Models;
-using BrandexSalesAdapter.Infrastructure;
 
 public class PharmacyDetailsController : AdministrationController
 {
@@ -200,7 +200,6 @@ public class PharmacyDetailsController : AdministrationController
         var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
 
         if (!Directory.Exists(newPath))
-
         {
 
             Directory.CreateDirectory(newPath);
@@ -208,7 +207,6 @@ public class PharmacyDetailsController : AdministrationController
         }
 
         if (file.Length > 0)
-
         {
 
             string sFileExtension = Path.GetExtension(file.FileName)!.ToLower();
@@ -242,11 +240,9 @@ public class PharmacyDetailsController : AdministrationController
             }
 
             for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-
             {
 
                 var row = sheet.GetRow(i);
-
                 if (row == null) continue;
 
                 if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
@@ -287,9 +283,11 @@ public class PharmacyDetailsController : AdministrationController
                 
         }
 
-        await _pharmaciesService.UploadBulk(validPharmacyList);
-
-        await _pharmaciesService.Update(pharmaciesEdited);
+        if (errorDictionary.Count==0)
+        {
+            await _pharmaciesService.UploadBulk(validPharmacyList);
+            await _pharmaciesService.Update(pharmaciesEdited);
+        }
 
         var pharmacyErrorModel = new CustomErrorDictionaryOutputModel
         {
