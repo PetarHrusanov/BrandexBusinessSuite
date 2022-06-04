@@ -60,13 +60,17 @@ public static class ApplicationBuilderExtensions
         var db = serviceProvider.GetRequiredService<DbContext>();
 
         db.Database.Migrate();
+        
+        // new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
 
-        var seeders = serviceProvider.GetServices<IDataSeeder>();
+        var seeder = serviceProvider.GetService<ISeeder>();
 
-        foreach (var seeder in seeders)
-        {
-            seeder.SeedData();
-        }
+        seeder?.SeedAsync();
+
+        // foreach (var seeder in seeders)
+        // {
+        //     seeder.SeedData();
+        // }
 
         return app;
     }
