@@ -15,7 +15,7 @@ using Infrastructure;
 using Models.Products;
 using Services.Products;
 
-public class ProductController :ApiController
+public class ProductController :AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 

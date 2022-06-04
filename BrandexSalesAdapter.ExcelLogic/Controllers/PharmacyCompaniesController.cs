@@ -1,6 +1,4 @@
-﻿using BrandexSalesAdapter.Infrastructure;
-
-namespace BrandexSalesAdapter.ExcelLogic.Controllers;
+﻿namespace BrandexSalesAdapter.ExcelLogic.Controllers;
 
 using System.Collections.Generic;
 using System.IO;
@@ -16,19 +14,17 @@ using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
-using Models.PharmacyCompanies;
-    
-using Services.PharmacyCompanies;
-
 using Newtonsoft.Json;
+
+using BrandexSalesAdapter.Controllers;
+using BrandexSalesAdapter.Models;
+using BrandexSalesAdapter.Infrastructure;
+using Models.PharmacyCompanies;
+using Services.PharmacyCompanies;
 
 using static Common.InputOutputConstants.SingleStringConstants;
 using static Common.ExcelDataConstants.ExcelLineErrors;
-    
-using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Models;
-    
-    
+
 public class PharmacyCompaniesController :AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
