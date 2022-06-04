@@ -16,7 +16,7 @@ using Data.Enums;
 using Models.AdMedias;
 using Services.AdMedias;
 
-public class AdMediaController : ApiController
+public class AdMediaController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 
