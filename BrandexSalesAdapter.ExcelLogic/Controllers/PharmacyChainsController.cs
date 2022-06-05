@@ -24,7 +24,6 @@ using Services.PharmacyChains;
 using static Common.InputOutputConstants.SingleStringConstants;
 using static Common.ExcelDataConstants.ExcelLineErrors;
 
-
 public class PharmacyChainsController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;

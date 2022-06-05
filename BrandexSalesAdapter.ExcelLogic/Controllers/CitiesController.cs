@@ -24,8 +24,7 @@ using Services.Cities;
 
 using static Common.InputOutputConstants.SingleStringConstants;
 using static Common.ExcelDataConstants.ExcelLineErrors;
-
-using static BrandexSalesAdapter.Common.Constants;
+using static Common.Constants;
 
 public class CitiesController :AdministrationController
 {
