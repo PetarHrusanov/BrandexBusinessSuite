@@ -20,7 +20,6 @@ using Data.Enums;
 
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
-using BrandexSalesAdapter.Infrastructure;
 
 using Models.Pharmacies;
 using Models.Cities;
@@ -79,102 +78,8 @@ public class PharmacyDetailsController : AdministrationController
         _citiesService = citiesService;
 
     }
-
-
-    [HttpPost]
-    [Consumes("multipart/form-data")]
-    public async Task<string> Check([FromForm]IFormFile file)
-    {
-            
-        string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
-
-        var errorDictionary = new Dictionary<int, string>();
-            
-        var citiesIdsForCheck = await _citiesService.GetCitiesCheck();
-        var pharmacyCompaniesIdsForCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesCheck();
-        var pharmacyChainsIdsForCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
-        var regionIdsForCheck = await _regionsService.AllRegions();
-        
-
-        if (file.Length > 0)
-
-        {
-
-            var sFileExtension = Path.GetExtension(file.FileName)!.ToLower();
-
-            if (file.FileName != null)
-            {
-                var fullPath = Path.Combine(newPath, file.FileName);
-
-                await using var stream = new FileStream(fullPath, FileMode.Create);
-                await file.CopyToAsync(stream);
-
-                stream.Position = 0;
-
-                ISheet sheet;
-                if (sFileExtension == ".xls")
-
-                {
-
-                    var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
-                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-
-                }
-
-                else
-                {
-
-                    var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
-                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
-
-                }
-
-                for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-
-                {
-
-                    var row = sheet.GetRow(i);
-
-                    if (row == null) continue;
-
-                    if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                    var newPharmacy = new PharmacyDbInputModel
-                    {
-                        PharmacyClass = PharmacyClass.Other,
-                        Active = true,
-                        Name = row.GetCell(NameColumn).ToString()?.TrimEnd(),
-                        Address = row.GetCell(AddressColumn).ToString()?.TrimEnd(),
-                        // PharmacyChainId = await this._pharmacyChainsService.IdByName(string.Empty)
-                    };
-                    CreatePharmacyInputModel(
-                        citiesIdsForCheck,
-                        pharmacyCompaniesIdsForCheck,
-                        pharmacyChainsIdsForCheck,
-                        regionIdsForCheck,
-                        newPharmacy,
-                        row,
-                        i,
-                        errorDictionary);
-                        
-                }
-            }
-        }
-
-        var pharmacyErrorModel = new CustomErrorDictionaryOutputModel
-        {
-            Errors = errorDictionary
-        };
-            
-        string outputSerialized = JsonConvert.SerializeObject(pharmacyErrorModel);
-
-        return outputSerialized;
-            
-    }
-
-    // [Authorize]
+    
+    
     [HttpPost]
     [Consumes("multipart/form-data")]
     public async Task<string> Import([FromForm]IFormFile file)
