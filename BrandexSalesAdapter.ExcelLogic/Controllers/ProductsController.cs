@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
-using BrandexSalesAdapter.Infrastructure;
+using Infrastructure;
 
 using Models.Products;
 using Services;
