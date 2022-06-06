@@ -60,5 +60,43 @@ public class ProductConstants
 
     }
     
+    public class Google_Marketing
+    {
+        public const string ZinSeD = "ZinSeD | traffic";
+        public const string EnzyMill = "Enzy-Mill";
+        public const string CystiRen = "CystiRen";
+        public const string LadyHarmonia = "Lady Harmonia | Traffic";
+        public const string DetoxiFive = "DetoxiFive | Traffic";
+        public const string LaxaL = "LaxaL | Traffic";
+        public const string Bland = "Bland";
+        public const string DiabeForGluco = "DiabeFor Gluco";
+        public const string GinkgoVin = "GinkgoVin";
+        public const string Venaxin = "Venaxin";
+        public const string ForFlex = "ForFlex | Sales";
+        public const string ProstaRen = "ProstaRen";
+        public const string Sleep = "Sleep";
+        // public const string Botanic = "BOTANIC";
+
+    }
     
+    public class Google_Marketing_ERP
+    {
+        public const string ZinSeD = "ЗинСеД реклама";
+        public const string EnzyMill = "Ензи-Мил реклама";
+        public const string CystiRen = "ЦистиРен реклама";
+        public const string LadyHarmonia = "Лейди Хармония реклама";
+        public const string DetoxiFive = "ДетоксиФайв реклама";
+        public const string LaxaL = "Лаксал реклама";
+        public const string Bland = "Бланд реклама";
+        public const string DiabeForGluco = "ДиабеФор Глюко реклама";
+        public const string GinkgoVin = "Гинко Вин реклама";
+        public const string Venaxin = "Венаксин реклама";
+        public const string ForFlex = "Форфлекс реклама";
+        public const string ProstaRen = "ПростаРен реклама";
+        public const string Sleep = "Слийп реклама";
+        // public const string Botanic = "BOTANIC";
+
+    }
+
+
 }
