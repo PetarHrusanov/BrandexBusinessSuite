@@ -1,40 +1,79 @@
-﻿namespace BrandexSalesAdapter.ExcelLogic.Data.Seeding
+﻿namespace BrandexSalesAdapter.ExcelLogic.Data.Seeding;
+
+using System.Collections.Generic;
+using System.Linq;
+
+using Microsoft.Extensions.Options;
+
+using BrandexSalesAdapter.Services.Data;
+using BrandexSalesAdapter.ExcelLogic.Data.Models;
+
+using static Common.ExcelDataConstants.Regions;
+using static Common.ExcelDataConstants.Ditributors;
+
+public class ApplicationDbContextSeeder : ISeeder
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
+    
+    private readonly SpravkiDbContext db;
+    // private readonly ApplicationSettings applicationSettings;
 
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-
-    public class ApplicationDbContextSeeder : ISeeder
+    public ApplicationDbContextSeeder(
+        SpravkiDbContext db,
+        IOptions<ApplicationSettings> applicationSettings)
     {
-        public async Task SeedAsync(SpravkiDbContext dbContext, IServiceProvider serviceProvider)
-        {
-            if (dbContext == null)
-            {
-                throw new ArgumentNullException(nameof(dbContext));
-            }
-
-            if (serviceProvider == null)
-            {
-                throw new ArgumentNullException(nameof(serviceProvider));
-            }
-
-            var logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger(typeof(ApplicationDbContextSeeder));
-
-            var seeders = new List<ISeeder>
-                          {
-                              // new RolesSeeder(),
-                              // new AdministratorSeeder(),
-                          };
-
-            foreach (var seeder in seeders)
-            {
-                await seeder.SeedAsync(dbContext, serviceProvider);
-                await dbContext.SaveChangesAsync();
-                logger.LogInformation($"Seeder {seeder.GetType().Name} done.");
-            }
-        }
+        this.db = db;
+        // this.applicationSettings = applicationSettings.Value;
     }
+
+    public void SeedAsync()
+    {
+        if (db.Regions.Any()) return;
+        foreach (var region in GetRegions())
+        {
+            db.Regions.Add(region);
+        }
+        
+        db.SaveChanges();
+        
+        if (db.Distributors.Any()) return;
+        foreach (var distributor in GetDistributors())
+        {
+            db.Distributors.Add(distributor);
+        }
+        
+        db.SaveChanges();
+    }
+    
+    private static IEnumerable<Region> GetRegions()
+            => new List<Region>
+            {
+                new() { Name = CentralOfficeSofia },
+                new() { Name = Ruse },
+                new() { Name = Varna },
+                new() { Name = Burgas },
+                new() { Name = StaraZagora },
+                new() { Name = SofiaLiulin },
+                new() { Name = SofiaMladost },
+                new() { Name = SofiaKrasnoSelo },
+                new() { Name = SofiaDrujba },
+                new() { Name = Plovdiv },
+                new() { Name = Pleven },
+                new() { Name = Vidin },
+                new() { Name = Unserviced },
+                new() { Name = OnlineShop },
+       
+            };
+    
+    private static IEnumerable<Distributor> GetDistributors()
+        => new List<Distributor>
+        {
+            new() { Name = Brandex },
+            new() { Name = Phoenix },
+            new() { Name = Sopharma },
+            new() { Name = Sting },
+            new() { Name = Pharmnet },
+
+        };
+    
+
 }

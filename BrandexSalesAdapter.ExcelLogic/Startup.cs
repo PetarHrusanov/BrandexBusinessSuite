@@ -1,3 +1,6 @@
+using BrandexSalesAdapter.ExcelLogic.Data.Seeding;
+using BrandexSalesAdapter.Services.Data;
+
 namespace BrandexSalesAdapter.ExcelLogic;
 
 // Data 
@@ -54,7 +57,8 @@ public class Startup
             .AddTransient<IProductsService, ProductsService>()
             .AddTransient<IRegionsService, RegionsService>()
             .AddTransient<ISalesService, SalesService>()
-            .AddTransient<INumbersChecker, NumbersChecker>();
+            .AddTransient<INumbersChecker, NumbersChecker>()
+            .AddTransient<ISeeder, ApplicationDbContextSeeder>();
 
         // services.AddCors();
 
