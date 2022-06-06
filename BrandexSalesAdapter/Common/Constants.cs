@@ -4,6 +4,7 @@
     {
         public const string AdministratorRoleName = "Administrator";
         public const string AccountantRoleName = "Accountant";
+        public const string MarketingRoleName = "Marketing";
         
         public const string AppName = "Brandex Sales Adapter";
 
