@@ -1,3 +1,5 @@
+using NPOI.HSSF.UserModel;
+
 namespace BrandexSalesAdapter.Accounting.Controllers;
 
 using System.IO;
@@ -34,7 +36,7 @@ public class FacebookCountingController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> ConvertPdfForAccounting([FromForm] IFormFile file)
+    public async Task<IActionResult> ConvertFacebookPdfForAccounting([FromForm] IFormFile file)
     {
 
         double euroRate = 1.9894;
@@ -111,7 +113,7 @@ public class FacebookCountingController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> ConvertPdfForMarketing([FromForm] IFormFile file)
+    public async Task<IActionResult> ConvertFacebookPdfForMarketing([FromForm] IFormFile file)
     {
 
         double euroRate = 1.9894;
@@ -165,45 +167,20 @@ public class FacebookCountingController : ApiController
             {
 
                 var price = (double)product.Value * euroRate;
+
+                CreateErpMarketingXlsSheet(workbook,
+                    product.Key,
+                    dateMonth.ToString(),
+                    dateYear.ToString(),
+                    "впечатления",
+                    "Фейсбук",
+                    "фейсбук",
+                    "Facebook",
+                    Math.Round(price, 2),
+                    "",
+                    product.Key
+                );
                 
-                var excelSheet = workbook.CreateSheet(product.Key);
-                var row = excelSheet.CreateRow(0);
-                
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue("МЕСЕЦ");
-                row.CreateCell(row.Cells.Count()).SetCellValue(dateMonth.ToString());
-                
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue("ГОДИНА");
-                row.CreateCell(row.Cells.Count()).SetCellValue(dateYear.ToString());
-                
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue("Размер");
-                row.CreateCell(row.Cells.Count()).SetCellValue("впечатления");
-                
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue("тип реклама");
-                row.CreateCell(row.Cells.Count()).SetCellValue("Фейсбук");
-                
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue("Медиа");
-                row.CreateCell(row.Cells.Count()).SetCellValue("фейсбук");
-                
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue("Издание");
-                row.CreateCell(row.Cells.Count()).SetCellValue("Facebook");
-                
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue("цена реклама");
-                row.CreateCell(row.Cells.Count()).SetCellValue(Math.Round(price, 2));
-                
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue("ТРП");
-                row.CreateCell(row.Cells.Count()).SetCellValue("");
-                
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue("ПРОДУКТ БРАНДЕКС");
-                row.CreateCell(row.Cells.Count()).SetCellValue(product.Key);
                 
             }
             
@@ -222,6 +199,168 @@ public class FacebookCountingController : ApiController
 
         return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
         
+    }
+
+    [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    [IgnoreAntiforgeryToken]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> ConvertGoogleForMarketing([FromForm] IFormFile file)
+    {
+        string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+
+        if (file.Length > 0)
+
+        {
+            var sFileExtension = System.IO.Path.GetExtension(file.FileName)?.ToLower();
+
+            if (file.FileName != null)
+            {
+                var fullPath = System.IO.Path.Combine(newPath, file.FileName);
+
+                await using var stream = new FileStream(fullPath, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                stream.Position = 0;
+
+                ISheet sheetInput;
+
+                if (sFileExtension == ".xls")
+
+                {
+                    var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+                    sheetInput = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+                }
+
+                else
+                {
+                    var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+                    sheetInput = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+                }
+
+                var sWebRootFolder = _hostEnvironment.WebRootPath;
+                var sFileName = @"Facebook_Marketing.xlsx";
+
+                var memory = new MemoryStream();
+
+                await using var fs = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Create,
+                    FileAccess.Write);
+                
+                IWorkbook workbookOutput = new XSSFWorkbook();
+
+                var productsList = new List<string>()
+                {
+                    Google_Marketing.Bland,
+                    Google_Marketing.Sleep,
+                    Google_Marketing.Venaxin,
+                    Google_Marketing.CystiRen,
+                    Google_Marketing.DetoxiFive,
+                    Google_Marketing.EnzyMill,
+                    Google_Marketing.ForFlex,
+                    Google_Marketing.GinkgoVin,
+                    Google_Marketing.LadyHarmonia,
+                    Google_Marketing.LaxaL,
+                    Google_Marketing.ProstaRen,
+                    Google_Marketing.DiabeForGluco,
+                    Google_Marketing.ZinSeD
+                };
+
+                const int dateColumn = 0;
+                const int campaignColumn = 2;
+                const int priceColumn = 4;
+
+                var regexPrice = new Regex(@"\d*\.?\d+");
+
+                for (var i = (sheetInput.FirstRowNum + 1); i <= sheetInput.LastRowNum; i++) //Read Excel File
+
+                {
+                    var row = sheetInput.GetRow(i);
+
+                    if (row == null) continue;
+
+                    if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+                    var productCell = row.GetCell(campaignColumn);
+
+                    if (productCell==null) continue;
+
+                    if (!productsList.Any(s => productCell.ToString().Contains(s))) continue;
+
+                    var dateCell = row.GetCell(dateColumn).ToString()?.TrimEnd();
+                    var date = DateTime.Parse(dateCell);
+                    var productName = row.GetCell(campaignColumn).ToString()?.TrimEnd();
+                    var price = regexPrice.Matches(row.GetCell(priceColumn).ToString()?.TrimEnd())[0].ToString();
+                    
+                    string productNameConverted = null;
+
+                    switch(productName)
+                    {
+                        case Google_Marketing.Bland:
+                            productNameConverted = Google_Marketing_ERP.Bland;
+                            break;
+                        case Google_Marketing.Sleep:
+                            productNameConverted = Google_Marketing_ERP.Sleep;
+                            break;
+                        case Google_Marketing.Venaxin:
+                            productNameConverted = Google_Marketing_ERP.Venaxin;
+                            break;
+                        case Google_Marketing.CystiRen:
+                            productNameConverted = Google_Marketing_ERP.CystiRen;
+                            break;
+                        case Google_Marketing.DetoxiFive:
+                            productNameConverted = Google_Marketing_ERP.DetoxiFive;
+                            break;
+                        case Google_Marketing.EnzyMill:
+                            productNameConverted = Google_Marketing_ERP.EnzyMill;
+                            break;
+                        case Google_Marketing.ForFlex:
+                            productNameConverted = Google_Marketing_ERP.ForFlex;
+                            break;
+                        case Google_Marketing.GinkgoVin:
+                            productNameConverted = Google_Marketing_ERP.GinkgoVin;
+                            break;
+                        case Google_Marketing.LadyHarmonia:
+                            productNameConverted = Google_Marketing_ERP.LadyHarmonia;
+                            break;
+                        case Google_Marketing.LaxaL:
+                            productNameConverted = Google_Marketing_ERP.LaxaL;
+                            break;
+                        case Google_Marketing.ProstaRen:
+                            productNameConverted = Google_Marketing_ERP.ProstaRen;
+                            break;
+                        case Google_Marketing.DiabeForGluco:
+                            productNameConverted = Google_Marketing_ERP.DiabeForGluco;
+                            break;
+                        case Google_Marketing.ZinSeD:
+                            productNameConverted = Google_Marketing_ERP.ZinSeD;
+                            break;
+                    };
+
+
+                    CreateErpMarketingXlsSheet(workbookOutput, $"{productName} {dateCell}", date.Month.ToString(),
+                        date.Year.ToString(), "клик", "google adwords", "Google", "Ad Words",
+                        Convert.ToDouble(price), "", productNameConverted);
+                }
+                
+                workbookOutput.Write(fs);
+                
+                await using (var streatWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
+                {
+
+                    await streatWrite.CopyToAsync(memory);
+
+                }
+
+                memory.Position = 0;
+
+                return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
+                
+            }
+            
+            
+        }
+
+        return BadRequest();
     }
 
     private static string PdfText(string path)
@@ -297,6 +436,57 @@ public class FacebookCountingController : ApiController
         dic.Remove(fromKey);
         dic[toKey] = value;
     }
-    
-    
+
+    private void CreateErpMarketingXlsSheet(IWorkbook workbook,
+        string sheetName,
+        string month,
+        string year,
+        string measure,
+        string type,
+        string media,
+        string publishType,
+        double price,
+        string TRP,
+        string product
+        )
+    {
+        var excelSheet = workbook.CreateSheet(sheetName);
+        var row = excelSheet.CreateRow(0);
+
+        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue("МЕСЕЦ");
+        row.CreateCell(row.Cells.Count()).SetCellValue(month);
+
+        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue("ГОДИНА");
+        row.CreateCell(row.Cells.Count()).SetCellValue(year);
+
+        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue("Размер");
+        row.CreateCell(row.Cells.Count()).SetCellValue(measure);
+
+        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue("тип реклама");
+        row.CreateCell(row.Cells.Count()).SetCellValue(type);
+
+        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue("Медиа");
+        row.CreateCell(row.Cells.Count()).SetCellValue(media);
+
+        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue("Издание");
+        row.CreateCell(row.Cells.Count()).SetCellValue(publishType);
+
+        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue("цена реклама");
+        row.CreateCell(row.Cells.Count()).SetCellValue(Math.Round(price, 2));
+
+        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue("ТРП");
+        row.CreateCell(row.Cells.Count()).SetCellValue(TRP);
+
+        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue("ПРОДУКТ БРАНДЕКС");
+        row.CreateCell(row.Cells.Count()).SetCellValue(product);
+    }
 }
