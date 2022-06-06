@@ -37,8 +37,26 @@ public class ProductConstants
         public const string ForFlex = "Форфлекс";
         public const string ProstaRen = "ПростаРен";
         public const string Sleep = "Слийп 30 табл.";
-        
         public const string Botanic = "Ботаник";
+
+    }
+    
+    public class ERP_Marketing
+    {
+        public const string ZinSeD = "ZINSED";
+        public const string EnzyMill = "ENZY-MILL";
+        public const string CystiRen = "CYSTIREN";
+        public const string LadyHarmonia = "LADYHARMONIA";
+        public const string DetoxiFive = "DETOXIFIVE";
+        public const string LaxaL = "LAXAL";
+        public const string Bland = "BLAND";
+        public const string DiabeForGluco = "DIABEFOR GLUCO";
+        public const string GinkgoVin = "GINKGOVIN";
+        public const string Venaxin = "VENAXIN";
+        public const string ForFlex = "FORFLEX";
+        public const string ProstaRen = "PROSTAREN";
+        public const string Sleep = "SLEEP";
+        public const string Botanic = "BOTANIC";
 
     }
     
