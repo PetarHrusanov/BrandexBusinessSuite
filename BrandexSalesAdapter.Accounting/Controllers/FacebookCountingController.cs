@@ -337,7 +337,7 @@ public class FacebookCountingController : ApiController
                     };
 
 
-                    CreateErpMarketingXlsSheet(workbookOutput, $"{productName} {dateCell}", date.Month.ToString(),
+                    CreateErpMarketingXlsSheet(workbookOutput, $"{productName} {dateCell}", date.ToString("MM"),
                         date.Year.ToString(), "клик", "google adwords", "Google", "Ad Words",
                         Convert.ToDouble(price), "", productNameConverted);
                 }
