@@ -68,16 +68,21 @@
         
         public class Regions
         {
-            // public const string Burgas = "БУРГАС";
-            // public const string Varna = "ВАРНА";
-            // public const string Vidin = "ВИДИН";
-            // public const string Neobslujvan = "НЕОБСЛУЖВАН";
-            // public const string OnlineMagazin = "ОНЛАЙН МАГАЗИН";
-            // public const string Vidin = "ВИДИН";
-            // public const string Neobslujvan = "НЕОБСЛУЖВАН";
-            // public const string OnlineMagazin = "ОНЛАЙН МАГАЗИН";
-            
-            
+            public const string CentralOfficeSofia = "ЦЕНТРАЛЕН ОФИС СОФИЯ";
+            public const string Ruse = "РУСЕ";
+            public const string Varna = "ВАРНА";
+            public const string Burgas = "БУРГАС";
+            public const string StaraZagora = "СТАРА ЗАГОРА";
+            public const string SofiaLiulin = "СОФИЯ ЛЮЛИН";
+            public const string SofiaMladost = "СОФИЯ МЛАДОСТ";
+            public const string SofiaKrasnoSelo = "СОФИЯ КРАСНО СЕЛО";
+            public const string SofiaDrujba = "СОФИЯ ДРУЖБА";
+            public const string Plovdiv = "ПЛОВДИВ";
+            public const string Pleven = "ПЛЕВЕН";
+            public const string Vidin = "ВИДИН";
+            public const string Unserviced = "НЕОБСЛУЖВАН";
+            public const string OnlineShop = "ОНЛАЙН МАГАЗИН";
+
         }
 
         public class ExcelLineErrors
