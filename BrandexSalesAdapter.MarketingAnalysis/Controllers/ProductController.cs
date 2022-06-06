@@ -61,7 +61,6 @@ public class ProductController :AdministrationController
 
                 ISheet sheet;
                 if (sFileExtension == ".xls")
-
                 {
 
                     var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  

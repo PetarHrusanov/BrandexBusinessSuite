@@ -1,17 +1,15 @@
-using BrandexSalesAdapter.Identity.Data;
-using BrandexSalesAdapter.Infrastructure;
-using BrandexSalesAdapter.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-
 namespace BrandexSalesAdapter.Identity.Controllers;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Identity.Services.Identity;
 using BrandexSalesAdapter.Services.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+using BrandexSalesAdapter.Models;
+
 using Models.Identity;
+using Infrastructure;
 
 public class IdentityController : ApiController
 {
@@ -31,11 +29,7 @@ public class IdentityController : ApiController
     public async Task Register(UserInputModel input)
     {
         await _identity.Register(input);
-        
-        
 
-        // if (!result.Succeeded) return BadRequest(result.Errors);
-        
     }
     
     [HttpPost]
@@ -53,12 +47,6 @@ public class IdentityController : ApiController
     public async Task CreateRole([FromBody]SingleStringInputModel singleStringInputModel)
     {
         await _identity.CreateRole(singleStringInputModel.SingleStringValue);
-
-        // var roleStore = new RoleStore<IdentityRole>(new ApplicationUsersDbContext());
-        // var roleManager = new RoleManager<IdentityRole>(roleStore);
-        // if(!await roleManager.RoleExistsAsync("YourRoleName"))
-        //     await roleManager.CreateAsync(new IdentityRole("YourRoleName"));
-
 
         // if (!result.Succeeded) return BadRequest(result.Errors);
 
@@ -79,18 +67,7 @@ public class IdentityController : ApiController
         // if (!result.Succeeded) return BadRequest(result.Errors);
 
     }
-    
-    
-    
-    // public async Task<ActionResult<UserOutputModel>> Register(UserInputModel input)
-    // {
-    //     var result = await _identity.Register(input);
-    //
-    //     if (!result.Succeeded) return BadRequest(result.Errors);
-    //
-    //     return await Login(input);
-    // }
-    
+
 
     [HttpPost]
     public async Task<ActionResult<UserOutputModel>> Login(UserInputModel input)
@@ -102,6 +79,7 @@ public class IdentityController : ApiController
         return new UserOutputModel(result.Data.Token);
     }
 
+    
     [HttpPut]
     [Authorize]
     [Route(nameof(ChangePassword))]
@@ -113,4 +91,6 @@ public class IdentityController : ApiController
             NewPassword = input.NewPassword
         });
     }
+    
+    
 }

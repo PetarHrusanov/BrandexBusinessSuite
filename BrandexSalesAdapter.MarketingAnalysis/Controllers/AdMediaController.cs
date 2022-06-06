@@ -76,7 +76,6 @@ public class AdMediaController : AdministrationController
                 {
 
                     var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
                     sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
                 }
@@ -88,7 +87,6 @@ public class AdMediaController : AdministrationController
                 for (var j = 0; j < cellCount; j++)
                 {
                     var cell = headerRow.GetCell(j);
-
                     if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
 
                 }

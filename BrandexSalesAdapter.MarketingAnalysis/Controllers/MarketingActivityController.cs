@@ -2,11 +2,11 @@ namespace BrandexSalesAdapter.MarketingAnalysis.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Newtonsoft.Json;
-
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+
+using Newtonsoft.Json;
 
 using BrandexSalesAdapter.Controllers;
 using BrandexSalesAdapter.Models;
@@ -136,8 +136,6 @@ public class MarketingActivityController : AdministrationController
                         var marketingActivityInput = new MarketingActivityInputModel();
 
                         marketingActivityInput.Price = sum;
-                        
-                        // marketingActivityInput.
 
                         marketingActivityInput.ProductId = products
                             .Where(p => p.Name == productString)
