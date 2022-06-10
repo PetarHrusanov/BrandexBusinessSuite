@@ -1,3 +1,6 @@
+using BrandexSalesAdapter.Accounting.Requests;
+using BrandexSalesAdapter.Models;
+
 namespace BrandexSalesAdapter.Accounting;
 
 using System.Reflection;
@@ -36,6 +39,16 @@ public class Startup
         services
             .Configure<ApplicationSettings>(
                 _configuration.GetSection(nameof(ApplicationSettings)), 
+                config => config.BindNonPublicProperties = true);
+        
+        services
+            .Configure<UserSettings>(
+                _configuration.GetSection(nameof(UserSettings)), 
+                config => config.BindNonPublicProperties = true);
+        
+        services
+            .Configure<ApiSettings>(
+                _configuration.GetSection(nameof(ApiSettings)), 
                 config => config.BindNonPublicProperties = true);
         
         services
