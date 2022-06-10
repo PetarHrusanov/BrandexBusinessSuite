@@ -18,6 +18,7 @@ public class ProductConstants
         public const string ProstaRen = "ProstaRen";
         public const string Sleep = "Sleep";
         
+        // Workaround - permanent solution should be considered
         public const string GeneralAudience = "General Audience";
 
     }
@@ -38,6 +39,9 @@ public class ProductConstants
         public const string ProstaRen = "ПростаРен";
         public const string Sleep = "Слийп 30 табл.";
         public const string Botanic = "Ботаник";
+        
+        // Workaround - permanent solution should be considered
+        public const string GeneralAudience = "Ботаник";
 
     }
     
