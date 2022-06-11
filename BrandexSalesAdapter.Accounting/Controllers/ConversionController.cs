@@ -1,6 +1,3 @@
-using BrandexSalesAdapter.Accounting.Requests;
-using Newtonsoft.Json.Linq;
-
 namespace BrandexSalesAdapter.Accounting.Controllers;
 
 using System.IO;
@@ -12,6 +9,7 @@ using System.Text;
 
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -26,6 +24,7 @@ using iTextSharp.text.pdf.parser;
 using BrandexSalesAdapter.Controllers;
 using Infrastructure;
 using Models;
+using Requests;
 
 using static Common.ProductConstants;
 using static  Common.Constants;
@@ -42,7 +41,13 @@ public class ConversionController : ApiController
     private static readonly HttpClient client = new HttpClient();
     
     private const string FacebookEng = "Facebook";
+    private const string Impressions = "впечатления";
+    private const string FacebookBgCapital = "Фейсбук";
     
+    private const double euroRate = 1.9894;
+    
+    private static readonly Regex regexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
+
     public ConversionController(IWebHostEnvironment hostEnvironment,
         IOptions<UserSettings> userSettings,
         IOptions<ApiSettings> apiSettings
@@ -59,8 +64,6 @@ public class ConversionController : ApiController
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ConvertFacebookPdfForAccounting([FromForm] IFormFile file)
     {
-
-        double euroRate = 1.9894;
 
         string newPath = CreateFileDirectories.CreatePDFFilesInputDirectory(_hostEnvironment);
 
@@ -140,11 +143,7 @@ public class ConversionController : ApiController
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ConvertFacebookPdfForMarketing([FromForm] IFormFile file)
     {
-
-        double euroRate = 1.9894;
-
-        var regexDate = new Regex(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
-
+        
         var dateString = regexDate.Matches(file.FileName)[0];
         
         var date = DateTime.ParseExact(dateString.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -188,8 +187,8 @@ public class ConversionController : ApiController
                     product.Key,
                     monthErp,
                     yearErp,
-                    "впечатления",
-                    "Фейсбук",
+                    Impressions,
+                    FacebookBgCapital,
                     "фейсбук",
                     FacebookEng,
                     priceRounded,
@@ -541,8 +540,8 @@ public class ConversionController : ApiController
             case FacebookEng:
                 subject = "Задача / FACEBOOK IRELAND LIMITED";
                 partyId = "b21c6bc3-a4d8-43b9-a3df-b2d39ddf552f";
-                measure = "впечатления";
-                type = "Фейсбук";
+                measure = Impressions;
+                type = FacebookBgCapital;
                 media = "фейсбук";
                 publishType = FacebookEng;
                 break;
