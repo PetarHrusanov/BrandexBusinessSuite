@@ -48,6 +48,7 @@ public class ConversionController : ApiController
     private const double euroRate = 1.9894;
     
     private static readonly Regex regexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
+    private static readonly Regex priceRegex = new (@"[0-9]+[.,][0-9]*");
 
     public ConversionController(IWebHostEnvironment hostEnvironment,
         IOptions<UserSettings> userSettings,
@@ -226,9 +227,9 @@ public class ConversionController : ApiController
     {
         string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
-        if (file.Length > 0)
-
+                if (file.Length > 0)
         {
+
             var sFileExtension = System.IO.Path.GetExtension(file.FileName)?.ToLower();
 
             if (file.FileName != null)
@@ -240,141 +241,68 @@ public class ConversionController : ApiController
 
                 stream.Position = 0;
 
-                ISheet sheetInput;
-
+                ISheet sheet;
                 if (sFileExtension == ".xls")
 
                 {
+
                     var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-                    sheetInput = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+
                 }
 
                 else
                 {
+
                     var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-                    sheetInput = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+
                 }
 
-                var sWebRootFolder = _hostEnvironment.WebRootPath;
-                var sFileName = @"Facebook_Marketing.xlsx";
+                // var headerRow = sheet.GetRow(0); //Get Header Row
 
-                var memory = new MemoryStream();
+                // int cellCount = headerRow.LastCellNum;
 
-                await using var fs = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Create,
-                    FileAccess.Write);
-                
-                IWorkbook workbookOutput = new XSSFWorkbook();
+                // for (var j = 0; j < cellCount; j++)
+                // {
+                //     var cell = headerRow.GetCell(j);
+                //
+                //     if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+                //
+                // }
 
-                var productsList = new List<string>()
+                var fieldsValues = new List<string>();
+                for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
                 {
-                    Google_Marketing.Bland,
-                    Google_Marketing.Sleep,
-                    Google_Marketing.Venaxin,
-                    Google_Marketing.CystiRen,
-                    Google_Marketing.DetoxiFive,
-                    Google_Marketing.EnzyMill,
-                    Google_Marketing.ForFlex,
-                    Google_Marketing.GinkgoVin,
-                    Google_Marketing.LadyHarmonia,
-                    Google_Marketing.LaxaL,
-                    Google_Marketing.ProstaRen,
-                    Google_Marketing.DiabeForGluco,
-                    Google_Marketing.ZinSeD
-                };
 
-                const int dateColumn = 0;
-                const int campaignColumn = 2;
-                const int priceColumn = 4;
-
-                var regexPrice = new Regex(@"\d*\.?\d+");
-
-                for (var i = (sheetInput.FirstRowNum + 1); i <= sheetInput.LastRowNum; i++) //Read Excel File
-
-                {
-                    var row = sheetInput.GetRow(i);
+                    IRow row = sheet.GetRow(i);
 
                     if (row == null) continue;
 
                     if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                    var productCell = row.GetCell(campaignColumn);
-
-                    if (productCell==null) continue;
-
-                    if (!productsList.Any(s => productCell.ToString().Contains(s))) continue;
-
-                    var dateCell = row.GetCell(dateColumn).ToString()?.TrimEnd();
-                    var date = DateTime.Parse(dateCell);
-                    var productName = row.GetCell(campaignColumn).ToString()?.TrimEnd();
-                    var price = regexPrice.Matches(row.GetCell(priceColumn).ToString()?.TrimEnd())[0].ToString();
                     
-                    string productNameConverted = null;
+                    var fieldsGoogle = typeof(Google_Marketing).GetFields(BindingFlags.Public | BindingFlags.Static);
+                    fieldsValues.AddRange(fieldsGoogle.Select(field => (string)field.GetValue(null)));
 
-                    switch(productName)
-                    {
-                        case Google_Marketing.Bland:
-                            productNameConverted = Google_Marketing_ERP.Bland;
-                            break;
-                        case Google_Marketing.Sleep:
-                            productNameConverted = Google_Marketing_ERP.Sleep;
-                            break;
-                        case Google_Marketing.Venaxin:
-                            productNameConverted = Google_Marketing_ERP.Venaxin;
-                            break;
-                        case Google_Marketing.CystiRen:
-                            productNameConverted = Google_Marketing_ERP.CystiRen;
-                            break;
-                        case Google_Marketing.DetoxiFive:
-                            productNameConverted = Google_Marketing_ERP.DetoxiFive;
-                            break;
-                        case Google_Marketing.EnzyMill:
-                            productNameConverted = Google_Marketing_ERP.EnzyMill;
-                            break;
-                        case Google_Marketing.ForFlex:
-                            productNameConverted = Google_Marketing_ERP.ForFlex;
-                            break;
-                        case Google_Marketing.GinkgoVin:
-                            productNameConverted = Google_Marketing_ERP.GinkgoVin;
-                            break;
-                        case Google_Marketing.LadyHarmonia:
-                            productNameConverted = Google_Marketing_ERP.LadyHarmonia;
-                            break;
-                        case Google_Marketing.LaxaL:
-                            productNameConverted = Google_Marketing_ERP.LaxaL;
-                            break;
-                        case Google_Marketing.ProstaRen:
-                            productNameConverted = Google_Marketing_ERP.ProstaRen;
-                            break;
-                        case Google_Marketing.DiabeForGluco:
-                            productNameConverted = Google_Marketing_ERP.DiabeForGluco;
-                            break;
-                        case Google_Marketing.ZinSeD:
-                            productNameConverted = Google_Marketing_ERP.ZinSeD;
-                            break;
-                    };
-
-
-                    CreateErpMarketingXlsSheet(workbookOutput, $"{productName} {dateCell}", date.ToString("MM"),
-                        date.Year.ToString(), "клик", "google adwords", "Google", "Ad Words",
-                        Convert.ToDouble(price), "", productNameConverted);
-                }
-                
-                workbookOutput.Write(fs);
-                
-                await using (var streatWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
-                {
-
-                    await streatWrite.CopyToAsync(memory);
-
+                    var productRow = row.GetCell(2);
+                    if (productRow==null) continue;
+                    
+                    var product = productRow.ToString()?.TrimEnd();
+                    if (string.IsNullOrEmpty(product)) continue;
+                    if (!fieldsValues.Contains(product)) continue;
+                    
+                    var productName = productRow;
+                    var priceRow = row.GetCell(4).ToString()?.TrimEnd();
+                    var priceString = priceRegex.Matches(priceRow)[0].ToString();
+                    var price = decimal.Parse(priceString);
+                        
+                    var dateRow = row.GetCell(0).ToString().TrimEnd();
+                        
+                    var date = DateTime.ParseExact(dateRow, "MMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture);;
+                    
                 }
 
-                memory.Position = 0;
-
-                return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
-                
             }
-            
-            
         }
 
         return BadRequest();
@@ -398,8 +326,6 @@ public class ConversionController : ApiController
         // Regex priceRegex = new Regex(@"[0-9]*\.[0-9]*");
         // Regex priceRegex = new Regex(@"[0-9]*\,[0-9]*");
         // Regex priceRegex = new Regex(@"\d+(?:[\.\,]\d{2})?");
-        Regex priceRegex = new Regex(@"[0-9]+[.,][0-9]*");
-        
 
         Dictionary<string, decimal> productsPrices = new Dictionary<string, decimal>();
 
