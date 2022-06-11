@@ -43,7 +43,8 @@ public class ConversionController : ApiController
     private const string FacebookEng = "Facebook";
     private const string Impressions = "впечатления";
     private const string FacebookBgCapital = "Фейсбук";
-    
+    private const string FacebookBgLower = "фейсбук";
+
     private const double euroRate = 1.9894;
     
     private static readonly Regex regexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
@@ -189,7 +190,7 @@ public class ConversionController : ApiController
                     yearErp,
                     Impressions,
                     FacebookBgCapital,
-                    "фейсбук",
+                    FacebookBgLower,
                     FacebookEng,
                     priceRounded,
                     "",
@@ -218,7 +219,7 @@ public class ConversionController : ApiController
     }
 
     [HttpPost]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ConvertGoogleForMarketing([FromForm] IFormFile file)
@@ -542,7 +543,7 @@ public class ConversionController : ApiController
                 partyId = "b21c6bc3-a4d8-43b9-a3df-b2d39ddf552f";
                 measure = Impressions;
                 type = FacebookBgCapital;
-                media = "фейсбук";
+                media = FacebookBgLower;
                 publishType = FacebookEng;
                 break;
         }
@@ -639,7 +640,7 @@ public class ConversionController : ApiController
             
         var uri = new Uri(_apiSettings.GeneralContactActivities);
             
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var content = new StringContent(json, Encoding.UTF8, RequestConstants.ApplicationJson);
 
         var response = await clientErp.PostAsync(uri, content);
 
@@ -655,7 +656,7 @@ public class ConversionController : ApiController
 
         string newStateSerialized = JsonConvert.SerializeObject(newState);
         
-        var stateContent =  new StringContent(newStateSerialized, Encoding.UTF8, "application/json");
+        var stateContent =  new StringContent(newStateSerialized, Encoding.UTF8, RequestConstants.ApplicationJson);
         var responseState = await clientErp.PostAsync(uriChangeSrate, stateContent);
 
         Console.WriteLine(responseState);

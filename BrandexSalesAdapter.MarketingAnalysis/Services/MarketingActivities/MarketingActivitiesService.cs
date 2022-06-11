@@ -1,3 +1,6 @@
+using BrandexSalesAdapter.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace BrandexSalesAdapter.MarketingAnalysis.Services.MarketingActivities;
 
 using System.Data;
@@ -73,5 +76,20 @@ public class MarketingActivitiesService :IMarketingActivitesService
         con.Open();
         await objbulk.WriteToServerAsync(table);  
         con.Close();
+    }
+
+    public async Task<MarketingActivityModel[]> GetMarketingActivitiesByDate(DateTime date)
+    {
+        return await db.MarketingActivities.Where(s=>s.Date.Month==date.Month && s.Date.Year == date.Year)
+            .Select(n => new MarketingActivityModel
+        {
+            Id = n.Id,
+            Description = n.Description,
+            Date = n.Date,
+            Price = n.Price,
+            ProductId = n.ProductId,
+            AdMediaId = n.AdMediaId
+            
+        }).ToArrayAsync();
     }
 }

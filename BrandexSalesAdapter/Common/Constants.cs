@@ -14,4 +14,9 @@ public class Constants
     public const string CreatedOn = "CreatedOn";
     public const string IsDeleted = "IsDeleted";
 
+    public class RequestConstants
+    {
+        public const string ApplicationJson = "application/json";
+    }
+
 }

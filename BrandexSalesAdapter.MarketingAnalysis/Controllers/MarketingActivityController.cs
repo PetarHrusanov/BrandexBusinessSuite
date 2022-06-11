@@ -1,3 +1,6 @@
+using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
+
 namespace BrandexSalesAdapter.MarketingAnalysis.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +19,8 @@ using Services.MarketingActivities;
 using Services.Products;
 using Infrastructure;
 using Services.AdMedias;
+
+using static Common.Constants;
 
 public class MarketingActivityController : AdministrationController
 {
@@ -185,6 +190,20 @@ public class MarketingActivityController : AdministrationController
         return outputSerialized;
 
     }
+
+    [HttpPost]
+    [Authorize(Roles = AdministratorRoleName)]
+    public async Task<MarketingActivityModel[]> GetMarketingActivitiesByDate([FromBody] SingleStringInputModel singleStringInputModel)
+    {
+        var date = DateTime.ParseExact(singleStringInputModel.SingleStringValue, "MM-yyyy", CultureInfo.InvariantCulture);
+        
+        var marketingActivitiesArray = await _marketingActivitesService.GetMarketingActivitiesByDate(date);
+
+        return marketingActivitiesArray;
+
+    }
+    
+    
 
     // [HttpPost]
     // public async Task<string> Upload([FromBody] SingleStringInputModel singleStringInputModel)
