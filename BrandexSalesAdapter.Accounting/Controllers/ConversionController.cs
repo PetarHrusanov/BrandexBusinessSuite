@@ -41,9 +41,15 @@ public class ConversionController : ApiController
     private static readonly HttpClient client = new HttpClient();
     
     private const string FacebookEng = "Facebook";
-    private const string Impressions = "впечатления";
     private const string FacebookBgCapital = "Фейсбук";
     private const string FacebookBgLower = "фейсбук";
+
+    private const string Google = "Google";
+    private const string GoogleAdWordsLower = "google adwords";
+    private const string GoogleAdWordsCapital = "Ad Words";
+
+    private const string Click = "клик";
+    private const string Impressions = "впечатления";
 
     private const double euroRate = 1.9894;
     
@@ -232,57 +238,65 @@ public class ConversionController : ApiController
 
             var sFileExtension = System.IO.Path.GetExtension(file.FileName)?.ToLower();
 
-            if (file.FileName != null)
+            if (file.FileName == null) return BadRequest();
+            
+            var fullPath = System.IO.Path.Combine(newPath, file.FileName);
+
+            await using var stream = new FileStream(fullPath, FileMode.Create);
+            await file.CopyToAsync(stream);
+
+            stream.Position = 0;
+
+            ISheet sheet;
+            if (sFileExtension == ".xls")
+
             {
-                var fullPath = System.IO.Path.Combine(newPath, file.FileName);
 
-                await using var stream = new FileStream(fullPath, FileMode.Create);
-                await file.CopyToAsync(stream);
+                var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
 
-                stream.Position = 0;
+            }
 
-                ISheet sheet;
-                if (sFileExtension == ".xls")
+            else
+            {
 
-                {
+                var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
-                    var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+            }
 
-                }
+            // var headerRow = sheet.GetRow(0); //Get Header Row
 
-                else
-                {
+            // int cellCount = headerRow.LastCellNum;
 
-                    var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-                    sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+            // for (var j = 0; j < cellCount; j++)
+            // {
+            //     var cell = headerRow.GetCell(j);
+            //
+            //     if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+            //
+            // }
 
-                }
-
-                // var headerRow = sheet.GetRow(0); //Get Header Row
-
-                // int cellCount = headerRow.LastCellNum;
-
-                // for (var j = 0; j < cellCount; j++)
-                // {
-                //     var cell = headerRow.GetCell(j);
-                //
-                //     if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-                //
-                // }
-
-                var fieldsValues = new List<string>();
+            var fieldsValues = new List<string>();
+            var fieldsGoogle = typeof(Google_Marketing).GetFields(BindingFlags.Public | BindingFlags.Static);
+            fieldsValues.AddRange(fieldsGoogle.Select(field => (string)field.GetValue(null)!));
+                
+            var sWebRootFolder = _hostEnvironment.WebRootPath;
+            var sFileName = @"Google_Marketing.xlsx";
+            var memory = new MemoryStream();
+                
+            await using (var fs = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
+            {
+                IWorkbook workbook = new XSSFWorkbook();
+                    
                 for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
                 {
-
+                    
                     IRow row = sheet.GetRow(i);
 
                     if (row == null) continue;
 
                     if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-                    
-                    var fieldsGoogle = typeof(Google_Marketing).GetFields(BindingFlags.Public | BindingFlags.Static);
-                    fieldsValues.AddRange(fieldsGoogle.Select(field => (string)field.GetValue(null)));
 
                     var productRow = row.GetCell(2);
                     if (productRow==null) continue;
@@ -291,18 +305,57 @@ public class ConversionController : ApiController
                     if (string.IsNullOrEmpty(product)) continue;
                     if (!fieldsValues.Contains(product)) continue;
                     
-                    var productName = productRow;
+                    foreach (var field in typeof(Google_Marketing).GetFields())
+                    {
+                        if ((string)field.GetValue(null) != product) continue;
+                        var fieldName = field.Name.ToString();
+                        var fieldErp = typeof(Google_Marketing_ERP).GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
+                        product = (string)fieldErp.GetValue(null);
+                        
+                    }
+                    
                     var priceRow = row.GetCell(4).ToString()?.TrimEnd();
                     var priceString = priceRegex.Matches(priceRow)[0].ToString();
-                    var price = decimal.Parse(priceString);
+                    var price = double.Parse(priceString);
                         
                     var dateRow = row.GetCell(0).ToString().TrimEnd();
                         
-                    var date = DateTime.ParseExact(dateRow, "MMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture);;
+                    var date = DateTime.ParseExact(dateRow, "MMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    
+                    var monthErpField = typeof(ErpMonths).GetField(date.ToString("MMMM"), BindingFlags.Public | BindingFlags.Static);
+                    var monthErp = (string)monthErpField.GetValue(null);
+                    var yearErp = date.ToString("yyyy");
+                        
+                    CreateErpMarketingXlsSheet(workbook,
+                        product+date.ToString("dd-MM-yyyy"),
+                        monthErp,
+                        yearErp,
+                        Click,
+                        GoogleAdWordsLower,
+                        Google,
+                        GoogleAdWordsCapital,
+                        price,
+                        "",
+                        product
+                    );
+                        
+                    await PostMarketingActivitiesToErp(Google, product, price, date);
                     
                 }
 
+                workbook.Write(fs);
+
             }
+            await using (var streatWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
+            {
+
+                await streatWrite.CopyToAsync(memory);
+
+            }
+
+            memory.Position = 0;
+
+            return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
         }
 
         return BadRequest();
@@ -471,6 +524,14 @@ public class ConversionController : ApiController
                 type = FacebookBgCapital;
                 media = FacebookBgLower;
                 publishType = FacebookEng;
+                break;
+            case Google:
+                subject = "Задача / GOOGLE IRELAND LIMITED";
+                partyId = "e5a6cfc4-d407-4424-a22e-d479136a28aa";
+                measure = Click;
+                type = GoogleAdWordsLower;
+                media = Google;
+                publishType = GoogleAdWordsCapital;
                 break;
         }
         
