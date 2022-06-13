@@ -8,6 +8,6 @@ public interface IMarketingActivitesService
 {
     Task UploadBulk(List<MarketingActivityInputModel> marketingActivities);
 
-    Task<MarketingActivityModel[]> GetMarketingActivitiesByDate(DateTime date);
+    Task<MarketingActivityOutputModel[]> GetMarketingActivitiesByDate(DateTime date);
 
 }
