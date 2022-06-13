@@ -193,7 +193,7 @@ public class MarketingActivityController : AdministrationController
 
     [HttpPost]
     [Authorize(Roles = AdministratorRoleName)]
-    public async Task<MarketingActivityModel[]> GetMarketingActivitiesByDate([FromBody] SingleStringInputModel singleStringInputModel)
+    public async Task<MarketingActivityOutputModel[]> GetMarketingActivitiesByDate([FromBody] SingleStringInputModel singleStringInputModel)
     {
         var date = DateTime.ParseExact(singleStringInputModel.SingleStringValue, "MM-yyyy", CultureInfo.InvariantCulture);
         

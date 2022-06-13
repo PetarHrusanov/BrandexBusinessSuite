@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 namespace BrandexSalesAdapter.MarketingAnalysis.Data.Configurations;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using Models;
 
 public class AdMediaConfiguration : IEntityTypeConfiguration<AdMedia>
