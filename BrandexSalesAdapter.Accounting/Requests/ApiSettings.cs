@@ -5,4 +5,6 @@ public class ApiSettings
     public string GeneralRequest { get; private set; }
     
     public string GeneralContactActivities { get; private set; }
+    
+    public string LogisticsProcurementReceivingOrders { get; private set; }
 }

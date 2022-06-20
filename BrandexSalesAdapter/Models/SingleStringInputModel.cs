@@ -1,7 +1,6 @@
-namespace BrandexSalesAdapter.Models
+namespace BrandexSalesAdapter.Models;
+
+public class SingleStringInputModel
 {
-    public class SingleStringInputModel
-    {
-        public string SingleStringValue { get; set; }
-    }
+    public string SingleStringValue { get; set; }
 }
