@@ -1,3 +1,5 @@
+using NPOI.SS.Formula.Functions;
+
 namespace BrandexSalesAdapter.Accounting.Controllers;
 
 using System.IO;
@@ -22,6 +24,7 @@ using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
 
 using BrandexSalesAdapter.Controllers;
+using BrandexSalesAdapter.Models.ErpDocuments;
 using Infrastructure;
 using Models;
 using Requests;
@@ -55,6 +58,7 @@ public class ConversionController : ApiController
     
     private static readonly Regex regexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
     private static readonly Regex priceRegex = new (@"[0-9]+[.,][0-9]*");
+    private static readonly Regex facebookInvoiceRegex = new (@"FBADS-[0-9]{3}-[0-9]{9}");
 
     public ConversionController(IWebHostEnvironment hostEnvironment,
         IOptions<UserSettings> userSettings,
@@ -72,7 +76,7 @@ public class ConversionController : ApiController
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> ConvertFacebookPdfForAccounting([FromForm] IFormFile file)
     {
-
+        
         string newPath = CreateFileDirectories.CreatePDFFilesInputDirectory(_hostEnvironment);
 
         if (file.Length <= 0) throw new ArgumentNullException();
@@ -83,7 +87,11 @@ public class ConversionController : ApiController
         await file.CopyToAsync(streamRead);
 
         string rawText = PdfText(fullPath);
-
+        
+        var dateString = regexDate.Matches(file.FileName)[0];
+        
+        var date = DateTime.ParseExact(dateString.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        
         var productsPrices = ProductPriceDictionaryFromText(rawText);
         
         var sWebRootFolder = _hostEnvironment.WebRootPath;
@@ -120,13 +128,131 @@ public class ConversionController : ApiController
 
             var row = excelSheet.CreateRow(0);
 
+            var facebookInvoiceNumber = facebookInvoiceRegex.Matches(rawText)[0].ToString();
+
+            var primaryDocument = new LogisticsProcurementReceivingOrder()
+            {
+                
+                DocumentType = new ErpCharacteristicId()
+                {
+                    Id = "General_DocumentTypes(b1787109-6d5e-41ad-8ba6-b9a15ebccf5e)"
+                },
+                
+                DocumentNo = "Znaish Ko",
+                InvoiceDocumentNo = "Mahlenski Simpatqga",
+                
+                EnterpriseCompany = new ErpDocument._EnterpriseCompany()
+                {
+                    Id = "General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)"
+                },
+                EnterpriseCompanyLocation = new ErpDocument._EnterpriseCompanyLocation()
+                {
+                    Id = "General_Contacts_CompanyLocations(f3156c3c-7c04-4de7-bf03-8b983aada49f)"
+                },
+                
+                FromParty = new ErpCharacteristicId()
+                {
+                    Id = "General_Contacts_Parties(42bef242-101f-48bd-b6c5-8da6819c844f)"
+                },
+                
+                ToParty = new ErpCharacteristicId()
+                {
+                    Id = "General_Contacts_Parties(b21c6bc3-a4d8-43b9-a3df-b2d39ddf552f)"
+                },
+                
+                DocumentCurrency = new ErpCharacteristicId
+                {
+                    Id = "General_Currencies(3187833a-d3c1-4804-bfc0-e17e6aee3069)"
+                },
+                
+                PaymentAccount = new ErpCharacteristicId()
+                {
+                    Id = "Finance_Payments_PaymentAccounts(b6d37a6d-2ac7-4a9c-a067-edf518bac68d)"
+                },
+                
+                PaymentType = new ErpCharacteristicId()
+                {
+                    Id = "Finance_Payments_PaymentTypes(7dd31560-4953-4d41-b7e6-3e831fdf8549)"
+                },
+                
+                DocumentDate = $"{date:yyyy-MM-dd}",
+                
+                PurchasePriceList = new ErpCharacteristicId()
+                {
+                    Id = "Logistics_Procurement_PurchasePriceLists(8fdaa904-47f7-49d3-b5a8-5bbcb02ada4f)"
+                },
+                CurrencyDirectory = new ErpCharacteristicId()
+                {
+                    Id = "General_CurrencyDirectories(cd9c56b1-2f9b-4ad2-888d-becf3c770cb6)"
+                },
+                Store = new ErpCharacteristicId()
+                {
+                    Id = "Logistics_Inventory_Stores(100447ff-44f4-4799-a4c2-7c9b22fb0aaa)"
+                },
+                Supplier = new ErpCharacteristicId()
+                {
+                    Id = "Logistics_Procurement_Suppliers(71887ab9-e1ec-4210-8927-aab5030c3d3b)"
+                }
+                
+            };
+
+
             foreach (var dictEntry in sortedProducts)
             {
+                
+                
                 row = excelSheet.CreateRow(excelSheet.LastRowNum+1);
                 row.CreateCell(row.Cells.Count()).SetCellValue(dictEntry.Key);
                 row.CreateCell(row.Cells.Count()).SetCellValue((double)dictEntry.Value);
                 row.CreateCell(row.Cells.Count()).SetCellValue((double)dictEntry.Value*euroRate);
+                
+                var price = (double)dictEntry.Value * euroRate;
+                var priceRounded = Math.Round(price, 2);
+
+                var erpLine = new ErpOrderLinesAccounting()
+                {
+                    Product = new ErpCharacteristicId()
+                    {
+                        Id = "General_Products_Products(ee6e5c65-6dc7-41d7-9d57-ba87b19aa56c)"
+                    },
+                    LineAmount = new ErpCharacteristicLineAmount()
+                    {
+                        Value = (decimal)priceRounded
+                    },
+                    Quantity = new ErpCharacteristicValueNumber()
+                    {
+                        Value = 1
+                    },
+                    LineStore = new ErpCharacteristicLineStore()
+                    {
+                        Id = "Logistics_Inventory_Stores(100447ff-44f4-4799-a4c2-7c9b22fb0aaa)"
+                    }
+                };
+
+                primaryDocument.Lines.Add(erpLine);
+
             }
+            
+            string json = JsonConvert.SerializeObject(primaryDocument, Formatting.Indented);
+            
+            var clientErp = new HttpClient();
+            
+            var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.AccountingAccount}:{_userSettings.AccountingPassword}");
+            clientErp.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            
+            var uri = new Uri(_apiSettings.LogisticsProcurementReceivingOrders);
+            
+            var content = new StringContent(json, Encoding.UTF8, RequestConstants.ApplicationJson);
+
+            var response = await clientErp.PostAsync(uri, content);
+
+            var responceContent = await response.Content.ReadAsStringAsync();
+
+            JObject obj = JObject.Parse(responceContent);
+
+            var documentId = obj["@odata.id"].ToString();
+            
+            
 
             workbook.Write(fs);
 
@@ -556,6 +682,7 @@ public class ConversionController : ApiController
                     Id = "General_Contacts_Parties(2469d153-839f-445a-b7c2-2e7cb955c491)"
                 },
                 ReferenceDate =  $"{date:yyyy-MM-dd}",
+                StartTime =  $"{date:yyyy-MM-dd}",
                 DeadlineTime = $"{date:yyyy-MM-dd}",
                 
                 OwnerParty = new MarketingActivityCm._OwnerParty()
@@ -568,7 +695,7 @@ public class ConversionController : ApiController
                     Id = "General_Contacts_Persons(623ed5c7-2eec-4e5b-a0c1-42c6faab3309)"
                 },
                 
-                ToParty = new MarketingActivityCm._ToParty()
+                ToParty = new ErpCharacteristicToParty()
                 {
                     Id = $"General_Contacts_Parties({partyId})"
                 },

@@ -1,20 +1,21 @@
-using Newtonsoft.Json;
-
 namespace BrandexSalesAdapter.Accounting.Models;
 
-public class MarketingActivityCm
+using BrandexSalesAdapter.Models.ErpDocuments;
+using Newtonsoft.Json;
+
+public class MarketingActivityCm : ErpDocument
 {
     
     // public _InnerClass InnerClass;
     public MarketingActivityCm()
     {
-        DocumentType = new _DocumentType();
-        EnterpriseCompany = new _EnterpriseCompany();
-        EnterpriseCompanyLocation = new _EnterpriseCompanyLocation();
+        // DocumentType = new _DocumentType();
+        // EnterpriseCompany = new _EnterpriseCompany();
+        // EnterpriseCompanyLocation = new _EnterpriseCompanyLocation();
         ResponsibleParty = new _ResponsibleParty();
         OwnerParty = new _OwnerParty();
         ResponsiblePerson = new _ResponsiblePerson();
-        ToParty = new _ToParty();
+        ToParty = new ErpCharacteristicToParty();
         TargetParty = new _TargetParty();
         CustomProperty_МЕСЕЦ = new _CustomProperty_МЕСЕЦ();
         CustomProperty_1579648 = new _CustomProperty_1579648();
@@ -28,13 +29,13 @@ public class MarketingActivityCm
     }
 
 
-    public _DocumentType DocumentType { get; set; }
-    public _EnterpriseCompany EnterpriseCompany { get; set; }
-    public _EnterpriseCompanyLocation EnterpriseCompanyLocation { get; set; }
+    // public _DocumentType DocumentType { get; set; }
+    // public _EnterpriseCompany EnterpriseCompany { get; set; }
+    // public _EnterpriseCompanyLocation EnterpriseCompanyLocation { get; set; }
     public _ResponsibleParty ResponsibleParty { get; set; }
     public _OwnerParty OwnerParty { get; set; }
     public _ResponsiblePerson ResponsiblePerson { get; set; }
-    public _ToParty ToParty { get; set; }
+    public ErpCharacteristicToParty ToParty { get; set; }
     public _TargetParty TargetParty { get; set; }
     public _CustomProperty_МЕСЕЦ CustomProperty_МЕСЕЦ { get; set; }
     public _CustomProperty_1579648 CustomProperty_1579648 { get; set; }
@@ -47,23 +48,23 @@ public class MarketingActivityCm
     public _CustomProperty_ПРОДУКТ_u0020БРАНДЕКС CustomProperty_ПРОДУКТ_u0020БРАНДЕКС { get; set; }
     
     
-    public class _DocumentType
-    {
-        [JsonProperty("@odata.id")]
-        public string Id { get; set; }
-    }
+    // public class _DocumentType
+    // {
+    //     [JsonProperty("@odata.id")]
+    //     public string Id { get; set; }
+    // }
     
-    public class _EnterpriseCompany
-    {
-        [JsonProperty("@odata.id")]
-        public string Id { get; set; }
-    }
+    // public class _EnterpriseCompany
+    // {
+    //     [JsonProperty("@odata.id")]
+    //     public string Id { get; set; }
+    // }
     
-    public class _EnterpriseCompanyLocation
-    {
-        [JsonProperty("@odata.id")]
-        public string Id { get; set; }
-    }
+    // public class _EnterpriseCompanyLocation
+    // {
+    //     [JsonProperty("@odata.id")]
+    //     public string Id { get; set; }
+    // }
     public class _ResponsibleParty
     {
         [JsonProperty("@odata.id")]
@@ -79,11 +80,11 @@ public class MarketingActivityCm
         [JsonProperty("@odata.id")]
         public string Id { get; set; }
     }
-    public class _ToParty
-    {
-        [JsonProperty("@odata.id")]
-        public string Id { get; set; }
-    }
+    // public class _ToParty
+    // {
+    //     [JsonProperty("@odata.id")]
+    //     public string Id { get; set; }
+    // }
     public class _TargetParty
     {
         [JsonProperty("@odata.id")]
@@ -97,6 +98,8 @@ public class MarketingActivityCm
     public string ReferenceDate { get; set; }
     
     public string DeadlineTime { get; set; }
+    
+    public string StartTime { get; set; }
     
     public class _CustomProperty_МЕСЕЦ
     {
