@@ -7,4 +7,6 @@ public class ApiSettings
     public string GeneralContactActivities { get; private set; }
     
     public string LogisticsProcurementReceivingOrders { get; private set; }
+    
+    public string LogisticsProcurementPurchaseInvoices { get; private set; }
 }

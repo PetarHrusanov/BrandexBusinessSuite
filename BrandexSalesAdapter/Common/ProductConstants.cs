@@ -45,6 +45,49 @@ public class ProductConstants
 
     }
     
+    public class ErpCodesNumber
+    {
+        public const string ZinSeD = "184701";
+        public const string EnzyMill = "183301";
+        public const string CystiRen = "183501";
+        public const string LadyHarmonia = "184101";
+        public const string DetoxiFive = "183901";
+        public const string LaxaL = "182301";
+        public const string Bland = "181111";
+        public const string DiabeForGluco = "184301";
+        public const string GinkgoVin = "182701";
+        public const string Venaxin = "184901";
+        public const string ForFlex = "182601";
+        public const string ProstaRen = "183701";
+        public const string Sleep = "181311";
+        public const string Botanic = "999998";
+        
+        // Workaround - permanent solution should be considered
+        public const string GeneralAudience = "999998";
+
+    }
+
+    public class ERP_Codes
+    {
+        public const string ZinSeD = "b84ee3e7-01d8-4a4e-9cef-5cc14e94f0d2";
+        public const string EnzyMill = "e56d7f1b-212d-4821-985e-efcde41dcb0d";
+        public const string CystiRen = "9237a1a9-5287-4724-a46b-9763c2fddaa3";
+        public const string LadyHarmonia = "e619709a-c6b1-4abd-bf84-79a605b94791";
+        public const string DetoxiFive = "17b1cf6f-216d-41fc-8795-65d1e24b31f4";
+        public const string LaxaL = "7ff0e56d-70e8-4f68-9f6a-2b9aa61f104d";
+        public const string Bland = "f1b11aac-c9ad-4fab-9dbe-a891b3960b5d";
+        public const string DiabeForGluco = "cb9a43b2-57da-4a5f-8aa5-53b181f70ad5";
+        public const string GinkgoVin = "2394e761-b521-4c0e-89cc-5974d999aaa1";
+        public const string Venaxin = "d0b8f57c-b211-49de-a8bc-6b73fe202c82";
+        public const string ForFlex = "ea8cdfa1-d9b9-487a-be06-35a7e9a2ce8c";
+        public const string ProstaRen = "cd744098-4a98-47ed-9cdc-c6aecf2e4ee3";
+        public const string Sleep = "ba354fd5-eaae-4c78-ba4e-f7a1b29394a8";
+        public const string Botanic = "97eaee94-a96b-492d-89db-51e4d3d2a3cd";
+        
+        // Workaround - permanent solution should be considered
+        public const string GeneralAudience = "Ботаник";
+    }
+    
     public class ERP_Marketing
     {
         public const string ZinSeD = "ZINSED";
