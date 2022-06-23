@@ -21,6 +21,7 @@ public class LogisticsProcurementReceivingOrder : ErpDocumentSale
         ToParty = new ErpCharacteristicId();
         PurchasePriceList = new ErpCharacteristicId();
         PaymentType = new ErpCharacteristicId();
+        Store = new ErpCharacteristicId();
         Lines = new List<ErpOrderLinesAccounting>();
 
     }
@@ -36,8 +37,9 @@ public class LogisticsProcurementReceivingOrder : ErpDocumentSale
     public ErpCharacteristicId ToParty { get; set; }
     public ErpCharacteristicId PurchasePriceList { get; set; }
     public ErpCharacteristicId Supplier { get; set; }
-    
     public ErpCharacteristicId PaymentType { get; set; }
+    
+    public ErpCharacteristicId Store { get; set; }
     
     // public _CurrencyDirectory CurrencyDirectory { get; set; }
     //

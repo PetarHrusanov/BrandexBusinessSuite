@@ -1,5 +1,3 @@
-using NPOI.SS.Formula.Functions;
-
 namespace BrandexSalesAdapter.Accounting.Controllers;
 
 using System.IO;
@@ -86,16 +84,16 @@ public class ConversionController : ApiController
         await using var streamRead = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(streamRead);
 
-        string rawText = PdfText(fullPath);
+        var rawText = PdfText(fullPath);
         
         var dateString = regexDate.Matches(file.FileName)[0];
         
         var date = DateTime.ParseExact(dateString.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
         
         var productsPrices = ProductPriceDictionaryFromText(rawText);
-        
+
         var sWebRootFolder = _hostEnvironment.WebRootPath;
-        var sFileName = @"Facebook_Accounting.xlsx";
+        const string sFileName = @"Facebook_Accounting.xlsx";
 
         var memory = new MemoryStream();
 
@@ -103,22 +101,43 @@ public class ConversionController : ApiController
             .Select(field => field.Name)
             .ToList();
 
+        var productCodesPrices = new Dictionary<string, Dictionary<string, decimal>>();
+        
         foreach (var product in productNames)
         {
             var fieldFacebook = typeof(Facebook).GetField(product, BindingFlags.Public | BindingFlags.Static);
             var valueFacebook = (string)fieldFacebook.GetValue(null);
             
-            var fieldERP = typeof(ERP_Accounting).GetField(product, BindingFlags.Public | BindingFlags.Static);
-            var valueERP = (string)fieldERP.GetValue(null);
+            var fieldErp = typeof(ERP_Accounting).GetField(product, BindingFlags.Public | BindingFlags.Static);
+            var valueErp = (string)fieldErp.GetValue(null);
+            
+            var fieldERPCode = typeof(ErpCodesNumber).GetField(product, BindingFlags.Public | BindingFlags.Static);
+            var valueERPCode = (string)fieldERPCode.GetValue(null);
 
             if (productsPrices.ContainsKey(valueFacebook))
             {
-                RenameKey(productsPrices, valueFacebook, valueERP);
+                var priceDouble = productsPrices
+                    .Where(k => k.Key == valueFacebook)
+                    .Select(p => p.Value)
+                    .FirstOrDefault()
+                    ; 
+                
+                var price = (double)priceDouble * euroRate;
+                var priceRounded = Math.Round(price, 2);
+                
+                RenameKey(productsPrices, valueFacebook, valueErp);
+
+                productCodesPrices.Add(valueErp, new Dictionary<string, decimal>()
+                {
+                    {  valueERPCode,(decimal)priceRounded }
+                });
+                
+
             }
         }
         
         
-        var sortedProducts = productsPrices.OrderBy(x => x.Key);
+        var sortedProducts = productsPrices.OrderBy(x => x.Key).ToDictionary<KeyValuePair<string, decimal>, string, decimal>(pair => pair.Key, pair => pair.Value);;
 
         await using (var fs = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
         {
@@ -138,14 +157,14 @@ public class ConversionController : ApiController
                     Id = "General_DocumentTypes(b1787109-6d5e-41ad-8ba6-b9a15ebccf5e)"
                 },
                 
-                DocumentNo = "Znaish Ko",
-                InvoiceDocumentNo = "Mahlenski Simpatqga",
+                DocumentNo = facebookInvoiceNumber,
+                InvoiceDocumentNo = facebookInvoiceNumber,
                 
-                EnterpriseCompany = new ErpDocument._EnterpriseCompany()
+                EnterpriseCompany = new ErpCharacteristicId()
                 {
                     Id = "General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)"
                 },
-                EnterpriseCompanyLocation = new ErpDocument._EnterpriseCompanyLocation()
+                EnterpriseCompanyLocation = new ErpCharacteristicId()
                 {
                     Id = "General_Contacts_CompanyLocations(f3156c3c-7c04-4de7-bf03-8b983aada49f)"
                 },
@@ -223,7 +242,7 @@ public class ConversionController : ApiController
                     {
                         Value = 1
                     },
-                    LineStore = new ErpCharacteristicLineStore()
+                    LineStore = new ErpCharacteristicId()
                     {
                         Id = "Logistics_Inventory_Stores(100447ff-44f4-4799-a4c2-7c9b22fb0aaa)"
                     }
@@ -251,9 +270,72 @@ public class ConversionController : ApiController
             JObject obj = JObject.Parse(responceContent);
 
             var documentId = obj["@odata.id"].ToString();
+
+            var uriChangeState = new Uri($"{_apiSettings.GeneralRequest}{documentId}/ChangeState");
+
+            var newState = new { newState = "Released" };
+
+            string newStateSerialized = JsonConvert.SerializeObject(newState);
+        
+            var stateContent =  new StringContent(newStateSerialized, Encoding.UTF8, RequestConstants.ApplicationJson);
             
+            // await clientErp.PostAsync(uriChangeState, stateContent);
+            var responseState = await clientErp.PostAsync(uriChangeState, stateContent);
+            
+            uri = new Uri($"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoices?$filter=equalnull(DocumentNo,'{primaryDocument.InvoiceDocumentNo}')");
+            
+            response = await clientErp.GetAsync(uri);
+            responceContent = await response.Content.ReadAsStringAsync();
+            obj = JObject.Parse(responceContent);
+            
+            var invoice = (obj["value"]);
+            var invoiceId = Convert.ToString(invoice[0]["@odata.id"]);
+
+            uri = new Uri($"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoiceLines?$filter=PurchaseInvoice%20eq%20'{invoiceId}'");
+            response = await clientErp.GetAsync(uri);
+            responceContent = await response.Content.ReadAsStringAsync();
+            obj = JObject.Parse(responceContent);
+
+            var invoiceLinesJsonArray = (obj["value"]);
+            var invpiceLinesString = Convert.ToString(invoiceLinesJsonArray);
+            var invoiceLines = JsonConvert.DeserializeObject<List<ErpInvoiceLinesAccounting>>(invpiceLinesString);
             
 
+            foreach (var line in invoiceLines)
+            {
+                var unitPrice = line.UnitPrice.Value;
+                
+                var productName = productCodesPrices
+                    .Where(k => k.Value.Any(s => s.Value == unitPrice))
+                    .Select(k => k.Key).FirstOrDefault();
+                
+                var productCode = productCodesPrices
+                    .Where(k => k.Value.Any(s => s.Value == unitPrice))
+                    .Select(k => k.Value.Select(s=>s.Key).FirstOrDefault()).FirstOrDefault();
+                
+
+                line.CustomProperty_Продукт_u002Dпокупки.Description.BG = productName;
+                line.CustomProperty_Продукт_u002Dпокупки.Value = productCode;
+                
+                line.CustomProperty_ВРМ_u002Dпокупки.Value = "83";
+                line.CustomProperty_ВРМ_u002Dпокупки.Description.BG = "Фейсбук";
+                
+                uri = new Uri($"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoiceLines({line.Id})");
+                
+                json = JsonConvert.SerializeObject(line, Formatting.Indented);
+                content = new StringContent(json, Encoding.UTF8, RequestConstants.ApplicationJson);
+                
+                response = await clientErp.PutAsync(uri, content);
+
+            }
+            
+            uriChangeState = new Uri($"{_apiSettings.GeneralRequest}{invoiceId}/ChangeState");
+            
+            
+            // await clientErp.PostAsync(uriChangeState, stateContent);
+
+            responseState = await clientErp.PostAsync(uriChangeState, stateContent);
+            
             workbook.Write(fs);
 
         }
@@ -406,7 +488,7 @@ public class ConversionController : ApiController
             var fieldsValues = new List<string>();
             var fieldsGoogle = typeof(Google_Marketing).GetFields(BindingFlags.Public | BindingFlags.Static);
             fieldsValues.AddRange(fieldsGoogle.Select(field => (string)field.GetValue(null)!));
-                
+
             var sWebRootFolder = _hostEnvironment.WebRootPath;
             var sFileName = @"Google_Marketing.xlsx";
             var memory = new MemoryStream();
@@ -663,21 +745,21 @@ public class ConversionController : ApiController
         
         var activityObject = new MarketingActivityCm()
             {
-                DocumentType = new MarketingActivityCm._DocumentType()
+                DocumentType = new ErpCharacteristicId()
                 {
                     Id = "General_DocumentTypes(59b265f7-391a-4226-8bcb-44e192ba5690)"
                 },
-                EnterpriseCompany = new MarketingActivityCm._EnterpriseCompany()
+                EnterpriseCompany = new ErpCharacteristicId()
                 {
                     Id = "General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)"
                 },
-                EnterpriseCompanyLocation = new MarketingActivityCm._EnterpriseCompanyLocation()
+                EnterpriseCompanyLocation = new ErpCharacteristicId()
                 {
                     Id = "General_Contacts_CompanyLocations(902743f5-6076-4b5e-b725-2daa192c71f6)"
                 },
                 SystemType = "Task",
                 Subject = subject,
-                ResponsibleParty = new MarketingActivityCm._ResponsibleParty()
+                ResponsibleParty = new ErpCharacteristicId()
                 {
                     Id = "General_Contacts_Parties(2469d153-839f-445a-b7c2-2e7cb955c491)"
                 },
@@ -685,60 +767,60 @@ public class ConversionController : ApiController
                 StartTime =  $"{date:yyyy-MM-dd}",
                 DeadlineTime = $"{date:yyyy-MM-dd}",
                 
-                OwnerParty = new MarketingActivityCm._OwnerParty()
+                OwnerParty = new ErpCharacteristicId()
                 {
                     Id = "General_Contacts_Parties(2469d153-839f-445a-b7c2-2e7cb955c491)"
                 },
                 
-                ResponsiblePerson = new MarketingActivityCm._ResponsiblePerson()
+                ResponsiblePerson = new ErpCharacteristicId()
                 {
                     Id = "General_Contacts_Persons(623ed5c7-2eec-4e5b-a0c1-42c6faab3309)"
                 },
                 
-                ToParty = new ErpCharacteristicToParty()
+                ToParty = new ErpCharacteristicId()
                 {
                     Id = $"General_Contacts_Parties({partyId})"
                 },
                 
-                TargetParty = new MarketingActivityCm._TargetParty()
+                TargetParty = new ErpCharacteristicId()
                 {
                     Id =$"General_Contacts_Parties({partyId})"
                 },
                 
-                CustomProperty_МЕСЕЦ = new MarketingActivityCm._CustomProperty_МЕСЕЦ()
+                CustomProperty_МЕСЕЦ = new ErpCharacteristicValue()
                 {
                     Value = monthErp
                 },
                 
-                CustomProperty_1579648 = new MarketingActivityCm._CustomProperty_1579648()
+                CustomProperty_1579648 = new ErpCharacteristicValue()
                 {
                     Value = yearErp
                 },
-                CustomProperty_Размер = new MarketingActivityCm._CustomProperty_Размер()
+                CustomProperty_Размер = new ErpCharacteristicValue()
                 {
                     Value = measure
                 },
-                CustomProperty_тип_u0020реклама = new MarketingActivityCm._CustomProperty_тип_u0020реклама()
+                CustomProperty_тип_u0020реклама = new ErpCharacteristicValue()
                 {
                     Value = type
                 },
-                CustomProperty_ре = new MarketingActivityCm._CustomProperty_ре()
+                CustomProperty_ре = new ErpCharacteristicValue()
                 {
                     Value = media
                 },
-                CustomProperty_novinar = new MarketingActivityCm._CustomProperty_novinar()
+                CustomProperty_novinar = new ErpCharacteristicValue()
                 {
                     Value = publishType
                 },
-                CustomProperty_цена_u0020реклама = new MarketingActivityCm._CustomProperty_цена_u0020реклама()
+                CustomProperty_цена_u0020реклама = new ErpCharacteristicValue()
                 {
                     Value = $"{price}"
                 },
-                CustomProperty_058 = new MarketingActivityCm._CustomProperty_058()
+                CustomProperty_058 = new ErpCharacteristicValue()
                 {
                     Value = ""
                 },
-                CustomProperty_ПРОДУКТ_u0020БРАНДЕКС = new MarketingActivityCm._CustomProperty_ПРОДУКТ_u0020БРАНДЕКС()
+                CustomProperty_ПРОДУКТ_u0020БРАНДЕКС = new ErpCharacteristicValue()
                 {
                     Value = product
                 },
