@@ -1,6 +1,8 @@
+namespace BrandexSalesAdapter.Models.ErpDocuments;
+
 using Newtonsoft.Json;
 
-namespace BrandexSalesAdapter.Models.ErpDocuments;
+using static Common.ErpConstants;
 
 public class ErpInvoiceLinesAccounting
 {
@@ -20,41 +22,15 @@ public class ErpInvoiceLinesAccounting
         CustomProperty_ВРМ_u002Dпокупки = new ErpCharacteristicValueDescriptionBg();
 
     }
-
-    // [JsonProperty("@odata.context")]
-    // public string Entity { get; set; } =
-    //     "https: //brandexbg.my.erp.net/api/domain/odata/$metadata#Logistics_Procurement_PurchaseInvoiceLines/$entity";
+    
     
     public string Id { get; set; } 
     
-    [JsonProperty("@odata.id")]
+    [JsonProperty(ErpDocuments.ODataId)]
     public string OId { get; set; }
-    
-    public string DeliveryTermsCode { get; set; }
-    
-    public string IntrastatApplyDate { get; set; }
-    
-    public string IntrastatTransactionNatureCode { get; set; }
-    
-    public string IntrastatTransportModeCode { get; set; }
-    
+
     public int LineNo { get; set; }
-    
-    public string Notes { get; set; }
-    
-    public string IntrastatDestinationRegion { get; set; }
-    
-    public string IntrastatTransportCountry { get; set; }
-    
-    public string LineCostCenter { get; set; }
-    
-    public string LineDealType { get; set; }
-    
-    public string OriginCountry { get; set; }
-    
-    public string SaleLineDealType { get; set; }
-    
-    
+
     public ErpCharacteristicProductName ProductName { get; set; }
     public ErpCharacteristicValueNumber Quantity { get; set; }
     

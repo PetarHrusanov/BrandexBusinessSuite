@@ -1,12 +1,7 @@
-using BrandexSalesAdapter.ExcelLogic.Data.Seeding;
-using BrandexSalesAdapter.Services.Data;
-
 namespace BrandexSalesAdapter.ExcelLogic;
 
-// Data 
 using Data;
 
-// Common Services
 using Services;
 
 // Business- Specific Services
@@ -26,7 +21,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using BrandexSalesAdapter.Infrastructure;
+using BrandexSalesAdapter.Services.Data;
+using Infrastructure;
+using Data.Seeding;
 
 
 public class Startup
