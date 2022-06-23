@@ -1,7 +1,5 @@
 namespace BrandexSalesAdapter.Models.ErpDocuments;
 
-using Newtonsoft.Json;
-
 public abstract class ErpDocument
 {
 

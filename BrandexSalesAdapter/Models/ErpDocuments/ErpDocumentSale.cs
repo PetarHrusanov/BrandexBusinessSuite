@@ -1,7 +1,5 @@
 namespace BrandexSalesAdapter.Models.ErpDocuments;
 
-using Newtonsoft.Json;
-
 public abstract class ErpDocumentSale : ErpDocument
 {
 
@@ -16,8 +14,5 @@ public abstract class ErpDocumentSale : ErpDocument
     public ErpCharacteristicId DocumentCurrency { get; set; } 
     public ErpCharacteristicId PaymentAccount { get; set; }
     public ErpCharacteristicId PaymentType { get; set; }
-    // public ErpCharacteristicId Store { get; set; }
-    
-    
-    
+
 }

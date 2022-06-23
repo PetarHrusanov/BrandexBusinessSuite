@@ -1,6 +1,3 @@
-using BrandexSalesAdapter.Accounting.Requests;
-using BrandexSalesAdapter.Models;
-
 namespace BrandexSalesAdapter.Accounting;
 
 using System.Reflection;
@@ -14,9 +11,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-using Models;
+using BrandexSalesAdapter.Models;
 using Services.Identity;
 using Infrastructure;
+using Requests;
 
 
 public class Startup
