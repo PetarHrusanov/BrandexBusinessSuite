@@ -39,7 +39,7 @@ public class ConversionController : ApiController
     private readonly UserSettings _userSettings;
     private readonly ApiSettings _apiSettings;
     
-    private static readonly HttpClient client = new HttpClient();
+    private static readonly HttpClient Client = new HttpClient();
     
     private const string FacebookEng = "Facebook";
     private const string FacebookBgCapital = "Фейсбук";
@@ -52,11 +52,13 @@ public class ConversionController : ApiController
     private const string Click = "клик";
     private const string Impressions = "впечатления";
 
-    private const double euroRate = 1.9894;
+    private readonly string _newStateSerialized = JsonConvert.SerializeObject( new { newState = "Released" });
+
+    private const double EuroRate = 1.9894;
     
-    private static readonly Regex regexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
-    private static readonly Regex priceRegex = new (@"[0-9]+[.,][0-9]*");
-    private static readonly Regex facebookInvoiceRegex = new (@"FBADS-[0-9]{3}-[0-9]{9}");
+    private static readonly Regex RegexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
+    private static readonly Regex PriceRegex = new (@"[0-9]+[.,][0-9]*");
+    private static readonly Regex FacebookInvoiceRegex = new (@"FBADS-[0-9]{3}-[0-9]{9}");
 
     public ConversionController(IWebHostEnvironment hostEnvironment,
         IOptions<UserSettings> userSettings,
@@ -75,7 +77,7 @@ public class ConversionController : ApiController
     public async Task<IActionResult> ConvertFacebookPdfForAccounting([FromForm] IFormFile file)
     {
         
-        string newPath = CreateFileDirectories.CreatePDFFilesInputDirectory(_hostEnvironment);
+        var newPath = CreateFileDirectories.CreatePDFFilesInputDirectory(_hostEnvironment);
 
         if (file.Length <= 0) throw new ArgumentNullException();
         
@@ -86,8 +88,7 @@ public class ConversionController : ApiController
 
         var rawText = PdfText(fullPath);
         
-        var dateString = regexDate.Matches(file.FileName)[0];
-        
+        var dateString = RegexDate.Matches(file.FileName)[0];
         var date = DateTime.ParseExact(dateString.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
         
         var productsPrices = ProductPriceDictionaryFromText(rawText);
@@ -106,38 +107,31 @@ public class ConversionController : ApiController
         foreach (var product in productNames)
         {
             var fieldFacebook = typeof(Facebook).GetField(product, BindingFlags.Public | BindingFlags.Static);
-            var valueFacebook = (string)fieldFacebook.GetValue(null);
+            var valueFacebook = (string)fieldFacebook!.GetValue(null)!;
             
             var fieldErp = typeof(ERP_Accounting).GetField(product, BindingFlags.Public | BindingFlags.Static);
-            var valueErp = (string)fieldErp.GetValue(null);
+            var valueErp = (string)fieldErp!.GetValue(null)!;
             
-            var fieldERPCode = typeof(ErpCodesNumber).GetField(product, BindingFlags.Public | BindingFlags.Static);
-            var valueERPCode = (string)fieldERPCode.GetValue(null);
+            var fieldErpCode = typeof(ErpCodesNumber).GetField(product, BindingFlags.Public | BindingFlags.Static);
+            var valueErpCode = (string)fieldErpCode!.GetValue(null)!;
 
-            if (productsPrices.ContainsKey(valueFacebook))
+            if (!productsPrices.ContainsKey(valueFacebook)) continue;
+            
+            var priceDouble = productsPrices
+                .Where(k => k.Key == valueFacebook)
+                .Select(p => p.Value)
+                .FirstOrDefault();
+            var price = (double)priceDouble * EuroRate;
+            var priceRounded = Math.Round(price, 2);
+                
+            RenameKey(productsPrices, valueFacebook, valueErp);
+
+            productCodesPrices.Add(valueErp, new Dictionary<string, decimal>()
             {
-                var priceDouble = productsPrices
-                    .Where(k => k.Key == valueFacebook)
-                    .Select(p => p.Value)
-                    .FirstOrDefault()
-                    ; 
-                
-                var price = (double)priceDouble * euroRate;
-                var priceRounded = Math.Round(price, 2);
-                
-                RenameKey(productsPrices, valueFacebook, valueErp);
-
-                productCodesPrices.Add(valueErp, new Dictionary<string, decimal>()
-                {
-                    {  valueERPCode,(decimal)priceRounded }
-                });
-                
-
-            }
+                {  valueErpCode,(decimal)priceRounded }
+            });
         }
         
-        
-        var sortedProducts = productsPrices.OrderBy(x => x.Key).ToDictionary<KeyValuePair<string, decimal>, string, decimal>(pair => pair.Key, pair => pair.Value);;
 
         await using (var fs = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
         {
@@ -147,7 +141,7 @@ public class ConversionController : ApiController
 
             var row = excelSheet.CreateRow(0);
 
-            var facebookInvoiceNumber = facebookInvoiceRegex.Matches(rawText)[0].ToString();
+            var facebookInvoiceNumber = FacebookInvoiceRegex.Matches(rawText)[0].ToString();
 
             var primaryDocument = new LogisticsProcurementReceivingOrder()
             {
@@ -216,16 +210,14 @@ public class ConversionController : ApiController
             };
 
 
-            foreach (var dictEntry in sortedProducts)
+            foreach (var (key, value) in productsPrices)
             {
-                
-                
                 row = excelSheet.CreateRow(excelSheet.LastRowNum+1);
-                row.CreateCell(row.Cells.Count()).SetCellValue(dictEntry.Key);
-                row.CreateCell(row.Cells.Count()).SetCellValue((double)dictEntry.Value);
-                row.CreateCell(row.Cells.Count()).SetCellValue((double)dictEntry.Value*euroRate);
+                row.CreateCell(row.Cells.Count()).SetCellValue(key);
+                row.CreateCell(row.Cells.Count()).SetCellValue((double)value);
+                row.CreateCell(row.Cells.Count()).SetCellValue((double)value*EuroRate);
                 
-                var price = (double)dictEntry.Value * euroRate;
+                var price = (double)value * EuroRate;
                 var priceRounded = Math.Round(price, 2);
 
                 var erpLine = new ErpOrderLinesAccounting()
@@ -252,66 +244,53 @@ public class ConversionController : ApiController
 
             }
             
-            string json = JsonConvert.SerializeObject(primaryDocument, Formatting.Indented);
-            
-            var clientErp = new HttpClient();
-            
+            var json = JsonConvert.SerializeObject(primaryDocument, Formatting.Indented);
+
             var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.AccountingAccount}:{_userSettings.AccountingPassword}");
-            clientErp.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             
             var uri = new Uri(_apiSettings.LogisticsProcurementReceivingOrders);
-            
             var content = new StringContent(json, Encoding.UTF8, RequestConstants.ApplicationJson);
 
-            var response = await clientErp.PostAsync(uri, content);
+            var response = await Client.PostAsync(uri, content);
+            var responseContentJObj = JObject.Parse(await response.Content.ReadAsStringAsync());
 
-            var responceContent = await response.Content.ReadAsStringAsync();
+            var primaryDocumentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
 
-            JObject obj = JObject.Parse(responceContent);
-
-            var documentId = obj["@odata.id"].ToString();
-
-            var uriChangeState = new Uri($"{_apiSettings.GeneralRequest}{documentId}/ChangeState");
-
-            var newState = new { newState = "Released" };
-
-            string newStateSerialized = JsonConvert.SerializeObject(newState);
-        
-            var stateContent =  new StringContent(newStateSerialized, Encoding.UTF8, RequestConstants.ApplicationJson);
+            var uriChangeState = new Uri($"{_apiSettings.GeneralRequest}{primaryDocumentId}/ChangeState");
+            var stateContent =  new StringContent(_newStateSerialized, Encoding.UTF8, RequestConstants.ApplicationJson);
             
-            // await clientErp.PostAsync(uriChangeState, stateContent);
-            var responseState = await clientErp.PostAsync(uriChangeState, stateContent);
+            await Client.PostAsync(uriChangeState, stateContent);
             
             uri = new Uri($"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoices?$filter=equalnull(DocumentNo,'{primaryDocument.InvoiceDocumentNo}')");
             
-            response = await clientErp.GetAsync(uri);
-            responceContent = await response.Content.ReadAsStringAsync();
-            obj = JObject.Parse(responceContent);
+            response = await Client.GetAsync(uri);
+            responseContentJObj = JObject.Parse(await response.Content.ReadAsStringAsync());
             
-            var invoice = (obj["value"]);
-            var invoiceId = Convert.ToString(invoice[0]["@odata.id"]);
+            var invoice = (responseContentJObj[ErpDocuments.ValueLower]);
+            var invoiceId = Convert.ToString(invoice![0]![ErpDocuments.ODataId]);
 
             uri = new Uri($"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoiceLines?$filter=PurchaseInvoice%20eq%20'{invoiceId}'");
-            response = await clientErp.GetAsync(uri);
-            responceContent = await response.Content.ReadAsStringAsync();
-            obj = JObject.Parse(responceContent);
-
-            var invoiceLinesJsonArray = (obj["value"]);
-            var invpiceLinesString = Convert.ToString(invoiceLinesJsonArray);
-            var invoiceLines = JsonConvert.DeserializeObject<List<ErpInvoiceLinesAccounting>>(invpiceLinesString);
+            response = await Client.GetAsync(uri);
+            responseContentJObj = JObject.Parse(await response.Content.ReadAsStringAsync());
             
-
-            foreach (var line in invoiceLines)
+            
+            var invoiceLinesString = Convert.ToString(responseContentJObj[ErpDocuments.ValueLower]);
+            var invoiceLines = JsonConvert.DeserializeObject<List<ErpInvoiceLinesAccounting>>(invoiceLinesString!);
+            
+            foreach (var line in invoiceLines!)
             {
                 var unitPrice = line.UnitPrice.Value;
                 
                 var productName = productCodesPrices
                     .Where(k => k.Value.Any(s => s.Value == unitPrice))
                     .Select(k => k.Key).FirstOrDefault();
+
+                var productCode = productCodesPrices[productName!].Keys.FirstOrDefault();
                 
-                var productCode = productCodesPrices
-                    .Where(k => k.Value.Any(s => s.Value == unitPrice))
-                    .Select(k => k.Value.Select(s=>s.Key).FirstOrDefault()).FirstOrDefault();
+                // var productCode = productCodesPrices
+                //     .Where(k => k.Value.Any(s => s.Value == unitPrice))
+                //     .Select(k => k.Value.Select(s=>s.Key).FirstOrDefault()).FirstOrDefault();
                 
 
                 line.CustomProperty_Продукт_u002Dпокупки.Description.BG = productName;
@@ -325,25 +304,22 @@ public class ConversionController : ApiController
                 json = JsonConvert.SerializeObject(line, Formatting.Indented);
                 content = new StringContent(json, Encoding.UTF8, RequestConstants.ApplicationJson);
                 
-                response = await clientErp.PutAsync(uri, content);
+                await Client.PutAsync(uri, content);
 
             }
             
             uriChangeState = new Uri($"{_apiSettings.GeneralRequest}{invoiceId}/ChangeState");
-            
-            
-            // await clientErp.PostAsync(uriChangeState, stateContent);
 
-            responseState = await clientErp.PostAsync(uriChangeState, stateContent);
+            await Client.PostAsync(uriChangeState, stateContent);
             
             workbook.Write(fs);
 
         }
 
-        await using (var streatWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
+        await using (var streamWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
         {
 
-            await streatWrite.CopyToAsync(memory);
+            await streamWrite.CopyToAsync(memory);
 
         }
 
@@ -360,7 +336,7 @@ public class ConversionController : ApiController
     public async Task<IActionResult> ConvertFacebookPdfForMarketing([FromForm] IFormFile file)
     {
         
-        var dateString = regexDate.Matches(file.FileName)[0];
+        var dateString = RegexDate.Matches(file.FileName)[0];
         
         var date = DateTime.ParseExact(dateString.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
@@ -396,7 +372,7 @@ public class ConversionController : ApiController
             foreach (var product in sortedProducts)
             {
 
-                var price = (double)product.Value * euroRate;
+                var price = (double)product.Value * EuroRate;
                 var priceRounded = Math.Round(price, 2);
 
                 CreateErpMarketingXlsSheet(workbook,
@@ -472,18 +448,7 @@ public class ConversionController : ApiController
                 sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
 
             }
-
-            // var headerRow = sheet.GetRow(0); //Get Header Row
-
-            // int cellCount = headerRow.LastCellNum;
-
-            // for (var j = 0; j < cellCount; j++)
-            // {
-            //     var cell = headerRow.GetCell(j);
-            //
-            //     if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-            //
-            // }
+            
 
             var fieldsValues = new List<string>();
             var fieldsGoogle = typeof(Google_Marketing).GetFields(BindingFlags.Public | BindingFlags.Static);
@@ -523,7 +488,7 @@ public class ConversionController : ApiController
                     }
                     
                     var priceRow = row.GetCell(4).ToString()?.TrimEnd();
-                    var priceString = priceRegex.Matches(priceRow)[0].ToString();
+                    var priceString = PriceRegex.Matches(priceRow)[0].ToString();
                     var price = double.Parse(priceString);
                         
                     var dateRow = row.GetCell(0).ToString().TrimEnd();
@@ -611,7 +576,7 @@ public class ConversionController : ApiController
                     productsPrices.Add(product,0);
                 }
 
-                var priceString = priceRegex.Matches(line)[0].ToString();
+                var priceString = PriceRegex.Matches(line)[0].ToString();
 
                 decimal price = 1;
 
@@ -659,7 +624,7 @@ public class ConversionController : ApiController
         string media,
         string publishType,
         double price,
-        string TRP,
+        string trp,
         string product
         )
     {
@@ -696,7 +661,7 @@ public class ConversionController : ApiController
 
         row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
         row.CreateCell(row.Cells.Count()).SetCellValue("ТРП");
-        row.CreateCell(row.Cells.Count()).SetCellValue(TRP);
+        row.CreateCell(row.Cells.Count()).SetCellValue(trp);
 
         row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
         row.CreateCell(row.Cells.Count()).SetCellValue("ПРОДУКТ БРАНДЕКС");
@@ -827,33 +792,26 @@ public class ConversionController : ApiController
 
             };
         
-        string json = JsonConvert.SerializeObject(activityObject, Formatting.Indented);
-            
-        var clientErp = new HttpClient();
-            
+        var json = JsonConvert.SerializeObject(activityObject, Formatting.Indented);
+
         var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.MarketingAccount}:{_userSettings.MarketingPassword}");
-        clientErp.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             
         var uri = new Uri(_apiSettings.GeneralContactActivities);
             
         var content = new StringContent(json, Encoding.UTF8, RequestConstants.ApplicationJson);
 
-        var response = await clientErp.PostAsync(uri, content);
+        var response = await Client.PostAsync(uri, content);
+        var responseContent = await response.Content.ReadAsStringAsync();
 
-        var responceContent = await response.Content.ReadAsStringAsync();
+        var obj = JObject.Parse(responseContent);
 
-        JObject obj = JObject.Parse(responceContent);
+        var documentId = obj[ErpDocuments.ODataId]!.ToString();
 
-        var documentId = obj["@odata.id"].ToString();
+        var uriChangeState = new Uri($"{_apiSettings.GeneralRequest}{documentId}/ChangeState");
 
-        var uriChangeSrate = new Uri($"{_apiSettings.GeneralRequest}{documentId}/ChangeState");
-
-        var newState = new { newState = "Released" };
-
-        string newStateSerialized = JsonConvert.SerializeObject(newState);
-        
-        var stateContent =  new StringContent(newStateSerialized, Encoding.UTF8, RequestConstants.ApplicationJson);
-        var responseState = await clientErp.PostAsync(uriChangeSrate, stateContent);
+        var stateContent =  new StringContent(_newStateSerialized, Encoding.UTF8, RequestConstants.ApplicationJson);
+        var responseState = await Client.PostAsync(uriChangeState, stateContent);
 
         Console.WriteLine(responseState);
     }
