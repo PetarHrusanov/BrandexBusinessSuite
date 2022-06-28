@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "F7I9baFk6JBWh9PYR7q/sINDqsAQ7/w2eQsArczO2sE0+m/UvWo/s/SlUdH9o30e80cKoAZNgytkQu5JT+WnAw==",
+  "dgSpecHash": "MPR6R0v0ct0BmrFKWdvkEpqTGPQJE2xV0RyFDJOXQsrCP/0aR4hUlDtgQn6EAPFyQu6c2kaIsGaiNlMTedckIA==",
   "success": true,
-  "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj",
+  "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj",
   "expectedPackageFiles": [
     "/Users/Petar/.nuget/packages/aspnetcore.healthchecks.rabbitmq/3.1.2/aspnetcore.healthchecks.rabbitmq.3.1.2.nupkg.sha512",
     "/Users/Petar/.nuget/packages/aspnetcore.healthchecks.sqlserver/3.1.1/aspnetcore.healthchecks.sqlserver.3.1.1.nupkg.sha512",

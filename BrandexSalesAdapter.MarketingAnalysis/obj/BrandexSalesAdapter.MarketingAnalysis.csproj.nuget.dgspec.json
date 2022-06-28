@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj": {}
+    "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj": {}
   },
   "projects": {
-    "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj": {
+    "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj",
+        "projectUniqueName": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj",
         "projectName": "BrandexSalesAdapter.MarketingAnalysis",
-        "projectPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj",
+        "projectPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj",
         "packagesPath": "/Users/Petar/.nuget/packages/",
-        "outputPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter.MarketingAnalysis/obj/",
+        "outputPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.MarketingAnalysis/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/Petar/.nuget/NuGet/NuGet.Config"
@@ -26,8 +26,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter/BrandexSalesAdapter.csproj": {
-                "projectPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter/BrandexSalesAdapter.csproj"
+              "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter/BrandexSalesAdapter.csproj": {
+                "projectPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter/BrandexSalesAdapter.csproj"
               }
             }
           }
@@ -87,14 +87,14 @@
         }
       }
     },
-    "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter/BrandexSalesAdapter.csproj": {
+    "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter/BrandexSalesAdapter.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter/BrandexSalesAdapter.csproj",
+        "projectUniqueName": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter/BrandexSalesAdapter.csproj",
         "projectName": "BrandexSalesAdapter",
-        "projectPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter/BrandexSalesAdapter.csproj",
+        "projectPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter/BrandexSalesAdapter.csproj",
         "packagesPath": "/Users/Petar/.nuget/packages/",
-        "outputPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexSalesAdapter/BrandexSalesAdapter/obj/",
+        "outputPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/Petar/.nuget/NuGet/NuGet.Config"
