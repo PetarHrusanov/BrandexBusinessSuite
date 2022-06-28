@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Infrastructure;
+﻿namespace BrandexBusinessSuite.Infrastructure;
 
 using System.Linq;
 using System.Threading.Tasks;

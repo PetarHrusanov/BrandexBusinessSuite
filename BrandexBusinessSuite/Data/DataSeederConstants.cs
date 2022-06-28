@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Data
+﻿namespace BrandexBusinessSuite.Data
 {
     public class DataSeederConstants
     {

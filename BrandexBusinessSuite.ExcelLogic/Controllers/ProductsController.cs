@@ -15,15 +15,15 @@ using NPOI.XSSF.UserModel;
 
 using Newtonsoft.Json;
 
-using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Models;
-using BrandexSalesAdapter.Infrastructure;
+using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Models;
+using BrandexBusinessSuite.Infrastructure;
 
 using Models.Products;
 using Services;
 using Services.Products;
 
-using static BrandexSalesAdapter.Common.ExcelDataConstants.ExcelLineErrors;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
 
 public class ProductsController :AdministrationController
 {

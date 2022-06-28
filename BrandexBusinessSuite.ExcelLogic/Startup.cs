@@ -21,8 +21,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using BrandexSalesAdapter.Services.Data;
-using BrandexSalesAdapter.Infrastructure;
+using BrandexBusinessSuite.Services.Data;
+using BrandexBusinessSuite.Infrastructure;
 using Data.Seeding;
 
 

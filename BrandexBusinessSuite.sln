@@ -5,11 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.ExcelL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite", "BrandexBusinessSuite\BrandexBusinessSuite.csproj", "{97D5950C-AB01-4AB2-AB8D-662F2D939C21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.Identity", "BrandexSalesAdapter.Identity\BrandexSalesAdapter.Identity.csproj", "{EC33A447-DDE0-48F2-90F9-4B0148ACDB45}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.Identity", "BrandexBusinessSuite.Identity\BrandexBusinessSuite.Identity.csproj", "{EC33A447-DDE0-48F2-90F9-4B0148ACDB45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.MarketingAnalysis", "BrandexSalesAdapter.MarketingAnalysis\BrandexSalesAdapter.MarketingAnalysis.csproj", "{40A69A05-37ED-4DF9-AE8C-022694E38E78}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.MarketingAnalysis", "BrandexBusinessSuite.MarketingAnalysis\BrandexBusinessSuite.MarketingAnalysis.csproj", "{40A69A05-37ED-4DF9-AE8C-022694E38E78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.Accounting", "BrandexSalesAdapter.Accounting\BrandexSalesAdapter.Accounting.csproj", "{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.Accounting", "BrandexBusinessSuite.Accounting\BrandexBusinessSuite.Accounting.csproj", "{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

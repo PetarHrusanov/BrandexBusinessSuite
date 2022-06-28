@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Data.Models;
+﻿namespace BrandexBusinessSuite.Data.Models;
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;

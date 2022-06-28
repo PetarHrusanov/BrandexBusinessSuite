@@ -1,10 +1,9 @@
-﻿using System;
+﻿namespace BrandexBusinessSuite.ExcelLogic.Data.Models;
 
-namespace BrandexBusinessSuite.ExcelLogic.Data.Models;
-
+using System;
 using System.Collections.Generic;
 
-using BrandexSalesAdapter.Data.Models.Common;
+using BrandexBusinessSuite.Data.Models.Common;
 
 public class Region : IAuditInfo, IDeletableEntity
 {

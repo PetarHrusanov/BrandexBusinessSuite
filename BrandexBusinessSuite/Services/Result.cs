@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Services;
+﻿namespace BrandexBusinessSuite.Services;
 
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Messages;
+﻿namespace BrandexBusinessSuite.Messages;
 
 using System.Linq;
 using System.Threading;

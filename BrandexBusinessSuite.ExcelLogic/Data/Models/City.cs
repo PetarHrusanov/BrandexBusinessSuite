@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-using BrandexSalesAdapter.Data.Models.Common;
+using BrandexBusinessSuite.Data.Models.Common;
 
 public class City : IAuditInfo, IDeletableEntity
 {

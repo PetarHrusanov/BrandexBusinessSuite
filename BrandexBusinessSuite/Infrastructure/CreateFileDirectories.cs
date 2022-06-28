@@ -1,4 +1,4 @@
-namespace BrandexSalesAdapter.Infrastructure;
+namespace BrandexBusinessSuite.Infrastructure;
 
 using Microsoft.AspNetCore.Hosting;
 using static Common.Constants;

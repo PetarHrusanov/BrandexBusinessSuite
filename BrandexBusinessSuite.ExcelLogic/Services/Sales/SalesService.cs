@@ -16,9 +16,9 @@ using Models.Sales;
 using Microsoft.Extensions.Configuration;
     
     
-using static BrandexSalesAdapter.Common.ExcelDataConstants.Ditributors;
-using static BrandexSalesAdapter.Common.ExcelDataConstants.SalesColumns;
-using static BrandexSalesAdapter.Common.Constants;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.Ditributors;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.SalesColumns;
+using static BrandexBusinessSuite.Common.Constants;
 
 
 public class SalesService :ISalesService

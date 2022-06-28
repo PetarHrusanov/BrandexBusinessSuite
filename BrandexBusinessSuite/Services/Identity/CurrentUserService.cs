@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Services.Identity;
+﻿namespace BrandexBusinessSuite.Services.Identity;
 
 using System;
 using System.Security.Claims;

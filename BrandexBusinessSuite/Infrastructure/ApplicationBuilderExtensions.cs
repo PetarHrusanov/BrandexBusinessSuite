@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Infrastructure;
+﻿namespace BrandexBusinessSuite.Infrastructure;
 
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;

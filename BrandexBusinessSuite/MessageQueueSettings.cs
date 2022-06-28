@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter
+﻿namespace BrandexBusinessSuite
 {
     public class MessageQueueSettings
     {

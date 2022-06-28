@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Models;
+﻿namespace BrandexBusinessSuite.Models;
 
 using AutoMapper;
 

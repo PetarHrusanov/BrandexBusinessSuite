@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Infrastructure;
+﻿namespace BrandexBusinessSuite.Infrastructure;
 
 using System;
 using System.Collections.Generic;

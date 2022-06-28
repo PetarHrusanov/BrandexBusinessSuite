@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Services.Data;
+﻿namespace BrandexBusinessSuite.Services.Data;
 
 using System.Threading.Tasks;
 

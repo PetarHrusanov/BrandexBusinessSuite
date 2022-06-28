@@ -16,13 +16,13 @@ using NPOI.XSSF.UserModel;
 
 using Newtonsoft.Json;
 
-using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Models;
-using BrandexSalesAdapter.Infrastructure;
+using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Models;
+using BrandexBusinessSuite.Infrastructure;
 using Services.PharmacyChains;
 
-using static BrandexSalesAdapter.Common.InputOutputConstants.SingleStringConstants;
-using static BrandexSalesAdapter.Common.ExcelDataConstants.ExcelLineErrors;
+using static BrandexBusinessSuite.Common.InputOutputConstants.SingleStringConstants;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
 
 public class PharmacyChainsController : AdministrationController
 {

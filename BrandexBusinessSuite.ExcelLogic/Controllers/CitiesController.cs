@@ -17,14 +17,14 @@ using NPOI.XSSF.UserModel;
 
 using Newtonsoft.Json;
 
-using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Models;
-using BrandexSalesAdapter.Infrastructure;
+using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Models;
+using BrandexBusinessSuite.Infrastructure;
 using Services.Cities;
 
-using static BrandexSalesAdapter.Common.InputOutputConstants.SingleStringConstants;
-using static BrandexSalesAdapter.Common.ExcelDataConstants.ExcelLineErrors;
-using static BrandexSalesAdapter.Common.Constants;
+using static BrandexBusinessSuite.Common.InputOutputConstants.SingleStringConstants;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
+using static BrandexBusinessSuite.Common.Constants;
 
 public class CitiesController :AdministrationController
 {

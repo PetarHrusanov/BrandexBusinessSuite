@@ -8,14 +8,14 @@ using Microsoft.EntityFrameworkCore;
     
 using Newtonsoft.Json;
 
-using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Models;
+using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Models;
 
 using Data;
 using Data.Models;
 using Models.Distributor;
 
-using static BrandexSalesAdapter.Common.InputOutputConstants.SingleStringConstants;
+using static BrandexBusinessSuite.Common.InputOutputConstants.SingleStringConstants;
 
 public class DistributorsController :AdministrationController
 {

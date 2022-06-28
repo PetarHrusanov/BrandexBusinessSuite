@@ -1,4 +1,4 @@
-namespace BrandexSalesAdapter.Common;
+namespace BrandexBusinessSuite.Common;
 
 public class ErpConstants
 {
