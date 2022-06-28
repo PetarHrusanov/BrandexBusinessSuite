@@ -22,6 +22,7 @@ public class ErpOrderLinesAccounting
         LineAmount = lineAmount;
         Quantity = quantity;
         LineStore = lineStore;
+        PricePerUnit = lineAmount;
     }
 
 
@@ -29,6 +30,8 @@ public class ErpOrderLinesAccounting
     public ErpCharacteristicLineAmount LineAmount { get; set; }
     public ErpCharacteristicValueNumber Quantity { get; set; }
     public ErpCharacteristicId LineStore { get; set; }
+    
+    public ErpCharacteristicLineAmount PricePerUnit { get; set; }
 
     // public ErpCharacteristicQuantityUnit UnitPrice { get; set; }
     

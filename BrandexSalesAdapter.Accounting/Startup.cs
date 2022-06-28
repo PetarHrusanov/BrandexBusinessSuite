@@ -91,8 +91,19 @@ public class Startup
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // services.AddAuthentication();
+         
+        // services.AddCors();
         
-        services.AddCors();
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+        });
 
         services.AddControllers();
         
