@@ -209,8 +209,6 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/bin/Debug/net6.0/runtimes/win/lib/netstandard2.0/System.Runtime.Caching.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/bin/Debug/net6.0/runtimes/win/lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/bin/Debug/net6.0/runtimes/win/lib/netcoreapp3.0/System.Windows.Extensions.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/bin/Debug/net6.0/BrandexSalesAdapter.dll
-/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/bin/Debug/net6.0/BrandexSalesAdapter.pdb
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/obj/Debug/net6.0/BrandexSalesAdapter.Accounting.csproj.AssemblyReference.cache
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/obj/Debug/net6.0/BrandexSalesAdapter.Accounting.GeneratedMSBuildEditorConfig.editorconfig
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/obj/Debug/net6.0/BrandexSalesAdapter.Accounting.AssemblyInfoInputs.cache
@@ -226,3 +224,5 @@
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/obj/Debug/net6.0/ref/BrandexSalesAdapter.Accounting.dll
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/obj/Debug/net6.0/BrandexSalesAdapter.Accounting.pdb
 /Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/obj/Debug/net6.0/BrandexSalesAdapter.Accounting.genruntimeconfig.cache
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/bin/Debug/net6.0/BrandexBusinessSuite.dll
+/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter.Accounting/bin/Debug/net6.0/BrandexBusinessSuite.pdb

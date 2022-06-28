@@ -22,7 +22,7 @@ namespace BrandexSalesAdapter.Identity.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationRole", b =>
+            modelBuilder.Entity("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -61,7 +61,7 @@ namespace BrandexSalesAdapter.Identity.Data.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationUser", b =>
+            modelBuilder.Entity("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -261,7 +261,7 @@ namespace BrandexSalesAdapter.Identity.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationRole", null)
+                    b.HasOne("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -270,11 +270,11 @@ namespace BrandexSalesAdapter.Identity.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
+                    b.HasOne("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
                         .WithMany("Claims")
                         .HasForeignKey("ApplicationUserId");
 
-                    b.HasOne("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
+                    b.HasOne("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -283,11 +283,11 @@ namespace BrandexSalesAdapter.Identity.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
+                    b.HasOne("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
                         .WithMany("Logins")
                         .HasForeignKey("ApplicationUserId");
 
-                    b.HasOne("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
+                    b.HasOne("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -296,17 +296,17 @@ namespace BrandexSalesAdapter.Identity.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
+                    b.HasOne("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
                         .WithMany("Roles")
                         .HasForeignKey("ApplicationUserId");
 
-                    b.HasOne("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationRole", null)
+                    b.HasOne("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
+                    b.HasOne("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -315,14 +315,14 @@ namespace BrandexSalesAdapter.Identity.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
+                    b.HasOne("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BrandexSalesAdapter.Identity.Data.Models.ApplicationUserModels.ApplicationUser", b =>
+            modelBuilder.Entity("BrandexBusinessSuite.Identity.Data.Models.ApplicationUserModels.ApplicationUser", b =>
                 {
                     b.Navigation("Claims");
 

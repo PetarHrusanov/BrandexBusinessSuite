@@ -2528,7 +2528,7 @@
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
       },
-      "BrandexSalesAdapter/1.0.0": {
+      "BrandexBusinessSuite/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
@@ -2549,10 +2549,10 @@
           "Newtonsoft.Json": "13.0.1"
         },
         "compile": {
-          "bin/placeholder/BrandexSalesAdapter.dll": {}
+          "bin/placeholder/BrandexBusinessSuite.dll": {}
         },
         "runtime": {
-          "bin/placeholder/BrandexSalesAdapter.dll": {}
+          "bin/placeholder/BrandexBusinessSuite.dll": {}
         },
         "frameworkReferences": [
           "Microsoft.AspNetCore.App"
@@ -8431,16 +8431,16 @@
         "system.xml.xdocument.nuspec"
       ]
     },
-    "BrandexSalesAdapter/1.0.0": {
+    "BrandexBusinessSuite/1.0.0": {
       "type": "project",
-      "path": "../BrandexSalesAdapter/BrandexSalesAdapter.csproj",
-      "msbuildProject": "../BrandexSalesAdapter/BrandexSalesAdapter.csproj"
+      "path": "../BrandexBusinessSuite/BrandexBusinessSuite.csproj",
+      "msbuildProject": "../BrandexBusinessSuite/BrandexBusinessSuite.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
       "AutoMapper.Extensions.Microsoft.DependencyInjection >= 11.0.0",
-      "BrandexSalesAdapter >= 1.0.0",
+      "BrandexBusinessSuite >= 1.0.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 6.0.4",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 3.1.5",
       "Microsoft.AspNetCore.Identity.UI >= 6.0.4",
@@ -8474,8 +8474,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter/BrandexSalesAdapter.csproj": {
-              "projectPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexSalesAdapter/BrandexSalesAdapter.csproj"
+            "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite/BrandexBusinessSuite.csproj": {
+              "projectPath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite/BrandexBusinessSuite.csproj"
             }
           }
         }

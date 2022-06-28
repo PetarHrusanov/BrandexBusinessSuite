@@ -22,7 +22,7 @@ namespace BrandexSalesAdapter.MarketingAnalysis.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("BrandexSalesAdapter.MarketingAnalysis.Data.Models.AdMedia", b =>
+            modelBuilder.Entity("BrandexBusinessSuite.MarketingAnalysis.Data.Models.AdMedia", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,7 +54,7 @@ namespace BrandexSalesAdapter.MarketingAnalysis.Data.Migrations
                     b.ToTable("AdMedias");
                 });
 
-            modelBuilder.Entity("BrandexSalesAdapter.MarketingAnalysis.Data.Models.MarketingActivity", b =>
+            modelBuilder.Entity("BrandexBusinessSuite.MarketingAnalysis.Data.Models.MarketingActivity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -99,7 +99,7 @@ namespace BrandexSalesAdapter.MarketingAnalysis.Data.Migrations
                     b.ToTable("MarketingActivities");
                 });
 
-            modelBuilder.Entity("BrandexSalesAdapter.MarketingAnalysis.Data.Models.Product", b =>
+            modelBuilder.Entity("BrandexBusinessSuite.MarketingAnalysis.Data.Models.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -132,15 +132,15 @@ namespace BrandexSalesAdapter.MarketingAnalysis.Data.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("BrandexSalesAdapter.MarketingAnalysis.Data.Models.MarketingActivity", b =>
+            modelBuilder.Entity("BrandexBusinessSuite.MarketingAnalysis.Data.Models.MarketingActivity", b =>
                 {
-                    b.HasOne("BrandexSalesAdapter.MarketingAnalysis.Data.Models.AdMedia", "AdMedia")
+                    b.HasOne("BrandexBusinessSuite.MarketingAnalysis.Data.Models.AdMedia", "AdMedia")
                         .WithMany("MarketingActivities")
                         .HasForeignKey("AdMediaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BrandexSalesAdapter.MarketingAnalysis.Data.Models.Product", "Product")
+                    b.HasOne("BrandexBusinessSuite.MarketingAnalysis.Data.Models.Product", "Product")
                         .WithMany("MarketingActivities")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -151,12 +151,12 @@ namespace BrandexSalesAdapter.MarketingAnalysis.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("BrandexSalesAdapter.MarketingAnalysis.Data.Models.AdMedia", b =>
+            modelBuilder.Entity("BrandexBusinessSuite.MarketingAnalysis.Data.Models.AdMedia", b =>
                 {
                     b.Navigation("MarketingActivities");
                 });
 
-            modelBuilder.Entity("BrandexSalesAdapter.MarketingAnalysis.Data.Models.Product", b =>
+            modelBuilder.Entity("BrandexBusinessSuite.MarketingAnalysis.Data.Models.Product", b =>
                 {
                     b.Navigation("MarketingActivities");
                 });

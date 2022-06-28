@@ -9,7 +9,7 @@
       "BrandexSalesAdapter.Identity/1.0.0": {
         "dependencies": {
           "AutoMapper.Extensions.Microsoft.DependencyInjection": "11.0.0",
-          "BrandexSalesAdapter": "1.0.0",
+          "BrandexBusinessSuite": "1.0.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "6.0.4",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "3.1.5",
           "Microsoft.AspNetCore.Identity.UI": "6.0.4",
@@ -1653,7 +1653,7 @@
           "System.Xml.ReaderWriter": "4.3.1"
         }
       },
-      "BrandexSalesAdapter/1.0.0": {
+      "BrandexBusinessSuite/1.0.0": {
         "dependencies": {
           "AspNetCore.HealthChecks.Rabbitmq": "3.1.2",
           "AspNetCore.HealthChecks.SqlServer": "3.1.1",
@@ -1672,7 +1672,7 @@
           "Newtonsoft.Json": "13.0.1"
         },
         "runtime": {
-          "BrandexSalesAdapter.dll": {}
+          "BrandexBusinessSuite.dll": {}
         }
       }
     }
@@ -2880,7 +2880,7 @@
       "path": "system.xml.xdocument/4.3.0",
       "hashPath": "system.xml.xdocument.4.3.0.nupkg.sha512"
     },
-    "BrandexSalesAdapter/1.0.0": {
+    "BrandexBusinessSuite/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

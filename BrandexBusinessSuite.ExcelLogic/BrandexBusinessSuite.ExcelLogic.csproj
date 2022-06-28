@@ -1,0 +1,98 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+<!--    <TargetFramework>netcoreapp3.1</TargetFramework>-->
+    <TargetFramework>net6.0</TargetFramework>
+    <DockerComposeProjectPath>../docker-compose.dcproj</DockerComposeProjectPath>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <RootNamespace>BrandexBusinessSuite.ExcelLogic</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'BrandexBusinessSuite.ExcelLogic' " />
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Data\Migrations" />
+    <Folder Include="Data\Models\" />
+    <Folder Include="Data\Enums\" />
+    <Folder Include="Data\Confirugations\" />
+    <Folder Include="Data\Migrations\" />
+    <Folder Include="wwwroot\UploadExcel" />
+    <Folder Include="wwwroot\UploadExcel\" />
+    <Folder Include="Models\Distributor\" />
+    <Folder Include="Models\Pharmacies\" />
+    <Folder Include="Models\Sales\" />
+    <Folder Include="Models\Enums\" />
+    <Folder Include="Services\" />
+    <Folder Include="Services\Sales\" />
+    <Folder Include="Services\Products\" />
+    <Folder Include="Services\Pharmacies\" />
+    <Folder Include="Services\Distributor\" />
+    <Folder Include="Services\Cities\" />
+    <Folder Include="Models\Cities\" />
+    <Folder Include="Services\PharmacyCompanies\" />
+    <Folder Include="Models\PharmacyCompanies\" />
+    <Folder Include="Models\PharmacyChains\" />
+    <Folder Include="Services\PharmacyChains\" />
+    <Folder Include="Services\Regions\" />
+    <Folder Include="Models\Regions\" />
+    <Folder Include="Models\Products\" />
+    <Folder Include="Models\Map\" />
+  </ItemGroup>
+  <ItemGroup>
+<!--    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />-->
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.4" />
+    
+<!--    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.8">-->
+<!--      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
+<!--      <PrivateAssets>all</PrivateAssets>-->
+<!--    </PackageReference>-->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    
+<!--    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.8">-->
+<!--      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
+<!--      <PrivateAssets>all</PrivateAssets>-->
+<!--    </PackageReference>-->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
+    
+    <PackageReference Include="DotNetCore.NPOI" Version="1.2.2" />
+    
+    <PackageReference Include="Refit.HttpClientFactory" Version="5.2.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.8" />
+    
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.8" />
+    
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Newtonsoft.Json" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\PharmacyCompanies\Import.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyCompanies\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyCompanies\Upload.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Cities\Import.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Cities\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Cities\Upload.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Distributors\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyChains\Import.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyChains\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\PharmacyChains\Upload.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Regions\Import.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Regions\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Regions\Upload.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Administration\Views\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Administration\Views\_ViewStart.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ViewStart.cshtml" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\site.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\site.min.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BrandexBusinessSuite\BrandexBusinessSuite.csproj" />
+  </ItemGroup>
+</Project>

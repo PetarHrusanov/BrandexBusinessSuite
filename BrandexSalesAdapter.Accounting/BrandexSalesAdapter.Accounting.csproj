@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BrandexSalesAdapter\BrandexSalesAdapter.csproj" />
+      <ProjectReference Include="..\BrandexBusinessSuite\BrandexBusinessSuite.csproj" />
     </ItemGroup>
 
     <ItemGroup>
