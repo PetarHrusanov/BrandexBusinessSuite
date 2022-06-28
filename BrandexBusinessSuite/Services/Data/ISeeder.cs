@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Services.Data;
+﻿namespace BrandexBusinessSuite.Services.Data;
 
 public interface ISeeder
 {

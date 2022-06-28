@@ -8,7 +8,7 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore;
 
 using BrandexBusinessSuite.ExcelLogic.Data.Models;
-using BrandexSalesAdapter.Data.Models.Common;
+using BrandexBusinessSuite.Data.Models.Common;
 
 public class SpravkiDbContext : DbContext
 {

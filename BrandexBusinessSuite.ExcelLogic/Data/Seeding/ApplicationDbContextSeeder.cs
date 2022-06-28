@@ -7,11 +7,11 @@ using Microsoft.Extensions.Options;
 
 using Models;
 
-using BrandexSalesAdapter;
-using BrandexSalesAdapter.Services.Data;
+using BrandexBusinessSuite;
+using BrandexBusinessSuite.Services.Data;
 
-using static BrandexSalesAdapter.Common.ExcelDataConstants.Regions;
-using static BrandexSalesAdapter.Common.ExcelDataConstants.Ditributors;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.Regions;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.Ditributors;
 
 public class ApplicationDbContextSeeder : ISeeder
 {

@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-using BrandexSalesAdapter.Data.Models.Common;
+using BrandexBusinessSuite.Data.Models.Common;
 using BrandexBusinessSuite.ExcelLogic.Data.Enums;
 
 public class Pharmacy : IAuditInfo, IDeletableEntity

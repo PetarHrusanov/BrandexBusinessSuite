@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Data.Configuration;
+﻿namespace BrandexBusinessSuite.Data.Configuration;
 
 using System;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Infrastructure;
+﻿namespace BrandexBusinessSuite.Infrastructure;
 
 public class InfrastructureConstants
 {

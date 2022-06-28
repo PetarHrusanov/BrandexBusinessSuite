@@ -15,14 +15,14 @@ using NPOI.XSSF.UserModel;
 
 using Newtonsoft.Json;
 
-using BrandexSalesAdapter.Models;
-using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Infrastructure;
+using BrandexBusinessSuite.Models;
+using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Infrastructure;
 using Models.Regions;
 using Services.Regions;
 
-using static BrandexSalesAdapter.Common.InputOutputConstants.SingleStringConstants;
-using static BrandexSalesAdapter.Common.ExcelDataConstants.ExcelLineErrors;
+using static BrandexBusinessSuite.Common.InputOutputConstants.SingleStringConstants;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
 
 public class RegionsController: AdministrationController
 {

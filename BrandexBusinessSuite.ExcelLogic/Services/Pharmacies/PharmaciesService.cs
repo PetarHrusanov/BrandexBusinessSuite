@@ -16,9 +16,9 @@ using Data.Models;
 using Models.Pharmacies;
 using Models.Sales;
 
-using static BrandexSalesAdapter.Common.ExcelDataConstants.Ditributors;
-using static BrandexSalesAdapter.Common.ExcelDataConstants.PharmacyColumns;
-using static  BrandexSalesAdapter.Common.Constants;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.Ditributors;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.PharmacyColumns;
+using static  BrandexBusinessSuite.Common.Constants;
 
 public class PharmaciesService : IPharmaciesService
 {

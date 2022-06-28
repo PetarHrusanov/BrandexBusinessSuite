@@ -18,8 +18,8 @@ using Newtonsoft.Json;
     
 using Data.Enums;
 
-using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Models;
+using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Models;
 
 using Models.Pharmacies;
 using Models.Cities;
@@ -33,7 +33,7 @@ using Services.PharmacyChains;
 using Services.Regions;
 using Services.PharmacyCompanies;
 
-using static BrandexSalesAdapter.Common.ExcelDataConstants.ExcelLineErrors;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
 
 public class PharmacyDetailsController : AdministrationController
 {

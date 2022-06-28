@@ -1,4 +1,4 @@
-namespace BrandexSalesAdapter.Controllers
+namespace BrandexBusinessSuite.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
 

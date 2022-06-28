@@ -2,7 +2,7 @@
 
 using System;
 
-using BrandexSalesAdapter.Data.Models.Common;
+using BrandexBusinessSuite.Data.Models.Common;
 using System.Collections.Generic;
 
 public class Product : IAuditInfo, IDeletableEntity

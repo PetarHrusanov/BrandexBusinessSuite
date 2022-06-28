@@ -17,8 +17,8 @@ using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
-using BrandexSalesAdapter.Controllers;
-using BrandexSalesAdapter.Infrastructure;
+using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Infrastructure;
     
 using Models.Pharmacies;
 using Models.Products;
@@ -30,8 +30,8 @@ using Services.Pharmacies;
 using Services.Products;
 using Services.Sales;
     
-using static BrandexSalesAdapter.Common.ExcelDataConstants.Ditributors;
-using static BrandexSalesAdapter.Common.ExcelDataConstants.ExcelLineErrors;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.Ditributors;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
 
 public class SalesController : AdministrationController
 {

@@ -1,4 +1,4 @@
-namespace BrandexSalesAdapter.Data.Models.Common;
+namespace BrandexBusinessSuite.Data.Models.Common;
 
 using System;
 

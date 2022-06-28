@@ -1,28 +1,27 @@
-﻿namespace BrandexSalesAdapter.Data
+﻿namespace BrandexBusinessSuite.Data;
+
+using System.Reflection;
+using Configuration;
+using Microsoft.EntityFrameworkCore;
+using Models;
+
+public abstract class MessageDbContext : DbContext
 {
-    using System.Reflection;
-    using Configuration;
-    using Microsoft.EntityFrameworkCore;
-    using Models;
-
-    public abstract class MessageDbContext : DbContext
+    protected MessageDbContext(DbContextOptions options)
+        : base(options)
     {
-        protected MessageDbContext(DbContextOptions options)
-            : base(options)
-        {
-        }
+    }
 
-        public DbSet<Message> Messages { get; set; }
+    public DbSet<Message> Messages { get; set; }
 
-        protected abstract Assembly ConfigurationsAssembly { get; }
+    protected abstract Assembly ConfigurationsAssembly { get; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            builder.ApplyConfiguration(new MessageConfiguration());
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        builder.ApplyConfiguration(new MessageConfiguration());
 
-            builder.ApplyConfigurationsFromAssembly(this.ConfigurationsAssembly);
+        builder.ApplyConfigurationsFromAssembly(this.ConfigurationsAssembly);
 
-            base.OnModelCreating(builder);
-        }
+        base.OnModelCreating(builder);
     }
 }

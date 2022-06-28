@@ -1,8 +1,8 @@
-﻿namespace BrandexSalesAdapter.Services.Messages;
+﻿namespace BrandexBusinessSuite.Services.Messages;
 
 using System;
 using System.Threading.Tasks;
-using BrandexSalesAdapter.Data;
+using BrandexBusinessSuite.Data;
 using Microsoft.EntityFrameworkCore;
 
 public class MessageService : IMessageService

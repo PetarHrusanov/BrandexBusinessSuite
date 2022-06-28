@@ -1,4 +1,4 @@
-namespace BrandexSalesAdapter.Models.ErpDocuments;
+namespace BrandexBusinessSuite.Models.ErpDocuments;
 
 public class ErpOrderLinesAccounting
 {

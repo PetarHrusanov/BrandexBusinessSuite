@@ -1,4 +1,4 @@
-﻿namespace BrandexSalesAdapter.Services.Messages;
+﻿namespace BrandexBusinessSuite.Services.Messages;
 
 using System.Threading.Tasks;
 

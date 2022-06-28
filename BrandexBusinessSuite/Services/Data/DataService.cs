@@ -1,9 +1,9 @@
-﻿namespace BrandexSalesAdapter.Services.Data;
+﻿namespace BrandexBusinessSuite.Services.Data;
 
 using System.Linq;
 using System.Threading.Tasks;
-using BrandexSalesAdapter.Data;
-using BrandexSalesAdapter.Data.Models;
+using BrandexBusinessSuite.Data;
+using BrandexBusinessSuite.Data.Models;
 using Messages;
 using Microsoft.EntityFrameworkCore;
 

@@ -10,7 +10,7 @@ using BrandexBusinessSuite.ExcelLogic.Data;
 using BrandexBusinessSuite.ExcelLogic.Data.Models;
 using BrandexBusinessSuite.ExcelLogic.Models.Products;
     
-using static BrandexSalesAdapter.Common.ExcelDataConstants.Ditributors;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.Ditributors;
 
 public class ProductsService : IProductsService
 {

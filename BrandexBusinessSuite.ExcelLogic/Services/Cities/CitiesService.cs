@@ -14,8 +14,8 @@ using Data;
 using BrandexBusinessSuite.ExcelLogic.Data.Models;
 using BrandexBusinessSuite.ExcelLogic.Models.Cities;
 
-using static BrandexSalesAdapter.Common.ExcelDataConstants.CitiesColumns;
-using static  BrandexSalesAdapter.Common.Constants;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.CitiesColumns;
+using static  BrandexBusinessSuite.Common.Constants;
 
 public class CitiesService :ICitiesService
 {
