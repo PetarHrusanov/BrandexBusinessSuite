@@ -40,36 +40,7 @@ public class LogisticsProcurementReceivingOrder : ErpDocumentSale
     public ErpCharacteristicId PaymentType { get; set; }
     
     public ErpCharacteristicId Store { get; set; }
-    
-    // public _CurrencyDirectory CurrencyDirectory { get; set; }
-    //
-    // public ErpCharacteristicToParty ToParty { get; set; }
-    // public _FromParty FromParty { get; set; }
-    // public _PurchasePriceList PurchasePriceList { get; set; }
-    // public _Supplier Supplier { get; set; }
 
-    // public class _CurrencyDirectory
-    // {
-    //     [JsonProperty("@odata.id")]
-    //     public string Id { get; set; }
-    // }
-    //
-    // public class _FromParty
-    // {
-    //     [JsonProperty("@odata.id")]
-    //     public string Id { get; set; }
-    // }
-    // public class _PurchasePriceList
-    // {
-    //     [JsonProperty("@odata.id")]
-    //     public string Id { get; set; }
-    // }
-    // public class _Supplier
-    // {
-    //     [JsonProperty("@odata.id")]
-    //     public string Id { get; set; }
-    // }
-    
     public List<ErpOrderLinesAccounting> Lines { get; set; }
     
 }

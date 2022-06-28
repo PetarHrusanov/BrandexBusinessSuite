@@ -3,7 +3,6 @@
 using System;
 using System.Reflection;
 using System.Text;
-using AutoMapper;
 using GreenPipes;
 using Hangfire;
 using MassTransit;

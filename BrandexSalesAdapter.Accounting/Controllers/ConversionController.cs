@@ -1,5 +1,3 @@
-using BrandexSalesAdapter.Common;
-
 namespace BrandexSalesAdapter.Accounting.Controllers;
 
 using System.IO;
@@ -15,6 +13,7 @@ using Newtonsoft.Json.Linq;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -32,7 +31,6 @@ using Requests;
 using static Common.ProductConstants;
 using static  Common.Constants;
 using static Common.ErpConstants;
-
 
 public class ConversionController : ApiController
 {
@@ -74,6 +72,7 @@ public class ConversionController : ApiController
     }
 
     [HttpPost]
+    [EnableCors()]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
@@ -109,14 +108,10 @@ public class ConversionController : ApiController
         
         foreach (var product in productNames)
         {
-            var fieldFacebook = typeof(Facebook).GetField(product, BindingFlags.Public | BindingFlags.Static);
-            var valueFacebook = (string)fieldFacebook!.GetValue(null)!;
             
-            var fieldErp = typeof(ERP_Accounting).GetField(product, BindingFlags.Public | BindingFlags.Static);
-            var valueErp = (string)fieldErp!.GetValue(null)!;
-            
-            var fieldErpCode = typeof(ErpCodesNumber).GetField(product, BindingFlags.Public | BindingFlags.Static);
-            var valueErpCode = (string)fieldErpCode!.GetValue(null)!;
+            var valueFacebook = ReturnValueByClassAndName(typeof(Facebook), product);
+            var valueErp = ReturnValueByClassAndName(typeof(ERP_Accounting), product);
+            var valueErpCode = ReturnValueByClassAndName(typeof(ErpCodesNumber), product);
 
             if (!productsPrices.ContainsKey(valueFacebook)) continue;
 
@@ -148,6 +143,8 @@ public class ConversionController : ApiController
                 DocumentType = new ErpCharacteristicId("General_DocumentTypes(b1787109-6d5e-41ad-8ba6-b9a15ebccf5e)"),
                 DocumentNo = facebookInvoiceNumber,
                 InvoiceDocumentNo = facebookInvoiceNumber,
+                // DocumentNo = "Kurosawa",
+                // InvoiceDocumentNo = "Kurosawa",
                 EnterpriseCompany = new ErpCharacteristicId("General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)"),
                 EnterpriseCompanyLocation = new ErpCharacteristicId("General_Contacts_CompanyLocations(f3156c3c-7c04-4de7-bf03-8b983aada49f)"),
                 FromParty = new ErpCharacteristicId("General_Contacts_Parties(42bef242-101f-48bd-b6c5-8da6819c844f)"),
@@ -194,11 +191,11 @@ public class ConversionController : ApiController
 
             var primaryDocumentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
             
-            ChangeStateToRelease(primaryDocumentId);
+            await ChangeStateToRelease(primaryDocumentId);
 
             responseContentJObj =
                 await JObjectByUriGetRequest(
-                    $"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoices?$filter=equalnull(DocumentNo,'{primaryDocument.InvoiceDocumentNo}')");
+                    $"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoices?$filter=equalnull(DocumentNo,'{primaryDocument.InvoiceDocumentNo}')%20and%20Void%20eq%20false");
             
             var invoice = (responseContentJObj[ErpDocuments.ValueLower]);
             var invoiceId = Convert.ToString(invoice![0]![ErpDocuments.ODataId]);
@@ -221,14 +218,12 @@ public class ConversionController : ApiController
 
                 var productCode = productCodesPrices[productName!].Keys.FirstOrDefault();
 
-                line.CustomProperty_Продукт_u002Dпокупки.Description.BG = productName;
-                line.CustomProperty_Продукт_u002Dпокупки.Value = productCode;
-                
-                line.CustomProperty_ВРМ_u002Dпокупки.Value = "83";
-                line.CustomProperty_ВРМ_u002Dпокупки.Description.BG = "Фейсбук";
+                line.CustomProperty_Продукт_u002Dпокупки =
+                    new ErpCharacteristicValueDescriptionBg(productCode, new ErpCharacteristicValueDescriptionBg._Description(productName));
+                line.CustomProperty_ВРМ_u002Dпокупки =
+                    new ErpCharacteristicValueDescriptionBg("83", new ErpCharacteristicValueDescriptionBg._Description("Фейсбук"));
                 
                 var uri = new Uri($"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoiceLines({line.Id})");
-                
                 jsonPostString = JsonConvert.SerializeObject(line, Formatting.Indented);
                 var content = new StringContent(jsonPostString, Encoding.UTF8, RequestConstants.ApplicationJson);
                 
@@ -236,7 +231,7 @@ public class ConversionController : ApiController
 
             }
 
-            ChangeStateToRelease(invoiceId);
+            await ChangeStateToRelease(invoiceId);
             
             workbook.Write(fs);
 
@@ -244,9 +239,7 @@ public class ConversionController : ApiController
 
         await using (var streamWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
         {
-
             await streamWrite.CopyToAsync(memory);
-
         }
 
         memory.Position = 0;
@@ -256,6 +249,7 @@ public class ConversionController : ApiController
     }
     
     [HttpPost]
+    [EnableCors()]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
@@ -263,12 +257,9 @@ public class ConversionController : ApiController
     {
         
         var dateString = RegexDate.Matches(file.FileName)[0];
-        
         var date = DateTime.ParseExact(dateString.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-        var monthErpField = typeof(ErpMonths).GetField(date.ToString("MMMM"), BindingFlags.Public | BindingFlags.Static);
-        var monthErp = (string)monthErpField.GetValue(null);
-
+        var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), date.ToString("MMMM"));
         var yearErp = date.ToString("yyyy");
 
         var newPath = CreateFileDirectories.CreatePDFFilesInputDirectory(_hostEnvironment);
@@ -289,13 +280,11 @@ public class ConversionController : ApiController
 
         var memory = new MemoryStream();
 
-        var sortedProducts = productsPrices.OrderBy(x => x.Key);
-
         await using (var fs = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
         {
             IWorkbook workbook = new XSSFWorkbook();
 
-            foreach (var (key, value) in sortedProducts)
+            foreach (var (key, value) in productsPrices)
             {
 
                 var price = (double)value * EuroRate;
@@ -324,9 +313,7 @@ public class ConversionController : ApiController
 
         await using (var streamWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
         {
-
             await streamWrite.CopyToAsync(memory);
-
         }
 
         memory.Position = 0;
@@ -411,12 +398,10 @@ public class ConversionController : ApiController
 
                 var dateRow = row.GetCell(0).ToString().TrimEnd();
 
-                var date = DateTime.ParseExact(dateRow, "MMM d, yyyy",
-                    System.Globalization.CultureInfo.InvariantCulture);
+                var date = DateTime.ParseExact(dateRow, "MMM d, yyyy", CultureInfo.InvariantCulture);
 
-                var monthErpField =
-                    typeof(ErpMonths).GetField(date.ToString("MMMM"), BindingFlags.Public | BindingFlags.Static);
-                var monthErp = (string)monthErpField.GetValue(null);
+                var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), date.ToString("MMMM"));
+
                 var yearErp = date.ToString("yyyy");
 
                 CreateErpMarketingXlsSheet(workbook,
@@ -528,47 +513,28 @@ public class ConversionController : ApiController
     {
         var excelSheet = workbook.CreateSheet(sheetName);
         var row = excelSheet.CreateRow(0);
+        
+        CreateErpMarketingXlsRow(excelSheet, "МЕСЕЦ", month);
+        CreateErpMarketingXlsRow(excelSheet, "ГОДИНА", year);
+        CreateErpMarketingXlsRow(excelSheet, "Размер", measure);
+        CreateErpMarketingXlsRow(excelSheet, "тип реклама", type);
+        CreateErpMarketingXlsRow(excelSheet, "Медиа", media);
+        CreateErpMarketingXlsRow(excelSheet, "Издание", publishType);
+        CreateErpMarketingXlsRow(excelSheet, "цена реклама", Math.Round(price, 2).ToString());
+        CreateErpMarketingXlsRow(excelSheet, "ТРП", trp);
+        CreateErpMarketingXlsRow(excelSheet, "ПРОДУКТ БРАНДЕКС", product);
+    }
 
-        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-        row.CreateCell(row.Cells.Count()).SetCellValue("МЕСЕЦ");
-        row.CreateCell(row.Cells.Count()).SetCellValue(month);
-
-        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-        row.CreateCell(row.Cells.Count()).SetCellValue("ГОДИНА");
-        row.CreateCell(row.Cells.Count()).SetCellValue(year);
-
-        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-        row.CreateCell(row.Cells.Count()).SetCellValue("Размер");
-        row.CreateCell(row.Cells.Count()).SetCellValue(measure);
-
-        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-        row.CreateCell(row.Cells.Count()).SetCellValue("тип реклама");
-        row.CreateCell(row.Cells.Count()).SetCellValue(type);
-
-        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-        row.CreateCell(row.Cells.Count()).SetCellValue("Медиа");
-        row.CreateCell(row.Cells.Count()).SetCellValue(media);
-
-        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-        row.CreateCell(row.Cells.Count()).SetCellValue("Издание");
-        row.CreateCell(row.Cells.Count()).SetCellValue(publishType);
-
-        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-        row.CreateCell(row.Cells.Count()).SetCellValue("цена реклама");
-        row.CreateCell(row.Cells.Count()).SetCellValue(Math.Round(price, 2));
-
-        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-        row.CreateCell(row.Cells.Count()).SetCellValue("ТРП");
-        row.CreateCell(row.Cells.Count()).SetCellValue(trp);
-
-        row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-        row.CreateCell(row.Cells.Count()).SetCellValue("ПРОДУКТ БРАНДЕКС");
-        row.CreateCell(row.Cells.Count()).SetCellValue(product);
+    private void CreateErpMarketingXlsRow(ISheet excelSheet, string rowName, string rowValue)
+    {
+        var row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+        row.CreateCell(row.Cells.Count()).SetCellValue(rowName);
+        row.CreateCell(row.Cells.Count()).SetCellValue(rowValue);
     }
 
     private async Task PostMarketingActivitiesToErp(string digital, string product, double price, DateTime date)
     {
-
+        
         var subject = string.Empty;
         var partyId = string.Empty;
         var measure = string.Empty;
@@ -576,8 +542,7 @@ public class ConversionController : ApiController
         var media = string.Empty;
         var publishType = string.Empty;
 
-        var monthErpField = typeof(ErpMonths).GetField(date.ToString("MMMM"), BindingFlags.Public | BindingFlags.Static);
-        var monthErp = (string)monthErpField.GetValue(null);
+        var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), date.ToString("MMMM"));
 
         var yearErp = date.ToString("yyyy");
 
@@ -645,10 +610,11 @@ public class ConversionController : ApiController
         
     }
 
-    public async void ChangeStateToRelease(string document)
+    public async Task ChangeStateToRelease(string document)
     {
         var uriChangeState = new Uri($"{_apiSettings.GeneralRequest}{document}/ChangeState");
         await Client.PostAsync(uriChangeState, _stateContent);
+        // var response = await Client.PostAsync(uriChangeState, _stateContent);
     }
 
     public async Task<JObject> JObjectByUriGetRequest(string newUri)
@@ -670,11 +636,10 @@ public class ConversionController : ApiController
 
     }
     
-    // public string ReturnValueByClassAndName(ProductConstants className, string propertyName)
-    // {
-    //     var fieldFacebook = typeof(className).GetField(product, BindingFlags.Public | BindingFlags.Static);
-    //     var valueFacebook = (string)fieldFacebook!.GetValue(null)!;
-    //     return "hui";
-    // }
+    public string ReturnValueByClassAndName(Type type, string propertyName)
+    {
+        var field = type.GetField(propertyName, BindingFlags.Public | BindingFlags.Static);
+        return (string)field!.GetValue(null)!;
+    }
     
 }
