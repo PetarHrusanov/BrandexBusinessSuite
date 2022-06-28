@@ -1,10 +1,9 @@
-﻿namespace BrandexSalesAdapter.Infrastructure
-{
-    using Microsoft.Extensions.Configuration;
+﻿namespace BrandexSalesAdapter.Infrastructure;
 
-    public static class ConfigurationExtensions
-    {
-        public static string GetDefaultConnectionString(this IConfiguration configuration)
-            => configuration.GetConnectionString("DefaultConnection");
-    }
+using Microsoft.Extensions.Configuration;
+
+public static class ConfigurationExtensions
+{
+    public static string GetDefaultConnectionString(this IConfiguration configuration)
+        => configuration.GetConnectionString("DefaultConnection");
 }

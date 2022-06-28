@@ -1,9 +1,8 @@
-﻿namespace BrandexSalesAdapter
-{
-    public class ApplicationSettings
-    {
-        public string Secret { get; private set; }
+﻿namespace BrandexSalesAdapter;
 
-        public bool SeedInitialData { get; private set; }
-    }
+public class ApplicationSettings
+{
+    public string Secret { get; private set; }
+
+    public bool SeedInitialData { get; private set; }
 }

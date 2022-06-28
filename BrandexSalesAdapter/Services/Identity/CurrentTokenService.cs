@@ -1,11 +1,10 @@
-﻿namespace BrandexSalesAdapter.Services.Identity
+﻿namespace BrandexSalesAdapter.Services.Identity;
+
+public class CurrentTokenService : ICurrentTokenService
 {
-    public class CurrentTokenService : ICurrentTokenService
-    {
-        private string currentToken;
+    private string currentToken;
 
-        public string Get() => this.currentToken;
+    public string Get() => this.currentToken;
 
-        public void Set(string token) => this.currentToken = token;
-    }
+    public void Set(string token) => this.currentToken = token;
 }

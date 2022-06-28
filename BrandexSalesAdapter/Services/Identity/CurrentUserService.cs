@@ -1,28 +1,27 @@
-﻿namespace BrandexSalesAdapter.Services.Identity
+﻿namespace BrandexSalesAdapter.Services.Identity;
+
+using System;
+using System.Security.Claims;
+using Infrastructure;
+using Microsoft.AspNetCore.Http;
+
+public class CurrentUserService : ICurrentUserService
 {
-    using System;
-    using System.Security.Claims;
-    using Infrastructure;
-    using Microsoft.AspNetCore.Http;
+    private readonly ClaimsPrincipal user;
 
-    public class CurrentUserService : ICurrentUserService
+    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
     {
-        private readonly ClaimsPrincipal user;
+        this.user = httpContextAccessor.HttpContext?.User;
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+        if (user == null)
         {
-            this.user = httpContextAccessor.HttpContext?.User;
-
-            if (user == null)
-            {
-                throw new InvalidOperationException("This request does not have an authenticated user.");
-            }
-
-            this.UserId = this.user.FindFirstValue(ClaimTypes.NameIdentifier);
+            throw new InvalidOperationException("This request does not have an authenticated user.");
         }
 
-        public string UserId { get; }
-
-        public bool IsAdministrator => this.user.IsAdministrator();
+        this.UserId = this.user.FindFirstValue(ClaimTypes.NameIdentifier);
     }
+
+    public string UserId { get; }
+
+    public bool IsAdministrator => this.user.IsAdministrator();
 }

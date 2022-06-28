@@ -1,12 +1,11 @@
-﻿namespace BrandexSalesAdapter.Services.Messages
+﻿namespace BrandexSalesAdapter.Services.Messages;
+
+using System;
+using System.Threading.Tasks;
+
+public interface IPublisher
 {
-    using System;
-    using System.Threading.Tasks;
+    Task Publish<TMessage>(TMessage message);
 
-    public interface IPublisher
-    {
-        Task Publish<TMessage>(TMessage message);
-
-        Task Publish<TMessage>(TMessage message, Type messageType);
-    }
+    Task Publish<TMessage>(TMessage message, Type messageType);
 }

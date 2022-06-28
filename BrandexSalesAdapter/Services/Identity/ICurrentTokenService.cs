@@ -1,9 +1,8 @@
-﻿namespace BrandexSalesAdapter.Services.Identity
-{
-    public interface ICurrentTokenService
-    {
-        string Get();
+﻿namespace BrandexSalesAdapter.Services.Identity;
 
-        void Set(string token);
-    }
+public interface ICurrentTokenService
+{
+    string Get();
+
+    void Set(string token);
 }

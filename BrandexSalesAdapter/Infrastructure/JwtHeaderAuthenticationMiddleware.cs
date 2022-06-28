@@ -1,39 +1,38 @@
-﻿namespace BrandexSalesAdapter.Infrastructure
+﻿namespace BrandexSalesAdapter.Infrastructure;
+
+using System.Linq;
+using System.Threading.Tasks;
+using Services.Identity;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+
+using static InfrastructureConstants;
+
+public class JwtHeaderAuthenticationMiddleware : IMiddleware
 {
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Services.Identity;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Http;
+    private readonly ICurrentTokenService currentToken;
 
-    using static InfrastructureConstants;
+    public JwtHeaderAuthenticationMiddleware(ICurrentTokenService currentToken)
+        => this.currentToken = currentToken;
 
-    public class JwtHeaderAuthenticationMiddleware : IMiddleware
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        private readonly ICurrentTokenService currentToken;
+        var token = context.Request.Headers[AuthorizationHeaderName].ToString();
 
-        public JwtHeaderAuthenticationMiddleware(ICurrentTokenService currentToken)
-            => this.currentToken = currentToken;
-
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        if (!string.IsNullOrWhiteSpace(token))
         {
-            var token = context.Request.Headers[AuthorizationHeaderName].ToString();
-
-            if (!string.IsNullOrWhiteSpace(token))
-            {
-                this.currentToken.Set(token.Split().Last());
-            }
-
-            await next.Invoke(context);
+            this.currentToken.Set(token.Split().Last());
         }
-    }
 
-    public static class JwtHeaderAuthenticationMiddlewareExtensions
-    {
-        public static IApplicationBuilder UseJwtHeaderAuthentication(
-            this IApplicationBuilder app)
-            => app
-                .UseMiddleware<JwtHeaderAuthenticationMiddleware>()
-                .UseAuthentication();
+        await next.Invoke(context);
     }
+}
+
+public static class JwtHeaderAuthenticationMiddlewareExtensions
+{
+    public static IApplicationBuilder UseJwtHeaderAuthentication(
+        this IApplicationBuilder app)
+        => app
+            .UseMiddleware<JwtHeaderAuthenticationMiddleware>()
+            .UseAuthentication();
 }

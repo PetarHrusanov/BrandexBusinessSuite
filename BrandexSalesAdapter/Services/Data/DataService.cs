@@ -1,55 +1,54 @@
-﻿namespace BrandexSalesAdapter.Services.Data
-{
-    using System.Linq;
-    using System.Threading.Tasks;
-    using BrandexSalesAdapter.Data;
-    using BrandexSalesAdapter.Data.Models;
-    using Messages;
-    using Microsoft.EntityFrameworkCore;
+﻿namespace BrandexSalesAdapter.Services.Data;
 
-    public abstract class DataService<TEntity> : IDataService<TEntity>
-        where TEntity : class
+using System.Linq;
+using System.Threading.Tasks;
+using BrandexSalesAdapter.Data;
+using BrandexSalesAdapter.Data.Models;
+using Messages;
+using Microsoft.EntityFrameworkCore;
+
+public abstract class DataService<TEntity> : IDataService<TEntity>
+    where TEntity : class
+{
+    protected DataService(DbContext data, IPublisher publisher)
     {
-        protected DataService(DbContext data, IPublisher publisher)
+        this.Data = data;
+        this.Publisher = publisher;
+    }
+
+    protected DbContext Data { get; }
+
+    protected IPublisher Publisher { get; }
+
+    protected IQueryable<TEntity> All() => this.Data.Set<TEntity>();
+
+    public void Add(TEntity entity)
+        => this.Data.Add(entity);
+
+    public async Task Save(params object[] messages)
+    {
+        var dataMessages = messages
+            .ToDictionary(data => data, data => new Message(data));
+
+        if (this.Data is MessageDbContext)
         {
-            this.Data = data;
-            this.Publisher = publisher;
+            foreach (var (_, message) in dataMessages)
+            {
+                this.Data.Add(message);
+            }
         }
 
-        protected DbContext Data { get; }
+        await this.Data.SaveChangesAsync();
 
-        protected IPublisher Publisher { get; }
-
-        protected IQueryable<TEntity> All() => this.Data.Set<TEntity>();
-
-        public void Add(TEntity entity)
-            => this.Data.Add(entity);
-
-        public async Task Save(params object[] messages)
+        if (this.Data is MessageDbContext)
         {
-            var dataMessages = messages
-                .ToDictionary(data => data, data => new Message(data));
-
-            if (this.Data is MessageDbContext)
+            foreach (var (data, message) in dataMessages)
             {
-                foreach (var (_, message) in dataMessages)
-                {
-                    this.Data.Add(message);
-                }
-            }
+                await this.Publisher.Publish(data);
 
-            await this.Data.SaveChangesAsync();
+                message.MarkAsPublished();
 
-            if (this.Data is MessageDbContext)
-            {
-                foreach (var (data, message) in dataMessages)
-                {
-                    await this.Publisher.Publish(data);
-
-                    message.MarkAsPublished();
-
-                    await this.Data.SaveChangesAsync();
-                }
+                await this.Data.SaveChangesAsync();
             }
         }
     }

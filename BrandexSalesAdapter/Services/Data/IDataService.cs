@@ -1,12 +1,11 @@
-﻿namespace BrandexSalesAdapter.Services.Data
+﻿namespace BrandexSalesAdapter.Services.Data;
+
+using System.Threading.Tasks;
+
+public interface IDataService<in TEntity>
+    where TEntity : class
 {
-    using System.Threading.Tasks;
+    void Add(TEntity entity);
 
-    public interface IDataService<in TEntity>
-        where TEntity : class
-    {
-        void Add(TEntity entity);
-
-        Task Save(params object[] messages);
-    }
+    Task Save(params object[] messages);
 }
