@@ -1,0 +1,41 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.ExcelLogic", "BrandexSalesAdapter.ExcelLogic\BrandexSalesAdapter.ExcelLogic.csproj", "{2F4DB71A-D889-4470-83B2-091163C0D3BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter", "BrandexSalesAdapter\BrandexSalesAdapter.csproj", "{97D5950C-AB01-4AB2-AB8D-662F2D939C21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.Identity", "BrandexSalesAdapter.Identity\BrandexSalesAdapter.Identity.csproj", "{EC33A447-DDE0-48F2-90F9-4B0148ACDB45}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.MarketingAnalysis", "BrandexSalesAdapter.MarketingAnalysis\BrandexSalesAdapter.MarketingAnalysis.csproj", "{40A69A05-37ED-4DF9-AE8C-022694E38E78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexSalesAdapter.Accounting", "BrandexSalesAdapter.Accounting\BrandexSalesAdapter.Accounting.csproj", "{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F4DB71A-D889-4470-83B2-091163C0D3BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F4DB71A-D889-4470-83B2-091163C0D3BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F4DB71A-D889-4470-83B2-091163C0D3BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F4DB71A-D889-4470-83B2-091163C0D3BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97D5950C-AB01-4AB2-AB8D-662F2D939C21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97D5950C-AB01-4AB2-AB8D-662F2D939C21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97D5950C-AB01-4AB2-AB8D-662F2D939C21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97D5950C-AB01-4AB2-AB8D-662F2D939C21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC33A447-DDE0-48F2-90F9-4B0148ACDB45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC33A447-DDE0-48F2-90F9-4B0148ACDB45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC33A447-DDE0-48F2-90F9-4B0148ACDB45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC33A447-DDE0-48F2-90F9-4B0148ACDB45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40A69A05-37ED-4DF9-AE8C-022694E38E78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40A69A05-37ED-4DF9-AE8C-022694E38E78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40A69A05-37ED-4DF9-AE8C-022694E38E78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40A69A05-37ED-4DF9-AE8C-022694E38E78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EF23D1D-0852-4E8E-AC68-F50A3BD1F1F1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
