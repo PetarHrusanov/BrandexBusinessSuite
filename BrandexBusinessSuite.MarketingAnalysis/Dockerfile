@@ -5,17 +5,17 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj", "BrandexSalesAdapter.MarketingAnalysis/"]
-COPY ["BrandexSalesAdapter/BrandexSalesAdapter.csproj", "BrandexSalesAdapter/"]
-RUN dotnet restore "BrandexSalesAdapter.MarketingAnalysis/BrandexSalesAdapter.MarketingAnalysis.csproj"
+COPY ["BrandexBusinessSuite.MarketingAnalysis/BrandexBusinessSuite.MarketingAnalysis.csproj", "BrandexBusinessSuite.MarketingAnalysis/"]
+COPY ["BrandexBusinessSuite/BrandexBusinessSuite.csproj", "BrandexBusinessSuite/"]
+RUN dotnet restore "BrandexBusinessSuite.MarketingAnalysis/BrandexBusinessSuite.MarketingAnalysis.csproj"
 COPY . .
-WORKDIR "/src/BrandexSalesAdapter.MarketingAnalysis"
-RUN dotnet build "BrandexSalesAdapter.MarketingAnalysis.csproj" -c Release -o /app/build
+WORKDIR "/src/BrandexBusinessSuite.MarketingAnalysis"
+RUN dotnet build "BrandexBusinessSuite.MarketingAnalysis.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "BrandexSalesAdapter.MarketingAnalysis.csproj" -c Release -o /app/publish
+RUN dotnet publish "BrandexBusinessSuite.MarketingAnalysis.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "BrandexSalesAdapter.MarketingAnalysis.dll"]
+ENTRYPOINT ["dotnet", "BrandexBusinessSuite.MarketingAnalysis.dll"]
