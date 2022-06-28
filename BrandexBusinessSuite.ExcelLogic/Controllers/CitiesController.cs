@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.ExcelLogic.Controllers;
+﻿using BrandexBusinessSuite.Common;
+
+namespace BrandexBusinessSuite.ExcelLogic.Controllers;
 
 using System.Collections.Generic;
 using System;
@@ -19,12 +21,12 @@ using Newtonsoft.Json;
 
 using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Models;
-using BrandexBusinessSuite.Infrastructure;
+using Infrastructure;
 using Services.Cities;
 
-using static BrandexBusinessSuite.Common.InputOutputConstants.SingleStringConstants;
-using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
-using static BrandexBusinessSuite.Common.Constants;
+using static InputOutputConstants.SingleStringConstants;
+using static ExcelDataConstants.ExcelLineErrors;
+using static Constants;
 
 public class CitiesController :AdministrationController
 {

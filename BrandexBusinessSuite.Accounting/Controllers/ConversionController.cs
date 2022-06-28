@@ -39,7 +39,7 @@ public class ConversionController : ApiController
     private readonly UserSettings _userSettings;
     private readonly ApiSettings _apiSettings;
     
-    private static readonly HttpClient Client = new HttpClient();
+    private static readonly HttpClient Client = new();
     
     private const string FacebookEng = "Facebook";
     private const string FacebookBgCapital = "Фейсбук";

@@ -15,7 +15,7 @@ using Data;
 using Data.Models;
 using Models.Distributor;
 
-using static BrandexBusinessSuite.Common.InputOutputConstants.SingleStringConstants;
+using static Common.InputOutputConstants.SingleStringConstants;
 
 public class DistributorsController :AdministrationController
 {
