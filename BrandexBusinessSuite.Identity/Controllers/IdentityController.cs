@@ -58,12 +58,6 @@ public class IdentityController : ApiController
     {
         return await _identity.GetRoles();
 
-        // var roleStore = new RoleStore<IdentityRole>(new ApplicationUsersDbContext());
-        // var roleManager = new RoleManager<IdentityRole>(roleStore);
-        // if(!await roleManager.RoleExistsAsync("YourRoleName"))
-        //     await roleManager.CreateAsync(new IdentityRole("YourRoleName"));
-
-
         // if (!result.Succeeded) return BadRequest(result.Errors);
 
     }
