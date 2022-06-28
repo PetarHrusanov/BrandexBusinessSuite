@@ -1,29 +1,28 @@
-﻿namespace BrandexSalesAdapter.Services.Messages
+﻿namespace BrandexSalesAdapter.Services.Messages;
+
+using System;
+using System.Threading.Tasks;
+using BrandexSalesAdapter.Data;
+using Microsoft.EntityFrameworkCore;
+
+public class MessageService : IMessageService
 {
-    using System;
-    using System.Threading.Tasks;
-    using BrandexSalesAdapter.Data;
-    using Microsoft.EntityFrameworkCore;
+    private readonly MessageDbContext data;
 
-    public class MessageService : IMessageService
+    public MessageService(DbContext data) 
+        => this.data = data as MessageDbContext 
+                       ?? throw new InvalidOperationException($"Messages can only be used with a {nameof(MessageDbContext)}.");
+
+    public async Task<bool> IsDuplicated(
+        object messageData, 
+        string propertyFilter,
+        object identifier)
     {
-        private readonly MessageDbContext data;
+        var messageType = messageData.GetType();
 
-        public MessageService(DbContext data) 
-            => this.data = data as MessageDbContext 
-                ?? throw new InvalidOperationException($"Messages can only be used with a {nameof(MessageDbContext)}.");
-
-        public async Task<bool> IsDuplicated(
-            object messageData, 
-            string propertyFilter,
-            object identifier)
-        {
-            var messageType = messageData.GetType();
-
-            return await this.data
-                .Messages
-                // .AsQueryable($"SELECT * FROM Messages WHERE Type = '{messageType.AssemblyQualifiedName}' AND JSON_VALUE(serializedData, '$.{propertyFilter}') = {identifier}")
-                .AnyAsync();
-        }
+        return await this.data
+            .Messages
+            // .AsQueryable($"SELECT * FROM Messages WHERE Type = '{messageType.AssemblyQualifiedName}' AND JSON_VALUE(serializedData, '$.{propertyFilter}') = {identifier}")
+            .AnyAsync();
     }
 }

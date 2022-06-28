@@ -1,7 +1,6 @@
 namespace BrandexSalesAdapter.Accounting.Models;
 
 using BrandexSalesAdapter.Models.ErpDocuments;
-using Newtonsoft.Json;
 
 public class MarketingActivityCm : ErpDocument
 {

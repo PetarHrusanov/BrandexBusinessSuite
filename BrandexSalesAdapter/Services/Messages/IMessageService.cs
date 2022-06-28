@@ -1,12 +1,11 @@
-﻿namespace BrandexSalesAdapter.Services.Messages
-{
-    using System.Threading.Tasks;
+﻿namespace BrandexSalesAdapter.Services.Messages;
 
-    public interface IMessageService
-    {
-        Task<bool> IsDuplicated(
-            object messageData,
-            string propertyFilter,
-            object identifier);
-    }
+using System.Threading.Tasks;
+
+public interface IMessageService
+{
+    Task<bool> IsDuplicated(
+        object messageData,
+        string propertyFilter,
+        object identifier);
 }

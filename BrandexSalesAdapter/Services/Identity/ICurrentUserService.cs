@@ -1,9 +1,8 @@
-﻿namespace BrandexSalesAdapter.Services.Identity
-{
-    public interface ICurrentUserService
-    {
-        string UserId { get; }
+﻿namespace BrandexSalesAdapter.Services.Identity;
 
-        bool IsAdministrator { get; }
-    }
+public interface ICurrentUserService
+{
+    string UserId { get; }
+
+    bool IsAdministrator { get; }
 }
