@@ -9,7 +9,6 @@ using System.Text;
 
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -32,6 +31,9 @@ using static Common.ProductConstants;
 using static  Common.Constants;
 using static Common.ErpConstants;
 
+using static BrandexBusinessSuite.Requests.RequestsMethods;
+using static Methods.FieldsValuesMethods;
+
 public class ConversionController : ApiController
 {
 
@@ -51,9 +53,6 @@ public class ConversionController : ApiController
 
     private const string Click = "клик";
     private const string Impressions = "впечатления";
-
-    private static readonly string NewStateSerialized = JsonConvert.SerializeObject( new { newState = "Released" });
-    private readonly StringContent _stateContent =  new (NewStateSerialized, Encoding.UTF8, RequestConstants.ApplicationJson);
 
     private const double EuroRate = 1.9894;
     
@@ -143,8 +142,6 @@ public class ConversionController : ApiController
                 DocumentType = new ErpCharacteristicId("General_DocumentTypes(b1787109-6d5e-41ad-8ba6-b9a15ebccf5e)"),
                 DocumentNo = facebookInvoiceNumber,
                 InvoiceDocumentNo = facebookInvoiceNumber,
-                // DocumentNo = "Kurosawa",
-                // InvoiceDocumentNo = "Kurosawa",
                 EnterpriseCompany = new ErpCharacteristicId("General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)"),
                 EnterpriseCompanyLocation = new ErpCharacteristicId("General_Contacts_CompanyLocations(f3156c3c-7c04-4de7-bf03-8b983aada49f)"),
                 FromParty = new ErpCharacteristicId("General_Contacts_Parties(42bef242-101f-48bd-b6c5-8da6819c844f)"),
@@ -187,21 +184,21 @@ public class ConversionController : ApiController
             Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
             var responseContentJObj = await 
-                JObjectByUriPostRequest(_apiSettings.LogisticsProcurementReceivingOrders, jsonPostString);
+                JObjectByUriPostRequest(Client, _apiSettings.LogisticsProcurementReceivingOrders, jsonPostString);
 
             var primaryDocumentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
             
-            await ChangeStateToRelease(primaryDocumentId);
+            await ChangeStateToRelease(Client, primaryDocumentId);
 
             responseContentJObj =
-                await JObjectByUriGetRequest(
+                await JObjectByUriGetRequest(Client,
                     $"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoices?$filter=equalnull(DocumentNo,'{primaryDocument.InvoiceDocumentNo}')%20and%20Void%20eq%20false");
             
             var invoice = (responseContentJObj[ErpDocuments.ValueLower]);
             var invoiceId = Convert.ToString(invoice![0]![ErpDocuments.ODataId]);
 
             responseContentJObj =
-                await JObjectByUriGetRequest(
+                await JObjectByUriGetRequest(Client,
                     $"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoiceLines?$filter=PurchaseInvoice%20eq%20'{invoiceId}'");
             
             
@@ -231,7 +228,7 @@ public class ConversionController : ApiController
 
             }
 
-            await ChangeStateToRelease(invoiceId);
+            await ChangeStateToRelease(Client, invoiceId);
             
             workbook.Write(fs);
 
@@ -333,7 +330,6 @@ public class ConversionController : ApiController
         if (file.Length <= 0) return BadRequest();
 
         var sFileExtension = System.IO.Path.GetExtension(file.FileName)?.ToLower();
-
         var fullPath = System.IO.Path.Combine(newPath, file.FileName);
 
         await using var stream = new FileStream(fullPath, FileMode.Create);
@@ -356,7 +352,7 @@ public class ConversionController : ApiController
 
 
         var fieldsValues = new List<string>();
-        var fieldsGoogle = typeof(Google_Marketing).GetFields(BindingFlags.Public | BindingFlags.Static);
+        var fieldsGoogle = typeof(GoogleMarketing).GetFields(BindingFlags.Public | BindingFlags.Static);
         fieldsValues.AddRange(fieldsGoogle.Select(field => (string)field.GetValue(null)!));
 
         var sWebRootFolder = _hostEnvironment.WebRootPath;
@@ -383,13 +379,12 @@ public class ConversionController : ApiController
                 if (string.IsNullOrEmpty(product)) continue;
                 if (!fieldsValues.Contains(product)) continue;
 
-                foreach (var field in typeof(Google_Marketing).GetFields())
+                foreach (var field in typeof(GoogleMarketing).GetFields())
                 {
-                    if ((string)field.GetValue(null) != product) continue;
-                    var fieldName = field.Name.ToString();
-                    var fieldErp =
-                        typeof(Google_Marketing_ERP).GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
-                    product = (string)fieldErp.GetValue(null);
+                    if ((string)field.GetValue(null)! != product) continue;
+                    var fieldName = field.Name;
+                    var fieldErp = typeof(GoogleMarketingErp).GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
+                    product = (string)fieldErp!.GetValue(null)!;
                 }
 
                 var priceRow = row.GetCell(4).ToString()?.TrimEnd();
@@ -483,7 +478,6 @@ public class ConversionController : ApiController
                 
                 productsPrices[product] += price;
             }
-
         }
 
         return productsPrices;
@@ -602,44 +596,13 @@ public class ConversionController : ApiController
         var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.MarketingAccount}:{_userSettings.MarketingPassword}");
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-        var responseContentJObj = await  JObjectByUriPostRequest(_apiSettings.GeneralContactActivities, jsonPostString);
+        var responseContentJObj = await  JObjectByUriPostRequest(Client, _apiSettings.GeneralContactActivities, jsonPostString);
 
         var documentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
 
-        ChangeStateToRelease(documentId);
+        await ChangeStateToRelease(Client, documentId);
+        
         
     }
 
-    public async Task ChangeStateToRelease(string document)
-    {
-        var uriChangeState = new Uri($"{_apiSettings.GeneralRequest}{document}/ChangeState");
-        await Client.PostAsync(uriChangeState, _stateContent);
-        // var response = await Client.PostAsync(uriChangeState, _stateContent);
-    }
-
-    public async Task<JObject> JObjectByUriGetRequest(string newUri)
-    {
-        var uri = new Uri(newUri);
-        var response = await Client.GetAsync(uri);
-        var responseContent = await response.Content.ReadAsStringAsync();
-        return JObject.Parse(responseContent);
-
-    }
-    
-    public async Task<JObject> JObjectByUriPostRequest(string newUri, string jsonPostString)
-    {
-        var uri = new Uri(newUri);
-        var content = new StringContent(jsonPostString, Encoding.UTF8, RequestConstants.ApplicationJson);
-        var response = await Client.PostAsync(uri, content);
-        var responseContent = await response.Content.ReadAsStringAsync();
-        return JObject.Parse(responseContent);
-
-    }
-    
-    public string ReturnValueByClassAndName(Type type, string propertyName)
-    {
-        var field = type.GetField(propertyName, BindingFlags.Public | BindingFlags.Static);
-        return (string)field!.GetValue(null)!;
-    }
-    
 }
