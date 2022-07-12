@@ -51,7 +51,6 @@ public class DistributorsController :AdministrationController
         await _context.SaveChangesAsync();
 
         var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
-
         outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
 
         return outputSerialized;

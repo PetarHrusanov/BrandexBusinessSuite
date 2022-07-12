@@ -33,7 +33,7 @@ using Services.PharmacyChains;
 using Services.Regions;
 using Services.PharmacyCompanies;
 
-using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
+using static Common.ExcelDataConstants.ExcelLineErrors;
 
 public class PharmacyDetailsController : AdministrationController
 {
@@ -59,7 +59,7 @@ public class PharmacyDetailsController : AdministrationController
     private const int SopharmaIdColumn = 16;
     private const int StingIdColumn = 17;
     private const int RegionColumn = 8;
-        
+
 
     public PharmacyDetailsController(
         IWebHostEnvironment hostEnvironment,
@@ -106,17 +106,14 @@ public class PharmacyDetailsController : AdministrationController
 
         if (!Directory.Exists(newPath))
         {
-
             Directory.CreateDirectory(newPath);
-
         }
 
         if (file.Length > 0)
         {
 
-            string sFileExtension = Path.GetExtension(file.FileName)!.ToLower();
-
-            string fullPath = Path.Combine(newPath, file.FileName);
+            var sFileExtension = Path.GetExtension(file.FileName)!.ToLower();
+            var fullPath = Path.Combine(newPath, file.FileName);
 
             await using var stream = new FileStream(fullPath, FileMode.Create);
             await file.CopyToAsync(stream);
@@ -125,26 +122,18 @@ public class PharmacyDetailsController : AdministrationController
 
             ISheet sheet;
             if (sFileExtension == ".xls")
-
             {
-
                 HSSFWorkbook hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
-                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-
+                sheet = hssfwb.GetSheetAt(0);
             }
 
             else
-
             {
-
                 var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
-                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
-
+                sheet = hssfwb.GetSheetAt(0);
             }
 
-            for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+            for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++) //Read Excel File
             {
 
                 var row = sheet.GetRow(i);
@@ -184,8 +173,7 @@ public class PharmacyDetailsController : AdministrationController
                 }
 
             }
-                
-                
+            
         }
 
         if (errorDictionary.Count==0)
@@ -199,13 +187,12 @@ public class PharmacyDetailsController : AdministrationController
             Errors = errorDictionary
         };
             
-        string outputSerialized = JsonConvert.SerializeObject(pharmacyErrorModel);
+        var outputSerialized = JsonConvert.SerializeObject(pharmacyErrorModel);
 
         return outputSerialized;
             
     }
-
-    // [Authorize]
+    
     [HttpPost]
     public async Task<string> Upload([FromBody]PharmacyInputModel pharmacyInputModel)
     {
@@ -267,30 +254,23 @@ public class PharmacyDetailsController : AdministrationController
     }
 
     private void CreatePharmacyInputModel(
-        List<CityCheckModel> citiesIdsForCheck,
-        List<PharmacyCompanyCheckModel> pharmacyCompanyIdsForCheck,
-        List<PharmacyChainCheckModel> pharmacyChainsIdsForCheck,
-        RegionOutputModel[] regionIdsForCheck,
+        IEnumerable<CityCheckModel> citiesIdsForCheck,
+        IEnumerable<PharmacyCompanyCheckModel> pharmacyCompanyIdsForCheck,
+        IEnumerable<PharmacyChainCheckModel> pharmacyChainsIdsForCheck,
+        IEnumerable<RegionOutputModel> regionIdsForCheck,
         PharmacyDbInputModel newPharmacy,
         IRow row,
         int i,
-        Dictionary<int, string> errorDictionary
+        IDictionary<int, string> errorDictionary
     )
     {
         var brandexId = row.GetCell(BrandexIdColumn);
 
-        if (brandexId!=null)
+        if (brandexId!=null && int.TryParse(brandexId.ToString()!.TrimEnd(), out var brandexIdConverted))
         {
-            if (int.TryParse(brandexId.ToString()!.TrimEnd(), out var brandexIdConverted))
-            {
-                newPharmacy.BrandexId = brandexIdConverted;
-            }
-            else
-            {
-                errorDictionary[i + 1] = IncorrectPharmacyId;
-            }
+            newPharmacy.BrandexId = brandexIdConverted;
         }
-            
+        
         else
         {
             errorDictionary[i + 1] = IncorrectPharmacyId;
@@ -298,12 +278,9 @@ public class PharmacyDetailsController : AdministrationController
 
         var pharmacyClass = row.GetCell(PharmacyClassColumn);
 
-        if (pharmacyClass!=null)
+        if (pharmacyClass!=null && !string.IsNullOrWhiteSpace(pharmacyClass.ToString()!.TrimEnd()))
         {
-            if (!string.IsNullOrWhiteSpace(pharmacyClass.ToString()!.TrimEnd()))
-            {
-                newPharmacy.PharmacyClass = (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass.ToString()!.TrimEnd(), true);   
-            }
+            newPharmacy.PharmacyClass = (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass.ToString()!.TrimEnd(), true);
         }
 
         var pharmacyActive = row.GetCell(ActiveColumn);
@@ -315,21 +292,16 @@ public class PharmacyDetailsController : AdministrationController
 
         var companyIdRow = row.GetCell(PharmacyCompanyColumn);
 
-        if (companyIdRow!=null)
+        if (companyIdRow!=null && 
+            pharmacyCompanyIdsForCheck.Any(p => companyIdRow != null && p.Name == companyIdRow.ToString().TrimEnd().ToUpper()))
         {
             var companyId = pharmacyCompanyIdsForCheck
                 .Where(p => companyIdRow != null && p.Name == companyIdRow.ToString().TrimEnd().ToUpper())
                 .Select(p => p.Id)
                 .FirstOrDefault();
 
-            if (companyId != 0)
-            {
-                newPharmacy.CompanyId = companyId;
-            }
-            else
-            {
-                errorDictionary[i + 1] = IncorrectPharmacyCompanyId;
-            }
+            newPharmacy.CompanyId = companyId;
+            
         }
             
         else
@@ -339,42 +311,35 @@ public class PharmacyDetailsController : AdministrationController
             
 
         var chainIdRow = row.GetCell(PharmacyChainColumn);
-
-        if (chainIdRow!=null)
+        
+        if (chainIdRow!=null && 
+            pharmacyChainsIdsForCheck.Any(p => p.Name == chainIdRow.ToString()?.TrimEnd().ToUpper())
+           )
         {
             var chainId = pharmacyChainsIdsForCheck
                 .Where(p => p.Name == chainIdRow.ToString()?.TrimEnd().ToUpper())
                 .Select(p => p.Id)
                 .FirstOrDefault();
-                
-            if (chainId != 0)
-            {
-                newPharmacy.PharmacyChainId = chainId;
-            }
-            else
-            {
-                errorDictionary[i + 1] = IncorrectPharmacyChainId;
-            }
-        }
             
-            
-        var regionIdRow = row.GetCell(RegionColumn);
+            newPharmacy.PharmacyChainId = chainId;
 
-        if (regionIdRow!=null)
+        }
+        else
         {
-            int regionId = regionIdsForCheck
+            errorDictionary[i + 1] = IncorrectPharmacyChainId;
+        }
+        
+        var regionIdRow = row.GetCell(RegionColumn);
+        
+        if (regionIdRow!=null && 
+            regionIdsForCheck.Any(r => r.Name==regionIdRow.ToString()!.TrimEnd()))
+        {
+            var regionId = regionIdsForCheck
                 .Where(r => r.Name==regionIdRow.ToString()!.TrimEnd())
                 .Select(r => r.Id)
                 .FirstOrDefault();
 
-            if (regionId != 0)
-            {
-                newPharmacy.RegionId = regionId;
-            }
-            else
-            {
-                errorDictionary[i + 1] = IncorrectRegion;
-            }
+            newPharmacy.RegionId = regionId;
         }
             
         else
@@ -384,51 +349,45 @@ public class PharmacyDetailsController : AdministrationController
             
 
         var pharmnetIdRow = row.GetCell(PharmnetIdColumn);
-
+        
         if (pharmnetIdRow != null && int.TryParse(pharmnetIdRow.ToString()?.TrimEnd(), out var pharmnetId))
         {
             newPharmacy.PharmnetId = pharmnetId;
         }
 
         var phoenixIdRow = row.GetCell(PhoenixIdColumn);
-
+        
         if (phoenixIdRow != null && int.TryParse(phoenixIdRow.ToString()?.TrimEnd(), out var phoenixId))
         {
             newPharmacy.PhoenixId = phoenixId;
         }
 
         var sopharmaIdRow = row.GetCell(SopharmaIdColumn);
-
+        
         if (sopharmaIdRow != null && int.TryParse(sopharmaIdRow.ToString()?.TrimEnd(), out var sopharmaId))
         {
             newPharmacy.SopharmaId = sopharmaId;
         }
 
         var stingIdRow = row.GetCell(StingIdColumn);
-
+        
         if (stingIdRow != null && int.TryParse(stingIdRow.ToString()?.TrimEnd(), out var stingId))
         {
             newPharmacy.StingId = stingId;
         }
 
         var cityIdRow = row.GetCell(CityColumn);
-
-        if (cityIdRow!=null)
+        
+        if (cityIdRow!=null && citiesIdsForCheck.Any(c=>c.Name==cityIdRow.ToString()!
+                .TrimEnd().ToUpper()))
         {
+
             var cityId = citiesIdsForCheck.Where(c=>c.Name==cityIdRow.ToString()!
                     .TrimEnd().ToUpper())
                 .Select(c=>c.Id)
                 .FirstOrDefault();
-
-            if (cityId != 0)
-            {
-                newPharmacy.CityId = cityId;
-            }
-                
-            else
-            {
-                errorDictionary[i + 1] = IncorrectCityName;
-            }
+            
+            newPharmacy.CityId = cityId;
         }
 
         else

@@ -18,11 +18,11 @@ using Newtonsoft.Json;
 
 using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Models;
-using BrandexBusinessSuite.Infrastructure;
+using Infrastructure;
 using Services.PharmacyChains;
 
-using static BrandexBusinessSuite.Common.InputOutputConstants.SingleStringConstants;
-using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
+using static Common.InputOutputConstants.SingleStringConstants;
+using static Common.ExcelDataConstants.ExcelLineErrors;
 
 public class PharmacyChainsController : AdministrationController
 {
@@ -36,10 +36,8 @@ public class PharmacyChainsController : AdministrationController
         IPharmacyChainsService pharmacyChainsService)
 
     {
-
         _hostEnvironment = hostEnvironment;
         _pharmacyChainsService = pharmacyChainsService;
-
     }
         
     [HttpPost]
@@ -47,13 +45,12 @@ public class PharmacyChainsController : AdministrationController
     public async Task<string> Import([FromForm]IFormFile file)
     {
 
-        string newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        var newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
 
         var errorDictionary = new Dictionary<int, string>();
 
         var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
         var uniquePharmacyChains = new List<string>();
-
 
         if (file.Length > 0)
         {
@@ -68,57 +65,41 @@ public class PharmacyChainsController : AdministrationController
             stream.Position = 0;
 
             ISheet sheet;
+            
             if (sFileExtension == ".xls")
-
             {
                 var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-
-                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+                sheet = hssfwb.GetSheetAt(0);
             }
 
             else
             {
                 var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-
-                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+                sheet = hssfwb.GetSheetAt(0);
             }
 
-            var headerRow = sheet.GetRow(0); //Get Header Row
-
-            int cellCount = headerRow.LastCellNum;
-
-            for (var j = 0; j < cellCount; j++)
-            {
-                var cell = headerRow.GetCell(j);
-
-                if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
-            }
-
-            for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+            for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++)
 
             {
                 var row = sheet.GetRow(i);
 
                 if (row == null) continue;
-
                 if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-
                 var chainName = row.GetCell(0);
-                if (chainName != null)
-                {
-                    var chainNameString = chainName.ToString().ToUpper().TrimEnd();
 
-                    if (pharmacyChainsCheck.All(c =>
-                            !string.Equals(c.Name, chainNameString, StringComparison.CurrentCultureIgnoreCase)))
-                    {
-                        uniquePharmacyChains.Add(chainNameString);
-                    }
-                }
-
-                else
+                if (chainName == null)
                 {
                     errorDictionary[i + 1] = IncorrectPharmacyChainName;
+                    continue;
+                }
+                
+                var chainNameString = chainName.ToString()!.ToUpper().TrimEnd();
+                
+                if (pharmacyChainsCheck.All(c =>
+                        !string.Equals(c.Name, chainNameString, StringComparison.CurrentCultureIgnoreCase)))
+                {
+                    uniquePharmacyChains.Add(chainNameString);
                 }
             }
 
@@ -135,8 +116,7 @@ public class PharmacyChainsController : AdministrationController
         return outputSerialized;
 
     }
-
-    // [Authorize]
+    
     [HttpPost]
     public async Task<string> Upload([FromBody]SingleStringInputModel singleStringInputModel)
     {
@@ -145,7 +125,7 @@ public class PharmacyChainsController : AdministrationController
             await _pharmacyChainsService.UploadPharmacyChain(singleStringInputModel.SingleStringValue);
         }
             
-        string outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
+        var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
 
         outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
 
