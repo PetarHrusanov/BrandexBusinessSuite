@@ -24,14 +24,11 @@ using Infrastructure;
 using Services.Cities;
 
 using static Common.InputOutputConstants.SingleStringConstants;
-using static Common.ExcelDataConstants.ExcelLineErrors;
 using static Common.Constants;
 
 public class CitiesController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
-
-    // db Services
     private readonly ICitiesService _citiesService;
 
     public CitiesController(IWebHostEnvironment hostEnvironment, ICitiesService citiesService)
@@ -69,17 +66,17 @@ public class CitiesController : AdministrationController
 
             {
                 var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+                sheet = hssfwb.GetSheetAt(0);
             }
 
             else
             {
                 var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+                sheet = hssfwb.GetSheetAt(0); 
             }
             
 
-            for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+            for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)
             {
                 var row = sheet.GetRow(i);
 
@@ -88,19 +85,13 @@ public class CitiesController : AdministrationController
 
                 var cityRow = row.GetCell(0).ToString()?.TrimEnd();
                 
-                if (!string.IsNullOrEmpty(cityRow))
+                if (!string.IsNullOrEmpty(cityRow)
+                    && citiesCheck.All(c =>
+                        !string.Equals(c.Name, cityRow, StringComparison.CurrentCultureIgnoreCase)))
                 {
-                    if (citiesCheck.All(c =>
-                            !string.Equals(c.Name, cityRow, StringComparison.CurrentCultureIgnoreCase)))
-                    {
-                        uniqueCities.Add(cityRow.ToUpper());
-                    }
+                    uniqueCities.Add(cityRow.ToUpper());
                 }
-
-                else
-                {
-                    errorDictionary[i + 1] = IncorrectCityName;
-                }
+                
             }
 
             await _citiesService.UploadBulk(uniqueCities);
