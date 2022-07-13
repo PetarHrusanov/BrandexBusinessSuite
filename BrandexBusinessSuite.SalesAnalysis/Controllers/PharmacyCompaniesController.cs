@@ -22,8 +22,8 @@ using Infrastructure;
 using Models.PharmacyCompanies;
 using Services.PharmacyCompanies;
 
-using static BrandexBusinessSuite.Common.InputOutputConstants.SingleStringConstants;
-using static BrandexBusinessSuite.Common.ExcelDataConstants.ExcelLineErrors;
+using static Common.InputOutputConstants.SingleStringConstants;
+using static Common.ExcelDataConstants.ExcelLineErrors;
 
 public class PharmacyCompaniesController : AdministrationController
 {
@@ -39,8 +39,7 @@ public class PharmacyCompaniesController : AdministrationController
         _hostEnvironment = hostEnvironment;
         _pharmacyCompaniesService = pharmacyCompaniesService;
     }
-
-    // [Authorize]
+    
     [HttpPost]
     [Consumes("multipart/form-data")]
     public async Task<string> Import([FromForm] IFormFile file)
@@ -83,8 +82,7 @@ public class PharmacyCompaniesController : AdministrationController
             {
                 var row = sheet.GetRow(i);
 
-                if (row == null) continue;
-                if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+                if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
                 var newCompany = new PharmacyCompanyInputModel();
 
@@ -121,7 +119,7 @@ public class PharmacyCompaniesController : AdministrationController
 
         var errorModel = new CustomErrorDictionaryOutputModel { Errors = errorDictionary };
 
-        string outputSerialized = JsonConvert.SerializeObject(errorModel);
+        var outputSerialized = JsonConvert.SerializeObject(errorModel);
 
         return outputSerialized;
     }
@@ -139,8 +137,7 @@ public class PharmacyCompaniesController : AdministrationController
         outputModel.VAT = pharmacyCompanyInputModel.VAT;
         outputModel.Owner = pharmacyCompanyInputModel.Owner;
 
-        string outputSerialized = JsonConvert.SerializeObject(outputModel);
-
+        var outputSerialized = JsonConvert.SerializeObject(outputModel);
         outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
 
         return outputSerialized;

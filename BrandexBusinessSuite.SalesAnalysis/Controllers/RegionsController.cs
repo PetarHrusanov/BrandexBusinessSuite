@@ -85,8 +85,7 @@ public class RegionsController : AdministrationController
             {
                 var row = sheet.GetRow(i);
 
-                if (row == null) continue;
-                if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+                if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
                 var regionName = row.GetCell(0).ToString()?.TrimEnd();
                 if (!string.IsNullOrEmpty(regionName))

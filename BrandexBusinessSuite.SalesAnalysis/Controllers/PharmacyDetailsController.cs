@@ -126,9 +126,8 @@ public class PharmacyDetailsController : AdministrationController
             {
 
                 var row = sheet.GetRow(i);
-                if (row == null) continue;
-
-                if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+                
+                if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
                 if (row.GetCell(NameColumn) == null || row.GetCell(AddressColumn) == null)
                 {
