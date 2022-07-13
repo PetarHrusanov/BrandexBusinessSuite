@@ -14,9 +14,7 @@ public abstract class CreateFileDirectories
         
         if (!Directory.Exists(newPath))
         {
-
             Directory.CreateDirectory(newPath);
-
         }
         
         return newPath;

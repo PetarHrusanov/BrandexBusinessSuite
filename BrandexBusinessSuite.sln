@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.ExcelLogic", "BrandexBusinessSuite.ExcelLogic\BrandexBusinessSuite.ExcelLogic.csproj", "{2F4DB71A-D889-4470-83B2-091163C0D3BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.SalesAnalysis", "BrandexBusinessSuite.SalesAnalysis\BrandexBusinessSuite.SalesAnalysis.csproj", "{2F4DB71A-D889-4470-83B2-091163C0D3BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite", "BrandexBusinessSuite\BrandexBusinessSuite.csproj", "{97D5950C-AB01-4AB2-AB8D-662F2D939C21}"
 EndProject
