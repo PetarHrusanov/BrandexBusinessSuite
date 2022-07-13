@@ -38,14 +38,15 @@ public class Startup
         _configuration = configuration;
         _hostingEnvironment = hostingEnvironment;
     }
-
-    // This method gets called by the runtime. Use this method to add services to the container.
+    
+    
     public void ConfigureServices(IServiceCollection services)
     {
 
-        services.AddWebService<SpravkiDbContext>(_configuration);
+        // services.AddWebService<SpravkiDbContext>(_configuration);
 
         services
+            .AddWebService<SpravkiDbContext>(_configuration)
             .AddTransient<ICitiesService, CitiesService>()
             .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()
             .AddTransient<IDistributorService, DistributorService>()
@@ -54,7 +55,6 @@ public class Startup
             .AddTransient<IProductsService, ProductsService>()
             .AddTransient<IRegionsService, RegionsService>()
             .AddTransient<ISalesService, SalesService>()
-            .AddTransient<INumbersChecker, NumbersChecker>()
             .AddTransient<ISeeder, ApplicationDbContextSeeder>();
 
         // services.AddCors();

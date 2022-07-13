@@ -86,8 +86,7 @@ public class ProductsController : AdministrationController
             {
                 var row = sheet.GetRow(i);
 
-                if (row == null) continue;
-                if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+                if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
                 var newProduct = new ProductInputModel();
 
@@ -117,7 +116,6 @@ public class ProductsController : AdministrationController
                     newProduct.BrandexId = brandexIdInt;
                 }
                 
-
                 var phoenixId = row.GetCell(3).ToString()?.TrimEnd();
 
                 if (!string.IsNullOrEmpty(phoenixId) && int.TryParse(phoenixId, out var phoenixIdInt))

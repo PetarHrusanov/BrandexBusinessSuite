@@ -81,8 +81,7 @@ public class PharmacyChainsController : AdministrationController
             {
                 var row = sheet.GetRow(i);
 
-                if (row == null) continue;
-                if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+                if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
                 var chainName = row.GetCell(0);
 
@@ -119,7 +118,6 @@ public class PharmacyChainsController : AdministrationController
         }
             
         var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
-
         outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
 
         return outputSerialized;

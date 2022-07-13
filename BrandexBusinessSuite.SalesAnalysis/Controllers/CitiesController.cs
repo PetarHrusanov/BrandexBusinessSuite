@@ -79,8 +79,7 @@ public class CitiesController : AdministrationController
             {
                 var row = sheet.GetRow(i);
 
-                if (row == null) continue;
-                if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+                if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
                 var cityRow = row.GetCell(0);
                 
