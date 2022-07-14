@@ -19,23 +19,16 @@ using static Common.InputOutputConstants.SingleStringConstants;
 
 public class DistributorsController :AdministrationController
 {
-
+    
     private readonly SpravkiDbContext _context;
 
-    public DistributorsController(SpravkiDbContext context)
-    {
-        _context = context;
-    }
+    public DistributorsController(SpravkiDbContext context) => _context = context;
 
     [HttpGet]
     public async Task<DistributorOutputModel[]> GetDistributors()
     {
-        return await _context.Distributors.Select(n => new DistributorOutputModel
-        {
-            Name = n.Name,
-            Id = n.Id
-        }).ToArrayAsync();
-          
+        return await _context.Distributors.Select(n => new DistributorOutputModel { Name = n.Name, Id = n.Id })
+            .ToArrayAsync();
     }
         
     [HttpPost]

@@ -11,14 +11,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
-    
-using NPOI.HSSF.UserModel;
+
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 using BrandexBusinessSuite.Controllers;
 using Infrastructure;
-    
 using Models.Pharmacies;
 using Models.Products;
 using Models.Sales;
@@ -27,35 +25,29 @@ using Services.Distributor;
 using Services.Pharmacies;
 using Services.Products;
 using Services.Sales;
-    
+
 using static Common.ExcelDataConstants.Ditributors;
 using static Common.ExcelDataConstants.ExcelLineErrors;
+using static Common.Constants;
 
 public class SalesController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 
-    // db Services
     private readonly ISalesService _salesService;
     private readonly IProductsService _productsService;
     private readonly IPharmaciesService _pharmaciesService;
     private readonly IDistributorService _distributorService;
-        
-        
+
     private const int BrandexDateColumn = 0;
     private const int BrandexProductIdColumn = 1;
     private const int BrandexCountColumn = 2;
     private const int BrandexPharmacyIdColumn = 3;
-        
+
     private const int ProductCounter = 4;
 
-    public SalesController(
-        IWebHostEnvironment hostEnvironment,
-        ISalesService salesService,
-        IProductsService productsService,
-        IPharmaciesService pharmaciesService,
-        IDistributorService distributorService
-    )
+    public SalesController(IWebHostEnvironment hostEnvironment, ISalesService salesService,
+        IProductsService productsService, IPharmaciesService pharmaciesService, IDistributorService distributorService)
 
     {
         _hostEnvironment = hostEnvironment;
@@ -63,30 +55,26 @@ public class SalesController : AdministrationController
         _productsService = productsService;
         _pharmaciesService = pharmaciesService;
         _distributorService = distributorService;
-
     }
-        
-        
+
     [HttpPost]
     [IgnoreAntiforgeryToken]
-    public async Task<IActionResult> GenerateSummed([FromBody] SalesRegionDateInputModel inputModel)
+    public async Task<IActionResult> Generate([FromBody] SalesRegionDateInputModel inputModel)
     {
-        var dateBeginString = inputModel.DateBegin;
-        var dateEndString = inputModel.DateEnd;
 
-        DateTime.TryParseExact(dateBeginString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None,
+        DateTime.TryParseExact(inputModel.DateBegin, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None,
             out var dateBegin);
-            
-        if (!DateTime.TryParseExact(dateEndString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateEnd))
+
+        if (!DateTime.TryParseExact(inputModel.DateEnd, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None,
+                out var dateEnd))
         {
             dateEnd = DateTime.MaxValue;
         }
-            
+
         var regionId = inputModel.RegionId;
-            
+
         var sWebRootFolder = _hostEnvironment.WebRootPath;
-        
-        var sFileName = @"Sales.xlsx";
+        const string sFileName = @"Sales.xlsx";
 
         var memory = new MemoryStream();
 
@@ -95,193 +83,71 @@ public class SalesController : AdministrationController
             IWorkbook workbook = new XSSFWorkbook();
 
             var excelSheet = workbook.CreateSheet("sales");
-
             var row = excelSheet.CreateRow(0);
-                
+
             var products = await _productsService.GetProductsIdPrices();
-            
+
             foreach (var product in products)
             {
                 var sumCount = await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
-                row.CreateCell(ProductCounter +row.Cells.Count()).SetCellValue(sumCount);
+                row.CreateCell(ProductCounter + row.Cells.Count()).SetCellValue(sumCount);
             }
-                
-            row = excelSheet.CreateRow(excelSheet.LastRowNum+1);
-                
+
+            row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+
             foreach (var product in products)
             {
                 var sumCount = await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
                 var productRevenue = sumCount * product.Price;
-                row.CreateCell(row.Cells.Count()+ProductCounter).SetCellValue(productRevenue);
+                row.CreateCell(row.Cells.Count() + ProductCounter).SetCellValue(productRevenue);
             }
-            
-            row = excelSheet.CreateRow(excelSheet.LastRowNum+1);
+
+            row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
 
             await CreateHeaderColumnsAsync(row);
 
             var collectionPharmacies = await _pharmaciesService.GetPharmaciesExcelModel(dateBegin, dateEnd, regionId);
 
-            foreach (var pharmacy in collectionPharmacies)
+            switch (inputModel.Summed)
             {
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+                case "Summed":
+                    CreatePharmacySalesRow(excelSheet, collectionPharmacies, products, null);
+                    break;
 
-                row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Name);
-                row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Address);
-                row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.PharmacyClass.ToString());
-                row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Region);
-
-
-                foreach (var product in products)
-                {
-                    int sumCount = pharmacy.Sales.Where(i => i.ProductId == product.Id).Sum(b => b.Count);
-                    row.CreateCell(row.Cells.Count()).SetCellValue(sumCount);
-                }
-
-                row.CreateCell(row.Cells.Count())
-                    .SetCellValue(pharmacy.Sales.Select(p => p.ProductPrice * p.Count).Sum());
-            }
-
-            workbook.Write(fs);
-
-        }
-
-        await using (var stream = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
-        {
-
-            await stream.CopyToAsync(memory);
-
-        }
-
-        memory.Position = 0;
-
-        return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
-    }
-        
-    [HttpPost]
-    [IgnoreAntiforgeryToken]
-    public async Task<IActionResult> GenerateSeparated([FromBody] SalesRegionDateInputModel inputModel)
-    {
-        var dateBeginString = inputModel.DateBegin;
-        var dateEndString = inputModel.DateEnd;
-
-        DateTime.TryParseExact(dateBeginString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None,
-            out var dateBegin);
-            
-            
-        if (!DateTime.TryParseExact(dateEndString, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateEnd))
-        {
-            dateEnd = DateTime.MaxValue;
-        }
-            
-        var regionId = inputModel.RegionId;
-            
-        var sWebRootFolder = _hostEnvironment.WebRootPath;
-        var sFileName = @"Sales.xlsx";
-
-        var memory = new MemoryStream();
-            
-        var products = await _productsService.GetProductsIdPrices();
-
-        await using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create,
-                         FileAccess.Write))
-        {
-
-            List<PharmacyExcelModel> collectionPharmacies;
-
-            IWorkbook workbook = new XSSFWorkbook();
-
-            var excelSheet = workbook.CreateSheet("sales");
-
-            var row = excelSheet.CreateRow(0);
-
-            foreach (var product in products)
-            {
-                var sumCount =
-                    await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
-                row.CreateCell(ProductCounter + row.Cells.Count()).SetCellValue(sumCount);
-
-            }
-
-            row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-
-            foreach (var product in products)
-            {
-                var sumCount =
-                    await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
-                var productRevenue = sumCount * product.Price;
-                row.CreateCell(row.Cells.Count() + ProductCounter).SetCellValue(productRevenue);
-            }
-
-
-            row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-
-            await CreateHeaderColumnsAsync(row);
-
-            row.CreateCell(row.Cells.Count()).SetCellValue("Date");
-
-            var dates = await _salesService.GetDistinctDatesByMonths();
-
-            foreach (var currentDate in dates)
-            {
-                collectionPharmacies = await _pharmaciesService.GetPharmaciesExcelModel(dateBegin, dateEnd, regionId);
-
-                foreach (var pharmacy in collectionPharmacies)
-                {
-
-                    row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-
-                    row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Name);
-                    row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Address);
-                    row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.PharmacyClass.ToString());
-                    row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Region);
-
-
-                    foreach (var product in products)
+                case "Separated":
+                    row.CreateCell(row.Cells.Count()).SetCellValue("Date");
+                    var dates = await _salesService.GetDistinctDatesByMonths();
+                    foreach (var currentDate in dates)
                     {
-                        int sumCount = pharmacy.Sales
-                            .Where(i => i.ProductId == product.Id && i.Date==currentDate)
-                            .Sum(b => b.Count);
-
-                        row.CreateCell(row.Cells.Count()).SetCellValue(sumCount);
+                        CreatePharmacySalesRow(excelSheet, collectionPharmacies, products, currentDate);
                     }
-
-                    row.CreateCell(row.Cells.Count())
-                        .SetCellValue(pharmacy.Sales.Select(p => p.ProductPrice * p.Count).Sum());
-                        
-                    row.CreateCell(row.Cells.Count()).SetCellValue(currentDate.ToString("yyyy/MM/dd"));
-                }
+                    break;
             }
 
             workbook.Write(fs);
-
         }
 
         await using (var stream = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
         {
-
             await stream.CopyToAsync(memory);
-
         }
 
         memory.Position = 0;
 
         return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
     }
-        
+
     [HttpPost]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
     public async Task<string> Import([FromForm] SalesBulkInputModel salesBulkInput)
     {
-            
         var dateFromClient = salesBulkInput.Date;
         var dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
 
         var distributorName = salesBulkInput.Distributor;
-            
-        var file = salesBulkInput.ImageFile;
 
-        var newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        var file = salesBulkInput.ImageFile;
 
         var errorDictionary = new Dictionary<int, string>();
 
@@ -290,247 +156,176 @@ public class SalesController : AdministrationController
         var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
         var productIdsForCheck = await _productsService.GetProductsCheck();
 
-        if (file.Length > 0)
+        if (file.Length <= 0 || Path.GetExtension(file.FileName)?.ToLower() != ".xlsx")
         {
+            errorDictionary[0] = Errors.IncorrectFileFormat;
+            return JsonConvert.SerializeObject(errorDictionary.ToArray());
+        }
+        
+        var newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        var fullPath = Path.Combine(newPath, file.FileName);
 
-            var sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
+        await using var stream = new FileStream(fullPath, FileMode.Create);
+        await file.CopyToAsync(stream);
 
-            ISheet sheet;
+        stream.Position = 0;
 
-            var fullPath = Path.Combine(newPath, file.FileName);
+        var hssfwb = new XSSFWorkbook(stream);
+        var sheet = hssfwb.GetSheetAt(0);
 
-            await using var stream = new FileStream(fullPath, FileMode.Create);
-            await file.CopyToAsync(stream);
+        for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+        {
+            var row = sheet.GetRow(i);
 
-            stream.Position = 0;
+            if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-            if (sFileExtension == ".xls")
+            var newSale = new SaleInputModel
             {
-                var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-                sheet = hssfwb.GetSheetAt(0);
+                Date = dateForDb, DistributorId = await _distributorService.IdByName(salesBulkInput.Distributor)
+            };
+
+            switch (distributorName)
+            {
+                case Brandex:
+                    CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale, errorDictionary,
+                        Brandex, BrandexDateColumn, BrandexProductIdColumn, BrandexPharmacyIdColumn,
+                        BrandexCountColumn);
+                    break;
+
+                case Phoenix:
+                    CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale, errorDictionary,
+                        Phoenix, 16, 0, 2, 14);
+                    break;
+
+                case Sting:
+                    CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale, errorDictionary,
+                        Sting, 0, 1, 6, 11);
+                    break;
+
+                case Pharmnet:
+                    CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale, errorDictionary,
+                        Pharmnet, 9, 2, 4, 11);
+                    break;
+
+                case Sopharma:
+                    CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale, errorDictionary,
+                        Sopharma, 0, 2, 5, 11);
+                    break;
             }
 
-            else
+            if (newSale.PharmacyId != 0 && newSale.ProductId != 0 && newSale.Count != 0 && newSale.DistributorId != 0)
             {
-                var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-                sheet = hssfwb.GetSheetAt(0);
-            }
-
-            for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-            {
-
-                var row = sheet.GetRow(i);
-
-                if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                var newSale = new SaleInputModel
-                {
-                    Date = dateForDb,
-                    DistributorId = await _distributorService.IdByName(salesBulkInput.Distributor)
-                };
-                        
-                switch (distributorName)
-                {
-                    case Brandex:
-                        CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale,
-                            errorDictionary, Brandex, BrandexDateColumn, BrandexProductIdColumn, BrandexPharmacyIdColumn, BrandexCountColumn);
-                        break;
-                            
-                    case Phoenix:
-                        CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                            errorDictionary,Phoenix,16,0,2,14);
-                        break;
-                            
-                    case Sting:
-                        CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                            errorDictionary,Sting,0,1,6,11);
-                        break;
-                            
-                    case Pharmnet:
-                        CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                            errorDictionary,Pharmnet,9,2,4,11);
-                        break;
-                            
-                    case Sopharma:
-                        CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row,i,newSale,
-                            errorDictionary,Sopharma,0,2,5,11);
-                        break;
-                            
-                }
-
-                if (newSale.PharmacyId != 0
-                    && newSale.ProductId != 0
-                    && newSale.Count != 0
-                    && newSale.DistributorId != 0)
-                {
-                    validSalesList.Add(newSale);
-                }
+                validSalesList.Add(newSale);
             }
         }
 
-        if (errorDictionary.Count==0)
-        {
-            await _salesService.UploadBulk(validSalesList);
-        }
-
-        var outputModel = new SalesBulkOutputModel
+        if (errorDictionary.Count == 0) await _salesService.UploadBulk(validSalesList); 
+        
+        var outputModel = new SalesBulkOutputModel 
         {
             Date = dateFromClient,
             Errors = errorDictionary,
             ErrorsArray = errorDictionary.Select(entry => entry.Key - 2).ToArray()
-
         };
 
-        var outputSerialized = JsonConvert.SerializeObject(outputModel);
-
-        return outputSerialized;
-
+        return JsonConvert.SerializeObject(outputModel);
     }
-    
+
     [HttpPost]
-    public async Task<string> Upload([FromBody]SaleSingleInputModel saleSingleInputModel)
+    public async Task<string> Upload([FromBody] SaleSingleInputModel saleSingleInputModel)
     {
-        if (!await _salesService.UploadIndividualSale(
-                saleSingleInputModel.PharmacyId,
-                saleSingleInputModel.ProductId,
-                saleSingleInputModel.Date,
-                saleSingleInputModel.Count,
-                saleSingleInputModel.Distributor)) return "END";
+        if (!await _salesService.UploadIndividualSale(saleSingleInputModel.PharmacyId, saleSingleInputModel.ProductId,
+                saleSingleInputModel.Date, saleSingleInputModel.Count, saleSingleInputModel.Distributor))
+            return "END";
         var saleOutputModel = new SaleOutputModel
         {
-            ProductName = await _productsService.NameById(saleSingleInputModel.ProductId, saleSingleInputModel.Distributor),
-            PharmacyName = await _pharmaciesService.NameById(saleSingleInputModel.PharmacyId, saleSingleInputModel.Distributor),
+            ProductName =
+                await _productsService.NameById(saleSingleInputModel.ProductId, saleSingleInputModel.Distributor),
+            PharmacyName =
+                await _pharmaciesService.NameById(saleSingleInputModel.PharmacyId,
+                    saleSingleInputModel.Distributor),
             Count = saleSingleInputModel.Count,
             Date = saleSingleInputModel.Date,
             Distributor = saleSingleInputModel.Distributor
         };
-                
-        var outputSerialized = JsonConvert.SerializeObject(saleOutputModel);
 
-        return outputSerialized;
-
+        return JsonConvert.SerializeObject(saleOutputModel);
     }
-    
+
     public int ResolveProductId(string inputProductId, string inputDistributor, List<ProductCheckModel> productsToCheck)
     {
-        
-        var productId = 0;
-
-        if (inputDistributor==Sopharma && inputProductId != null)
+        if (inputDistributor == Sopharma)
         {
-            productId = productsToCheck.Where(p => p.SopharmaId == inputProductId).Select(p => p.Id).FirstOrDefault();
-            return productId != 0 ? productId : 0;
-        }
-        
-        if (!int.TryParse(inputProductId, out productId)) return productId;
-
-        switch (inputDistributor)
-        {
-            case Brandex:
-                productId = productsToCheck.Where(p => p.BrandexId == productId).Select(p => p.Id).FirstOrDefault();
-                return productId != 0 ? productId : 0;
-            case Phoenix:
-                productId = productsToCheck.Where(p => p.PhoenixId == productId).Select(p => p.Id).FirstOrDefault();
-                return productId != 0 ? productId : 0;
-            case Sting:
-                productId = productsToCheck.Where(p => p.StingId == productId).Select(p => p.Id).FirstOrDefault();
-                return productId != 0 ? productId : 0;
-            case Pharmnet:
-                productId = productsToCheck.Where(p => p.PharmnetId == productId).Select(p => p.Id).FirstOrDefault();
-                return productId != 0 ? productId : 0;
-            default:
-                return 0;
+            return productsToCheck.Where(p => p.SopharmaId == inputProductId).Select(p => p.Id).FirstOrDefault();
         }
 
+        if (!int.TryParse(inputProductId, out var productId)) return productId;
+
+        return inputDistributor switch
+        {
+            Brandex => productsToCheck.Where(p => p.BrandexId == productId).Select(p => p.Id).FirstOrDefault(),
+            Phoenix => productsToCheck.Where(p => p.PhoenixId == productId).Select(p => p.Id).FirstOrDefault(),
+            Sting => productsToCheck.Where(p => p.StingId == productId).Select(p => p.Id).FirstOrDefault(),
+            Pharmnet => productsToCheck.Where(p => p.PharmnetId == productId).Select(p => p.Id).FirstOrDefault(),
+            _ => 0
+        };
     }
 
-    public int? ResolveSaleCount(string inputSaleCount)
-    {
-        if (int.TryParse(inputSaleCount, out var inputSalesCountInt)) return inputSalesCountInt;
-        return null;
-    }
-
-    public int ResolvePharmacyId(string inputPharmacyId, string inputDistributor, List<PharmacyCheckModel> pharmaciesToCheck)
+    public int ResolvePharmacyId(string inputPharmacyId, string inputDistributor,
+        List<PharmacyCheckModel> pharmaciesToCheck)
     {
         if (!int.TryParse(inputPharmacyId, out var pharmacyId)) return pharmacyId;
 
-        switch (inputDistributor)
+        return inputDistributor switch
         {
-            case Brandex:
-                pharmacyId = pharmaciesToCheck.Where(p => p.BrandexId == pharmacyId).Select(p => p.Id).FirstOrDefault();
-                return pharmacyId != 0 ? pharmacyId : 0;
-            case Phoenix:pharmacyId = pharmaciesToCheck.Where(p => p.PhoenixId == pharmacyId).Select(p => p.Id).FirstOrDefault();
-                return pharmacyId != 0 ? pharmacyId : 0;
-            case Sting:pharmacyId = pharmaciesToCheck.Where(p => p.StingId == pharmacyId).Select(p => p.Id).FirstOrDefault();
-                return pharmacyId != 0 ? pharmacyId : 0;
-            case Pharmnet:pharmacyId = pharmaciesToCheck.Where(p => p.PharmnetId == pharmacyId).Select(p => p.Id).FirstOrDefault();
-                return pharmacyId != 0 ? pharmacyId : 0;
-            case Sopharma:pharmacyId = pharmaciesToCheck.Where(p => p.SopharmaId == pharmacyId).Select(p => p.Id).FirstOrDefault();
-                return pharmacyId != 0 ? pharmacyId : 0;
-            default:
-                return 0;
-        }
-        
+            Brandex => pharmaciesToCheck.Where(p => p.BrandexId == pharmacyId).Select(p => p.Id).FirstOrDefault(),
+            Phoenix => pharmaciesToCheck.Where(p => p.PhoenixId == pharmacyId).Select(p => p.Id).FirstOrDefault(),
+            Sting => pharmaciesToCheck.Where(p => p.StingId == pharmacyId).Select(p => p.Id).FirstOrDefault(),
+            Pharmnet => pharmaciesToCheck.Where(p => p.PharmnetId == pharmacyId).Select(p => p.Id).FirstOrDefault(),
+            Sopharma => pharmaciesToCheck.Where(p => p.SopharmaId == pharmacyId).Select(p => p.Id).FirstOrDefault(),
+            _ => 0
+        };
     }
-        
-    private void CreateSaleInputModel(
-        List<ProductCheckModel> productIdsForCheck,
-        List<PharmacyCheckModel> pharmacyIdsForCheck,
-        IRow row,
-        int i,
-        SaleInputModel newSale, 
-        IDictionary<int, string> errorDictionary,
-        string distributor,
-        int dateColumn,
-        int productIdColumn,
-        int pharmacyIdColumn,
-        int saleCountColumn)
+
+    private void CreateSaleInputModel(List<ProductCheckModel> productIdsForCheck,
+        List<PharmacyCheckModel> pharmacyIdsForCheck, IRow row, int i, SaleInputModel newSale,
+        IDictionary<int, string> errorDictionary, string distributor, int dateColumn, int productIdColumn,
+        int pharmacyIdColumn, int saleCountColumn)
     {
-            
         var dateRow = row.GetCell(dateColumn);
-            
-        if (dateRow.CellType == CellType.Numeric)
+
+        if (dateRow.CellType == CellType.Numeric) newSale.Date = DateTime.FromOADate(dateRow.NumericCellValue);
+
+        var productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor,
+            productIdsForCheck);
+        var pharmacyIdRow = ResolvePharmacyId(row.GetCell(pharmacyIdColumn).ToString()?.TrimEnd(), distributor,
+            pharmacyIdsForCheck);
+
+        if (productRow == 0)
         {
-            newSale.Date = DateTime.FromOADate(dateRow.NumericCellValue);
+            errorDictionary[i + 1] = IncorrectProductId;
+            return;
         }
 
-        var productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor, productIdsForCheck);
-
-        if (productRow != 0)
+        if (pharmacyIdRow == 0)
         {
-            newSale.ProductId = productRow;
-        }
-                                
-        else
-        {
-            errorDictionary[i+1] = IncorrectProductId + " "+productRow;
-        }
-        
-        int pharmacyIdRow = ResolvePharmacyId(row.GetCell(pharmacyIdColumn).ToString()?.TrimEnd(), distributor, pharmacyIdsForCheck);
-
-        if (pharmacyIdRow != 0)
-        {
-            newSale.PharmacyId = pharmacyIdRow;
-        }
-        else
-        {
-            errorDictionary[i+1] = IncorrectPharmacyId;
+            errorDictionary[i + 1] = IncorrectPharmacyId;
+            return;
         }
 
         var saleCountRow = row.GetCell(saleCountColumn);
-        if (saleCountRow == null) return;
-        if (int.TryParse(saleCountRow.ToString()?.TrimEnd(), out var saleCountInt))
+
+        if (saleCountRow == null || !int.TryParse(saleCountRow.ToString()?.TrimEnd(), out var saleCountInt))
         {
-            newSale.Count = saleCountInt;
-        }
-                
-        else
-        {
-            errorDictionary[i+1] = IncorrectSalesCount;
+            errorDictionary[i + 1] = IncorrectSalesCount;
+            return;
         }
 
+        newSale.ProductId = productRow;
+        newSale.PharmacyId = pharmacyIdRow;
+        newSale.Count = saleCountInt;
     }
-        
+
     private async Task CreateHeaderColumnsAsync(IRow row)
     {
         var products = await _productsService.GetProductsNames();
@@ -538,14 +333,53 @@ public class SalesController : AdministrationController
         row.CreateCell(1).SetCellValue("Pharmacy Address");
         row.CreateCell(2).SetCellValue("Pharmacy Class");
         row.CreateCell(3).SetCellValue("Region");
-        
+
         foreach (var product in products)
         {
             row.CreateCell(row.Cells.Count()).SetCellValue(product);
         }
 
         row.CreateCell(row.Cells.Count()).SetCellValue("SumSale");
-            
     }
-        
+
+    private static void CreatePharmacySalesRow(ISheet excelSheet, IEnumerable<PharmacyExcelModel> collectionPharmacies,
+        IEnumerable<ProductShortOutputModel> products, DateTime? currentDate)
+    {
+        foreach (var pharmacy in collectionPharmacies)
+        {
+            var row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+
+            row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Name);
+            row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Address);
+            row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.PharmacyClass.ToString());
+            row.CreateCell(row.Cells.Count()).SetCellValue(pharmacy.Region);
+
+            if (currentDate != null)
+            {
+                foreach (var product in products)
+                {
+                    var sumCount = pharmacy.Sales.Where(i => i.ProductId == product.Id && i.Date == currentDate)
+                        .Sum(b => b.Count);
+
+                    row.CreateCell(row.Cells.Count()).SetCellValue(sumCount);
+                }
+
+                row.CreateCell(row.Cells.Count())
+                    .SetCellValue(pharmacy.Sales.Select(p => p.ProductPrice * p.Count).Sum());
+
+                row.CreateCell(row.Cells.Count()).SetCellValue(currentDate.ToString());
+            }
+            else
+            {
+                foreach (var product in products)
+                {
+                    var sumCount = pharmacy.Sales.Where(i => i.ProductId == product.Id).Sum(b => b.Count);
+                    row.CreateCell(row.Cells.Count()).SetCellValue(sumCount);
+                }
+
+                row.CreateCell(row.Cells.Count())
+                    .SetCellValue(pharmacy.Sales.Select(p => p.ProductPrice * p.Count).Sum());
+            }
+        }
+    }
 }

@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
@@ -22,11 +21,11 @@ using Models.Products;
 using Services.Products;
 
 using static Common.ExcelDataConstants.ExcelLineErrors;
+using static Common.Constants;
 
 public class ProductsController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
-    
     private readonly IProductsService _productsService;
     
     public ProductsController(
@@ -42,126 +41,97 @@ public class ProductsController : AdministrationController
     [Consumes("multipart/form-data")]
     public async Task<string> Import([FromForm] IFormFile file)
     {
-        var newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        var errorDictionary = new List<string>();
 
-        var errorDictionary = new Dictionary<int, string>();
-
-        if (file.Length > 0)
-
+        if (file.Length <= 0 || Path.GetExtension(file.FileName)?.ToLower() != ".xlsx")
         {
-            var sFileExtension = Path.GetExtension(file.FileName)?.ToLower();
-            
-            var fullPath = Path.Combine(newPath, file.FileName);
+            errorDictionary.Add(Errors.IncorrectFileFormat);
+            return JsonConvert.SerializeObject(errorDictionary.ToArray());
+        }
+        
+        var newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
+        var fullPath = Path.Combine(newPath, file.FileName);
 
-            await using var stream = new FileStream(fullPath, FileMode.Create);
-            await file.CopyToAsync(stream);
+        await using var stream = new FileStream(fullPath, FileMode.Create);
+        await file.CopyToAsync(stream);
 
-            stream.Position = 0;
+        stream.Position = 0;
 
-            ISheet sheet;
-            if (sFileExtension == ".xls")
+        var hssfwb = new XSSFWorkbook(stream);
+        var sheet = hssfwb.GetSheetAt(0);
+
+        for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++)
+        {
+            var row = sheet.GetRow(i);
+
+            if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+            var newProduct = new ProductInputModel();
+
+            var nameRow = row.GetCell(0).ToString()?.TrimEnd();
+
+            if (!string.IsNullOrEmpty(nameRow))
             {
-                var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+                newProduct.Name = nameRow;
+            }
+
+            var nameShortRow = row.GetCell(1).ToString()?.TrimEnd();
+
+            if (!string.IsNullOrEmpty(nameShortRow))
+            {
+                newProduct.ShortName = nameShortRow;
             }
 
             else
             {
-                var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-                sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+                errorDictionary.Add($"{i} Line: {IncorrectProductId}");
             }
 
-            var headerRow = sheet.GetRow(0); //Get Header Row
+            var brandexId = row.GetCell(2).ToString()?.TrimEnd();
 
-            int cellCount = headerRow.LastCellNum;
-
-            for (int j = 0; j < cellCount; j++)
+            if (int.TryParse(brandexId, out var brandexIdInt))
             {
-                var cell = headerRow.GetCell(j);
-
-                if (cell == null || string.IsNullOrWhiteSpace(cell.ToString())) continue;
+                newProduct.BrandexId = brandexIdInt;
             }
-
-            for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
-            {
-                var row = sheet.GetRow(i);
-
-                if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-
-                var newProduct = new ProductInputModel();
-
-                var nameRow = row.GetCell(0).ToString()?.TrimEnd();
-
-                if (!string.IsNullOrEmpty(nameRow))
-                {
-                    newProduct.Name = nameRow;
-                }
-
-                var nameShortRow = row.GetCell(1).ToString()?.TrimEnd();
-
-                if (!string.IsNullOrEmpty(nameShortRow))
-                {
-                    newProduct.ShortName = nameShortRow;
-                }
-
-                else
-                {
-                    errorDictionary[i + 1] = IncorrectProductId;
-                }
-
-                var brandexId = row.GetCell(2).ToString()?.TrimEnd();
-
-                if (int.TryParse(brandexId, out var brandexIdInt))
-                {
-                    newProduct.BrandexId = brandexIdInt;
-                }
                 
-                var phoenixId = row.GetCell(3).ToString()?.TrimEnd();
+            var phoenixId = row.GetCell(3).ToString()?.TrimEnd();
 
-                if (!string.IsNullOrEmpty(phoenixId) && int.TryParse(phoenixId, out var phoenixIdInt))
-                {
-                    newProduct.PhoenixId = phoenixIdInt;
-                }
-
-                var pharmnetId = row.GetCell(4).ToString()?.TrimEnd();
-
-                if (!string.IsNullOrEmpty(pharmnetId)  && int.TryParse(pharmnetId, out var pharmnetIdInt))
-                {
-                    newProduct.PharmnetId = pharmnetIdInt;
-                }
-
-                var stingId = row.GetCell(5).ToString()?.TrimEnd();
-
-                if (!string.IsNullOrEmpty(stingId) && int.TryParse(stingId, out var stingIdInt))
-                {
-                    newProduct.StingId = stingIdInt;
-                }
-
-                var sopharmaId = row.GetCell(6).ToString()?.TrimEnd();
-
-                if (!string.IsNullOrEmpty(sopharmaId))
-                {
-                    newProduct.SopharmaId = sopharmaId;
-                }
-
-                var priceRow = row.GetCell(7).ToString()?.TrimEnd();
-
-                double.TryParse(priceRow, out var price);
-
-                newProduct.Price = price;
-
-                await _productsService.CreateProduct(newProduct);
+            if (!string.IsNullOrEmpty(phoenixId) && int.TryParse(phoenixId, out var phoenixIdInt))
+            {
+                newProduct.PhoenixId = phoenixIdInt;
             }
+
+            var pharmnetId = row.GetCell(4).ToString()?.TrimEnd();
+
+            if (!string.IsNullOrEmpty(pharmnetId)  && int.TryParse(pharmnetId, out var pharmnetIdInt))
+            {
+                newProduct.PharmnetId = pharmnetIdInt;
+            }
+
+            var stingId = row.GetCell(5).ToString()?.TrimEnd();
+
+            if (!string.IsNullOrEmpty(stingId) && int.TryParse(stingId, out var stingIdInt))
+            {
+                newProduct.StingId = stingIdInt;
+            }
+
+            var sopharmaId = row.GetCell(6).ToString()?.TrimEnd();
+
+            if (!string.IsNullOrEmpty(sopharmaId))
+            {
+                newProduct.SopharmaId = sopharmaId;
+            }
+
+            var priceRow = row.GetCell(7).ToString()?.TrimEnd();
+
+            double.TryParse(priceRow, out var price);
+
+            newProduct.Price = price;
+
+            await _productsService.CreateProduct(newProduct);
         }
 
-        var errorModel = new CustomErrorDictionaryOutputModel
-        {
-            Errors = errorDictionary
-        };
-
-        string outputSerialized = JsonConvert.SerializeObject(errorModel);
-
-        return outputSerialized;
+        return JsonConvert.SerializeObject(errorDictionary);
     }
 
     [HttpPost]
@@ -202,8 +172,6 @@ public class ProductsController : AdministrationController
             }
         }
 
-        var outputSerialized = JsonConvert.SerializeObject(outputProduct);
-
-        return outputSerialized;
+        return JsonConvert.SerializeObject(outputProduct);
     }
 }

@@ -1,7 +1,4 @@
-﻿using BrandexBusinessSuite.SalesAnalysis.Data.Models;
-using BrandexBusinessSuite.SalesAnalysis.Models.Cities;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Cities;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Cities;
 
 using System;
 using System.Data;
@@ -91,7 +88,6 @@ public class CitiesService :ICitiesService
             Name = p.Name
         }).ToListAsync();
     }
-        
 
     public async Task<string> UploadCity(string city)
     {
@@ -103,8 +99,6 @@ public class CitiesService :ICitiesService
         await db.Cities.AddAsync(cityModel);
         await db.SaveChangesAsync();
         return cityModel.Name;
-
     }
-
-
+    
 }

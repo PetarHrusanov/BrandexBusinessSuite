@@ -149,7 +149,6 @@ public class PharmaciesService : IPharmaciesService
         }
     }
 
-
     public async Task<string> NameById(string input, string distributor)
     {
         var success = int.TryParse(input, out var convertedNumber);
@@ -217,7 +216,6 @@ public class PharmaciesService : IPharmaciesService
                     ProductId = s.ProductId,
                     Count = s.Count,
                     ProductPrice = s.Product.Price
-                    // Date = date
                 }).ToList()
         }).ToListAsync();
 
@@ -261,83 +259,5 @@ public class PharmaciesService : IPharmaciesService
         }).ToListAsync();
 
     }
-        
-    // public async Task<bool> CheckPharmacyByDistributor(string input, string distributor)
-    // {
-    //     int convertedNumber = int.Parse(input);
-    //     switch (distributor)
-    //     {
-    //         case Brandex:
-    //             return await db.Pharmacies.Where(c => c.BrandexId == convertedNumber).AnyAsync();
-    //         case Sting:
-    //             return await db.Pharmacies.Where(c => c.StingId == convertedNumber).AnyAsync();
-    //         case Phoenix:
-    //             return await db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).AnyAsync();
-    //         case Pharmnet:
-    //             return await db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).AnyAsync();
-    //         case Sopharma:
-    //             return await db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).AnyAsync();
-    //         default:
-    //             return false;
-    //     }
-    // }
-        
-    // public async Task<int> PharmacyIdByDistributor(string input, string distributor)
-    // {
-    //     int convertedNumber = int.Parse(input);
-    //     switch (distributor)
-    //     {
-    //         case Brandex:
-    //             return await db.Pharmacies.Where(c => c.BrandexId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
-    //         case Sting:
-    //             return await db.Pharmacies.Where(c => c.StingId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
-    //         case Phoenix:
-    //             return await db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
-    //         case Pharmnet:
-    //             return await db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
-    //         case Sopharma:
-    //             return await db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).Select(p => p.Id).FirstOrDefaultAsync();
-    //         default:
-    //             return 0;
-    //     };
-    // }
-        
-    // public async Task<ICollection<PharmacyDistributorCheck>> PharmacyIdsByDistributorForCheck(string distributor)
-    // {
-    //     switch (distributor)
-    //     {
-    //         case Brandex:
-    //             return await this.db.Pharmacies.Where(c => c.BrandexId != null).Select(p => new PharmacyDistributorCheck
-    //             {
-    //                 PharmacyId = p.Id,
-    //                 DistributorId = (int)p.BrandexId
-    //             }).ToListAsync();
-    //         case Sting:
-    //             return await this.db.Pharmacies.Where(c => c.StingId != null).Select(p => new PharmacyDistributorCheck
-    //             {
-    //                 PharmacyId = p.Id,
-    //                 DistributorId = (int)p.StingId
-    //             }).ToListAsync();
-    //         case Phoenix:
-    //             return await this.db.Pharmacies.Where(c => c.PhoenixId != null).Select(p => new PharmacyDistributorCheck
-    //             {
-    //                 PharmacyId = p.Id,
-    //                 DistributorId = (int)p.PhoenixId
-    //             }).ToListAsync();
-    //         case Pharmnet:
-    //             return await this.db.Pharmacies.Where(c => c.PharmnetId != null).Select(p => new PharmacyDistributorCheck
-    //             {
-    //                 PharmacyId = p.Id,
-    //                 DistributorId = (int)p.PharmnetId
-    //             }).ToListAsync();
-    //         case Sopharma:
-    //             return await this.db.Pharmacies.Where(c => c.SopharmaId != null).Select(p => new PharmacyDistributorCheck
-    //             {
-    //                 PharmacyId = p.Id,
-    //                 DistributorId = (int)p.SopharmaId
-    //             }).ToListAsync();
-    //         default:
-    //             return new List<PharmacyDistributorCheck>();
-    //     };
-    // }
+    
 }

@@ -1,7 +1,4 @@
-﻿using BrandexBusinessSuite.SalesAnalysis.Data.Models;
-using BrandexBusinessSuite.SalesAnalysis.Models.Regions;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Regions;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Regions;
 
 using System.Collections.Generic;
 using System.Linq;

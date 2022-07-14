@@ -288,18 +288,14 @@ public class SalesService :ISalesService
 
     public async Task<int> ProductCountSumById(int productId, int? regionId=null)
     {
-        // var kurcho = db.Sales.Where(s => s.PharmacyId == 2).Select(p => p.Product.Price * p.Count).Sum();
-            
+        
         if (regionId != null)
         {
             return await this.db.Sales
                 .Where(p => p.Pharmacy.RegionId == regionId)
                 .Where(p => p.ProductId == productId).SumAsync(c => c.Count);
         }
-        else
-        {
-            return await this.db.Sales.Where(p => p.ProductId == productId).SumAsync(c => c.Count);
-        }
+        return await this.db.Sales.Where(p => p.ProductId == productId).SumAsync(c => c.Count);
 
     }
 
