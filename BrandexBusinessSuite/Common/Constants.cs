@@ -19,4 +19,9 @@ public class Constants
         public const string ApplicationJson = "application/json";
     }
 
+    public class Errors
+    {
+        public const string IncorrectFileFormat = "Incorrect file format - supported format is xlsx.";
+    }
+
 }

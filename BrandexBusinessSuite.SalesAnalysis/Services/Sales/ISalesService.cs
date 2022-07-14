@@ -1,6 +1,4 @@
-﻿using BrandexBusinessSuite.SalesAnalysis.Models.Sales;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Sales;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Sales;
 
 using System;
 using System.Collections.Generic;

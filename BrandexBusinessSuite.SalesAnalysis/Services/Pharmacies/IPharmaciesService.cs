@@ -1,6 +1,4 @@
-﻿using BrandexBusinessSuite.SalesAnalysis.Models.Pharmacies;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Pharmacies;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Pharmacies;
 
 using System;
 using System.Collections.Generic;
@@ -19,11 +17,5 @@ public interface IPharmaciesService
     Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime? dateBegin, DateTime? dateEnd, int? regionId);
 
     Task Update(List<PharmacyDbInputModel> pharmacies);
-        
-    // Task<bool> CheckPharmacyByDistributor(string input, string Distributor);
-
-    // Task<int> PharmacyIdByDistributor(string input, string Distributor);
-
-    // Task<ICollection<PharmacyDistributorCheck>> PharmacyIdsByDistributorForCheck(string input);
 
 }

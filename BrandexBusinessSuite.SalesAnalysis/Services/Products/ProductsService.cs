@@ -1,8 +1,4 @@
-﻿using BrandexBusinessSuite.SalesAnalysis.Data;
-using BrandexBusinessSuite.SalesAnalysis.Data.Models;
-using BrandexBusinessSuite.SalesAnalysis.Models.Products;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Products;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Products;
 
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +6,11 @@ using System.Threading.Tasks;
     
 using Microsoft.EntityFrameworkCore;
     
-using SalesAnalysis.Data;
+using Data;
 using SalesAnalysis.Data.Models;
 using SalesAnalysis.Models.Products;
     
-using static BrandexBusinessSuite.Common.ExcelDataConstants.Ditributors;
+using static Common.ExcelDataConstants.Ditributors;
 
 public class ProductsService : IProductsService
 {

@@ -5,4 +5,6 @@ public class SalesRegionDateInputModel
     public string DateBegin { get; set; }
     public string DateEnd { get; set; }
     public int? RegionId { get; set; }
+    
+    public string Summed { get; set; }
 }
