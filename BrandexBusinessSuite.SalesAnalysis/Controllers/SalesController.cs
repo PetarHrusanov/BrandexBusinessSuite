@@ -237,13 +237,11 @@ public class SalesController : AdministrationController
         if (!await _salesService.UploadIndividualSale(saleSingleInputModel.PharmacyId, saleSingleInputModel.ProductId,
                 saleSingleInputModel.Date, saleSingleInputModel.Count, saleSingleInputModel.Distributor))
             return "END";
+        
         var saleOutputModel = new SaleOutputModel
         {
-            ProductName =
-                await _productsService.NameById(saleSingleInputModel.ProductId, saleSingleInputModel.Distributor),
-            PharmacyName =
-                await _pharmaciesService.NameById(saleSingleInputModel.PharmacyId,
-                    saleSingleInputModel.Distributor),
+            ProductName = await _productsService.NameById(saleSingleInputModel.ProductId, saleSingleInputModel.Distributor),
+            PharmacyName = await _pharmaciesService.NameById(saleSingleInputModel.PharmacyId, saleSingleInputModel.Distributor),
             Count = saleSingleInputModel.Count,
             Date = saleSingleInputModel.Date,
             Distributor = saleSingleInputModel.Distributor

@@ -15,7 +15,6 @@ using NPOI.XSSF.UserModel;
 using Newtonsoft.Json;
 
 using BrandexBusinessSuite.Controllers;
-using BrandexBusinessSuite.Models;
 using Infrastructure;
 using Models.Products;
 using Services.Products;
@@ -75,7 +74,7 @@ public class ProductsController : AdministrationController
                 newProduct.Name = nameRow;
             }
 
-            var nameShortRow = row.GetCell(1).ToString()?.TrimEnd();
+            var nameShortRow = row.GetCell(1)?.ToString()?.TrimEnd();
 
             if (!string.IsNullOrEmpty(nameShortRow))
             {
@@ -87,45 +86,42 @@ public class ProductsController : AdministrationController
                 errorDictionary.Add($"{i} Line: {IncorrectProductId}");
             }
 
-            var brandexId = row.GetCell(2).ToString()?.TrimEnd();
+            var brandexId = row.GetCell(2)?.ToString()?.TrimEnd();
 
             if (int.TryParse(brandexId, out var brandexIdInt))
             {
                 newProduct.BrandexId = brandexIdInt;
             }
                 
-            var phoenixId = row.GetCell(3).ToString()?.TrimEnd();
+            var phoenixId = row.GetCell(3)?.ToString()?.TrimEnd();
 
             if (!string.IsNullOrEmpty(phoenixId) && int.TryParse(phoenixId, out var phoenixIdInt))
             {
                 newProduct.PhoenixId = phoenixIdInt;
             }
 
-            var pharmnetId = row.GetCell(4).ToString()?.TrimEnd();
+            var pharmnetId = row.GetCell(4)?.ToString()?.TrimEnd();
 
             if (!string.IsNullOrEmpty(pharmnetId)  && int.TryParse(pharmnetId, out var pharmnetIdInt))
             {
                 newProduct.PharmnetId = pharmnetIdInt;
             }
 
-            var stingId = row.GetCell(5).ToString()?.TrimEnd();
+            var stingId = row.GetCell(5)?.ToString()?.TrimEnd();
 
             if (!string.IsNullOrEmpty(stingId) && int.TryParse(stingId, out var stingIdInt))
             {
                 newProduct.StingId = stingIdInt;
             }
 
-            var sopharmaId = row.GetCell(6).ToString()?.TrimEnd();
+            var sopharmaId = row.GetCell(6)?.ToString()?.TrimEnd();
 
             if (!string.IsNullOrEmpty(sopharmaId))
             {
                 newProduct.SopharmaId = sopharmaId;
             }
 
-            var priceRow = row.GetCell(7).ToString()?.TrimEnd();
-
-            double.TryParse(priceRow, out var price);
-
+            double.TryParse(row.GetCell(7)?.ToString()?.TrimEnd(), out var price);
             newProduct.Price = price;
 
             await _productsService.CreateProduct(newProduct);
@@ -139,37 +135,35 @@ public class ProductsController : AdministrationController
     {
         var outputProduct = new ProductOutputModel();
 
-        if (!string.IsNullOrEmpty(productInputModel.Name) &&
-            !string.IsNullOrEmpty(productInputModel.ShortName) &&
-            productInputModel.Price != 0 &&
-            productInputModel.BrandexId != 0)
+        if (string.IsNullOrEmpty(productInputModel.Name) || string.IsNullOrEmpty(productInputModel.ShortName) ||
+            productInputModel.Price == 0 ||
+            productInputModel.BrandexId == 0) return JsonConvert.SerializeObject(outputProduct);
+        
+        var newProduct = new ProductInputModel
         {
-            var newProduct = new ProductInputModel
+            Name = productInputModel.Name,
+            ShortName = productInputModel.ShortName,
+            Price = productInputModel.Price,
+            BrandexId = productInputModel.BrandexId,
+            PharmnetId = productInputModel.PharmnetId,
+            PhoenixId = productInputModel.PhoenixId,
+            SopharmaId = productInputModel.SopharmaId,
+            StingId = productInputModel.StingId
+        };
+
+        if (await _productsService.CreateProduct(newProduct) != "")
+        {
+            outputProduct = new ProductOutputModel
             {
                 Name = productInputModel.Name,
                 ShortName = productInputModel.ShortName,
                 Price = productInputModel.Price,
                 BrandexId = productInputModel.BrandexId,
+                SopharmaId = productInputModel.SopharmaId,
                 PharmnetId = productInputModel.PharmnetId,
                 PhoenixId = productInputModel.PhoenixId,
-                SopharmaId = productInputModel.SopharmaId,
-                StingId = productInputModel.StingId
+                StingId = productInputModel.StingId,
             };
-
-            if (await _productsService.CreateProduct(newProduct) != "")
-            {
-                outputProduct = new ProductOutputModel
-                {
-                    Name = productInputModel.Name,
-                    ShortName = productInputModel.ShortName,
-                    Price = productInputModel.Price,
-                    BrandexId = productInputModel.BrandexId,
-                    SopharmaId = productInputModel.SopharmaId,
-                    PharmnetId = productInputModel.PharmnetId,
-                    PhoenixId = productInputModel.PhoenixId,
-                    StingId = productInputModel.StingId,
-                };
-            }
         }
 
         return JsonConvert.SerializeObject(outputProduct);

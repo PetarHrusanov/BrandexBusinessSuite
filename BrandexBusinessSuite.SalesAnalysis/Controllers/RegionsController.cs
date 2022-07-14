@@ -50,7 +50,7 @@ public class RegionsController : AdministrationController
     {
         var errorDictionary = new List<string>();
 
-        if (file.Length <= 0 || Path.GetExtension(file.FileName)?.ToLower() != ".xlsx")
+        if (file.Length <= 0 || Path.GetExtension(file.FileName).ToLower() != ".xlsx")
         {
             errorDictionary.Add(Errors.IncorrectFileFormat);
             return JsonConvert.SerializeObject(errorDictionary.ToArray());
@@ -73,7 +73,7 @@ public class RegionsController : AdministrationController
 
             if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-            var regionName = row.GetCell(0).ToString()?.TrimEnd();
+            var regionName = row.GetCell(0)?.ToString()?.TrimEnd();
             if (!string.IsNullOrEmpty(regionName))
             {
                 await _regionService.UploadRegion(regionName);
@@ -96,7 +96,6 @@ public class RegionsController : AdministrationController
         }
 
         var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
-
         outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);
 
         return outputSerialized;
