@@ -60,13 +60,11 @@ public class PharmacyChainsController : AdministrationController
         await file.CopyToAsync(stream);
 
         stream.Position = 0;
-        
 
         var hssfwb = new XSSFWorkbook(stream);
         var sheet = hssfwb.GetSheetAt(0); 
 
         for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++)
-
         {
             var row = sheet.GetRow(i);
 

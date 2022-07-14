@@ -87,7 +87,7 @@ public class PharmacyDetailsController : AdministrationController
 
         var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
 
-        if (file.Length <= 0 || Path.GetExtension(file.FileName)?.ToLower() != ".xlsx")
+        if (file.Length <= 0 || Path.GetExtension(file.FileName).ToLower() != ".xlsx")
         {
             errorDictionary.Add(Errors.IncorrectFileFormat);
             return JsonConvert.SerializeObject(errorDictionary.ToArray());
@@ -199,7 +199,7 @@ public class PharmacyDetailsController : AdministrationController
         throw new InvalidOperationException();
     }
 
-    private void CreatePharmacyInputModel(IEnumerable<CityCheckModel> citiesIdsForCheck,
+    private static void CreatePharmacyInputModel(IEnumerable<CityCheckModel> citiesIdsForCheck,
         IEnumerable<PharmacyCompanyCheckModel> pharmacyCompanyIdsForCheck,
         IEnumerable<PharmacyChainCheckModel> pharmacyChainsIdsForCheck,
         IEnumerable<RegionOutputModel> regionIdsForCheck, PharmacyDbInputModel newPharmacy, IRow row, int i,
@@ -232,8 +232,7 @@ public class PharmacyDetailsController : AdministrationController
 
         if (pharmacyClass != null && !string.IsNullOrWhiteSpace(pharmacyClass.ToString()!.TrimEnd()))
         {
-            newPharmacy.PharmacyClass =
-                (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass.ToString()!.TrimEnd(), true);
+            newPharmacy.PharmacyClass = (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass.ToString()!.TrimEnd(), true);
         }
 
         if (pharmacyActive != null && pharmacyActive.ToString()?.TrimEnd()[0] == '0') newPharmacy.Active = false;
@@ -264,24 +263,14 @@ public class PharmacyDetailsController : AdministrationController
 
         if (newPharmacy.CityId == 0) errorDictionary.Add($"{i} Line: {IncorrectCityName}");
 
-        if (GetDistributorIdFromRow(row, PharmnetIdColumn) != 0)
-            newPharmacy.PharmnetId = GetDistributorIdFromRow(row, PharmnetIdColumn);
-        if (GetDistributorIdFromRow(row, PhoenixIdColumn) != 0)
-            newPharmacy.PhoenixId = GetDistributorIdFromRow(row, PhoenixIdColumn);
-        if (GetDistributorIdFromRow(row, SopharmaIdColumn) != 0)
-            newPharmacy.SopharmaId = GetDistributorIdFromRow(row, SopharmaIdColumn);
-        if (GetDistributorIdFromRow(row, StingIdColumn) != 0)
-            newPharmacy.StingId = GetDistributorIdFromRow(row, StingIdColumn);
+        if (GetDistributorIdFromRow(row, PharmnetIdColumn) != 0) newPharmacy.PharmnetId = GetDistributorIdFromRow(row, PharmnetIdColumn);
+        if (GetDistributorIdFromRow(row, PhoenixIdColumn) != 0) newPharmacy.PhoenixId = GetDistributorIdFromRow(row, PhoenixIdColumn);
+        if (GetDistributorIdFromRow(row, SopharmaIdColumn) != 0) newPharmacy.SopharmaId = GetDistributorIdFromRow(row, SopharmaIdColumn);
+        if (GetDistributorIdFromRow(row, StingIdColumn) != 0) newPharmacy.StingId = GetDistributorIdFromRow(row, StingIdColumn);
     }
 
     private static int GetDistributorIdFromRow(IRow row, int distributorColumn)
     {
-        var idRow = row.GetCell(distributorColumn);
-        if (idRow != null && int.TryParse(idRow.ToString()?.TrimEnd(), out var idInt))
-        {
-            return idInt;
-        }
-
-        return 0;
+        return int.TryParse(row.GetCell(distributorColumn)?.ToString()?.TrimEnd(), out var idInt) ? idInt : 0;
     }
 }

@@ -19,7 +19,6 @@ using static Common.InputOutputConstants.SingleStringConstants;
 
 public class DistributorsController :AdministrationController
 {
-    
     private readonly SpravkiDbContext _context;
 
     public DistributorsController(SpravkiDbContext context) => _context = context;
@@ -34,7 +33,6 @@ public class DistributorsController :AdministrationController
     [HttpPost]
     public async Task<string> Import([FromBody]SingleStringInputModel singleStringInputModel)
     {
-
         var distributor = new Distributor
         {
             Name = singleStringInputModel.SingleStringValue

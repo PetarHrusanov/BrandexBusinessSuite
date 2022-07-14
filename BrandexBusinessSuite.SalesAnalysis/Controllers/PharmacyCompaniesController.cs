@@ -33,7 +33,6 @@ public class PharmacyCompaniesController : AdministrationController
 
     public PharmacyCompaniesController(IWebHostEnvironment hostEnvironment,
         IPharmacyCompaniesService pharmacyCompaniesService)
-
     {
         _hostEnvironment = hostEnvironment;
         _pharmacyCompaniesService = pharmacyCompaniesService;
@@ -76,26 +75,19 @@ public class PharmacyCompaniesController : AdministrationController
             var newCompany = new PharmacyCompanyInputModel();
 
             var companyName = row.GetCell(0).ToString()?.TrimEnd();
-
-            if (!string.IsNullOrEmpty(companyName))
-            {
-                newCompany.Name = companyName;
-            }
-
-            else
+            
+            if (string.IsNullOrEmpty(companyName))
             {
                 errorDictionary.Add($"{i} Line: {IncorrectPharmacyCompanyName}");
                 continue;
             }
 
+            newCompany.Name = companyName;
+            
             var vatRow = row.GetCell(1);
-            if (vatRow != null)
-            {
-                newCompany.VAT = vatRow.ToString()?.TrimEnd();
-            }
+            if (vatRow != null) newCompany.VAT = vatRow.ToString()?.TrimEnd();
 
             // Consider implementing check for Company changes, but clean ERP database first.
-
             if (pharmacyCompaniesCheck.All(p =>
                     !string.Equals(p.Name.TrimEnd(), newCompany.Name, StringComparison.InvariantCultureIgnoreCase)))
             {
