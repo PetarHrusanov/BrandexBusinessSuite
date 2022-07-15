@@ -1,6 +1,3 @@
-using BrandexBusinessSuite.MarketingAnalysis.Data;
-using BrandexBusinessSuite.MarketingAnalysis.Models.Products;
-
 namespace BrandexBusinessSuite.MarketingAnalysis.Services.Products;
 
 using System.Data;
@@ -9,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 
 using MarketingAnalysis.Models.Products;
-using MarketingAnalysis.Data;
+using Data;
 
 using static Common.MarketingDataConstants;
 using static Common.Constants;
@@ -68,12 +65,7 @@ public class ProductsService :IProductsService
         await objbulk.WriteToServerAsync(table);  
         con.Close();
     }
-
-    public Task<string> CreateProduct(ProductInputModel productInputModel)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public async Task<List<ProductCheckModel>> GetCheckModels()
     {
         return await db.Products.Select(p => new ProductCheckModel()
@@ -83,19 +75,5 @@ public class ProductsService :IProductsService
             ShortName = p.ShortName
         }).ToListAsync();
     }
-
-    public Task<string> NameById(string input, string distributor)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<string>> GetProductsNames()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<int>> GetProductsId()
-    {
-        throw new NotImplementedException();
-    }
+    
 }

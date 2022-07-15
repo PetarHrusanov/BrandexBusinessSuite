@@ -1,5 +1,3 @@
-using BrandexBusinessSuite.MarketingAnalysis.Models.AdMedias;
-
 namespace BrandexBusinessSuite.MarketingAnalysis.Services.AdMedias;
 
 using System.Data;
@@ -62,22 +60,7 @@ public class AdMediasService :IAdMediasService
         con.Close();  
         
     }
-
-    public Task<string> UploadSingle(string media)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> CheckByName(string mediaName)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<int> IdByName(string mediaName)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public async Task<List<AdMediaCheckModel>> GetCheckModels()
     {
         return await db.AdMedias.Select(p => new AdMediaCheckModel()

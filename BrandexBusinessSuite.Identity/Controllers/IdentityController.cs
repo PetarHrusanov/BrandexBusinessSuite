@@ -47,7 +47,6 @@ public class IdentityController : ApiController
     public async Task CreateRole([FromBody]SingleStringInputModel singleStringInputModel)
     {
         await _identity.CreateRole(singleStringInputModel.SingleStringValue);
-
         // if (!result.Succeeded) return BadRequest(result.Errors);
 
     }
@@ -57,11 +56,9 @@ public class IdentityController : ApiController
     public async Task<string[] > GetRoles()
     {
         return await _identity.GetRoles();
-
         // if (!result.Succeeded) return BadRequest(result.Errors);
 
     }
-
 
     [HttpPost]
     public async Task<ActionResult<UserOutputModel>> Login(UserInputModel input)
@@ -73,7 +70,6 @@ public class IdentityController : ApiController
         return new UserOutputModel(result.Data.Token);
     }
 
-    
     [HttpPut]
     [Authorize]
     [Route(nameof(ChangePassword))]

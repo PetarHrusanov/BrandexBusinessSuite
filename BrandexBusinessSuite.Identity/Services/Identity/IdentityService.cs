@@ -54,7 +54,6 @@ public class IdentityService : IIdentityService
         };
 
         await _userManager.CreateAsync(user, userInput.Password);
-
         await _userManager.AddToRoleAsync(user, userInput.Role);
     }
 
@@ -75,16 +74,10 @@ public class IdentityService : IIdentityService
 
     public async Task CreateRole(string input)
     {
-
         if (!await _roleManager.RoleExistsAsync(input))
         { 
             await _roleManager.CreateAsync(new ApplicationRole(input));
         }
-        
-        // var roleStore = new RoleStore<IdentityRole>(new ApplicationUsersDbContext());
-        // var roleManager = new RoleManager<IdentityRole>(roleStore);
-        // if(!await roleManager.RoleExistsAsync("YourRoleName"))
-        //     await roleManager.CreateAsync(new IdentityRole("YourRoleName"));
     }
 
     public async Task<string[]> GetRoles()

@@ -1,12 +1,11 @@
-﻿namespace BrandexBusinessSuite.Identity.Models.Identity
-{
-    public class UserOutputModel
-    {
-        public UserOutputModel(string token)
-        {
-            this.Token = token;
-        }
+﻿namespace BrandexBusinessSuite.Identity.Models.Identity;
 
-        public string Token { get; }
+public class UserOutputModel
+{
+    public UserOutputModel(string token)
+    {
+        Token = token;
     }
+
+    public string Token { get; }
 }

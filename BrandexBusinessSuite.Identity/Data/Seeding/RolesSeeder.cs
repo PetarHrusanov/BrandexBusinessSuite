@@ -28,7 +28,6 @@ internal class RolesSeeder : ISeeder
     
     public void SeedAsync()
     {
-        
         Task
             .Run(async () =>
             {
@@ -38,7 +37,6 @@ internal class RolesSeeder : ISeeder
             })
             .GetAwaiter()
             .GetResult();
-        
     }
 
     private static async Task SeedRoleAsync(RoleManager<ApplicationRole> roleManager, string roleName)
