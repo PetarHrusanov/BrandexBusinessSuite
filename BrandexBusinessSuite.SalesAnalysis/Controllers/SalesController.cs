@@ -162,8 +162,7 @@ public class SalesController : AdministrationController
             return JsonConvert.SerializeObject(errorDictionary.ToArray());
         }
         
-        var newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
-        var fullPath = Path.Combine(newPath, file.FileName);
+        var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
 
         await using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace BrandexBusinessSuite.Infrastructure;
 
 using Microsoft.AspNetCore.Hosting;
@@ -8,9 +10,9 @@ public abstract class CreateFileDirectories
     public static string CreateExcelFilesInputDirectory(IWebHostEnvironment hostEnvironment)
     {
         
-        string webRootPath = hostEnvironment.WebRootPath;
+        var webRootPath = hostEnvironment.WebRootPath;
 
-        string newPath = Path.Combine(webRootPath, UploadExcel);
+        var newPath = Path.Combine(webRootPath, UploadExcel);
         
         if (!Directory.Exists(newPath))
         {
@@ -18,6 +20,12 @@ public abstract class CreateFileDirectories
         }
         
         return newPath;
+    }
+
+    public static string CreateExcelFilesInputCompletePath(IWebHostEnvironment hostEnvironment, IFormFile file)
+    {
+        var newPath = CreateExcelFilesInputDirectory(hostEnvironment);
+        return Path.Combine(newPath, file.FileName);
     }
     
     public static string CreatePDFFilesInputDirectory(IWebHostEnvironment hostEnvironment)

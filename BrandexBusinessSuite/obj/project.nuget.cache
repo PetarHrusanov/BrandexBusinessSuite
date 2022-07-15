@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "WuBeY7/LR/yI2IYu/1zwm+CYioMyy2s2ovTafc5ZRsO8j/EnuvIuBQRtemIUz9jwg6dQ1c/+hkw1VKvDwG+/nw==",
+  "dgSpecHash": "S1ulpR047IZQsGZmyYvy50uFT9iB3WpFEwb0we9zG0ZC9zXRTr7iE/RVCSlSq+eIGBJG0NNZML3Lqz0kis99Mg==",
   "success": true,
   "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite/BrandexBusinessSuite.csproj",
   "expectedPackageFiles": [
@@ -12,6 +12,7 @@
     "/Users/Petar/.nuget/packages/automatonymous/5.0.0/automatonymous.5.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/azure.core/1.6.0/azure.core.1.6.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/azure.identity/1.3.0/azure.identity.1.3.0.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/dotnetcore.npoi.core/1.2.2/dotnetcore.npoi.core.1.2.2.nupkg.sha512",
     "/Users/Petar/.nuget/packages/greenpipes/4.0.0/greenpipes.4.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/hangfire.aspnetcore/1.7.28/hangfire.aspnetcore.1.7.28.nupkg.sha512",
     "/Users/Petar/.nuget/packages/hangfire.core/1.7.28/hangfire.core.1.7.28.nupkg.sha512",
@@ -85,6 +86,7 @@
     "/Users/Petar/.nuget/packages/runtime.win-arm64.runtime.native.system.data.sqlclient.sni/4.4.0/runtime.win-arm64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/runtime.win-x64.runtime.native.system.data.sqlclient.sni/4.4.0/runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/runtime.win-x86.runtime.native.system.data.sqlclient.sni/4.4.0/runtime.win-x86.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/sharpziplib/1.2.0/sharpziplib.1.2.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/system.appcontext/4.3.0/system.appcontext.4.3.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/system.buffers/4.5.1/system.buffers.4.5.1.nupkg.sha512",
     "/Users/Petar/.nuget/packages/system.collections/4.3.0/system.collections.4.3.0.nupkg.sha512",

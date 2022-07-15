@@ -31,8 +31,9 @@ using Services.PharmacyChains;
 using Services.Regions;
 using Services.PharmacyCompanies;
 
+using static Methods.ExcelMethods;
+
 using static Common.ExcelDataConstants.ExcelLineErrors;
-using static Common.Constants;
 
 public class PharmacyDetailsController : AdministrationController
 {
@@ -87,18 +88,13 @@ public class PharmacyDetailsController : AdministrationController
 
         var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
 
-        if (file.Length <= 0 || Path.GetExtension(file.FileName).ToLower() != ".xlsx")
-        {
-            errorDictionary.Add(Errors.IncorrectFileFormat);
-            return JsonConvert.SerializeObject(errorDictionary.ToArray());
-        }
-        
-        var newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
-        var fullPath = Path.Combine(newPath, file.FileName);
+        if (!CheckXlsx(file, errorDictionary)) return JsonConvert.SerializeObject(errorDictionary.ToArray());
 
+        var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
+        
         await using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
-
+        
         stream.Position = 0;
 
         var hssfwb = new XSSFWorkbook(stream);
@@ -151,52 +147,49 @@ public class PharmacyDetailsController : AdministrationController
     [HttpPost]
     public async Task<string> Upload([FromBody] PharmacyInputModel pharmacyInputModel)
     {
-        if (pharmacyInputModel.BrandexId != 0 && pharmacyInputModel.Name != null &&
-            await _pharmacyCompaniesService.CheckCompanyByName(pharmacyInputModel.CompanyName) &&
-            await _pharmacyChainsService.CheckPharmacyChainByName(pharmacyInputModel.PharmacyChainName) &&
-            await _citiesService.CheckCityName(pharmacyInputModel.CityName) &&
-            await _regionsService.CheckRegionByName(pharmacyInputModel.RegionName) &&
-            pharmacyInputModel.Address != null)
+        if (pharmacyInputModel.BrandexId == 0 || pharmacyInputModel.Name == null ||
+            !await _pharmacyCompaniesService.CheckCompanyByName(pharmacyInputModel.CompanyName) ||
+            !await _pharmacyChainsService.CheckPharmacyChainByName(pharmacyInputModel.PharmacyChainName) ||
+            !await _citiesService.CheckCityName(pharmacyInputModel.CityName) ||
+            !await _regionsService.CheckRegionByName(pharmacyInputModel.RegionName) ||
+            pharmacyInputModel.Address == null) throw new InvalidOperationException();
+        var pharmacyDbInputModel = new PharmacyDbInputModel
         {
-            var pharmacyDbInputModel = new PharmacyDbInputModel
-            {
-                BrandexId = pharmacyInputModel.BrandexId,
-                Name = pharmacyInputModel.Name,
-                PharmacyClass = pharmacyInputModel.PharmacyClass,
-                Active = pharmacyInputModel.Active,
-                CompanyId = await _pharmacyCompaniesService.IdByName(pharmacyInputModel.CompanyName),
-                PharmacyChainId = await _pharmacyChainsService.IdByName(pharmacyInputModel.PharmacyChainName),
-                Address = pharmacyInputModel.Address,
-                CityId = await _citiesService.IdByName(pharmacyInputModel.CityName),
-                PharmnetId = pharmacyInputModel.PharmnetId,
-                PhoenixId = pharmacyInputModel.PhoenixId,
-                SopharmaId = pharmacyInputModel.SopharmaId,
-                StingId = pharmacyInputModel.StingId,
-                RegionId = await _regionsService.IdByName(pharmacyInputModel.RegionName)
-            };
+            BrandexId = pharmacyInputModel.BrandexId,
+            Name = pharmacyInputModel.Name,
+            PharmacyClass = pharmacyInputModel.PharmacyClass,
+            Active = pharmacyInputModel.Active,
+            CompanyId = await _pharmacyCompaniesService.IdByName(pharmacyInputModel.CompanyName),
+            PharmacyChainId = await _pharmacyChainsService.IdByName(pharmacyInputModel.PharmacyChainName),
+            Address = pharmacyInputModel.Address,
+            CityId = await _citiesService.IdByName(pharmacyInputModel.CityName),
+            PharmnetId = pharmacyInputModel.PharmnetId,
+            PhoenixId = pharmacyInputModel.PhoenixId,
+            SopharmaId = pharmacyInputModel.SopharmaId,
+            StingId = pharmacyInputModel.StingId,
+            RegionId = await _regionsService.IdByName(pharmacyInputModel.RegionName)
+        };
 
-            if (await _pharmaciesService.CreatePharmacy(pharmacyDbInputModel) == "")
-                throw new InvalidOperationException();
-            var pharmacyOutputModel = new PharmacyOutputModel
-            {
-                Name = pharmacyInputModel.Name,
-                PharmacyClass = pharmacyInputModel.PharmacyClass.ToString(),
-                CompanyName = pharmacyInputModel.CompanyName,
-                PharmacyChainName = pharmacyInputModel.PharmacyChainName,
-                Address = pharmacyInputModel.Address,
-                CityName = pharmacyInputModel.CityName,
-                Region = pharmacyInputModel.RegionName,
-                BrandexId = pharmacyInputModel.BrandexId,
-                PharmnetId = pharmacyInputModel.PharmnetId,
-                PhoenixId = pharmacyInputModel.PhoenixId,
-                SopharmaId = pharmacyInputModel.SopharmaId,
-                StingId = pharmacyInputModel.StingId,
-            };
+        if (await _pharmaciesService.CreatePharmacy(pharmacyDbInputModel) == "")
+            throw new InvalidOperationException();
+        var pharmacyOutputModel = new PharmacyOutputModel
+        {
+            Name = pharmacyInputModel.Name,
+            PharmacyClass = pharmacyInputModel.PharmacyClass.ToString(),
+            CompanyName = pharmacyInputModel.CompanyName,
+            PharmacyChainName = pharmacyInputModel.PharmacyChainName,
+            Address = pharmacyInputModel.Address,
+            CityName = pharmacyInputModel.CityName,
+            Region = pharmacyInputModel.RegionName,
+            BrandexId = pharmacyInputModel.BrandexId,
+            PharmnetId = pharmacyInputModel.PharmnetId,
+            PhoenixId = pharmacyInputModel.PhoenixId,
+            SopharmaId = pharmacyInputModel.SopharmaId,
+            StingId = pharmacyInputModel.StingId,
+        };
 
-            return JsonConvert.SerializeObject(pharmacyOutputModel);
-        }
+        return JsonConvert.SerializeObject(pharmacyOutputModel);
 
-        throw new InvalidOperationException();
     }
 
     private static void CreatePharmacyInputModel(IEnumerable<CityCheckModel> citiesIdsForCheck,
@@ -263,14 +256,9 @@ public class PharmacyDetailsController : AdministrationController
 
         if (newPharmacy.CityId == 0) errorDictionary.Add($"{i} Line: {IncorrectCityName}");
 
-        if (GetDistributorIdFromRow(row, PharmnetIdColumn) != 0) newPharmacy.PharmnetId = GetDistributorIdFromRow(row, PharmnetIdColumn);
-        if (GetDistributorIdFromRow(row, PhoenixIdColumn) != 0) newPharmacy.PhoenixId = GetDistributorIdFromRow(row, PhoenixIdColumn);
-        if (GetDistributorIdFromRow(row, SopharmaIdColumn) != 0) newPharmacy.SopharmaId = GetDistributorIdFromRow(row, SopharmaIdColumn);
-        if (GetDistributorIdFromRow(row, StingIdColumn) != 0) newPharmacy.StingId = GetDistributorIdFromRow(row, StingIdColumn);
-    }
-
-    private static int GetDistributorIdFromRow(IRow row, int distributorColumn)
-    {
-        return int.TryParse(row.GetCell(distributorColumn)?.ToString()?.TrimEnd(), out var idInt) ? idInt : 0;
+        if (ConvertRowToInt(row, PharmnetIdColumn) != 0) newPharmacy.PharmnetId = ConvertRowToInt(row, PharmnetIdColumn);
+        if (ConvertRowToInt(row, PhoenixIdColumn) != 0) newPharmacy.PhoenixId = ConvertRowToInt(row, PhoenixIdColumn);
+        if (ConvertRowToInt(row, SopharmaIdColumn) != 0) newPharmacy.SopharmaId = ConvertRowToInt(row, SopharmaIdColumn);
+        if (ConvertRowToInt(row, StingIdColumn) != 0) newPharmacy.StingId = ConvertRowToInt(row, StingIdColumn);
     }
 }

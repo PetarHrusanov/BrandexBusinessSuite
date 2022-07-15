@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Lpmo90HAs3/b0DPeUioodcSw1eJGB5r88hmABkuM+fA=",
+  "Hash": "Uuks0legNrg8W258aUK398kDNObYc/joIv8hpi+dEWs=",
   "Source": "BrandexBusinessSuite.SalesAnalysis",
   "BasePath": "_content/BrandexBusinessSuite.SalesAnalysis",
   "Mode": "Default",
@@ -680,6 +680,23 @@
       "OriginalItemSpec": "wwwroot/UploadExcel/2022-05-13T14-04 Transaction #5014589618658277-9768913.pdf"
     },
     {
+      "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite.SalesAnalysis/wwwroot/UploadExcel/id-obekti-2022-05.xlsx",
+      "SourceId": "BrandexBusinessSuite.SalesAnalysis",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite.SalesAnalysis/wwwroot/",
+      "BasePath": "_content/BrandexBusinessSuite.SalesAnalysis",
+      "RelativePath": "UploadExcel/id-obekti-2022-05.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/UploadExcel/id-obekti-2022-05.xlsx"
+    },
+    {
       "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite.SalesAnalysis/wwwroot/UploadExcel/Sopharma-surov-03-2022.xlsx",
       "SourceId": "BrandexBusinessSuite.SalesAnalysis",
       "SourceType": "Discovered",
@@ -712,6 +729,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/UploadExcel/Sopharma-surov-04-2022.xlsx"
+    },
+    {
+      "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite.SalesAnalysis/wwwroot/UploadExcel/TestFakeProducts.xlsx",
+      "SourceId": "BrandexBusinessSuite.SalesAnalysis",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite.SalesAnalysis/wwwroot/",
+      "BasePath": "_content/BrandexBusinessSuite.SalesAnalysis",
+      "RelativePath": "UploadExcel/TestFakeProducts.xlsx",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/UploadExcel/TestFakeProducts.xlsx"
     },
     {
       "Identity": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite.SalesAnalysis/wwwroot/UploadExcel/Продукти.xlsx",
