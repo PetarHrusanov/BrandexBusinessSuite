@@ -9,8 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Data;
 using SalesAnalysis.Data.Models;
 using SalesAnalysis.Models.Products;
-    
-using static Common.ExcelDataConstants.Ditributors;
 
 public class ProductsService : IProductsService
 {
@@ -55,41 +53,10 @@ public class ProductsService : IProductsService
             SopharmaId = p.SopharmaId
         }).ToListAsync();
     }
-    
-
-    public async Task<string> NameById(string input, string distributor)
-    {
-        var unused = int.TryParse(input, out var convertedNumber);
-
-        return distributor switch
-        {
-            Brandex => await db.Products.Where(c => c.BrandexId == convertedNumber)
-                .Select(p => p.Name)
-                .FirstOrDefaultAsync(),
-            Sting => await db.Products.Where(c => c.StingId == convertedNumber)
-                .Select(p => p.Name)
-                .FirstOrDefaultAsync(),
-            Phoenix => await db.Products.Where(c => c.PhoenixId == convertedNumber)
-                .Select(p => p.Name)
-                .FirstOrDefaultAsync(),
-            Pharmnet => await db.Products.Where(c => c.PharmnetId == convertedNumber)
-                .Select(p => p.Name)
-                .FirstOrDefaultAsync(),
-            Sopharma => await db.Products.Where(c => c.SopharmaId == input)
-                .Select(p => p.Name)
-                .FirstOrDefaultAsync(),
-            _ => ""
-        };
-    }
 
     public async Task<IEnumerable<string>> GetProductsNames()
     {
         return await db.Products.Select(p => p.Name).ToListAsync();
-    }
-
-    public async Task<IEnumerable<int>> GetProductsId()
-    {
-        return await db.Products.Select(p => p.Id).ToListAsync();
     }
 
     public async Task<IEnumerable<ProductShortOutputModel>> GetProductsIdPrices()

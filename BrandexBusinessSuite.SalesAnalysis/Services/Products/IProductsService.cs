@@ -1,6 +1,4 @@
-﻿using BrandexBusinessSuite.SalesAnalysis.Models.Products;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Products;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Products;
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,11 +11,7 @@ public interface IProductsService
 
     Task<List<ProductCheckModel>> GetProductsCheck();
 
-    Task<string> NameById(string input, string distributor);
-
     Task<IEnumerable<string>> GetProductsNames();
-
-    Task<IEnumerable<int>> GetProductsId();
 
     Task<IEnumerable<ProductShortOutputModel>> GetProductsIdPrices();
 }

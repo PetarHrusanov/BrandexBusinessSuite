@@ -144,54 +144,6 @@ public class PharmacyDetailsController : AdministrationController
         return JsonConvert.SerializeObject(errorDictionary);
     }
 
-    [HttpPost]
-    public async Task<string> Upload([FromBody] PharmacyInputModel pharmacyInputModel)
-    {
-        if (pharmacyInputModel.BrandexId == 0 || pharmacyInputModel.Name == null ||
-            !await _pharmacyCompaniesService.CheckCompanyByName(pharmacyInputModel.CompanyName) ||
-            !await _pharmacyChainsService.CheckPharmacyChainByName(pharmacyInputModel.PharmacyChainName) ||
-            !await _citiesService.CheckCityName(pharmacyInputModel.CityName) ||
-            !await _regionsService.CheckRegionByName(pharmacyInputModel.RegionName) ||
-            pharmacyInputModel.Address == null) throw new InvalidOperationException();
-        var pharmacyDbInputModel = new PharmacyDbInputModel
-        {
-            BrandexId = pharmacyInputModel.BrandexId,
-            Name = pharmacyInputModel.Name,
-            PharmacyClass = pharmacyInputModel.PharmacyClass,
-            Active = pharmacyInputModel.Active,
-            CompanyId = await _pharmacyCompaniesService.IdByName(pharmacyInputModel.CompanyName),
-            PharmacyChainId = await _pharmacyChainsService.IdByName(pharmacyInputModel.PharmacyChainName),
-            Address = pharmacyInputModel.Address,
-            CityId = await _citiesService.IdByName(pharmacyInputModel.CityName),
-            PharmnetId = pharmacyInputModel.PharmnetId,
-            PhoenixId = pharmacyInputModel.PhoenixId,
-            SopharmaId = pharmacyInputModel.SopharmaId,
-            StingId = pharmacyInputModel.StingId,
-            RegionId = await _regionsService.IdByName(pharmacyInputModel.RegionName)
-        };
-
-        if (await _pharmaciesService.CreatePharmacy(pharmacyDbInputModel) == "")
-            throw new InvalidOperationException();
-        var pharmacyOutputModel = new PharmacyOutputModel
-        {
-            Name = pharmacyInputModel.Name,
-            PharmacyClass = pharmacyInputModel.PharmacyClass.ToString(),
-            CompanyName = pharmacyInputModel.CompanyName,
-            PharmacyChainName = pharmacyInputModel.PharmacyChainName,
-            Address = pharmacyInputModel.Address,
-            CityName = pharmacyInputModel.CityName,
-            Region = pharmacyInputModel.RegionName,
-            BrandexId = pharmacyInputModel.BrandexId,
-            PharmnetId = pharmacyInputModel.PharmnetId,
-            PhoenixId = pharmacyInputModel.PhoenixId,
-            SopharmaId = pharmacyInputModel.SopharmaId,
-            StingId = pharmacyInputModel.StingId,
-        };
-
-        return JsonConvert.SerializeObject(pharmacyOutputModel);
-
-    }
-
     private static void CreatePharmacyInputModel(IEnumerable<CityCheckModel> citiesIdsForCheck,
         IEnumerable<PharmacyCompanyCheckModel> pharmacyCompanyIdsForCheck,
         IEnumerable<PharmacyChainCheckModel> pharmacyChainsIdsForCheck,

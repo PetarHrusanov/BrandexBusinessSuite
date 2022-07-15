@@ -1,10 +1,8 @@
 ﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Regions;
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 using Data;
@@ -20,20 +18,6 @@ public class RegionsService : IRegionsService
         this.db = db;
     }
 
-    public async Task<bool> CheckRegionByName(string regionName)
-    {
-        return await db.Regions.Where(x => x.Name.ToLower().TrimEnd().Contains(regionName.ToLower().TrimEnd()))
-            .Select(x => x.Id)
-            .AnyAsync();
-    }
-
-    public async Task<int> IdByName(string regionName)
-    {
-        return await db.Regions.Where(x => x.Name.ToLower().TrimEnd().Contains(regionName.ToLower().TrimEnd()))
-            .Select(x => x.Id)
-            .FirstOrDefaultAsync();
-    }
-
     public async Task<string> UploadRegion(string regionName)
     {
         if (regionName == null) return "";
@@ -46,16 +30,6 @@ public class RegionsService : IRegionsService
         await db.SaveChangesAsync();
         return regionName;
 
-    }
-
-    public async Task<List<SelectListItem>> RegionsForSelect()
-    {
-        return await db.Regions.Select(a =>
-            new SelectListItem
-            {
-                Value = a.Id.ToString(),
-                Text = a.Name
-            }).ToListAsync();
     }
 
     public async Task<RegionOutputModel[]> AllRegions()

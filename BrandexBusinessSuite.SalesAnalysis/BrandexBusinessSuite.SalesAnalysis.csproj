@@ -20,7 +20,6 @@
     <Folder Include="Models\Distributor\" />
     <Folder Include="Models\Pharmacies\" />
     <Folder Include="Models\Sales\" />
-    <Folder Include="Models\Enums\" />
     <Folder Include="Services\" />
     <Folder Include="Services\Sales\" />
     <Folder Include="Services\Products\" />

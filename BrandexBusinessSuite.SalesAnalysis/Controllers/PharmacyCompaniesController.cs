@@ -61,7 +61,7 @@ public class PharmacyCompaniesController : AdministrationController
         var hssfwb = new XSSFWorkbook(stream);
         var sheet = hssfwb.GetSheetAt(0);
 
-        for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+        for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)
         {
             var row = sheet.GetRow(i);
 
