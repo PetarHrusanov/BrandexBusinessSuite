@@ -22,6 +22,8 @@ using BrandexBusinessSuite.Models;
 using Infrastructure;
 using Services.Cities;
 
+using static Methods.ExcelMethods;
+
 using static Common.InputOutputConstants.SingleStringConstants;
 using static Common.Constants;
 
@@ -46,18 +48,13 @@ public class CitiesController : AdministrationController
 
         var uniqueCities = new List<string>();
 
-        if (file.Length <= 0 || Path.GetExtension(file.FileName)?.ToLower() != ".xlsx")
-        {
-            errorDictionary.Add(Errors.IncorrectFileFormat);
-            return JsonConvert.SerializeObject(errorDictionary.ToArray());
-        }
+        if (!CheckXlsx(file, errorDictionary)) return JsonConvert.SerializeObject(errorDictionary.ToArray());
         
-        var newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
-        var fullPath = Path.Combine(newPath, file.FileName);
-
+        var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
+        
         await using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
-
+        
         stream.Position = 0;
 
         var hssfwb = new XSSFWorkbook(stream);
@@ -96,10 +93,7 @@ public class CitiesController : AdministrationController
     [Authorize(Roles = AdministratorRoleName)]
     public async Task<string> Upload([FromBody] SingleStringInputModel singleStringInputModel)
     {
-        if (singleStringInputModel.SingleStringValue != null)
-        {
-            await _citiesService.UploadCity(singleStringInputModel.SingleStringValue);
-        }
+        await _citiesService.UploadCity(singleStringInputModel.SingleStringValue);
 
         var outputSerialized = JsonConvert.SerializeObject(singleStringInputModel);
         outputSerialized = outputSerialized.Replace(SingleStringValueCapital, SingleStringValueLower);

@@ -21,9 +21,10 @@ using Infrastructure;
 using Models.PharmacyCompanies;
 using Services.PharmacyCompanies;
 
+using static Methods.ExcelMethods;
+
 using static Common.InputOutputConstants.SingleStringConstants;
 using static Common.ExcelDataConstants.ExcelLineErrors;
-using static Common.Constants;
 
 public class PharmacyCompaniesController : AdministrationController
 {
@@ -47,16 +48,10 @@ public class PharmacyCompaniesController : AdministrationController
         var pharmacyCompaniesCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesCheck();
 
         var validPharmacyCompanyNames = new List<PharmacyCompanyInputModel>();
-        var pharmacyCompaniesEditted = new List<PharmacyCompanyInputModel>();
 
-        if (file.Length <= 0 || Path.GetExtension(file.FileName)?.ToLower() != ".xlsx")
-        {
-            errorDictionary.Add(Errors.IncorrectFileFormat);
-            return JsonConvert.SerializeObject(errorDictionary.ToArray());
-        }
+        if (!CheckXlsx(file, errorDictionary)) return JsonConvert.SerializeObject(errorDictionary.ToArray());
         
-        var newPath = CreateFileDirectories.CreateExcelFilesInputDirectory(_hostEnvironment);
-        var fullPath = Path.Combine(newPath, file.FileName);
+        var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
 
         await using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
