@@ -71,7 +71,6 @@ public class PharmacyChainsService : IPharmacyChainsService
 
     public async Task<string> UploadPharmacyChain(string chainName)
     {
-        // if (chainName == null) return "";
         var chainInput = new PharmacyChain
         {
             Name = chainName
@@ -82,19 +81,7 @@ public class PharmacyChainsService : IPharmacyChainsService
         return chainName;
 
     }
-
-    public async Task<bool> CheckPharmacyChainByName(string pharmacyChainName)
-    {
-        return await db.PharmacyChains.Where(x => x.Name.ToLower().TrimEnd() == pharmacyChainName.ToLower().TrimEnd())
-            .Select(x => x.Id).AnyAsync();
-    }
-
-    public async Task<int> IdByName(string pharmacyChainName)
-    {
-        return await db.PharmacyChains.Where(x => x.Name.ToLower().TrimEnd() == pharmacyChainName.ToLower().TrimEnd())
-            .Select(x => x.Id).FirstOrDefaultAsync();
-    }
-
+    
     public async Task<List<PharmacyChainCheckModel>> GetPharmacyChainsCheck()
     {
         return await db.PharmacyChains.Select(p => new PharmacyChainCheckModel()

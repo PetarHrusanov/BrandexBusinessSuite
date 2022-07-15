@@ -11,14 +11,12 @@ using Microsoft.Data.SqlClient;
     
 using System.Data;
 using Data;
-using Data.Models;
 
 using Models.Pharmacies;
 using Models.Sales;
 
-using static BrandexBusinessSuite.Common.ExcelDataConstants.Ditributors;
-using static BrandexBusinessSuite.Common.ExcelDataConstants.PharmacyColumns;
-using static  BrandexBusinessSuite.Common.Constants;
+using static Common.ExcelDataConstants.PharmacyColumns;
+using static  Common.Constants;
 
 public class PharmaciesService : IPharmaciesService
 {
@@ -81,7 +79,7 @@ public class PharmaciesService : IPharmaciesService
             
             
             
-        string connection = _configuration.GetConnectionString("DefaultConnection");
+        var connection = _configuration.GetConnectionString("DefaultConnection");
             
         var con = new SqlConnection(connection);
             
@@ -111,71 +109,7 @@ public class PharmaciesService : IPharmaciesService
         con.Close(); 
             
     }
-
-    public async Task<string> CreatePharmacy(PharmacyDbInputModel pharmacyDbInputModel)
-    {
-        if(pharmacyDbInputModel.BrandexId!=0 &&
-           pharmacyDbInputModel.Name!=null &&
-           pharmacyDbInputModel.PharmacyChainId!= 0 &&
-           pharmacyDbInputModel.RegionId!= 0 &&
-           pharmacyDbInputModel.CityId!= 0 &&
-           pharmacyDbInputModel.CompanyId !=0)
-        {
-            var pharmacyModel = new Pharmacy
-            {
-                BrandexId = pharmacyDbInputModel.BrandexId,
-                Name = pharmacyDbInputModel.Name,
-                Address = pharmacyDbInputModel.Address,
-                PharmacyChainId = pharmacyDbInputModel.PharmacyChainId,
-                Active = pharmacyDbInputModel.Active,
-                CityId = pharmacyDbInputModel.CityId,
-                SopharmaId = pharmacyDbInputModel.SopharmaId,
-                StingId = pharmacyDbInputModel.StingId,
-                PhoenixId = pharmacyDbInputModel.PhoenixId,
-                PharmnetId = pharmacyDbInputModel.PharmnetId,
-                CompanyId = pharmacyDbInputModel.CompanyId,
-                PharmacyClass = pharmacyDbInputModel.PharmacyClass,
-                RegionId = pharmacyDbInputModel.RegionId
-
-            };
-
-            await this.db.Pharmacies.AddAsync(pharmacyModel);
-            await this.db.SaveChangesAsync();
-            return pharmacyModel.Name;
-        }
-        else
-        {
-            return "";
-        }
-    }
-
-    public async Task<string> NameById(string input, string distributor)
-    {
-        var success = int.TryParse(input, out var convertedNumber);
-
-        switch (distributor)
-        {
-            case Brandex:
-                return await db.Pharmacies.Where(c => c.BrandexId == convertedNumber).Select(p => p.Name)
-                    .FirstOrDefaultAsync();
-            case Sting:
-                return await db.Pharmacies.Where(c => c.StingId == convertedNumber).Select(p => p.Name)
-                    .FirstOrDefaultAsync();
-            case Phoenix:
-                return await db.Pharmacies.Where(c => c.PhoenixId == convertedNumber).Select(p => p.Name)
-                    .FirstOrDefaultAsync();
-            case Pharmnet:
-                return await db.Pharmacies.Where(c => c.PharmnetId == convertedNumber).Select(p => p.Name)
-                    .FirstOrDefaultAsync();
-            case Sopharma:
-                return await db.Pharmacies.Where(c => c.SopharmaId == convertedNumber).Select(p => p.Name)
-                    .FirstOrDefaultAsync();
-            default:
-                return "";
-        }
-
-        ;
-    }
+    
 
     public async Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime? dateBegin, DateTime? dateEnd, int? regionId)
     {
@@ -248,7 +182,7 @@ public class PharmaciesService : IPharmaciesService
 
     public async Task<List<PharmacyCheckModel>> GetPharmaciesCheck()
     {
-        return await this.db.Pharmacies.Select(p => new PharmacyCheckModel
+        return await db.Pharmacies.Select(p => new PharmacyCheckModel
         {
             Id = p.Id,
             BrandexId = p.BrandexId,

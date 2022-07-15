@@ -15,11 +15,6 @@ public class DistributorService :IDistributorService
         this.db = db;
     }
 
-    public async Task<bool> CheckDistributor(string input)
-    {
-        return await db.Distributors.Where(d => d.Name == input).AnyAsync();
-    }
-
     public async Task<int> IdByName(string input)
     {
         return await db.Distributors.Where(d => d.Name == input).Select(d => d.Id).FirstOrDefaultAsync();

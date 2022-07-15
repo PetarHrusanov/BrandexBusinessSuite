@@ -15,8 +15,8 @@ using Data.Models;
 using Models.PharmacyCompanies;
 using Microsoft.Data.SqlClient;
     
-using static BrandexBusinessSuite.Common.ExcelDataConstants.PharmacyCompaniesColumns;
-using static  BrandexBusinessSuite.Common.Constants;
+using static Common.ExcelDataConstants.PharmacyCompaniesColumns;
+using static  Common.Constants;
 
 public class PharmacyCompaniesService : IPharmacyCompaniesService
 {
@@ -54,7 +54,7 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
             table.Rows.Add(row);
         }
 
-        string connection = _configuration.GetConnectionString("DefaultConnection");
+        var connection = _configuration.GetConnectionString("DefaultConnection");
             
         var con = new SqlConnection(connection);
             
@@ -89,23 +89,7 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
         await db.SaveChangesAsync();
         return company.Name;
     }
-
-    public async Task<bool> CheckCompanyByName(string companyName)
-    {
-        return await db.Companies.Where(x => x.Name.ToLower()
-                .TrimEnd().Contains(companyName.ToLower().TrimEnd()))
-            .Select(x => x.Id).AnyAsync();
-    }
-
-    public async Task<int> IdByName(string companyName)
-    {
-        int companyId = await db.Companies
-            .Where(x => x.Name.ToLower()
-                .TrimEnd().Contains(companyName.ToLower().TrimEnd()))
-            .Select(x => x.Id).FirstOrDefaultAsync();
-        return companyId;
-    }
-
+    
     public async Task<List<PharmacyCompanyCheckModel>> GetPharmacyCompaniesCheck()
     {
         return await db.Companies.Select(p => new PharmacyCompanyCheckModel()

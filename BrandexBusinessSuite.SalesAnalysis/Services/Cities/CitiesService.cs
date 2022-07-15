@@ -14,8 +14,8 @@ using Data;
 using SalesAnalysis.Data.Models;
 using SalesAnalysis.Models.Cities;
 
-using static BrandexBusinessSuite.Common.ExcelDataConstants.CitiesColumns;
-using static  BrandexBusinessSuite.Common.Constants;
+using static Common.ExcelDataConstants.CitiesColumns;
+using static Common.Constants;
 
 public class CitiesService :ICitiesService
 {
@@ -66,18 +66,6 @@ public class CitiesService :ICitiesService
         await objbulk.WriteToServerAsync(table);  
         con.Close();  
             
-    }
-
-    public Task<bool> CheckCityName(string cityName)
-    {
-        return db.Cities.Where(x => x.Name.ToLower().TrimEnd().Contains(cityName.ToLower().TrimEnd()))
-            .Select(x => x.Id).AnyAsync();
-    }
-
-    public Task<int> IdByName(string companyName)
-    {
-        return db.Cities.Where(x => x.Name.ToLower().TrimEnd().Contains(companyName.ToLower().TrimEnd()))
-            .Select(x => x.Id).FirstOrDefaultAsync();
     }
 
     public async Task<List<CityCheckModel>> GetCitiesCheck()
