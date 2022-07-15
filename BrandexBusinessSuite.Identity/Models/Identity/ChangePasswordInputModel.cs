@@ -1,9 +1,7 @@
-﻿namespace BrandexBusinessSuite.Identity.Models.Identity
-{
-    public class ChangePasswordInputModel
-    {
-        public string CurrentPassword { get; set; }
+﻿namespace BrandexBusinessSuite.Identity.Models.Identity;
 
-        public string NewPassword { get; set; }
-    }
+public class ChangePasswordInputModel
+{
+    public string CurrentPassword { get; set; }
+    public string NewPassword { get; set; }
 }

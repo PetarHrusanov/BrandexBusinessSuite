@@ -1,18 +1,13 @@
-﻿namespace BrandexBusinessSuite.Identity.Models.Identity
+﻿namespace BrandexBusinessSuite.Identity.Models.Identity;
+
+using System.ComponentModel.DataAnnotations;
+
+public class UserInputModel
 {
-    using System.ComponentModel.DataAnnotations;
+    [EmailAddress]
+    [Required]
+    public string Email { get; set; }
 
-    // using static Data.DataConstants.Identity;
-
-    public class UserInputModel
-    {
-        [EmailAddress]
-        [Required]
-        // [MinLength(MinEmailLength)]
-        // [MaxLength(MaxEmailLength)]
-        public string Email { get; set; }
-
-        [Required]
-        public string Password { get; set; }
-    }
+    [Required]
+    public string Password { get; set; }
 }

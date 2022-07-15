@@ -1,50 +1,49 @@
-﻿namespace BrandexBusinessSuite.Identity.Services.Identity
+﻿namespace BrandexBusinessSuite.Identity.Services.Identity;
+
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using Data.Models;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+
+public class TokenGeneratorService : ITokenGeneratorService
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IdentityModel.Tokens.Jwt;
-    using System.Linq;
-    using System.Security.Claims;
-    using System.Text;
-    using Data.Models;
-    using Microsoft.Extensions.Options;
-    using Microsoft.IdentityModel.Tokens;
+    private readonly ApplicationSettings _applicationSettings;
 
-    public class TokenGeneratorService : ITokenGeneratorService
+    public TokenGeneratorService(IOptions<ApplicationSettings> applicationSettings)
     {
-        private readonly ApplicationSettings _applicationSettings;
+        _applicationSettings = applicationSettings.Value;
+    }
 
-        public TokenGeneratorService(IOptions<ApplicationSettings> applicationSettings)
+    public string GenerateToken(ApplicationUser user, IEnumerable<string> roles = null)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
+
+        var claims = new List<Claim>
         {
-            _applicationSettings = applicationSettings.Value;
-        }
+            new(ClaimTypes.NameIdentifier, user.Id),
+            new(ClaimTypes.Name, user.Email)
+        };
 
-        public string GenerateToken(ApplicationUser user, IEnumerable<string> roles = null)
+        if (roles != null) claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_applicationSettings.Secret);
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
+        };
 
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, user.Id),
-                new(ClaimTypes.Name, user.Email)
-            };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var encryptedToken = tokenHandler.WriteToken(token);
 
-            if (roles != null) claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var encryptedToken = tokenHandler.WriteToken(token);
-
-            return encryptedToken;
-        }
+        return encryptedToken;
     }
 }

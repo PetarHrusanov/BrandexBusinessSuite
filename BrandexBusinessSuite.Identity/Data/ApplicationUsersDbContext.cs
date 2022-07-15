@@ -1,8 +1,6 @@
-using BrandexBusinessSuite.Identity.Data.Models;
-
 namespace BrandexBusinessSuite.Identity.Data;
 
-using Identity.Data.Models;
+using Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Reflection;

@@ -5,7 +5,6 @@ using BrandexBusinessSuite.Models.ErpDocuments;
 public class MarketingActivityCm : ErpDocument
 {
     
-    // public _InnerClass InnerClass;
     public MarketingActivityCm()
     {
         DocumentType = new ErpCharacteristicId();

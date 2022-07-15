@@ -1,10 +1,9 @@
-﻿namespace BrandexBusinessSuite.Identity.Services.Identity
-{
-    using System.Collections.Generic;
-    using Data.Models;
+﻿namespace BrandexBusinessSuite.Identity.Services.Identity;
 
-    public interface ITokenGeneratorService
-    {
-        string GenerateToken(ApplicationUser user, IEnumerable<string> roles = null);
-    }
+using System.Collections.Generic;
+using Data.Models;
+
+public interface ITokenGeneratorService
+{
+    string GenerateToken(ApplicationUser user, IEnumerable<string> roles = null);
 }
