@@ -137,25 +137,7 @@ public class ConversionController : ApiController
 
             var facebookInvoiceNumber = FacebookInvoiceRegex.Matches(rawText)[0].ToString();
 
-            var primaryDocument = new LogisticsProcurementReceivingOrder()
-            {
-                DocumentType = new ErpCharacteristicId("General_DocumentTypes(b1787109-6d5e-41ad-8ba6-b9a15ebccf5e)"),
-                DocumentNo = facebookInvoiceNumber,
-                InvoiceDocumentNo = facebookInvoiceNumber,
-                EnterpriseCompany = new ErpCharacteristicId("General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)"),
-                EnterpriseCompanyLocation = new ErpCharacteristicId("General_Contacts_CompanyLocations(f3156c3c-7c04-4de7-bf03-8b983aada49f)"),
-                FromParty = new ErpCharacteristicId("General_Contacts_Parties(42bef242-101f-48bd-b6c5-8da6819c844f)"),
-                ToParty = new ErpCharacteristicId("General_Contacts_Parties(b21c6bc3-a4d8-43b9-a3df-b2d39ddf552f)"),
-                DocumentCurrency = new ErpCharacteristicId("General_Currencies(3187833a-d3c1-4804-bfc0-e17e6aee3069)"),
-                PaymentAccount = new ErpCharacteristicId("Finance_Payments_PaymentAccounts(b6d37a6d-2ac7-4a9c-a067-edf518bac68d)"),
-                PaymentType = new ErpCharacteristicId("Finance_Payments_PaymentTypes(7dd31560-4953-4d41-b7e6-3e831fdf8549)"), 
-                DocumentDate = $"{date:yyyy-MM-dd}",
-                PurchasePriceList = new ErpCharacteristicId("Logistics_Procurement_PurchasePriceLists(8fdaa904-47f7-49d3-b5a8-5bbcb02ada4f)"),
-                CurrencyDirectory = new ErpCharacteristicId("General_CurrencyDirectories(cd9c56b1-2f9b-4ad2-888d-becf3c770cb6)"),
-                Store = new ErpCharacteristicId("Logistics_Inventory_Stores(100447ff-44f4-4799-a4c2-7c9b22fb0aaa)"),
-                Supplier = new ErpCharacteristicId("Logistics_Procurement_Suppliers(71887ab9-e1ec-4210-8927-aab5030c3d3b)")
-
-            };
+            var primaryDocument = new LogisticsProcurementReceivingOrder(facebookInvoiceNumber, date);
 
             foreach (var (key, value) in productsPrices)
             {
@@ -194,7 +176,7 @@ public class ConversionController : ApiController
                 await JObjectByUriGetRequest(Client,
                     $"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoices?$filter=equalnull(DocumentNo,'{primaryDocument.InvoiceDocumentNo}')%20and%20Void%20eq%20false");
             
-            var invoice = (responseContentJObj[ErpDocuments.ValueLower]);
+            var invoice = responseContentJObj[ErpDocuments.ValueLower];
             var invoiceId = Convert.ToString(invoice![0]![ErpDocuments.ODataId]);
 
             responseContentJObj =
@@ -364,13 +346,11 @@ public class ConversionController : ApiController
         {
             IWorkbook workbook = new XSSFWorkbook();
 
-            for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+            for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++) //Read Excel File
             {
-                IRow row = sheet.GetRow(i);
+                var row = sheet.GetRow(i);
 
-                if (row == null) continue;
-
-                if (row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+                if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
                 var productRow = row.GetCell(2);
                 if (productRow == null) continue;
@@ -392,7 +372,6 @@ public class ConversionController : ApiController
                 var price = double.Parse(priceString);
 
                 var dateRow = row.GetCell(0).ToString().TrimEnd();
-
                 var date = DateTime.ParseExact(dateRow, "MMM d, yyyy", CultureInfo.InvariantCulture);
 
                 var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), date.ToString("MMMM"));
@@ -418,9 +397,9 @@ public class ConversionController : ApiController
             workbook.Write(fs);
         }
 
-        await using (var streatWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
+        await using (var streamWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
         {
-            await streatWrite.CopyToAsync(memory);
+            await streamWrite.CopyToAsync(memory);
         }
 
         memory.Position = 0;
@@ -431,8 +410,8 @@ public class ConversionController : ApiController
 
     private static string PdfText(string path)
     {
-        PdfReader reader = new PdfReader(path);
-        string text = string.Empty;
+        var reader = new PdfReader(path);
+        var text = string.Empty;
         for(int page = 1; page <= reader.NumberOfPages; page++)
         {
             text += PdfTextExtractor.GetTextFromPage(reader,page);
@@ -442,7 +421,7 @@ public class ConversionController : ApiController
         return text;
     }
 
-    private Dictionary<string, decimal> ProductPriceDictionaryFromText(string rawText)
+    private static Dictionary<string, decimal> ProductPriceDictionaryFromText(string rawText)
     {
         var productsPrices = new Dictionary<string, decimal>();
 
@@ -519,7 +498,7 @@ public class ConversionController : ApiController
         CreateErpMarketingXlsRow(excelSheet, "ПРОДУКТ БРАНДЕКС", product);
     }
 
-    private void CreateErpMarketingXlsRow(ISheet excelSheet, string rowName, string rowValue)
+    private static void CreateErpMarketingXlsRow(ISheet excelSheet, string rowName, string rowValue)
     {
         var row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
         row.CreateCell(row.Cells.Count()).SetCellValue(rowName);
@@ -564,33 +543,10 @@ public class ConversionController : ApiController
                 publishType = GoogleAdWordsCapital;
                 break;
         }
-        
-        var activityObject = new MarketingActivityCm()
-            {
-                DocumentType = new ErpCharacteristicId("General_DocumentTypes(59b265f7-391a-4226-8bcb-44e192ba5690)"),
-                EnterpriseCompany = new ErpCharacteristicId("General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)"),
-                EnterpriseCompanyLocation = new ErpCharacteristicId("General_Contacts_CompanyLocations(902743f5-6076-4b5e-b725-2daa192c71f6)"),
-                SystemType = "Task",
-                Subject = subject,
-                ResponsibleParty = new ErpCharacteristicId("General_Contacts_Parties(2469d153-839f-445a-b7c2-2e7cb955c491)"),
-                ReferenceDate =  $"{date:yyyy-MM-dd}",
-                StartTime =  $"{date:yyyy-MM-dd}",
-                DeadlineTime = $"{date:yyyy-MM-dd}",
-                OwnerParty = new ErpCharacteristicId("General_Contacts_Parties(2469d153-839f-445a-b7c2-2e7cb955c491)"),
-                ResponsiblePerson = new ErpCharacteristicId("General_Contacts_Persons(623ed5c7-2eec-4e5b-a0c1-42c6faab3309)"),
-                ToParty = new ErpCharacteristicId($"General_Contacts_Parties({partyId})"),
-                TargetParty = new ErpCharacteristicId($"General_Contacts_Parties({partyId})"),
-                CustomProperty_МЕСЕЦ = new ErpCharacteristicValue(monthErp),
-                CustomProperty_1579648 = new ErpCharacteristicValue(yearErp),
-                CustomProperty_Размер = new ErpCharacteristicValue(measure),
-                CustomProperty_тип_u0020реклама = new ErpCharacteristicValue(type),
-                CustomProperty_ре = new ErpCharacteristicValue(media),
-                CustomProperty_novinar = new ErpCharacteristicValue(publishType),
-                CustomProperty_цена_u0020реклама = new ErpCharacteristicValue($"{price}"),
-                CustomProperty_058 = new ErpCharacteristicValue(""),
-                CustomProperty_ПРОДУКТ_u0020БРАНДЕКС = new ErpCharacteristicValue(product)
-            };
-        
+
+        var activityObject = new MarketingActivityCm(subject, date, partyId, monthErp, yearErp, measure, type, media,
+            publishType, price, product);
+
         var jsonPostString = JsonConvert.SerializeObject(activityObject, Formatting.Indented);
 
         var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.MarketingAccount}:{_userSettings.MarketingPassword}");
@@ -601,8 +557,6 @@ public class ConversionController : ApiController
         var documentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
 
         await ChangeStateToRelease(Client, documentId);
-        
-        
-    }
 
+    }
 }
