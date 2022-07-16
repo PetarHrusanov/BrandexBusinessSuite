@@ -5,6 +5,7 @@ public class ErpInvoiceLines
     public ErpCharacteristicProductName ProductDescription { get; set; }
     public ErpCharacteristicQuantity Quantity { get; set; }
     public ErpCharacteristicQuantity QuantityBase { get; set; }
+    public ErpCharacteristicQuantity StandardQuantityBase { get; set; }
     public ErpCharacteristicUnitPrice LineAmount { get; set; }
     public ErpCharacteristicUnitPrice UnitPrice { get; set; }
     
@@ -12,4 +13,10 @@ public class ErpInvoiceLines
     public ErpCharacteristicId ParentSalesOrderLine { get; set; }
     public ErpCharacteristicId SalesOrder { get; set; }
     public ErpCharacteristicId InvoiceOrderLine { get; set; }
+    
+    public ErpCharacteristicId Product { get; set; }
+    
+    public int LineNo { get; set; }
+
+    public decimal SalesOrderAmount { get; set; }
 }

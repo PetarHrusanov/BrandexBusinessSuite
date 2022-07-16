@@ -16,4 +16,8 @@
       <ProjectReference Include="..\BrandexBusinessSuite\BrandexBusinessSuite.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot" />
+    </ItemGroup>
+
 </Project>

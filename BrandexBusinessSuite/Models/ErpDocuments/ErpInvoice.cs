@@ -3,7 +3,7 @@ namespace BrandexBusinessSuite.Models.ErpDocuments;
 public class ErpInvoice : ErpDocumentSale
 {
 
-    public ErpInvoice(string note)
+    public ErpInvoice(string note, string deliveryDate)
     {
         DocumentNotes = note;
         DocumentType = new ErpCharacteristicId("General_DocumentTypes(db26beb5-3604-4ab3-a8c7-a417d2c4ac59)");
@@ -18,6 +18,7 @@ public class ErpInvoice : ErpDocumentSale
         Customer = new ErpCharacteristicId("Crm_Customers(6053262d-3544-4cbb-a322-7036c07570ef)");
         DealType =  new ErpCharacteristicId("Finance_Vat_DealTypes(7e483e21-3b9b-489e-bd80-b3373cc9ed3e)");
         Lines = new List<ErpInvoiceLines>();
+        DeliveryDate = deliveryDate;
 
     }
     
@@ -28,8 +29,9 @@ public class ErpInvoice : ErpDocumentSale
     public ErpCharacteristicId ToParty { get; set; }
     public ErpCharacteristicId Customer { get; set; }
     public ErpCharacteristicId DealType { get; set; }
-    
     public List<ErpInvoiceLines> Lines { get; set; }
+    
+    public string DeliveryDate { get; set; }
 
 }
 
