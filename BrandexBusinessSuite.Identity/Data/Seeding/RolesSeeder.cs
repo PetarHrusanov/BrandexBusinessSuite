@@ -11,9 +11,10 @@ using BrandexBusinessSuite.Services.Data;
 
 using Models;
 
+using static  Common.Constants;
+
 internal class RolesSeeder : ISeeder
 {
-    
     
     private readonly ApplicationUsersDbContext _dbContext;
     private readonly IServiceProvider _serviceProvider;
@@ -33,7 +34,7 @@ internal class RolesSeeder : ISeeder
             {
                 var roleManager = _serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
-                await SeedRoleAsync(roleManager, "Administrator");
+                await SeedRoleAsync(roleManager, AdministratorRoleName);
             })
             .GetAwaiter()
             .GetResult();

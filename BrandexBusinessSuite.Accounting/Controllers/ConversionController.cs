@@ -431,7 +431,7 @@ public class ConversionController : ApiController
 
         foreach (var productField in fieldsFacebook)
         {
-            var product = (string)productField.GetValue(null);
+            var product = (string)productField.GetValue(null)!;
 
             var lines = rawTextSplit
                 .Where(element => element.Contains(product)).ToList();
@@ -471,7 +471,7 @@ public class ConversionController : ApiController
         dic[toKey] = value;
     }
 
-    private void CreateErpMarketingXlsSheet(IWorkbook workbook,
+    private static void CreateErpMarketingXlsSheet(IWorkbook workbook,
         string sheetName,
         string month,
         string year,

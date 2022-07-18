@@ -17,7 +17,6 @@ using static Methods.ExcelMethods;
 public class ProductController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
-
     private readonly IProductsService _productsService;
 
     public ProductController(IWebHostEnvironment hostEnvironment, IProductsService productsService)

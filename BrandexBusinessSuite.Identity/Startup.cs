@@ -20,7 +20,12 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-
+        
+        services
+            .Configure<AdminSettings>(
+                Configuration.GetSection(nameof(AdminSettings)), 
+                config => config.BindNonPublicProperties = true);
+        
         services.AddWebService<ApplicationUsersDbContext>(Configuration);
                 
         services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
