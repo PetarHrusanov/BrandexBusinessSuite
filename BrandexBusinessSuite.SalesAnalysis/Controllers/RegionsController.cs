@@ -24,6 +24,7 @@ using static Methods.ExcelMethods;
 
 using static Common.InputOutputConstants.SingleStringConstants;
 using static Common.ExcelDataConstants.ExcelLineErrors;
+using static Common.Constants;
 
 public class RegionsController : AdministrationController
 {
@@ -47,11 +48,11 @@ public class RegionsController : AdministrationController
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<string> Import([FromForm] IFormFile file)
+    public async Task<ActionResult<string>> Import([FromForm] IFormFile file)
     {
         var errorDictionary = new List<string>();
 
-        if (!CheckXlsx(file, errorDictionary)) return JsonConvert.SerializeObject(errorDictionary.ToArray());
+        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
         
         var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
 

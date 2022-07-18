@@ -1,12 +1,10 @@
-using BrandexBusinessSuite.Common;
-using BrandexBusinessSuite.Infrastructure;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-
 namespace BrandexBusinessSuite.Methods;
 
+using Microsoft.AspNetCore.Http;
+
 using NPOI.SS.UserModel;
+
+using Common;
 
 public class ExcelMethods
 {
@@ -15,13 +13,9 @@ public class ExcelMethods
         return int.TryParse(row.GetCell(column)?.ToString()?.TrimEnd(), out var idInt) ? idInt : 0;
     }
 
-    public static bool CheckXlsx(IFormFile file, IList<string> errors)
+    public static bool CheckXlsx(IFormFile file)
     {
-        if (file.Length > 0 && Path.GetExtension(file.FileName).ToLower() == ".xlsx") return true;
-        errors.Add(Constants.Errors.IncorrectFileFormat);
-        return false;
-
+        return file.Length > 0 && Path.GetExtension(file.FileName).ToLower() == ".xlsx";
     }
-    
-    
+
 }

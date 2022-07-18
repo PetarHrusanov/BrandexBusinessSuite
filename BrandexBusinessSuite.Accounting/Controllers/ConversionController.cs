@@ -207,7 +207,6 @@ public class ConversionController : ApiController
                 var content = new StringContent(jsonPostString, Encoding.UTF8, RequestConstants.ApplicationJson);
                 
                 await Client.PutAsync(uri, content);
-
             }
 
             await ChangeStateToRelease(Client, invoiceId);

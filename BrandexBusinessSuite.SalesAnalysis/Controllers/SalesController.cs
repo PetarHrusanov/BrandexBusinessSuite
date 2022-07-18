@@ -26,6 +26,8 @@ using Services.Pharmacies;
 using Services.Products;
 using Services.Sales;
 
+using static Methods.ExcelMethods;
+
 using static Common.ExcelDataConstants.Ditributors;
 using static Common.ExcelDataConstants.ExcelLineErrors;
 using static Common.Constants;
@@ -140,7 +142,7 @@ public class SalesController : AdministrationController
     [HttpPost]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
-    public async Task<string> Import([FromForm] SalesBulkInputModel salesBulkInput)
+    public async Task<ActionResult<string>> Import([FromForm] SalesBulkInputModel salesBulkInput)
     {
         var dateFromClient = salesBulkInput.Date;
         var dateForDb = DateTime.ParseExact(dateFromClient, "dd-MM-yyyy", null);
@@ -156,11 +158,7 @@ public class SalesController : AdministrationController
         var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
         var productIdsForCheck = await _productsService.GetProductsCheck();
 
-        if (file.Length <= 0 || Path.GetExtension(file.FileName)?.ToLower() != ".xlsx")
-        {
-            errorDictionary[0] = Errors.IncorrectFileFormat;
-            return JsonConvert.SerializeObject(errorDictionary.ToArray());
-        }
+        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
         
         var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
 
