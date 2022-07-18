@@ -6,21 +6,28 @@ using System.Threading.Tasks;
     
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using BrandexBusinessSuite.Services.Data;
 using Models;
+
+using static  Common.Constants;
 
 public class AdministratorSeeder : ISeeder
 {
     private readonly ApplicationUsersDbContext _dbContext;
     private readonly IServiceProvider _serviceProvider;
+    private readonly AdminSettings _adminSettings;
 
     public AdministratorSeeder(
         ApplicationUsersDbContext dbContext,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IOptions<AdminSettings> adminSettings
+        )
     {
         _dbContext = dbContext;
         _serviceProvider = serviceProvider;
+        _adminSettings = adminSettings.Value;
     }
 
     public void SeedAsync()
@@ -35,19 +42,14 @@ public class AdministratorSeeder : ISeeder
             {
                 var userManager = _serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-                string email = "marketing@brandex.bg";
-                string roleName = "Administrator";
-                string password = "FabricsFabricsExpensiveLinen";
-
                 var user = new ApplicationUser
                 {
-                    UserName = email,
-                    Email = email,
+                    UserName = _adminSettings.AdminUsername,
+                    Email = _adminSettings.AdminUsername
                 };
 
-                await userManager.CreateAsync(user, password);
-
-                await userManager.AddToRoleAsync(user, roleName);
+                await userManager.CreateAsync(user, _adminSettings.AdminPassword);
+                await userManager.AddToRoleAsync(user, AdministratorRoleName);
 
                 await _dbContext.SaveChangesAsync();
             })

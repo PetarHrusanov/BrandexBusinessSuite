@@ -19,7 +19,6 @@ using static Methods.ExcelMethods;
 public class AdMediaController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
-    
     private readonly IAdMediasService _adMediasService;
 
     public AdMediaController(IWebHostEnvironment hostEnvironment, IAdMediasService adMediasService)
