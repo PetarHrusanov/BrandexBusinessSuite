@@ -16,6 +16,8 @@ using Services.AdMedias;
 
 using static Methods.ExcelMethods;
 
+using static Common.Constants;
+
 public class AdMediaController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
@@ -30,7 +32,7 @@ public class AdMediaController : AdministrationController
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<string> Import([FromForm] IFormFile file)
+    public async Task<ActionResult<string>> Import([FromForm] IFormFile file)
     {
 
         var errorDictionary = new List<string>();
@@ -39,7 +41,7 @@ public class AdMediaController : AdministrationController
 
         var uniqueMedias = new List<AdMediaInputModel>();
 
-        if (!CheckXlsx(file, errorDictionary)) return JsonConvert.SerializeObject(errorDictionary.ToArray());
+        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
 
         var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
 

@@ -5,5 +5,5 @@ using static Common.Constants;
 
 public class AuthorizeAdministratorAttribute : AuthorizeAttribute
 {
-    public AuthorizeAdministratorAttribute() => this.Roles = AdministratorRoleName;
+    public AuthorizeAdministratorAttribute() => Roles = AdministratorRoleName;
 }

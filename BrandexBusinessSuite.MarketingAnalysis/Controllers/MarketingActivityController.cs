@@ -44,7 +44,7 @@ public class MarketingActivityController : AdministrationController
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<string> Import([FromForm] MarketingBulkInputModel marketingBulkInputModel)
+    public async Task<ActionResult<string>> Import([FromForm] MarketingBulkInputModel marketingBulkInputModel)
     {
         var dateForDb = DateTime.ParseExact(marketingBulkInputModel.Date, "dd-MM-yyyy", null);
 
@@ -56,7 +56,7 @@ public class MarketingActivityController : AdministrationController
 
         var marketingActivities = new List<MarketingActivityInputModel>();
 
-        if (!CheckXlsx(file, errorDictionary)) return JsonConvert.SerializeObject(errorDictionary.ToArray());
+        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
 
         var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
 
@@ -69,10 +69,9 @@ public class MarketingActivityController : AdministrationController
         stream.Position = 0;
 
         var hssfwb = new XSSFWorkbook(stream);
-        var sheet = hssfwb.GetSheet(sheetName); 
-        
+        var sheet = hssfwb.GetSheet(sheetName);
 
-        for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+        for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++) //Read Excel File
         {
             var row = sheet.GetRow(i);
 

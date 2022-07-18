@@ -25,6 +25,7 @@ using static Methods.ExcelMethods;
 
 using static Common.InputOutputConstants.SingleStringConstants;
 using static Common.ExcelDataConstants.ExcelLineErrors;
+using static Common.Constants;
 
 public class PharmacyCompaniesController : AdministrationController
 {
@@ -41,7 +42,7 @@ public class PharmacyCompaniesController : AdministrationController
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<string> Import([FromForm] IFormFile file)
+    public async Task<ActionResult<string>> Import([FromForm] IFormFile file)
     {
         var errorDictionary = new List<string>();
 
@@ -49,7 +50,7 @@ public class PharmacyCompaniesController : AdministrationController
 
         var validPharmacyCompanyNames = new List<PharmacyCompanyInputModel>();
 
-        if (!CheckXlsx(file, errorDictionary)) return JsonConvert.SerializeObject(errorDictionary.ToArray());
+        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
         
         var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
 

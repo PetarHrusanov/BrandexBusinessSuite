@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
+﻿using BrandexBusinessSuite.Common;
+
+namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
 
 using System;
 using System.Collections.Generic;
@@ -24,6 +26,7 @@ using static Methods.ExcelMethods;
 
 using static Common.InputOutputConstants.SingleStringConstants;
 using static Common.ExcelDataConstants.ExcelLineErrors;
+using static Common.Constants;
 
 public class PharmacyChainsController : AdministrationController
 {
@@ -41,14 +44,14 @@ public class PharmacyChainsController : AdministrationController
         
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<string> Import([FromForm]IFormFile file)
+    public async Task<ActionResult<string>> Import([FromForm]IFormFile file)
     {
         var errorDictionary = new List<string>();
 
         var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
         var uniquePharmacyChains = new List<string>();
 
-        if (!CheckXlsx(file, errorDictionary)) return JsonConvert.SerializeObject(errorDictionary.ToArray());
+        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
         
         var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
 

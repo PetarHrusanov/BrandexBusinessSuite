@@ -10,10 +10,10 @@ using static InfrastructureConstants;
 
 public class JwtHeaderAuthenticationMiddleware : IMiddleware
 {
-    private readonly ICurrentTokenService currentToken;
+    private readonly ICurrentTokenService _currentToken;
 
     public JwtHeaderAuthenticationMiddleware(ICurrentTokenService currentToken)
-        => this.currentToken = currentToken;
+        => _currentToken = currentToken;
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
@@ -21,7 +21,7 @@ public class JwtHeaderAuthenticationMiddleware : IMiddleware
 
         if (!string.IsNullOrWhiteSpace(token))
         {
-            this.currentToken.Set(token.Split().Last());
+            _currentToken.Set(token.Split().Last());
         }
 
         await next.Invoke(context);

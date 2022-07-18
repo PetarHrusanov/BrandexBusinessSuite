@@ -2,7 +2,7 @@ namespace BrandexBusinessSuite.Methods;
 
 using System.Reflection;
 
-public class FieldsValuesMethods
+public static class FieldsValuesMethods
 {
     public static string ReturnValueByClassAndName(Type type, string propertyName)
     {

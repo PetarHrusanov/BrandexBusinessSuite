@@ -12,7 +12,10 @@ using BrandexBusinessSuite.Controllers;
 using Infrastructure;
 using Models.Products;
 using Services.Products;
+
 using static Methods.ExcelMethods;
+
+using static Common.Constants;
 
 public class ProductController : AdministrationController
 {
@@ -27,7 +30,7 @@ public class ProductController : AdministrationController
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<string> Import([FromForm] IFormFile file)
+    public async Task<ActionResult<string>> Import([FromForm] IFormFile file)
     {
 
         var errorDictionary = new List<string>();
@@ -36,7 +39,7 @@ public class ProductController : AdministrationController
 
         var uniqueProducts = new List<ProductInputModel>();
 
-        if (!CheckXlsx(file, errorDictionary)) return JsonConvert.SerializeObject(errorDictionary.ToArray());
+        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
 
         var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
 

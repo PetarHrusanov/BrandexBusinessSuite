@@ -1,7 +1,6 @@
 namespace BrandexBusinessSuite.Accounting.Models;
 
 using BrandexBusinessSuite.Models.ErpDocuments;
-using Newtonsoft.Json;
 
 public class LogisticsProcurementReceivingOrder : ErpDocumentSale
 {

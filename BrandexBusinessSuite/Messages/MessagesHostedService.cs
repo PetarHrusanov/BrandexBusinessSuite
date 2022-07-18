@@ -12,32 +12,32 @@ using Services.Messages;
 
 public class MessagesHostedService : IHostedService
 {
-    private readonly IRecurringJobManager recurringJob;
-    private readonly IServiceScopeFactory serviceScopeFactory;
-    private readonly IPublisher publisher;
+    private readonly IRecurringJobManager _recurringJob;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly IPublisher _publisher;
 
     public MessagesHostedService(
         IRecurringJobManager recurringJob,
         IServiceScopeFactory serviceScopeFactory,
         IPublisher publisher)
     {
-        this.recurringJob = recurringJob;
-        this.serviceScopeFactory = serviceScopeFactory;
-        this.publisher = publisher;
+        _recurringJob = recurringJob;
+        _serviceScopeFactory = serviceScopeFactory;
+        _publisher = publisher;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        using var scope = this.serviceScopeFactory.CreateScope();
+        using var scope = _serviceScopeFactory.CreateScope();
 
         var data = scope.ServiceProvider.GetService<DbContext>();
 
-        if (!data.Database.CanConnect())
+        if (data != null && !data.Database.CanConnect())
         {
             data.Database.EnsureCreated();
         }
 
-        this.recurringJob.AddOrUpdate(
+        _recurringJob.AddOrUpdate(
             nameof(MessagesHostedService),
             () => this.ProcessPendingMessages(),
             "*/5 * * * * *");
@@ -50,7 +50,7 @@ public class MessagesHostedService : IHostedService
 
     public void ProcessPendingMessages()
     {
-        using var scope = this.serviceScopeFactory.CreateScope();
+        using var scope = _serviceScopeFactory.CreateScope();
 
         var data = scope.ServiceProvider.GetService<DbContext>();
 
@@ -62,7 +62,7 @@ public class MessagesHostedService : IHostedService
 
         foreach (var message in messages)
         {
-            this.publisher
+            _publisher
                 .Publish(message.Data, message.Type)
                 .GetAwaiter()
                 .GetResult();
