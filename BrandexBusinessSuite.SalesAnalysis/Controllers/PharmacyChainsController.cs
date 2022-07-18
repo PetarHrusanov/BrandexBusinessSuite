@@ -1,6 +1,4 @@
-﻿using BrandexBusinessSuite.Common;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
 
 using System;
 using System.Collections.Generic;

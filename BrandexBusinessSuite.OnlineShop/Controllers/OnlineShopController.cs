@@ -89,23 +89,23 @@ public class OnlineShopController : ApiController
 
             var speedyLink = "https://api.speedy.bg/v1/shipment";
             
-            // var responseContentJObj = await 
-            //     JObjectByUriPostRequest(Client, speedyLink, jsonPostString);
-            //
-            // if(responseContentJObj.ContainsKey("error")) continue;
-            //
-            // var speedyTracking = responseContentJObj["id"]!.ToString();
-            // var deliveryPrice = Convert.ToDouble(responseContentJObj["price"]!["total"]!.ToString());
+            var responseContentJObj = await 
+                JObjectByUriPostRequest(Client, speedyLink, jsonPostString);
             
-            // var saleInvoiceCheck = new SaleInvoiceCheck(
-            //     $"{order.date_created:yyyy-MM-dd}",
-            //     (double)order.total,
-            //     order.shipping.first_name+" "+order.shipping.last_name,
-            //     order.id.ToString(),
-            //     order.shipping.city,
-            //     deliveryPrice,
-            //     speedyTracking
-            //     );
+            if(responseContentJObj.ContainsKey("error")) continue;
+            
+            var speedyTracking = responseContentJObj["id"]!.ToString();
+            var deliveryPrice = Convert.ToDouble(responseContentJObj["price"]!["total"]!.ToString());
+            
+            var saleInvoiceCheck = new SaleInvoiceCheck(
+                $"{order.date_created:yyyy-MM-dd}",
+                (double)order.total,
+                order.shipping.first_name+" "+order.shipping.last_name,
+                order.id.ToString(),
+                order.shipping.city,
+                deliveryPrice,
+                speedyTracking
+                );
 
             var erpSale = new ErpOnlineSale(order.id.ToString(), $"{order.date_created:yyyy-MM-dd}");
 
@@ -152,14 +152,12 @@ public class OnlineShopController : ApiController
                 erpSale.Lines.Add(line);
             }
             
-
             jsonPostString = JsonConvert.SerializeObject(erpSale, Formatting.Indented);
             
             var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.UsernameErp}:{_userSettings.PasswordErp}");
             Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             
-            var responseContentJObj = await 
-                JObjectByUriPostRequest(Client, "https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrders", jsonPostString);
+            responseContentJObj = await JObjectByUriPostRequest(Client, "https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrders", jsonPostString);
 
             if (!responseContentJObj.ContainsKey(ErpDocuments.ODataId)) continue;
             
