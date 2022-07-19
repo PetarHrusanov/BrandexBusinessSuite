@@ -2,9 +2,6 @@ namespace BrandexBusinessSuite.SalesAnalysis;
 
 using Data;
 
-using Services;
-
-// Business- Specific Services
 using Services.Cities;
 using Services.Distributor;
 using Services.Pharmacies;
@@ -38,13 +35,9 @@ public class Startup
         _configuration = configuration;
         _hostingEnvironment = hostingEnvironment;
     }
-    
-    
+
     public void ConfigureServices(IServiceCollection services)
     {
-
-        // services.AddWebService<SpravkiDbContext>(_configuration);
-
         services
             .AddWebService<SpravkiDbContext>(_configuration)
             .AddTransient<ICitiesService, CitiesService>()
@@ -56,8 +49,6 @@ public class Startup
             .AddTransient<IRegionsService, RegionsService>()
             .AddTransient<ISalesService, SalesService>()
             .AddTransient<ISeeder, ApplicationDbContextSeeder>();
-
-        // services.AddCors();
 
     }
 

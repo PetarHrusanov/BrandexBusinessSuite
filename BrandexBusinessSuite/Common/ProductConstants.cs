@@ -2,6 +2,26 @@ namespace BrandexBusinessSuite.Common;
 
 public class ProductConstants
 {
+    public class GenericNames
+    {
+        public const string ZinSeD = "ZinSeD";
+        public const string EnzyMill = "EnzyMill";
+        public const string CystiRen = "CystiRen";
+        public const string LadyHarmonia = "LadyHarmonia";
+        public const string DetoxiFive = "DetoxiFive";
+        public const string LaxaL = "LaxaL";
+        public const string Bland = "Bland";
+        public const string DiabeForGluco = "DiabeForGluco";
+        public const string DiabeForProtect = "DiabeForProtect";
+        public const string GinkgoVin = "GinkgoVin";
+        public const string GinkgoVinCentella = "GinkgoVinCentella";
+        public const string Venaxin = "Venaxin";
+        public const string ForFlex = "ForFlex";
+        public const string Flexen = "Flexen";
+        public const string ProstaRen = "ProstaRen";
+        public const string Sleep = "Sleep";
+        public const string Ceget = "Ceget";
+    }
     public class Facebook
     {
         public const string ZinSeD = "ZinSeD";
@@ -20,7 +40,6 @@ public class ProductConstants
         
         // Workaround - permanent solution should be considered
         public const string GeneralAudience = "General Audience";
-
     }
     
     public class OnlineShop
@@ -42,7 +61,27 @@ public class ProductConstants
         public const string ProstaRen = "ПростаРен | ProstaRen";
         public const string Sleep = "Слийп | Sleep";
         public const string Ceget = "Цегет+ | Ceget+";
-
+    }
+    
+    public class OnlineShopSamples
+    {
+        public const string ZinSeD = "Мостра ЗинСеД";
+        public const string EnzyMill = "Мостра Ензи-Мил";
+        public const string CystiRen = "Мостра Цистирен";
+        public const string LadyHarmonia = "Мостра Лейди Хармония";
+        public const string DetoxiFive = "Мостра ДетоксиФайв";
+        public const string LaxaL = "Мостра Ласкал";
+        public const string Bland = "Мостра Бланд";
+        public const string DiabeForGluco = "Мостра ДиабеФор Глюко";
+        public const string DiabeForProtect = "Мостра ДиабеФор Протект";
+        public const string GinkgoVin = "Мостра Гинко Вин";
+        public const string GinkgoVinCentella = "Мостра Гинко Вин +Центела";
+        public const string Venaxin = "Мостра Венаксин";
+        public const string ForFlex = "Мостра Форфлекс";
+        public const string Flexen = "Мостра Флексен";
+        public const string ProstaRen = "Мостра Простарен";
+        public const string Sleep = "Мостра Слийп";
+        public const string Ceget = "Мостра Цегет+ селен";
     }
     
     public class ERP_Accounting
@@ -114,6 +153,27 @@ public class ProductConstants
         public const string GeneralAudience = "Ботаник";
     }
     
+    public class ErpSampleCodes
+    {
+        public const string ZinSeD = "f453e2e0-5df6-4e3f-a37c-f1f333609a79";
+        public const string EnzyMill = "35ce4e45-ee5a-416e-a2e3-30171b1fcabb";
+        public const string CystiRen = "38fa3963-a828-49ce-aaae-f469bf846590";
+        public const string LadyHarmonia = "58dd421a-c837-434c-90ff-7cb0eae48389";
+        public const string DetoxiFive = "92219812-4a2d-411c-a871-3fba7b6842dc";
+        public const string LaxaL = "bfcb5dec-fd9b-494f-b5f7-7969f19131d5";
+        public const string Bland = "62d6e2ef-ca5d-47d6-8176-3af667706cf2";
+        public const string DiabeForGluco = "86fbcb75-3b0f-4b49-9e45-f2b799664e42";
+        public const string DiabeForProtect = "1d5cbcd5-e849-4600-9b14-131261b2d050";
+        public const string GinkgoVin = "6a9b0625-d90c-4aa3-a233-52c41d22ac6c";
+        public const string GinkgoVinCentella = "5081a712-6c66-41de-9f65-a381b6dbf7bb";
+        public const string Venaxin = "0c5a1d59-6201-4121-b3a7-d5a7b8f50a25";
+        public const string ForFlex = "b2c633cc-9d55-4d6d-a40f-68b2f143eb84";
+        public const string Flexen = "e262ab04-f27d-43ed-b037-1a0dbd4bff39";
+        public const string ProstaRen = "c93ce91a-b331-4d0c-ae26-5089e0c7131c";
+        public const string Sleep = "dc2f59c8-b8aa-4204-8314-9ce624e183c5";
+        public const string Ceget = "d26d8faa-830c-4ed1-a8a0-5e70da2364f1";
+    }
+    
     public class ErpPriceCodes
     {
         public const string ZinSeD = "7d2a1ee1-6a8d-42ec-a0c9-4089f5545279";
@@ -133,7 +193,6 @@ public class ProductConstants
         public const string ProstaRen = "582cfec3-8513-4749-8a8d-9cc548131a10";
         public const string Sleep = "a1619ab5-3f3e-4e37-9c43-0910103bdb4a";
         public const string Ceget = "6eb3208d-19d2-4b3f-ae91-d4a108327ddb";
-   
     }
     
     public class ErpPriceNoVat
@@ -155,7 +214,6 @@ public class ProductConstants
         public const decimal ProstaRen = (decimal)19.075;
         public const decimal Sleep = (decimal)9.075;
         public const decimal Ceget = (decimal)9.075;
-   
     }
     
     
@@ -176,7 +234,6 @@ public class ProductConstants
         public const string ProstaRen = "PROSTAREN";
         public const string Sleep = "SLEEP";
         public const string Botanic = "BOTANIC";
-
     }
     
     public class GoogleMarketing
@@ -195,7 +252,6 @@ public class ProductConstants
         public const string ProstaRen = "ProstaRen";
         public const string Sleep = "Sleep";
         // public const string Botanic = "BOTANIC";
-
     }
     
     public class GoogleMarketingErp
@@ -214,7 +270,6 @@ public class ProductConstants
         public const string ProstaRen = "ПростаРен реклама";
         public const string Sleep = "Слийп реклама";
         // public const string Botanic = "BOTANIC";
-
     }
 
     public class ErpLots

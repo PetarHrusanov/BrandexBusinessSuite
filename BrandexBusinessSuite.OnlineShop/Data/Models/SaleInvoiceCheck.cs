@@ -2,7 +2,6 @@ namespace BrandexBusinessSuite.OnlineShop.Data.Models;
 
 public class SaleInvoiceCheck
 {
-
     public SaleInvoiceCheck(string date, double orderTotal, string clientName, string order, string city, double deliveryPrice, string trackingCode)
     {
         Date = date;
@@ -20,9 +19,7 @@ public class SaleInvoiceCheck
     public string Order { get; set; }
     public string City { get; set; }
     public double DeliveryPrice { get; set; }
-
     public string TrackingCode { get; set; }
-    
     public string InvoiceNumber { get; set; }
     
 }

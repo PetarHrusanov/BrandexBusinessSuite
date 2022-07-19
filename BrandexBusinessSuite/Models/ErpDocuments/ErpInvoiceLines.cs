@@ -2,6 +2,23 @@ namespace BrandexBusinessSuite.Models.ErpDocuments;
 
 public class ErpInvoiceLines
 {
+
+    public ErpInvoiceLines(ErpInvoiceOrderLines invoiceOrderLine, ErpSalesLinesOutput linesOutput, string documentId)
+    {
+        ProductDescription = invoiceOrderLine.ProductDescription;
+        Quantity = new ErpCharacteristicQuantity(Convert.ToInt16(invoiceOrderLine.Quantity.Value));
+        QuantityBase = new ErpCharacteristicQuantity(Convert.ToInt16(invoiceOrderLine.QuantityBase.Value));
+        StandardQuantityBase = new ErpCharacteristicQuantity(Convert.ToInt16(invoiceOrderLine.QuantityBase.Value));
+        LineAmount = invoiceOrderLine.LineAmount;
+        SalesOrderAmount = invoiceOrderLine.LineAmount.Value;
+        UnitPrice = invoiceOrderLine.UnitPrice;
+        ParentSalesOrderLine = new ErpCharacteristicId(linesOutput.Id);
+        SalesOrder = new ErpCharacteristicId(documentId);
+        InvoiceOrderLine = new ErpCharacteristicId(invoiceOrderLine.Id);
+        LineNo = linesOutput.LineNo;
+        Product = linesOutput.Product;
+
+    }
     public ErpCharacteristicProductName ProductDescription { get; set; }
     public ErpCharacteristicQuantity Quantity { get; set; }
     public ErpCharacteristicQuantity QuantityBase { get; set; }
@@ -13,7 +30,6 @@ public class ErpInvoiceLines
     public ErpCharacteristicId ParentSalesOrderLine { get; set; }
     public ErpCharacteristicId SalesOrder { get; set; }
     public ErpCharacteristicId InvoiceOrderLine { get; set; }
-    
     public ErpCharacteristicId Product { get; set; }
     
     public int LineNo { get; set; }
