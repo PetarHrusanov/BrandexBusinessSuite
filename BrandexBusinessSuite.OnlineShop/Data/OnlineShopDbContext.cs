@@ -15,30 +15,31 @@ public class OnlineShopDbContext : DbContext
     
     public DbSet<Product> Products { get; set; }
     
-
-    // General Logic
-    public override int SaveChanges() => this.SaveChanges(true);
+    
+    public override int SaveChanges() => SaveChanges(true);
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
-        this.ApplyAuditInfoRules();
+        ApplyAuditInfoRules();
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>
-        this.SaveChangesAsync(true, cancellationToken);
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return SaveChangesAsync(true, cancellationToken);
+    }
 
     public override Task<int> SaveChangesAsync(
         bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = default)
     {
-        this.ApplyAuditInfoRules();
+        ApplyAuditInfoRules();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 
     private void ApplyAuditInfoRules()
     {
-        var changedEntries = this.ChangeTracker
+        var changedEntries = ChangeTracker
             .Entries()
             .Where(e =>
                 e.Entity is IAuditInfo &&
@@ -48,13 +49,9 @@ public class OnlineShopDbContext : DbContext
         {
             var entity = (IAuditInfo)entry.Entity;
             if (entry.State == EntityState.Added && entity.CreatedOn == default)
-            {
                 entity.CreatedOn = DateTime.UtcNow;
-            }
             else
-            {
                 entity.ModifiedOn = DateTime.UtcNow;
-            }
         }
     }
     

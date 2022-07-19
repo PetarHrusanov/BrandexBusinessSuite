@@ -19,5 +19,12 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder
             .Property(c => c.ErpCode)
             .IsRequired();
+        
+        builder
+            .Property(c => c.ErpPriceCode)
+            .IsRequired();
+        builder
+            .Property(c => c.ErpPriceNoVat)
+            .IsRequired();
     }
 }

@@ -1,6 +1,4 @@
-﻿using BrandexBusinessSuite.SalesAnalysis.Data.Models;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Data;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Data;
 
 using System.Linq;
 using System;
@@ -21,38 +19,30 @@ public class SpravkiDbContext : DbContext
     }
 
     public DbSet<City> Cities { get; set; }
-
     public DbSet<Company> Companies { get; set; }
-
     public DbSet<Pharmacy> Pharmacies { get; set; }
-
     public DbSet<PharmacyChain> PharmacyChains { get; set; }
-
     public DbSet<Product> Products { get; set; }
-
     public DbSet<Region> Regions { get; set; }
-
     public DbSet<Sale> Sales { get; set; }
-
     public DbSet<Distributor> Distributors { get; set; }
-
-    // General Logic
-    public override int SaveChanges() => this.SaveChanges(true);
+    
+    public override int SaveChanges() => SaveChanges(true);
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
-        this.ApplyAuditInfoRules();
+        ApplyAuditInfoRules();
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>
-        this.SaveChangesAsync(true, cancellationToken);
+        SaveChangesAsync(true, cancellationToken);
 
     public override Task<int> SaveChangesAsync(
         bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = default)
     {
-        this.ApplyAuditInfoRules();
+        ApplyAuditInfoRules();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 

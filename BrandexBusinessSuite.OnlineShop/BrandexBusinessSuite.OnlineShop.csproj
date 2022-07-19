@@ -8,6 +8,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="11.0.1" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.4" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
         <PackageReference Include="WooCommerceNET" Version="0.8.4" />
     </ItemGroup>
@@ -17,7 +28,14 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Data\Migrations" />
       <Folder Include="wwwroot" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\2022’-‘07’-‘18’T’19’:’48’:’02.4134540+03:00\Kur.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022’-‘07’-‘18’T’19’:’53’:’04.9277670+03:00\Kur.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022’-‘07’-‘18’T’19’:’53’:’04.9277670+03:00\Kuromir.zip" />
     </ItemGroup>
 
 </Project>

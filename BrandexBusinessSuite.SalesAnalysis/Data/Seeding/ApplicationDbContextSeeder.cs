@@ -63,7 +63,6 @@ public class ApplicationDbContextSeeder : ISeeder
                 new() { Name = Vidin },
                 new() { Name = Unserviced },
                 new() { Name = OnlineShop },
-       
             };
     
     private static IEnumerable<Distributor> GetDistributors()
@@ -74,7 +73,6 @@ public class ApplicationDbContextSeeder : ISeeder
             new() { Name = Sopharma },
             new() { Name = Sting },
             new() { Name = Pharmnet },
-
         };
     
 

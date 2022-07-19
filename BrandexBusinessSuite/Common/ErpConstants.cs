@@ -23,5 +23,6 @@ public class ErpConstants
     {
         public const string ODataId = "@odata.id";
         public const string ValueLower = "value";
+        public const string DocumentNo = "DocumentNo";
     }
 }
