@@ -1,7 +1,7 @@
-namespace BrandexBusinessSuite.OnlineShop.Models;
+namespace BrandexBusinessSuite.OnlineShop.Models.Speedy;
 
 using Newtonsoft.Json;
-
+using WooCommerceNET.WooCommerce.v3;
 public class SpeedyInputOrder
 {
     public SpeedyInputOrder(string userName, string password, _Service service, _Recipient recipient, string ref1)
@@ -114,7 +114,14 @@ public class SpeedyInputOrder
             ClientName = clientName;
             Address = new _Address(siteName, postCode, addressNote);
         }
-        
+
+        public _Recipient(Order order)
+        {
+            PhoneNumber = new _PhoneNumber(order.billing.phone);
+            ClientName = order.shipping.first_name+" "+order.shipping.last_name;
+            Address = new _Address(order.shipping.city, order.shipping.postcode, order.shipping.address_1);
+        }
+
         [JsonProperty("phone1")]
         public _PhoneNumber PhoneNumber { get; set; }
         

@@ -14,6 +14,8 @@ public class Product : IAuditInfo, IDeletableEntity
     
     public string WooCommerceSampleName { get; set; }
     public string ErpSampleCode { get; set; }
+    
+    public virtual ICollection<SaleOnlineAnalysis> SaleOnlineAnalysis { get; set; }
 
     public DateTime CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }

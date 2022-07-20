@@ -14,6 +14,8 @@ using WooCommerceNET.WooCommerce.v3;
 
 using BrandexBusinessSuite.Models.ErpDocuments;
 using BrandexBusinessSuite.OnlineShop.Data.Models;
+using Models.Speedy;
+using Services.SalesAnalysis;
 using Services.Products;
 
 using BrandexBusinessSuite.Controllers;
@@ -33,19 +35,22 @@ public class OnlineShopController : ApiController
     private readonly WooCommerceSettings _wooCommerceSettings;
     
     private readonly IProductsService _productsService;
+    private readonly ISalesAnalysisService _salesAnalysisService;
 
     private static readonly HttpClient Client = new();
     
     public OnlineShopController(IWebHostEnvironment hostEnvironment,
         IOptions<UserSettings> userSettings,
         IOptions<WooCommerceSettings> wooCommerceSettings,
-        IProductsService productsService
+        IProductsService productsService,
+        ISalesAnalysisService salesAnalysisService
     )
     {
         _hostEnvironment = hostEnvironment;
         _userSettings = userSettings.Value;
         _wooCommerceSettings = wooCommerceSettings.Value;
         _productsService = productsService;
+        _salesAnalysisService = salesAnalysisService;
     }
 
     [HttpGet]
@@ -79,11 +84,7 @@ public class OnlineShopController : ApiController
                 _userSettings.UsernameSpeedy,
                 _userSettings.PasswordSpeedy,
                 new SpeedyInputOrder._Service(serviceCodeSpeedy, orderAmountSpeedy),
-                new SpeedyInputOrder._Recipient(order.billing.phone,
-                    order.shipping.first_name+" "+order.shipping.last_name,
-                    order.shipping.city,
-                    order.shipping.postcode,
-                    order.shipping.address_1),
+                new SpeedyInputOrder._Recipient(order),
                 order.id.ToString()
                 );
          
@@ -109,14 +110,15 @@ public class OnlineShopController : ApiController
 
             var erpSale = new ErpOnlineSale(order.id.ToString(), $"{order.date_created:yyyy-MM-dd}");
 
-            foreach (var line in from productLine in order.line_items let productCurrent = productsDb.FirstOrDefault(p => p.WooCommerceName == productLine.name) let discount = Math.Round(((decimal)(1 - productLine.total / productLine.subtotal))!) select new ErpSalesLines(
+            foreach (var line in from productLine in order.line_items let productCurrent = productsDb.FirstOrDefault(p => p.WooCommerceName == productLine.name) let discount = Math.Round(((decimal)(1 - productLine.total / productLine.subtotal))!)
+                     select new ErpSalesLines(
                          $"General_Products_Products({productCurrent!.ErpCode})",
                          (decimal)productLine.quantity,
                          discount,
                          $"Crm_ProductPrices({productCurrent!.ErpPriceCode})",
                          productCurrent!.ErpPriceNoVat,
                          $"Logistics_Inventory_Lots({productCurrent!.ErpLot})"
-                     ))
+                     )) 
             {
                 erpSale.Lines.Add(line);
             }
@@ -143,19 +145,19 @@ public class OnlineShopController : ApiController
 
             if (!responseContentJObj.ContainsKey(ErpDocuments.ODataId)) continue;
             
-            var newDocumentId = responseContentJObj[ErpDocuments.ODataId].ToString();
+            var newDocumentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
             await ChangeStateToRelease(Client, newDocumentId);
 
             responseContentJObj = await JObjectByUriGetRequest(Client, $"https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrderLines?$top=20&$filter=SalesOrder%20eq%20'{newDocumentId}'");
             
-            var orderLinesList = JsonConvert.DeserializeObject<List<ErpSalesLinesOutput>>((string)responseContentJObj["value"].ToString());
+            var orderLinesList = JsonConvert.DeserializeObject<List<ErpSalesLinesOutput>>(responseContentJObj["value"].ToString());
 
             var invoiceNew = new ErpInvoice(order.id.ToString(), $"{order.date_created:yyyy-MM-dd}");
 
             foreach (var orderLine in orderLinesList)
             {
                 responseContentJObj = await JObjectByUriGetRequest(Client, $"https://brandexbg.my.erp.net/api/domain/odata/Crm_Invoicing_InvoiceOrderLines?$top=20&$filter=SalesOrderLine%20eq%20'{orderLine.Id}'");
-                var listInvoiceOrderLine = JsonConvert.DeserializeObject<List<ErpInvoiceOrderLines>>((string)responseContentJObj["value"].ToString());
+                var listInvoiceOrderLine = JsonConvert.DeserializeObject<List<ErpInvoiceOrderLines>>(responseContentJObj["value"].ToString());
 
                 var invoiceLine = new ErpInvoiceLines(listInvoiceOrderLine![0], orderLine, newDocumentId);
                 
@@ -178,8 +180,6 @@ public class OnlineShopController : ApiController
             salesInvoicesCheck.Add(saleInvoiceCheck);
 
         }
-        
-        
 
         return BadRequest("Kur");
     }
@@ -256,8 +256,7 @@ public class OnlineShopController : ApiController
     {
         var rest = new RestAPI("https://botanic.cc/wp-json/wc/v3",_wooCommerceSettings.Key, _wooCommerceSettings.Secret);
         var wc = new WCObject(rest);
-        
-        
+
         var dateInput = "Jul 19, 2022";
         var parsedDate = DateTime.Parse(dateInput);
         
@@ -266,7 +265,51 @@ public class OnlineShopController : ApiController
             { "date_created",parsedDate.ToString() },
         });
         
-        
+        var productsDb = await _productsService.GetCheckModels();
+
+        var ordersForAnalysis = new List<SalesOnlineAnalysisInput>();
+
+        foreach (var order in orderList)
+        {
+
+            var sample = order.meta_data.Where(p => p.key == "sample").Select(p => p.value).FirstOrDefault();
+            var adSource = order.meta_data.Where(p => p.key == "order_details_information_source").Select(p => p.value).FirstOrDefault();
+            
+            foreach (var orderLine in order.line_items)
+            {
+                var orderAnalysis = new SalesOnlineAnalysisInput
+                {
+                    OrderNumber = order.number,
+                    Date = order.date_created,
+                    ProductId = productsDb.Where(p => p.WooCommerceName == orderLine.name).Select(p => p.Id)
+                        .FirstOrDefault(),
+                    Quantity = orderLine.quantity,
+                    Total = orderLine.total,
+                    City = order.shipping.city,
+                    Sample = (string)sample,
+                    AdSource = (string)adSource
+                };
+                ordersForAnalysis.Add(orderAnalysis);
+
+            }
+        }
+
+        // var ordersForAnalysis = (
+        //     from order in orderList 
+        //     from orderLine in order.line_items 
+        //     select new SalesOnlineAnalysisInput 
+        //     { 
+        //         OrderNumber = order.number, 
+        //         Date = order.date_created, 
+        //         ProductId = productsDb.Where(p => p.WooCommerceName == orderLine.name).Select(p => p.Id).FirstOrDefault(), 
+        //         Quantity = orderLine.quantity, 
+        //         Total = orderLine.total, 
+        //         City = order.shipping.city, 
+        //         Sample = order.meta_data["sample"], 
+        //         AdSource = "Kur" 
+        //     }).ToList();
+
+        await _salesAnalysisService.UploadBulk(ordersForAnalysis);
 
         return BadRequest("Tasho");
 

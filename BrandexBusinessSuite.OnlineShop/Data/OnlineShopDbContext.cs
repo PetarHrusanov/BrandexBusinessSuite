@@ -15,6 +15,8 @@ public class OnlineShopDbContext : DbContext
     
     public DbSet<Product> Products { get; set; }
     
+    public DbSet<SaleOnlineAnalysis> SaleOnline { get; set; }
+    
     
     public override int SaveChanges() => SaveChanges(true);
 
