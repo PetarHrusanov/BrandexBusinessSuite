@@ -9,6 +9,9 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+
 using WooCommerceNET;
 using WooCommerceNET.WooCommerce.v3;
 
@@ -17,6 +20,7 @@ using BrandexBusinessSuite.OnlineShop.Data.Models;
 using Models.Speedy;
 using Services.SalesAnalysis;
 using Services.Products;
+using BrandexBusinessSuite.Services;
 
 using BrandexBusinessSuite.Controllers;
 using Requests;
@@ -51,6 +55,35 @@ public class OnlineShopController : ApiController
         _wooCommerceSettings = wooCommerceSettings.Value;
         _productsService = productsService;
         _salesAnalysisService = salesAnalysisService;
+    }
+
+    [HttpGet]
+    [IgnoreAntiforgeryToken]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    public async Task<ActionResult> CheckBatches()
+    {
+        var productsDb = await _productsService.GetCheckModels();
+        
+        var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.UsernameErp}:{_userSettings.PasswordErp}");
+        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+        foreach (var product in productsDb)
+        {
+            var responseContentJObj = await JObjectByUriGetRequest(Client,
+                $"https://brandexbg.my.erp.net/api/domain/odata/Logistics_Inventory_Lots?$top=1000&$filter=Product%20eq%20'General_Products_Products({product.ErpCode})'");
+            var batchesList = JsonConvert.DeserializeObject<List<ErpLot>>(responseContentJObj["value"].ToString());
+
+            var newestBatch = batchesList!.OrderByDescending(p=>p.ExpiryDate).ThenByDescending(p=>p.ReceiptDate).FirstOrDefault();
+
+            if (product.ErpLot !=newestBatch!.Id)
+            {
+                await _productsService.ChangeBatch(product, newestBatch.Id);
+            }
+
+        }
+        
+        return Result.Success;
+
     }
 
     [HttpGet]
@@ -180,6 +213,8 @@ public class OnlineShopController : ApiController
             salesInvoicesCheck.Add(saleInvoiceCheck);
 
         }
+        
+        
 
         return BadRequest("Kur");
     }
@@ -189,13 +224,21 @@ public class OnlineShopController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
     public async Task<IActionResult> Speedy()
     {
+        
+        var salesInvoicesCheck = new List<SaleInvoiceCheck>()
+        {
+            new ("02:24", 13.24, "Shosho", "1234", "Sevlievo", 14.25, "61828714942"),
+            new ("02:24", 13.24, "Shosho", "1234", "Sevlievo", 14.25, "61828606150")
+        };
+
+        salesInvoicesCheck[0].InvoiceNumber = "1234";
+        salesInvoicesCheck[1].InvoiceNumber = "1235";
+        
         var request = new SpeedyPrintRequest(_userSettings.UsernameSpeedy, _userSettings.PasswordSpeedy);
 
-        string[] testko = { "61828714942", "61828606150" };
-
-        foreach (var variable in testko)
+        foreach (var variable in salesInvoicesCheck)
         {
-            request.Parcels.Add(new SpeedyParcelId(variable));
+            request.Parcels.Add(new SpeedyParcelId(variable.TrackingCode));
         }
         
         var jsonPostString = JsonConvert.SerializeObject(request, Formatting.Indented);
@@ -214,17 +257,52 @@ public class OnlineShopController : ApiController
             Directory.CreateDirectory(newPath);
         }
         
-        const string sFileName = "Kur.pdf";
+        const string filePdf = "tracking_codes.pdf";
 
-        await using(var newFile = System.IO.File.Create(Path.Combine(newPath,sFileName )))
+        await using(var newFile = System.IO.File.Create(Path.Combine(newPath,filePdf )))
         { 
             var stream = await responseContent.ReadAsStreamAsync();
             await stream.CopyToAsync(newFile);
         }
+
+        const string fileXlsx = "invoices.xlsx";
+        
+        await using (var fs = new FileStream(Path.Combine(newPath, fileXlsx), FileMode.Create, FileAccess.Write))
+        {
+            IWorkbook workbook = new XSSFWorkbook();
+
+            var excelSheet = workbook.CreateSheet("invoice_info");
+            var row = excelSheet.CreateRow(0);
+
+            row.CreateCell(row.Cells.Count()).SetCellValue("Фактура");
+            row.CreateCell(row.Cells.Count()).SetCellValue("Дата");
+            row.CreateCell(row.Cells.Count()).SetCellValue("Стойност");
+            row.CreateCell(row.Cells.Count()).SetCellValue("Клиент");
+            row.CreateCell(row.Cells.Count()).SetCellValue("№ Поръчка");
+            row.CreateCell(row.Cells.Count()).SetCellValue("Град");
+            row.CreateCell(row.Cells.Count()).SetCellValue("Цена доставка");
+            row.CreateCell(row.Cells.Count()).SetCellValue("Товарителница");
+            row.CreateCell(row.Cells.Count()).SetCellValue("Бележки");
+
+            foreach (var sale in salesInvoicesCheck)
+            {
+                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+                row.CreateCell(row.Cells.Count()).SetCellValue(sale.InvoiceNumber);
+                row.CreateCell(row.Cells.Count()).SetCellValue(sale.Date);
+                row.CreateCell(row.Cells.Count()).SetCellValue(sale.OrderTotal);
+                row.CreateCell(row.Cells.Count()).SetCellValue(sale.ClientName);
+                row.CreateCell(row.Cells.Count()).SetCellValue(sale.Order);
+                row.CreateCell(row.Cells.Count()).SetCellValue(sale.City);
+                row.CreateCell(row.Cells.Count()).SetCellValue(sale.DeliveryPrice);
+                row.CreateCell(row.Cells.Count()).SetCellValue(sale.TrackingCode);
+            }
+            
+            workbook.Write(fs);
+        }
         
         var files = Directory.GetFiles(newPath);
         
-        var zipFile = Path.Combine(newPath, "Kuromir.zip");
+        var zipFile = Path.Combine(newPath, "Collection.zip");
         
         using (var archive = ZipFile.Open(zipFile, ZipArchiveMode.Create))
         {
@@ -245,73 +323,51 @@ public class OnlineShopController : ApiController
 
         // return File(memory, "application/pdf", sFileName);
         
-        return File(memory, "application/zip", "Kuromir.zip");
+        return File(memory, "application/zip", "Collection.zip");
 
     }
     
-    [HttpGet]
+    [HttpPost]
     [IgnoreAntiforgeryToken]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
-    public async Task<IActionResult> OrdersWooCommerceCheck()
+    public async Task<ActionResult> OrdersWooCommerceCheck([FromBody] DateInput date)
     {
         var rest = new RestAPI("https://botanic.cc/wp-json/wc/v3",_wooCommerceSettings.Key, _wooCommerceSettings.Secret);
         var wc = new WCObject(rest);
-
-        var dateInput = "Jul 19, 2022";
-        var parsedDate = DateTime.Parse(dateInput);
         
         var orderList = await wc.Order.GetAll(new Dictionary < string, string > ()
         {
-            { "date_created",parsedDate.ToString() },
+            { "created_at_min",date.Date.ToString() },
+            { "per_page","100" },
         });
-        
+
+        var ordersDatabse = await _salesAnalysisService.GetCheckModelsByDate(date.Date);
+
+        orderList = orderList.Where(order => ordersDatabse.All(p => p.OrderNumber != order.number)).ToList();
+
         var productsDb = await _productsService.GetCheckModels();
 
-        var ordersForAnalysis = new List<SalesOnlineAnalysisInput>();
-
-        foreach (var order in orderList)
-        {
-
-            var sample = order.meta_data.Where(p => p.key == "sample").Select(p => p.value).FirstOrDefault();
-            var adSource = order.meta_data.Where(p => p.key == "order_details_information_source").Select(p => p.value).FirstOrDefault();
-            
-            foreach (var orderLine in order.line_items)
+        var ordersForAnalysis = (from order in orderList
+            let sample = order.meta_data.Where(p => p.key == "sample").Select(p => p.value).FirstOrDefault()
+            let adSource = order.meta_data.Where(p => p.key == "order_details_information_source").Select(p => p.value).FirstOrDefault()
+            from orderLine in order.line_items
+            select new SalesOnlineAnalysisInput
             {
-                var orderAnalysis = new SalesOnlineAnalysisInput
-                {
-                    OrderNumber = order.number,
-                    Date = order.date_created,
-                    ProductId = productsDb.Where(p => p.WooCommerceName == orderLine.name).Select(p => p.Id)
-                        .FirstOrDefault(),
-                    Quantity = orderLine.quantity,
-                    Total = orderLine.total,
-                    City = order.shipping.city,
-                    Sample = (string)sample,
-                    AdSource = (string)adSource
-                };
-                ordersForAnalysis.Add(orderAnalysis);
-
-            }
-        }
-
-        // var ordersForAnalysis = (
-        //     from order in orderList 
-        //     from orderLine in order.line_items 
-        //     select new SalesOnlineAnalysisInput 
-        //     { 
-        //         OrderNumber = order.number, 
-        //         Date = order.date_created, 
-        //         ProductId = productsDb.Where(p => p.WooCommerceName == orderLine.name).Select(p => p.Id).FirstOrDefault(), 
-        //         Quantity = orderLine.quantity, 
-        //         Total = orderLine.total, 
-        //         City = order.shipping.city, 
-        //         Sample = order.meta_data["sample"], 
-        //         AdSource = "Kur" 
-        //     }).ToList();
-
+                OrderNumber = order.number,
+                Date = order.date_created,
+                ProductId = productsDb.Where(p => p.WooCommerceName == orderLine.name)
+                    .Select(p => p.Id)
+                    .FirstOrDefault(),
+                Quantity = orderLine.quantity,
+                Total = orderLine.total,
+                City = order.shipping.city,
+                Sample = (string)sample,
+                AdSource = (string)adSource
+            }).ToList();
+        
         await _salesAnalysisService.UploadBulk(ordersForAnalysis);
 
-        return BadRequest("Tasho");
+        return Result.Success;
 
     }
 
