@@ -6,8 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using BrandexBusinessSuite.OnlineShop.Services.Products;
-
+using Services.SalesAnalysis;
+using Services.Products;
 using Data;
 using Data.Seeding;
 using BrandexBusinessSuite.Services.Data;
@@ -42,7 +42,8 @@ public class Startup
         services
             .AddWebService<OnlineShopDbContext>(_configuration)
             .AddTransient<ISeeder, ApplicationDbContextSeeder>()
-            .AddTransient<IProductsService, ProductsService>();
+            .AddTransient<IProductsService, ProductsService>()
+            .AddTransient<ISalesAnalysisService, SalesAnalysisService>();
 
     }
 

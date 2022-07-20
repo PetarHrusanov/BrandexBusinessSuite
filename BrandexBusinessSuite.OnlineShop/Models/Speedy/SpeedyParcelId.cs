@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace BrandexBusinessSuite.OnlineShop.Models;
+namespace BrandexBusinessSuite.OnlineShop.Models.Speedy;
 
 public class SpeedyParcelId
 {

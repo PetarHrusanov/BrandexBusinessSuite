@@ -1,4 +1,4 @@
-namespace BrandexBusinessSuite.OnlineShop.Models;
+namespace BrandexBusinessSuite.OnlineShop.Models.Speedy;
 
 using Newtonsoft.Json;
 
