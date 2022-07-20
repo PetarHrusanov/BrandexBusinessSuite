@@ -1,7 +1,9 @@
 namespace BrandexBusinessSuite.OnlineShop.Services.SalesAnalysis;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 
+using BrandexBusinessSuite.OnlineShop.Data.Models;
 using Models;
 using System.Data;
 using Data;
@@ -9,7 +11,7 @@ using Data;
 public class SalesAnalysisService :ISalesAnalysisService
 {
 
-    OnlineShopDbContext db;
+    OnlineShopDbContext _db;
     private readonly IConfiguration _configuration;
 
     private const string SaleOnline = "SaleOnline";
@@ -26,7 +28,7 @@ public class SalesAnalysisService :ISalesAnalysisService
 
     public SalesAnalysisService(OnlineShopDbContext db, IConfiguration configuration)
     {
-        this.db = db;
+        _db = db;
         _configuration = configuration;
     }
 
@@ -51,7 +53,7 @@ public class SalesAnalysisService :ISalesAnalysisService
             row[Quantity] = sale.Quantity;
             row[Total] = sale.Total;
             row[City] = sale.City;
-            row[Sample] = sale.Sample;
+            row[Sample] = string.Empty;
             row[AdSource] = string.Empty;
             
             if (sale.AdSource!=null)
@@ -59,7 +61,11 @@ public class SalesAnalysisService :ISalesAnalysisService
                 row[AdSource] = sale.AdSource;
             }
             
-            
+            if (sale.Sample!=null)
+            {
+                row[Sample] = sale.Sample;
+            }
+
             table.Rows.Add(row);
         }
 
@@ -79,4 +85,9 @@ public class SalesAnalysisService :ISalesAnalysisService
         await objbulk.WriteToServerAsync(table);  
         con.Close(); 
     }
+
+    public async Task<List<SaleOnlineAnalysis>> GetCheckModelsByDate(DateTime date)
+        => await _db.SaleOnline.Where(d=>d.Date>=date).ToListAsync();
+    
+    
 }

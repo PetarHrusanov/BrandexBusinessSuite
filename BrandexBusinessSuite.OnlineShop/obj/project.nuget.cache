@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "xwb4pMXBwHypBD34oBfy7MMuPMUfeFIVYbjI9PLM8AnM+460wQzFMXM2gBTSyLwVxinmSUkKWzchPgFdJ7UEAQ==",
+  "dgSpecHash": "5ACaUCcmjO0ua3s6djsQbd1/GugHF7bEtS8K6eR9e/LJd3h1R2pUGnVRx73bSO3kMvP5m1Izur8vVcc9T/wDsA==",
   "success": true,
   "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite.OnlineShop/BrandexBusinessSuite.OnlineShop.csproj",
   "expectedPackageFiles": [
@@ -12,7 +12,10 @@
     "/Users/Petar/.nuget/packages/automatonymous/5.0.0/automatonymous.5.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/azure.core/1.6.0/azure.core.1.6.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/azure.identity/1.3.0/azure.identity.1.3.0.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/dotnetcore.npoi/1.2.2/dotnetcore.npoi.1.2.2.nupkg.sha512",
     "/Users/Petar/.nuget/packages/dotnetcore.npoi.core/1.2.2/dotnetcore.npoi.core.1.2.2.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/dotnetcore.npoi.openxml4net/1.2.2/dotnetcore.npoi.openxml4net.1.2.2.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/dotnetcore.npoi.openxmlformats/1.2.2/dotnetcore.npoi.openxmlformats.1.2.2.nupkg.sha512",
     "/Users/Petar/.nuget/packages/greenpipes/4.0.0/greenpipes.4.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/hangfire.aspnetcore/1.7.28/hangfire.aspnetcore.1.7.28.nupkg.sha512",
     "/Users/Petar/.nuget/packages/hangfire.core/1.7.28/hangfire.core.1.7.28.nupkg.sha512",

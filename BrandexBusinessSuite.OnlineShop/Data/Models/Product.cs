@@ -11,7 +11,6 @@ public class Product : IAuditInfo, IDeletableEntity
     public decimal ErpPriceNoVat { get; set; }
     public string ErpLot { get; set; }
     public string WooCommerceName { get; set; }
-    
     public string WooCommerceSampleName { get; set; }
     public string ErpSampleCode { get; set; }
     
