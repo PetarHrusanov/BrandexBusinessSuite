@@ -33,7 +33,10 @@ public class Startup
         services.Configure<ApplicationSettings>(_configuration.GetSection(nameof(ApplicationSettings)),
             config => config.BindNonPublicProperties = true);
 
-        services.Configure<UserSettings>(_configuration.GetSection(nameof(UserSettings)),
+        services.Configure<SpeedyUserSettings>(_configuration.GetSection(nameof(SpeedyUserSettings)),
+            config => config.BindNonPublicProperties = true);
+        
+        services.Configure<ErpUserSettings>(_configuration.GetSection(nameof(ErpUserSettings)),
             config => config.BindNonPublicProperties = true);
 
         services.Configure<WooCommerceSettings>(_configuration.GetSection(nameof(WooCommerceSettings)),

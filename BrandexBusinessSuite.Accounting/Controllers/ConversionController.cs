@@ -38,7 +38,7 @@ public class ConversionController : ApiController
 {
 
     private readonly IWebHostEnvironment _hostEnvironment;
-    private readonly UserSettings _userSettings;
+    private readonly ErpUserSettings _userSettings;
     private readonly ApiSettings _apiSettings;
     
     private static readonly HttpClient Client = new();
@@ -61,7 +61,7 @@ public class ConversionController : ApiController
     private static readonly Regex FacebookInvoiceRegex = new (@"FBADS-[0-9]{3}-[0-9]{9}");
 
     public ConversionController(IWebHostEnvironment hostEnvironment,
-        IOptions<UserSettings> userSettings,
+        IOptions<ErpUserSettings> userSettings,
         IOptions<ApiSettings> apiSettings
         )
     {
@@ -162,7 +162,7 @@ public class ConversionController : ApiController
             
             var jsonPostString = JsonConvert.SerializeObject(primaryDocument, Formatting.Indented);
 
-            var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.AccountingAccount}:{_userSettings.AccountingPassword}");
+            var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.User}:{_userSettings.Password}");
             Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
             var responseContentJObj = await 
@@ -242,7 +242,7 @@ public class ConversionController : ApiController
 
         var newPath = CreateFileDirectories.CreatePDFFilesInputDirectory(_hostEnvironment);
 
-        if (file.Length <= 0) throw new ArgumentNullException();
+        if (file.Length <= 0) return BadRequest(Errors.IncorrectFileFormat);
         
         var fullPath = System.IO.Path.Combine(newPath, file.FileName);
 
@@ -548,7 +548,7 @@ public class ConversionController : ApiController
 
         var jsonPostString = JsonConvert.SerializeObject(activityObject, Formatting.Indented);
 
-        var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.MarketingAccount}:{_userSettings.MarketingPassword}");
+        var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.User}:{_userSettings.Password}");
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
         var responseContentJObj = await  JObjectByUriPostRequest(Client, _apiSettings.GeneralContactActivities, jsonPostString);

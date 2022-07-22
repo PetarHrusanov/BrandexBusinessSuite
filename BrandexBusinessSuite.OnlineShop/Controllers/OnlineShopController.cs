@@ -35,7 +35,8 @@ public class OnlineShopController : ApiController
 {
     
     private readonly IWebHostEnvironment _hostEnvironment;
-    private readonly UserSettings _userSettings;
+    private readonly SpeedyUserSettings _speedyUserSettings;
+    private readonly ErpUserSettings _erpUserSettings;
     private readonly WooCommerceSettings _wooCommerceSettings;
     
     private readonly IProductsService _productsService;
@@ -44,14 +45,16 @@ public class OnlineShopController : ApiController
     private static readonly HttpClient Client = new();
     
     public OnlineShopController(IWebHostEnvironment hostEnvironment,
-        IOptions<UserSettings> userSettings,
+        IOptions<SpeedyUserSettings> speedyUserSettings,
+        IOptions<ErpUserSettings> erpUserSettings,
         IOptions<WooCommerceSettings> wooCommerceSettings,
         IProductsService productsService,
         ISalesAnalysisService salesAnalysisService
     )
     {
         _hostEnvironment = hostEnvironment;
-        _userSettings = userSettings.Value;
+        _speedyUserSettings = speedyUserSettings.Value;
+        _erpUserSettings = erpUserSettings.Value;
         _wooCommerceSettings = wooCommerceSettings.Value;
         _productsService = productsService;
         _salesAnalysisService = salesAnalysisService;
@@ -64,7 +67,7 @@ public class OnlineShopController : ApiController
     {
         var productsDb = await _productsService.GetCheckModels();
         
-        var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.UsernameErp}:{_userSettings.PasswordErp}");
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
         foreach (var product in productsDb)
@@ -79,7 +82,6 @@ public class OnlineShopController : ApiController
             {
                 await _productsService.ChangeBatch(product, newestBatch.Id);
             }
-
         }
         
         return Result.Success;
@@ -104,6 +106,8 @@ public class OnlineShopController : ApiController
         var salesInvoicesCheck = new List<SaleInvoiceCheck>();
 
         var productsDb = await _productsService.GetCheckModels();
+
+        var speedyTrackingList = new List<string>();
         
         foreach (var order in orderList)
         {
@@ -114,8 +118,8 @@ public class OnlineShopController : ApiController
             if ( string.Equals(order.shipping.city, "София", StringComparison.OrdinalIgnoreCase)) serviceCodeSpeedy = 113;
             
             var newSpeedyInput = new SpeedyInputOrder(
-                _userSettings.UsernameSpeedy,
-                _userSettings.PasswordSpeedy,
+                _speedyUserSettings.UsernameSpeedy,
+                _speedyUserSettings.PasswordSpeedy,
                 new SpeedyInputOrder._Service(serviceCodeSpeedy, orderAmountSpeedy),
                 new SpeedyInputOrder._Recipient(order),
                 order.id.ToString()
@@ -130,6 +134,7 @@ public class OnlineShopController : ApiController
             if(responseContentJObj.ContainsKey("error")) continue;
             
             var speedyTracking = responseContentJObj["id"]!.ToString();
+            speedyTrackingList.Add(speedyTracking);
             var deliveryPrice = Convert.ToDouble(responseContentJObj["price"]!["total"]!.ToString());
             
             var saleInvoiceCheck = new SaleInvoiceCheck(
@@ -140,6 +145,8 @@ public class OnlineShopController : ApiController
                 order.shipping.city,
                 deliveryPrice,
                 speedyTracking);
+            
+            salesInvoicesCheck.Add(saleInvoiceCheck);
 
             var erpSale = new ErpOnlineSale(order.id.ToString(), $"{order.date_created:yyyy-MM-dd}");
 
@@ -171,7 +178,7 @@ public class OnlineShopController : ApiController
             
             jsonPostString = JsonConvert.SerializeObject(erpSale, Formatting.Indented);
             
-            var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.UsernameErp}:{_userSettings.PasswordErp}");
+            var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
             Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             
             responseContentJObj = await JObjectByUriPostRequest(Client, "https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrders", jsonPostString);
@@ -203,18 +210,13 @@ public class OnlineShopController : ApiController
             
             if (!responseContentJObj.ContainsKey(ErpDocuments.ODataId)) continue;
             
-            var newInvoiceId = responseContentJObj[ErpDocuments.ODataId].ToString();
-            var newInvoiceNo = responseContentJObj[ErpDocuments.DocumentNo].ToString();
+            var newInvoiceId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
 
-            saleInvoiceCheck.InvoiceNumber = newInvoiceNo;
+            saleInvoiceCheck.InvoiceNumber = responseContentJObj[ErpDocuments.DocumentNo]!.ToString();
             
             await ChangeStateToRelease(Client, newInvoiceId);
-            
-            salesInvoicesCheck.Add(saleInvoiceCheck);
 
         }
-        
-        
 
         return BadRequest("Kur");
     }
@@ -234,11 +236,16 @@ public class OnlineShopController : ApiController
         salesInvoicesCheck[0].InvoiceNumber = "1234";
         salesInvoicesCheck[1].InvoiceNumber = "1235";
         
-        var request = new SpeedyPrintRequest(_userSettings.UsernameSpeedy, _userSettings.PasswordSpeedy);
+        var request = new SpeedyPrintRequest(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy);
 
-        foreach (var variable in salesInvoicesCheck)
+        var trackingCoder = new List<string>()
         {
-            request.Parcels.Add(new SpeedyParcelId(variable.TrackingCode));
+            "61828714942", "61828606150"
+        };
+        
+        foreach (var code in trackingCoder)
+        {
+            request.Parcels.Add(new SpeedyParcelId(code));
         }
         
         var jsonPostString = JsonConvert.SerializeObject(request, Formatting.Indented);
@@ -274,27 +281,23 @@ public class OnlineShopController : ApiController
             var excelSheet = workbook.CreateSheet("invoice_info");
             var row = excelSheet.CreateRow(0);
 
-            row.CreateCell(row.Cells.Count()).SetCellValue("Фактура");
-            row.CreateCell(row.Cells.Count()).SetCellValue("Дата");
-            row.CreateCell(row.Cells.Count()).SetCellValue("Стойност");
-            row.CreateCell(row.Cells.Count()).SetCellValue("Клиент");
-            row.CreateCell(row.Cells.Count()).SetCellValue("№ Поръчка");
-            row.CreateCell(row.Cells.Count()).SetCellValue("Град");
-            row.CreateCell(row.Cells.Count()).SetCellValue("Цена доставка");
-            row.CreateCell(row.Cells.Count()).SetCellValue("Товарителница");
-            row.CreateCell(row.Cells.Count()).SetCellValue("Бележки");
+            var titlesArray = new[] { "Фактура", "Дата", "Стойност", "Клиент", "№ Поръчка", 
+                "Град","Цена доставка","Товарителница",  "Бележки"};
 
+            foreach (var title in titlesArray) row.CreateCell(row.Cells.Count).SetCellValue(title);
+            
+            
             foreach (var sale in salesInvoicesCheck)
             {
                 row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-                row.CreateCell(row.Cells.Count()).SetCellValue(sale.InvoiceNumber);
-                row.CreateCell(row.Cells.Count()).SetCellValue(sale.Date);
-                row.CreateCell(row.Cells.Count()).SetCellValue(sale.OrderTotal);
-                row.CreateCell(row.Cells.Count()).SetCellValue(sale.ClientName);
-                row.CreateCell(row.Cells.Count()).SetCellValue(sale.Order);
-                row.CreateCell(row.Cells.Count()).SetCellValue(sale.City);
-                row.CreateCell(row.Cells.Count()).SetCellValue(sale.DeliveryPrice);
-                row.CreateCell(row.Cells.Count()).SetCellValue(sale.TrackingCode);
+                row.CreateCell(row.Cells.Count).SetCellValue(sale.InvoiceNumber);
+                row.CreateCell(row.Cells.Count).SetCellValue(sale.Date);
+                row.CreateCell(row.Cells.Count).SetCellValue(sale.OrderTotal);
+                row.CreateCell(row.Cells.Count).SetCellValue(sale.ClientName);
+                row.CreateCell(row.Cells.Count).SetCellValue(sale.Order);
+                row.CreateCell(row.Cells.Count).SetCellValue(sale.City);
+                row.CreateCell(row.Cells.Count).SetCellValue(sale.DeliveryPrice);
+                row.CreateCell(row.Cells.Count).SetCellValue(sale.TrackingCode);
             }
             
             workbook.Write(fs);
@@ -321,8 +324,6 @@ public class OnlineShopController : ApiController
 
         memory.Position = 0;
 
-        // return File(memory, "application/pdf", sFileName);
-        
         return File(memory, "application/zip", "Collection.zip");
 
     }
@@ -370,5 +371,4 @@ public class OnlineShopController : ApiController
         return Result.Success;
 
     }
-
 }

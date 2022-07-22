@@ -40,8 +40,8 @@ public class Startup
                 config => config.BindNonPublicProperties = true);
         
         services
-            .Configure<UserSettings>(
-                _configuration.GetSection(nameof(UserSettings)), 
+            .Configure<ErpUserSettings>(
+                _configuration.GetSection(nameof(ErpUserSettings)), 
                 config => config.BindNonPublicProperties = true);
         
         services
