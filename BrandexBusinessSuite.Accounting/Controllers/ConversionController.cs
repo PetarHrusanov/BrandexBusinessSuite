@@ -12,16 +12,15 @@ using Newtonsoft.Json;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using NPOI.HSSF.UserModel;
 
 using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
 
 using BrandexBusinessSuite.Controllers;
+using Services;
 using BrandexBusinessSuite.Models.ErpDocuments;
 using Infrastructure;
 using Models;
@@ -31,6 +30,7 @@ using static Common.ProductConstants;
 using static  Common.Constants;
 using static Common.ErpConstants;
 
+using static  Methods.ExcelMethods;
 using static BrandexBusinessSuite.Requests.RequestsMethods;
 using static Methods.FieldsValuesMethods;
 
@@ -71,11 +71,10 @@ public class ConversionController : ApiController
     }
 
     [HttpPost]
-    [EnableCors()]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> ConvertFacebookPdfForAccounting([FromForm] IFormFile file)
+    public async Task<ActionResult> ConvertFacebookPdfForAccounting([FromForm] IFormFile file)
     {
         
         var newPath = CreateFileDirectories.CreatePDFFilesInputDirectory(_hostEnvironment);
@@ -94,10 +93,10 @@ public class ConversionController : ApiController
         
         var productsPrices = ProductPriceDictionaryFromText(rawText);
 
-        var sWebRootFolder = _hostEnvironment.WebRootPath;
-        const string sFileName = @"Facebook_Accounting.xlsx";
-
-        var memory = new MemoryStream();
+        // var sWebRootFolder = _hostEnvironment.WebRootPath;
+        // const string sFileName = @"Facebook_Accounting.xlsx";
+        //
+        // var memory = new MemoryStream();
 
         var productNames = typeof(Facebook).GetFields()
             .Select(field => field.Name)
@@ -107,7 +106,6 @@ public class ConversionController : ApiController
         
         foreach (var product in productNames)
         {
-            
             var valueFacebook = ReturnValueByClassAndName(typeof(Facebook), product);
             var valueErp = ReturnValueByClassAndName(typeof(ERP_Accounting), product);
             var valueErpCode = ReturnValueByClassAndName(typeof(ErpCodesNumber), product);
@@ -127,37 +125,27 @@ public class ConversionController : ApiController
         }
         
 
-        await using (var fs = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
-        {
-            IWorkbook workbook = new XSSFWorkbook();
+        // await using (var fs = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
+        // {
+        //     IWorkbook workbook = new XSSFWorkbook();
+        //
+        //     var excelSheet = workbook.CreateSheet("Products Summed");
+        //
+        //     var row = excelSheet.CreateRow(0);
+        //
+        
+        var facebookInvoiceNumber = FacebookInvoiceRegex.Matches(rawText)[0].ToString();
+        var primaryDocument = new LogisticsProcurementReceivingOrder(facebookInvoiceNumber, date);
 
-            var excelSheet = workbook.CreateSheet("Products Summed");
-
-            var row = excelSheet.CreateRow(0);
-
-            var facebookInvoiceNumber = FacebookInvoiceRegex.Matches(rawText)[0].ToString();
-
-            var primaryDocument = new LogisticsProcurementReceivingOrder(facebookInvoiceNumber, date);
-
-            foreach (var (key, value) in productsPrices)
+            foreach (var erpLine in productsPrices.Select(product => (double)product.Value * EuroRate)
+                         .Select(price => Math.Round(price, 2)).Select(priceRounded => new ErpOrderLinesAccounting(
+                         new ErpCharacteristicId("General_Products_Products(ee6e5c65-6dc7-41d7-9d57-ba87b19aa56c)"),
+                         new ErpCharacteristicLineAmount((decimal)priceRounded),
+                         new ErpCharacteristicValueNumber(1),
+                         new ErpCharacteristicId("Logistics_Inventory_Stores(100447ff-44f4-4799-a4c2-7c9b22fb0aaa)")
+                     )))
             {
-                row = excelSheet.CreateRow(excelSheet.LastRowNum+1);
-                row.CreateCell(row.Cells.Count()).SetCellValue(key);
-                row.CreateCell(row.Cells.Count()).SetCellValue((double)value);
-                row.CreateCell(row.Cells.Count()).SetCellValue((double)value*EuroRate);
-                
-                var price = (double)value * EuroRate;
-                var priceRounded = Math.Round(price, 2);
-
-                var erpLine = new ErpOrderLinesAccounting(
-                    new ErpCharacteristicId("General_Products_Products(ee6e5c65-6dc7-41d7-9d57-ba87b19aa56c)"),
-                    new ErpCharacteristicLineAmount((decimal)priceRounded),
-                    new ErpCharacteristicValueNumber(1),
-                    new ErpCharacteristicId("Logistics_Inventory_Stores(100447ff-44f4-4799-a4c2-7c9b22fb0aaa)")
-                );
-                
                 primaryDocument.Lines.Add(erpLine);
-
             }
             
             var jsonPostString = JsonConvert.SerializeObject(primaryDocument, Formatting.Indented);
@@ -182,7 +170,6 @@ public class ConversionController : ApiController
             responseContentJObj =
                 await JObjectByUriGetRequest(Client,
                     $"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoiceLines?$filter=PurchaseInvoice%20eq%20'{invoiceId}'");
-            
             
             var invoiceLinesString = Convert.ToString(responseContentJObj[ErpDocuments.ValueLower]);
             var invoiceLines = JsonConvert.DeserializeObject<List<ErpInvoiceLinesAccounting>>(invoiceLinesString!);
@@ -211,23 +198,24 @@ public class ConversionController : ApiController
 
             await ChangeStateToRelease(Client, invoiceId);
             
-            workbook.Write(fs);
+            // workbook.Write(fs);
+            // }
 
-        }
+        // await using (var streamWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
+        // {
+        //     await streamWrite.CopyToAsync(memory);
+        // }
+        //
+        // memory.Position = 0;
 
-        await using (var streamWrite = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
-        {
-            await streamWrite.CopyToAsync(memory);
-        }
-
-        memory.Position = 0;
-
-        return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
+        // return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
+        
+        return Result.Success;
         
     }
     
     [HttpPost]
-    [EnableCors()]
+    // [EnableCors()]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
@@ -310,7 +298,7 @@ public class ConversionController : ApiController
 
         if (file.Length <= 0) return BadRequest();
 
-        var sFileExtension = System.IO.Path.GetExtension(file.FileName)?.ToLower();
+        // var sFileExtension = System.IO.Path.GetExtension(file.FileName)?.ToLower();
         var fullPath = System.IO.Path.Combine(newPath, file.FileName);
 
         await using var stream = new FileStream(fullPath, FileMode.Create);
@@ -318,19 +306,22 @@ public class ConversionController : ApiController
 
         stream.Position = 0;
 
-        ISheet sheet;
-        if (sFileExtension == ".xls")
-        {
-            var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
-            sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
-        }
-
-        else
-        {
-            var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
-            sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
-        }
-
+        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
+        
+        // if (sFileExtension == ".xls")
+        // {
+        //     var hssfwb = new HSSFWorkbook(stream); //This will read the Excel 97-2000 formats  
+        //     sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook  
+        // }
+        //
+        // else
+        // {
+        //     var hssfwb = new XSSFWorkbook(stream); //This will read 2007 Excel format  
+        //     sheet = hssfwb.GetSheetAt(0); //get first sheet from workbook   
+        // }
+        
+        var hssfwb = new XSSFWorkbook(stream);
+        var sheet = hssfwb.GetSheetAt(0);
 
         var fieldsValues = new List<string>();
         var fieldsGoogle = typeof(GoogleMarketing).GetFields(BindingFlags.Public | BindingFlags.Static);

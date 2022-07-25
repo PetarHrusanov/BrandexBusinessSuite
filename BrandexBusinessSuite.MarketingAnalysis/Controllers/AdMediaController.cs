@@ -15,7 +15,6 @@ using Models.AdMedias;
 using Services.AdMedias;
 
 using static Methods.ExcelMethods;
-
 using static Common.Constants;
 
 public class AdMediaController : AdministrationController

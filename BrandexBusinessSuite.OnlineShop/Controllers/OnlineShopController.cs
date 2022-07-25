@@ -91,7 +91,7 @@ public class OnlineShopController : ApiController
     [HttpGet]
     [IgnoreAntiforgeryToken]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
-    public async Task<IActionResult> ProcessNewOrders()
+    public async Task<ActionResult> ProcessNewOrders()
     {
         
         var rest = new RestAPI("https://botanic.cc/wp-json/wc/v3",_wooCommerceSettings.Key, _wooCommerceSettings.Secret);
@@ -218,7 +218,7 @@ public class OnlineShopController : ApiController
 
         }
 
-        return BadRequest("Kur");
+        return Result.Success;
     }
 
     [HttpGet]

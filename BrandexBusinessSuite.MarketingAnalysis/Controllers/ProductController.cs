@@ -42,8 +42,7 @@ public class ProductController : AdministrationController
         if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
 
         var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
-
-
+        
         await using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
 

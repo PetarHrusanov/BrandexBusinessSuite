@@ -20,7 +20,6 @@ using Infrastructure;
 using Services.AdMedias;
 
 using static Methods.ExcelMethods;
-
 using static Common.Constants;
 
 public class MarketingActivityController : AdministrationController
@@ -128,9 +127,7 @@ public class MarketingActivityController : AdministrationController
 
         await _marketingActivitiesService.UploadBulk(marketingActivities);
 
-        var outputSerialized = JsonConvert.SerializeObject(errorDictionary.ToArray());
-
-        return outputSerialized;
+        return JsonConvert.SerializeObject(errorDictionary.ToArray());
     }
 
     [HttpPost]
