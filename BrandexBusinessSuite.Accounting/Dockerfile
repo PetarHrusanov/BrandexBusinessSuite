@@ -9,7 +9,7 @@ COPY ["BrandexBusinessSuite.Accounting/BrandexBusinessSuite.Accounting.csproj", 
 COPY ["BrandexBusinessSuite/BrandexBusinessSuite.csproj", "BrandexBusinessSuite/"]
 RUN dotnet restore "BrandexBusinessSuite.Accounting/BrandexBusinessSuite.Accounting.csproj"
 COPY . .
-WORKDIR "/src/BrandexSalesAdapter.Accounting"
+WORKDIR "/src/BrandexBusinessSuite.Accounting"
 RUN dotnet build "BrandexBusinessSuite.Accounting.csproj" -c Release -o /app/build
 
 FROM build AS publish

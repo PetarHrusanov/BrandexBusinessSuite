@@ -291,8 +291,7 @@ public class ConversionController : ApiController
         {
             var product = (string)productField.GetValue(null)!;
 
-            var lines = rawTextSplit
-                .Where(element => element.Contains(product)).ToList();
+            var lines = rawTextSplit.Where(element => element.Contains(product)).ToList();
 
             if (lines.Count==0) continue;
             
@@ -305,13 +304,11 @@ public class ConversionController : ApiController
 
                 var priceString = PriceRegex.Matches(line)[0].ToString();
 
-                decimal price = 1;
-
                 var numberFormatWithComma = new NumberFormatInfo
                 {
                     NumberDecimalSeparator = ","
                 };
-                price = decimal.Parse(priceString, numberFormatWithComma);
+                var price = decimal.Parse(priceString, numberFormatWithComma);
                 
                 productsPrices[product] += price;
             }
