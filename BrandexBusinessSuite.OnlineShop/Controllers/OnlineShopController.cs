@@ -217,41 +217,18 @@ public class OnlineShopController : ApiController
             await ChangeStateToRelease(Client, newInvoiceId);
 
         }
-
-        return Result.Success;
-    }
-
-    [HttpGet]
-    [IgnoreAntiforgeryToken]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
-    public async Task<IActionResult> Speedy()
-    {
         
-        var salesInvoicesCheck = new List<SaleInvoiceCheck>()
-        {
-            new ("02:24", 13.24, "Shosho", "1234", "Sevlievo", 14.25, "61828714942"),
-            new ("02:24", 13.24, "Shosho", "1234", "Sevlievo", 14.25, "61828606150")
-        };
-
-        salesInvoicesCheck[0].InvoiceNumber = "1234";
-        salesInvoicesCheck[1].InvoiceNumber = "1235";
+        var speedyPrintRequest = new SpeedyPrintRequest(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy);
         
-        var request = new SpeedyPrintRequest(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy);
-
-        var trackingCoder = new List<string>()
+        foreach (var code in speedyTrackingList)
         {
-            "61828714942", "61828606150"
-        };
-        
-        foreach (var code in trackingCoder)
-        {
-            request.Parcels.Add(new SpeedyParcelId(code));
+            speedyPrintRequest.Parcels.Add(new SpeedyParcelId(code));
         }
         
-        var jsonPostString = JsonConvert.SerializeObject(request, Formatting.Indented);
+        var speedyContentSerialized = JsonConvert.SerializeObject(speedyPrintRequest, Formatting.Indented);
         
         var uri = new Uri("https://api.speedy.bg/v1/print");
-        var content = new StringContent(jsonPostString, Encoding.UTF8, "application/json");
+        var content = new StringContent(speedyContentSerialized, Encoding.UTF8, "application/json");
         var response = await Client.PostAsync(uri, content);
         var responseContent = response.Content;
 
@@ -271,7 +248,7 @@ public class OnlineShopController : ApiController
             var stream = await responseContent.ReadAsStreamAsync();
             await stream.CopyToAsync(newFile);
         }
-
+        
         const string fileXlsx = "invoices.xlsx";
         
         await using (var fs = new FileStream(Path.Combine(newPath, fileXlsx), FileMode.Create, FileAccess.Write))
@@ -326,7 +303,115 @@ public class OnlineShopController : ApiController
 
         return File(memory, "application/zip", "Collection.zip");
 
+        return Result.Success;
     }
+
+    // [HttpGet]
+    // [IgnoreAntiforgeryToken]
+    // [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    // public async Task<IActionResult> Speedy()
+    // {
+    //     
+    //     var salesInvoicesCheck = new List<SaleInvoiceCheck>()
+    //     {
+    //         new ("02:24", 13.24, "Shosho", "1234", "Sevlievo", 14.25, "61828714942"),
+    //         new ("02:24", 13.24, "Shosho", "1234", "Sevlievo", 14.25, "61828606150")
+    //     };
+    //
+    //     salesInvoicesCheck[0].InvoiceNumber = "1234";
+    //     salesInvoicesCheck[1].InvoiceNumber = "1235";
+    //     
+    //     var request = new SpeedyPrintRequest(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy);
+    //
+    //     var trackingCoder = new List<string>()
+    //     {
+    //         "61828714942", "61828606150"
+    //     };
+    //     
+    //     foreach (var code in trackingCoder)
+    //     {
+    //         request.Parcels.Add(new SpeedyParcelId(code));
+    //     }
+    //     
+    //     var jsonPostString = JsonConvert.SerializeObject(request, Formatting.Indented);
+    //     
+    //     var uri = new Uri("https://api.speedy.bg/v1/print");
+    //     var content = new StringContent(jsonPostString, Encoding.UTF8, "application/json");
+    //     var response = await Client.PostAsync(uri, content);
+    //     var responseContent = response.Content;
+    //
+    //     var sWebRootFolder = _hostEnvironment.WebRootPath;
+    //     
+    //     var newPath = Path.Combine(sWebRootFolder, DateTime.Now.ToString("yyyy-MM-dd:HH:mm:ss"));
+    //     
+    //     if (!Directory.Exists(newPath))
+    //     {
+    //         Directory.CreateDirectory(newPath);
+    //     }
+    //     
+    //     const string filePdf = "tracking_codes.pdf";
+    //
+    //     await using(var newFile = System.IO.File.Create(Path.Combine(newPath,filePdf )))
+    //     { 
+    //         var stream = await responseContent.ReadAsStreamAsync();
+    //         await stream.CopyToAsync(newFile);
+    //     }
+    //
+    //     const string fileXlsx = "invoices.xlsx";
+    //     
+    //     await using (var fs = new FileStream(Path.Combine(newPath, fileXlsx), FileMode.Create, FileAccess.Write))
+    //     {
+    //         IWorkbook workbook = new XSSFWorkbook();
+    //
+    //         var excelSheet = workbook.CreateSheet("invoice_info");
+    //         var row = excelSheet.CreateRow(0);
+    //
+    //         var titlesArray = new[] { "Фактура", "Дата", "Стойност", "Клиент", "№ Поръчка", 
+    //             "Град","Цена доставка","Товарителница",  "Бележки"};
+    //
+    //         foreach (var title in titlesArray) row.CreateCell(row.Cells.Count).SetCellValue(title);
+    //         
+    //         
+    //         foreach (var sale in salesInvoicesCheck)
+    //         {
+    //             row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
+    //             row.CreateCell(row.Cells.Count).SetCellValue(sale.InvoiceNumber);
+    //             row.CreateCell(row.Cells.Count).SetCellValue(sale.Date);
+    //             row.CreateCell(row.Cells.Count).SetCellValue(sale.OrderTotal);
+    //             row.CreateCell(row.Cells.Count).SetCellValue(sale.ClientName);
+    //             row.CreateCell(row.Cells.Count).SetCellValue(sale.Order);
+    //             row.CreateCell(row.Cells.Count).SetCellValue(sale.City);
+    //             row.CreateCell(row.Cells.Count).SetCellValue(sale.DeliveryPrice);
+    //             row.CreateCell(row.Cells.Count).SetCellValue(sale.TrackingCode);
+    //         }
+    //         
+    //         workbook.Write(fs);
+    //     }
+    //     
+    //     var files = Directory.GetFiles(newPath);
+    //     
+    //     var zipFile = Path.Combine(newPath, "Collection.zip");
+    //     
+    //     using (var archive = ZipFile.Open(zipFile, ZipArchiveMode.Create))
+    //     {
+    //         foreach (var fPath in files)
+    //         {
+    //             archive.CreateEntryFromFile(fPath, Path.GetFileName(fPath));
+    //         }
+    //     }
+    //     
+    //     var memory = new MemoryStream();
+    //
+    //     await using (var stream = new FileStream(zipFile, FileMode.Open))
+    //     {
+    //         await stream.CopyToAsync(memory);
+    //     }
+    //
+    //     memory.Position = 0;
+    //
+    //     return File(memory, "application/zip", "Collection.zip");
+    //
+    // }
     
     [HttpPost]
     [IgnoreAntiforgeryToken]
