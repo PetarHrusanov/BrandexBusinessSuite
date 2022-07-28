@@ -6,9 +6,9 @@ public class ErpInvoiceLines
     public ErpInvoiceLines(ErpInvoiceOrderLines invoiceOrderLine, ErpSalesLinesOutput linesOutput, string documentId)
     {
         ProductDescription = invoiceOrderLine.ProductDescription;
-        Quantity = new ErpCharacteristicQuantity(Convert.ToInt16(invoiceOrderLine.Quantity.Value));
-        QuantityBase = new ErpCharacteristicQuantity(Convert.ToInt16(invoiceOrderLine.QuantityBase.Value));
-        StandardQuantityBase = new ErpCharacteristicQuantity(Convert.ToInt16(invoiceOrderLine.QuantityBase.Value));
+        Quantity = new ErpCharacteristicQuantity(Convert.ToInt16(Math.Round(Convert.ToDouble(invoiceOrderLine.QuantityBase.Value))));
+        QuantityBase = new ErpCharacteristicQuantity(Convert.ToInt16(Math.Round(Convert.ToDouble(invoiceOrderLine.QuantityBase.Value))));
+        StandardQuantityBase = new ErpCharacteristicQuantity(Convert.ToInt16(Math.Round(Convert.ToDouble(invoiceOrderLine.QuantityBase.Value))));
         LineAmount = invoiceOrderLine.LineAmount;
         SalesOrderAmount = invoiceOrderLine.LineAmount.Value;
         UnitPrice = invoiceOrderLine.UnitPrice;

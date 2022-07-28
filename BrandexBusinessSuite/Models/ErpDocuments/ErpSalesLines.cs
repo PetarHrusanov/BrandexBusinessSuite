@@ -6,6 +6,17 @@ public class ErpSalesLines
     {
         
     }
+    
+    public ErpSalesLines(string productId, decimal quantity, decimal discount, decimal unitPrice)
+    {
+        Product = new ErpCharacteristicId(productId);
+        Quantity = new ErpCharacteristicValueDecimal(quantity);
+        LineCustomDiscountPercent = discount;
+        ProductPrice = null;
+        UnitPrice = new ErpCharacteristicUnitPrice(unitPrice);
+        Lot = null;
+
+    }
     public ErpSalesLines(string productId, decimal quantity, decimal discount, string priceId, decimal unitPrice)
     {
         Product = new ErpCharacteristicId(productId);
@@ -34,7 +45,7 @@ public class ErpSalesLines
     
     public decimal LineCustomDiscountPercent { get; set; }
     
-    public ErpCharacteristicId ProductPrice { get; set; }
+    public ErpCharacteristicId? ProductPrice { get; set; }
     
     public ErpCharacteristicUnitPrice UnitPrice { get; set; }
 
