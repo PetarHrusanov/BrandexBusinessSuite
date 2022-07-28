@@ -45,7 +45,6 @@ public class MarketingActivityCm : ErpDocument
     public ErpCharacteristicId DocumentType { get; set; }
     public ErpCharacteristicId EnterpriseCompany { get; set; }
     public ErpCharacteristicId EnterpriseCompanyLocation { get; set; }
-    
     public string SystemType { get; set; }
     public string Subject { get; set; }
     public ErpCharacteristicId ResponsibleParty { get; set; }

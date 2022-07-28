@@ -29,8 +29,7 @@ public class Startup
         _configuration = configuration;
         _hostingEnvironment = hostingEnvironment;
     }
-
-    // This method gets called by the runtime. Use this method to add services to the container.
+    
     public void ConfigureServices(IServiceCollection services)
     {
 
@@ -102,14 +101,11 @@ public class Startup
         });
 
         services.AddControllers();
-        
-
     }
 
         
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        app
-            .UseWebService(env);
+        app.UseWebService(env);
     }
 }

@@ -110,8 +110,7 @@ public class ConversionController : ApiController
 
             RenameKey(productsPrices, valueFacebook, valueErp);
 
-            productCodesPrices.Add(valueErp,
-                new Dictionary<string, decimal>() { { valueErpCode, (decimal)priceRounded } });
+            productCodesPrices.Add(valueErp, new Dictionary<string, decimal>() { { valueErpCode, (decimal)priceRounded } });
         }
 
         var facebookInvoiceNumber = FacebookInvoiceRegex.Matches(rawText)[0].ToString();
