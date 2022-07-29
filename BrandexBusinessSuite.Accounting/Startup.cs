@@ -42,12 +42,7 @@ public class Startup
             .Configure<ErpUserSettings>(
                 _configuration.GetSection(nameof(ErpUserSettings)), 
                 config => config.BindNonPublicProperties = true);
-        
-        services
-            .Configure<ApiSettings>(
-                _configuration.GetSection(nameof(ApiSettings)), 
-                config => config.BindNonPublicProperties = true);
-        
+
         services
             .AddAutoMapper(
                 (_, config) => config

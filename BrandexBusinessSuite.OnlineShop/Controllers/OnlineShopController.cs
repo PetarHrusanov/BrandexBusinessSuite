@@ -73,7 +73,7 @@ public class OnlineShopController : ApiController
         foreach (var product in productsDb)
         {
             var responseContentJObj = await JObjectByUriGetRequest(Client,
-                $"https://brandexbg.my.erp.net/api/domain/odata/Logistics_Inventory_Lots?$top=1000&$filter=Product%20eq%20'General_Products_Products({product.ErpCode})'");
+                $"{ErpRequests.BaseUrl}Logistics_Inventory_Lots?$top=1000&$filter=Product%20eq%20'General_Products_Products({product.ErpCode})'");
             var batchesList = JsonConvert.DeserializeObject<List<ErpLot>>(responseContentJObj["value"].ToString());
 
             var newestBatch = batchesList!.OrderByDescending(p=>p.ExpiryDate).ThenByDescending(p=>p.ReceiptDate).FirstOrDefault();
@@ -218,7 +218,7 @@ public class OnlineShopController : ApiController
 
             foreach (var orderLine in orderLinesList)
             {
-                responseContentJObj = await JObjectByUriGetRequest(Client, $"https://brandexbg.my.erp.net/api/domain/odata/Crm_Invoicing_InvoiceOrderLines?$top=20&$filter=SalesOrderLine%20eq%20'{orderLine.Id}'");
+                responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_InvoiceOrderLines?$top=20&$filter=SalesOrderLine%20eq%20'{orderLine.Id}'");
                 var listInvoiceOrderLine = JsonConvert.DeserializeObject<List<ErpInvoiceOrderLines>>(responseContentJObj["value"].ToString());
 
                 var invoiceLine = new ErpInvoiceLines(listInvoiceOrderLine![0], orderLine, newDocumentId);
@@ -228,7 +228,7 @@ public class OnlineShopController : ApiController
 
             jsonPostString = JsonConvert.SerializeObject(invoiceNew, Formatting.Indented);
 
-            responseContentJObj = await JObjectByUriPostRequest(Client, "https://brandexbg.my.erp.net/api/domain/odata/Crm_Invoicing_Invoices/", jsonPostString);
+            responseContentJObj = await JObjectByUriPostRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_Invoices/", jsonPostString);
             
             if (!responseContentJObj.ContainsKey(ErpDocuments.ODataId)) continue;
             
@@ -324,7 +324,6 @@ public class OnlineShopController : ApiController
 
         return File(memory, "application/zip", "Collection.zip");
     }
-    
 
     [HttpPost]
     [IgnoreAntiforgeryToken]
@@ -385,8 +384,7 @@ public class OnlineShopController : ApiController
 
         var orderIds = (from order in orderList select new SpeedyReference(order.id.ToString())).ToList();
 
-        var speedyRequest = new SpeedyCheckCompleted(_speedyUserSettings.UsernameSpeedy,
-            _speedyUserSettings.PasswordSpeedy, orderIds);
+        var speedyRequest = new SpeedyCheckCompleted(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy, orderIds);
         
         var jsonPostString = JsonConvert.SerializeObject(speedyRequest, Formatting.Indented);
 

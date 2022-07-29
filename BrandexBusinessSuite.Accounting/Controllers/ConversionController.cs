@@ -24,14 +24,13 @@ using Services;
 using BrandexBusinessSuite.Models.ErpDocuments;
 using Infrastructure;
 using Models;
-using Requests;
 
 using static Common.ProductConstants;
 using static  Common.Constants;
 using static Common.ErpConstants;
 
-using static  Methods.ExcelMethods;
-using static BrandexBusinessSuite.Requests.RequestsMethods;
+using static Methods.ExcelMethods;
+using static Requests.RequestsMethods;
 using static Methods.FieldsValuesMethods;
 
 public class ConversionController : ApiController
@@ -39,8 +38,7 @@ public class ConversionController : ApiController
 
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly ErpUserSettings _userSettings;
-    private readonly ApiSettings _apiSettings;
-    
+
     private static readonly HttpClient Client = new();
     
     private const string FacebookEng = "Facebook";
@@ -60,14 +58,10 @@ public class ConversionController : ApiController
     private static readonly Regex PriceRegex = new (@"[0-9]+[.,][0-9]*");
     private static readonly Regex FacebookInvoiceRegex = new (@"FBADS-[0-9]{3}-[0-9]{9}");
 
-    public ConversionController(IWebHostEnvironment hostEnvironment,
-        IOptions<ErpUserSettings> userSettings,
-        IOptions<ApiSettings> apiSettings
-        )
+    public ConversionController(IWebHostEnvironment hostEnvironment, IOptions<ErpUserSettings> userSettings)
     {
         _hostEnvironment = hostEnvironment;
         _userSettings = userSettings.Value;
-        _apiSettings = apiSettings.Value;
     }
 
     [HttpPost]
@@ -131,20 +125,20 @@ public class ConversionController : ApiController
         var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.User}:{_userSettings.Password}");
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-        var responseContentJObj = await JObjectByUriPostRequest(Client, _apiSettings.LogisticsProcurementReceivingOrders, jsonPostString);
+        var responseContentJObj = await JObjectByUriPostRequest(Client, $"{ErpRequests.BaseUrl}Logistics_Procurement_ReceivingOrders/", jsonPostString);
 
         var primaryDocumentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
 
         await ChangeStateToRelease(Client, primaryDocumentId);
 
         responseContentJObj = await JObjectByUriGetRequest(Client,
-            $"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoices?$filter=equalnull(DocumentNo,'{primaryDocument.InvoiceDocumentNo}')%20and%20Void%20eq%20false");
+            $"{ErpRequests.BaseUrl}Logistics_Procurement_PurchaseInvoices?$filter=equalnull(DocumentNo,'{primaryDocument.InvoiceDocumentNo}')%20and%20Void%20eq%20false");
 
         var invoice = responseContentJObj[ErpDocuments.ValueLower];
         var invoiceId = Convert.ToString(invoice![0]![ErpDocuments.ODataId]);
 
         responseContentJObj = await JObjectByUriGetRequest(Client,
-            $"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoiceLines?$filter=PurchaseInvoice%20eq%20'{invoiceId}'");
+            $"{ErpRequests.BaseUrl}Logistics_Procurement_PurchaseInvoiceLines?$filter=PurchaseInvoice%20eq%20'{invoiceId}'");
 
         var invoiceLinesString = Convert.ToString(responseContentJObj[ErpDocuments.ValueLower]);
         var invoiceLines = JsonConvert.DeserializeObject<List<ErpInvoiceLinesAccounting>>(invoiceLinesString!);
@@ -162,7 +156,7 @@ public class ConversionController : ApiController
             line.CustomProperty_Продукт_u002Dпокупки = new ErpCharacteristicValueDescriptionBg(productCode, new ErpCharacteristicValueDescriptionBg._Description(productName));
             line.CustomProperty_ВРМ_u002Dпокупки = new ErpCharacteristicValueDescriptionBg("83", new ErpCharacteristicValueDescriptionBg._Description(FacebookBgCapital));
 
-            var uri = new Uri($"{_apiSettings.GeneralRequest}Logistics_Procurement_PurchaseInvoiceLines({line.Id})");
+            var uri = new Uri($"{ErpRequests.BaseUrl}Logistics_Procurement_PurchaseInvoiceLines({line.Id})");
             jsonPostString = JsonConvert.SerializeObject(line, Formatting.Indented);
             var content = new StringContent(jsonPostString, Encoding.UTF8, RequestConstants.ApplicationJson);
 
@@ -302,12 +296,7 @@ public class ConversionController : ApiController
                 }
 
                 var priceString = PriceRegex.Matches(line)[0].ToString();
-
-                var numberFormatWithComma = new NumberFormatInfo
-                {
-                    NumberDecimalSeparator = ","
-                };
-                var price = decimal.Parse(priceString, numberFormatWithComma);
+                var price = decimal.Parse(priceString, new NumberFormatInfo { NumberDecimalSeparator = "," });
                 
                 productsPrices[product] += price;
             }
@@ -372,7 +361,7 @@ public class ConversionController : ApiController
         var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.User}:{_userSettings.Password}");
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-        var responseContentJObj = await  JObjectByUriPostRequest(Client, _apiSettings.GeneralContactActivities, jsonPostString);
+        var responseContentJObj = await  JObjectByUriPostRequest(Client, $"{ErpRequests.BaseUrl}General_Contacts_Activities/", jsonPostString);
 
         var documentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
 

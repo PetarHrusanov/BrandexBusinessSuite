@@ -9,7 +9,7 @@ public class SpeedyInputOrder
         UserName = userName;
         Password = password;
         Service = service;
-        Conent = new _Conent();
+        Content = new _Content();
         Payment = new _Payment();
         Recipient = recipient;
         Ref1 = ref1;
@@ -25,7 +25,7 @@ public class SpeedyInputOrder
     public _Service Service { get; set; }
     
     [JsonProperty("content")]
-    public _Conent Conent { get; set; }
+    public _Content Content { get; set; }
     
     [JsonProperty("payment")]
     public _Payment Payment { get; set; }
@@ -81,7 +81,7 @@ public class SpeedyInputOrder
         }
     }
 
-    public class _Conent
+    public class _Content
     {
         [JsonProperty("parcelsCount")]
         public int ParcelCount { get; set; } = 1;

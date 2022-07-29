@@ -2,6 +2,11 @@ namespace BrandexBusinessSuite.Common;
 
 public class ErpConstants
 {
+
+    public class ErpRequests
+    {
+        public const string BaseUrl = "https://brandexbg.my.erp.net/api/domain/odata/";
+    }
     public class ErpMonths
     {
         public const string January = "01. ЯНУАРИ";
