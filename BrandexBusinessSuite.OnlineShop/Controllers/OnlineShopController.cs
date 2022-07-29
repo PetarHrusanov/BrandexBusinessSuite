@@ -372,6 +372,5 @@ public class OnlineShopController : ApiController
         await _salesAnalysisService.UploadBulk(ordersForAnalysis);
 
         return Result.Success;
-
     }
 }
