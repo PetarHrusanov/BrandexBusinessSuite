@@ -49,8 +49,8 @@ public class CitiesService :ICitiesService
             table.Rows.Add(row);
         }
 
-        string connection = _configuration.GetConnectionString("DefaultConnection");
-            
+        var connection = _configuration.GetConnectionString("DefaultConnection");
+        
         var con = new SqlConnection(connection);
             
         var objbulk = new SqlBulkCopy(con);  

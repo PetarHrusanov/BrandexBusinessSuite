@@ -316,45 +316,48 @@ public class ConversionController : ApiController
 
     private async Task PostMarketingActivitiesToErp(string digital, string product, double price, DateTime date)
     {
-        
-        var subject = string.Empty;
-        var partyId = string.Empty;
-        var measure = string.Empty;
-        var type = string.Empty;
-        var media = string.Empty;
-        var publishType = string.Empty;
 
         var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), date.ToString("MMMM"));
 
         var yearErp = date.ToString("yyyy");
 
-        if (product == "General Audience")
-        {
-            product = "Botanic";
-        }
+        if (product == "General Audience") product = "Botanic"; 
+        
+        var activityObject = new MarketingActivityCm();
 
         switch (digital)
         {
             case FacebookEng:
-                subject = "Задача / FACEBOOK IRELAND LIMITED";
-                partyId = "b21c6bc3-a4d8-43b9-a3df-b2d39ddf552f";
-                measure = Impressions;
-                type = FacebookBgCapital;
-                media = FacebookBgLower;
-                publishType = FacebookEng;
+                activityObject = new MarketingActivityCm(
+                    "Задача / FACEBOOK IRELAND LIMITED", 
+                    date, 
+                    "b21c6bc3-a4d8-43b9-a3df-b2d39ddf552f", 
+                    monthErp, 
+                    yearErp,
+                    Impressions,
+                    FacebookBgCapital,
+                    FacebookBgLower,
+                    FacebookEng, 
+                    price, 
+                    product
+                );
                 break;
             case Google:
-                subject = "Задача / GOOGLE IRELAND LIMITED";
-                partyId = "e5a6cfc4-d407-4424-a22e-d479136a28aa";
-                measure = Click;
-                type = GoogleAdWordsLower;
-                media = Google;
-                publishType = GoogleAdWordsCapital;
+                activityObject = new MarketingActivityCm(
+                    "Задача / GOOGLE IRELAND LIMITED", 
+                    date, 
+                    "e5a6cfc4-d407-4424-a22e-d479136a28aa", 
+                    monthErp, 
+                    yearErp,
+                    Click,
+                    GoogleAdWordsLower,
+                    Google,
+                    GoogleAdWordsCapital, 
+                    price, 
+                    product
+                );
                 break;
         }
-
-        var activityObject = new MarketingActivityCm(subject, date, partyId, monthErp, yearErp, measure, type, media,
-            publishType, price, product);
 
         var jsonPostString = JsonConvert.SerializeObject(activityObject, Formatting.Indented);
 

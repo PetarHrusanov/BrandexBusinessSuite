@@ -5,6 +5,10 @@ using BrandexBusinessSuite.Models.ErpDocuments;
 public class MarketingActivityCm : ErpDocument
 {
 
+    public MarketingActivityCm()
+    {
+        
+    }
     public MarketingActivityCm(string subject,
         DateTime date,
         string partyId,
