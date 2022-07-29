@@ -78,10 +78,7 @@ public class OnlineShopController : ApiController
 
             var newestBatch = batchesList!.OrderByDescending(p=>p.ExpiryDate).ThenByDescending(p=>p.ReceiptDate).FirstOrDefault();
 
-            if (product.ErpLot !=newestBatch!.Id)
-            {
-                await _productsService.ChangeBatch(product, newestBatch.Id);
-            }
+            if (product.ErpLot !=newestBatch!.Id) await _productsService.ChangeBatch(product, newestBatch.Id);
         }
         
         return Result.Success;
@@ -137,8 +134,6 @@ public class OnlineShopController : ApiController
 
             orderStatus.status = "shipped";
 
-            // order.status = "shipped";
-            
             await wc.Order.Update( (int)order.id, orderStatus);
             
             var speedyTracking = responseContentJObj["id"]!.ToString();
@@ -164,7 +159,7 @@ public class OnlineShopController : ApiController
                      select new ErpSalesLines(
                          $"General_Products_Products({productCurrent!.ErpCode})",
                          (decimal)productLine.quantity,
-                         (decimal)discount,
+                         discount,
                          $"Crm_ProductPrices({productCurrent!.ErpPriceCode})",
                          productCurrent!.ErpPriceNoVat,
                          $"Logistics_Inventory_Lots({productCurrent!.ErpLot})"
@@ -370,6 +365,49 @@ public class OnlineShopController : ApiController
             }).ToList();
         
         await _salesAnalysisService.UploadBulk(ordersForAnalysis);
+
+        return Result.Success;
+    }
+    
+    [HttpGet]
+    [IgnoreAntiforgeryToken]
+    [Authorize(Roles = $"{AdministratorRoleName}")]
+    public async Task<ActionResult> OrdersCompleted()
+    {
+        var rest = new RestAPI("https://botanic.cc/wp-json/wc/v3",_wooCommerceSettings.Key, _wooCommerceSettings.Secret);
+        var wc = new WCObject(rest);
+        
+        var orderList = await wc.Order.GetAll(new Dictionary < string, string > ()
+        {
+            { "status","shipped"},
+            { "per_page","100" },
+        });
+
+        var orderIds = (from order in orderList select new SpeedyReference(order.id.ToString())).ToList();
+
+        var speedyRequest = new SpeedyCheckCompleted(_speedyUserSettings.UsernameSpeedy,
+            _speedyUserSettings.PasswordSpeedy, orderIds);
+        
+        var jsonPostString = JsonConvert.SerializeObject(speedyRequest, Formatting.Indented);
+
+        const string speedyLink = "https://api.speedy.bg/v1/track";
+        
+        var responseContentJObj = await JObjectByUriPostRequest(Client, speedyLink, jsonPostString);
+        
+        var parcels = JsonConvert.DeserializeObject<List<SpeedyCheckCompletedResponse>>(responseContentJObj["parcels"].ToString());
+
+        var parcelsCompleted = parcels.Where(o => o.Operations.Any(op => op.OperationCode == -14))
+            .Select(r => r.Reference).ToList();
+        
+        var orderStatus = new Order
+        {
+            status = "completed"
+        };
+
+        foreach (var parcel in parcelsCompleted)
+        {
+            await wc.Order.Update(Convert.ToInt32(parcel), orderStatus);
+        }
 
         return Result.Success;
     }
