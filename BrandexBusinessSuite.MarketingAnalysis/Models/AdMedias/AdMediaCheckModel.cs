@@ -1,8 +1,6 @@
-using BrandexBusinessSuite.MarketingAnalysis.Data.Enums;
+using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
 
 namespace BrandexBusinessSuite.MarketingAnalysis.Models.AdMedias;
-
-using MarketingAnalysis.Data.Enums;
 
 public class AdMediaCheckModel
 {

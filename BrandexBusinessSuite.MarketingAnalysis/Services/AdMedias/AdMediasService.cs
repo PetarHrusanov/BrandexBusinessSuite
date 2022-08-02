@@ -35,7 +35,7 @@ public class AdMediasService :IAdMediasService
         {
             var row = table.NewRow();
             row[Name] = media.Name;
-            row[MediaType] = media.MediaType;
+            row[MediaType] = media.MediaType.Name;
             row[CreatedOn] = DateTime.Now;
             row[IsDeleted] = false;
             
@@ -67,7 +67,7 @@ public class AdMediasService :IAdMediasService
         {
             Id = p.Id,
             Name = p.Name,
-            MediaType = p.MediaType
+            // MediaType = p.MediaType
         }).ToListAsync();
     }
 }

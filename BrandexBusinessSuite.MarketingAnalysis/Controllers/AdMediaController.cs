@@ -10,7 +10,6 @@ using NPOI.SS.UserModel;
 using BrandexBusinessSuite.Controllers;
 
 using Infrastructure;
-using Data.Enums;
 using Models.AdMedias;
 using Services.AdMedias;
 
@@ -68,7 +67,7 @@ public class AdMediaController : AdministrationController
 
             if (typeRow != null)
             {
-                newAdMedia.MediaType = (MediaType)Enum.Parse(typeof(MediaType), typeRow.ToString()!.TrimEnd(), true);
+                // newAdMedia.MediaType = (MediaType)Enum.Parse(typeof(MediaType), typeRow.ToString()!.TrimEnd(), true);
             }
 
             if (adMediasCheck.All(c =>
