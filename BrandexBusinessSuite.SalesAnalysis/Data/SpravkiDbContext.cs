@@ -48,7 +48,7 @@ public class SpravkiDbContext : DbContext
 
     private void ApplyAuditInfoRules()
     {
-        var changedEntries = this.ChangeTracker
+        var changedEntries = ChangeTracker
             .Entries()
             .Where(e =>
                 e.Entity is IAuditInfo &&
