@@ -1,7 +1,7 @@
 namespace BrandexBusinessSuite.MarketingAnalysis.Data;
 
-using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
 using BrandexBusinessSuite.Data.Models.Common;
+using Models;
 using Microsoft.EntityFrameworkCore;
 
 public class MarketingAnalysisDbContext : DbContext
@@ -14,6 +14,8 @@ public class MarketingAnalysisDbContext : DbContext
         public DbSet<AdMedia> AdMedias { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<MarketingActivity> MarketingActivities { get; set; }
+        public DbSet<MediaType> MediaTypes { get; set; }
+        public DbSet<Company> Companies { get; set; }
         
         public override int SaveChanges() => SaveChanges(true);
 

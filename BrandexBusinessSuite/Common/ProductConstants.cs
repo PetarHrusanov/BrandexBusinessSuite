@@ -22,6 +22,27 @@ public class ProductConstants
         public const string Sleep = "Sleep";
         public const string Ceget = "Ceget";
     }
+
+    public class ShortName
+    {
+        public const string ZinSeD = "ЗИ-60";
+        public const string EnzyMill = "ЕН-60";
+        public const string CystiRen = "ЦИ-30";
+        public const string LadyHarmonia = "ЛЕ-60";
+        public const string DetoxiFive = "ДЕ-60";
+        public const string LaxaL = "ЛА-30";
+        public const string Bland = "БЛ-30";
+        public const string DiabeForGluco = "ДГ-60";
+        public const string DiabeForProtect = "ДП-60";
+        public const string GinkgoVin = "ГВ-60";
+        public const string GinkgoVinCentella = "ГЦ-30";
+        public const string Venaxin = "ВЕ-60";
+        public const string ForFlex = "ФО-60";
+        public const string Flexen = "ФЛ-60";
+        public const string ProstaRen = "ПР-60";
+        public const string Sleep = "СЛ-30";
+        public const string Ceget = "ЦЕ-30";
+    }
     public class Facebook
     {
         public const string ZinSeD = "ZinSeD";

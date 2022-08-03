@@ -1,4 +1,6 @@
+using BrandexBusinessSuite.MarketingAnalysis.Data.Seeding;
 using BrandexBusinessSuite.MarketingAnalysis.Services.MarketingActivities;
+using BrandexBusinessSuite.Services.Data;
 
 namespace BrandexBusinessSuite.MarketingAnalysis;
 
@@ -22,15 +24,13 @@ public class Startup
             .AddTransient<IAdMediasService, AdMediasService>()
             .AddTransient<IProductsService, ProductsService>()
             .AddTransient<IMarketingActivitesService, MarketingActivitiesService>()
-            ;
-        
-        services.AddCors();
-
+            .AddTransient<ISeeder, ApplicationDbContextSeeder>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        app.UseWebService(env)
+        app
+            .UseWebService(env)
             .Initialize();
     }
 }
