@@ -15,5 +15,12 @@ public class AdMediaConfiguration : IEntityTypeConfiguration<AdMedia>
         builder
             .Property(c => c.Name)
             .IsRequired();
+        
+        builder
+            .HasOne(c => c.Company)
+            .WithMany(c => c.AdMedias)
+            .HasForeignKey(c => c.CompanyId);
+
+
     }
 }

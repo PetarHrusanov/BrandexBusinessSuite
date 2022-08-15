@@ -124,34 +124,13 @@ public class ApplicationDbContextSeeder : ISeeder
     private static IEnumerable<MediaType> GetMediaTypes() =>
         new List<MediaType>
         {
-            new()
-            {
-                Name = "Radio",
-            },
-            new()
-            {
-                Name = "Tv",
-            },
-            new()
-            {
-                Name = "Print"
-            },
-            new()
-            {
-                Name = "Facebook"
-            },
-            new()
-            {
-                Name = "Google"
-            },
-            new()
-            {
-                Name = "Digital"
-            },
-            new()
-            {
-                Name = "Pharmacies"
-            },
+            new() { Name = "Radio" },
+            new() { Name = "Tv" },
+            new() { Name = "Print" },
+            new() { Name = "Facebook" },
+            new() { Name = "Google" },
+            new() { Name = "Digital" },
+            new() { Name = "Pharmacies" },
         };
 }
 

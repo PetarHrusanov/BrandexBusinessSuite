@@ -26,5 +26,10 @@ public class MarketingActivityConfiguration : IEntityTypeConfiguration<Marketing
             .WithMany(s => s.MarketingActivities)
             .HasForeignKey(s => s.AdMediaId);
         
+        builder
+            .HasOne(c => c.MediaType)
+            .WithMany(d => d.MarketingActivities)
+            .HasForeignKey(c => c.MediaTypeId);
+        
     }
 }

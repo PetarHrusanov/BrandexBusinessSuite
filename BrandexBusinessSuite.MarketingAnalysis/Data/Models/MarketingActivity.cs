@@ -10,7 +10,9 @@ public class MarketingActivity :IAuditInfo, IDeletableEntity
     public int Id { get; set; }
         
     public string Description { get; set; }
-        
+    
+    public string Notes { get; set; }
+    
     public DateTime Date { get; set; }
     
     [Column(TypeName = "decimal(18,4)")]
@@ -18,9 +20,14 @@ public class MarketingActivity :IAuditInfo, IDeletableEntity
         
     public int ProductId { get; set; }
     public virtual Product Product { get; set; }
-        
+    
+    public bool Paid { get; set; }
+
     public int AdMediaId { get; set; }
     public virtual AdMedia AdMedia { get; set; }
+    
+    public int MediaTypeId { get; set; }
+    public virtual MediaType MediaType { get; set; }
 
     public DateTime CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }

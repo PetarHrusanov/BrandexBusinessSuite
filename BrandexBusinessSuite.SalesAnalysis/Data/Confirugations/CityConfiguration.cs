@@ -1,6 +1,4 @@
-﻿using BrandexBusinessSuite.SalesAnalysis.Data.Models;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Data.Confirugations;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Data.Confirugations;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
