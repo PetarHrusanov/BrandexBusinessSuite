@@ -1,11 +1,11 @@
 ﻿{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "BrandexSalesAdapter.Accounting": {
+    "BrandexSalesAdapter.MarketingAnalysis": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "applicationUrl": "http://localhost:16005",
+      "applicationUrl": "http://localhost:15004",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
