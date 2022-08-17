@@ -37,6 +37,32 @@
       <_ContentIncludedByDefault Remove="wwwroot\2022’-‘07’-‘18’T’19’:’48’:’02.4134540+03:00\Kur.pdf" />
       <_ContentIncludedByDefault Remove="wwwroot\2022’-‘07’-‘18’T’19’:’53’:’04.9277670+03:00\Kur.pdf" />
       <_ContentIncludedByDefault Remove="wwwroot\2022’-‘07’-‘18’T’19’:’53’:’04.9277670+03:00\Kuromir.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-20:21:37:54\Collection.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-20:21:37:54\tracking_codes.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-20:21:45:26\Collection.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-20:21:45:26\invoices.xlsx" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-20:21:45:26\tracking_codes.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-21:10:08:03\Collection.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-21:10:08:03\invoices.xlsx" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-21:10:08:03\tracking_codes.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:14:58:36\Collection.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:14:58:36\invoices.xlsx" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:14:58:36\tracking_codes.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:15:42:22\Collection.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:15:42:22\invoices.xlsx" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:15:42:22\tracking_codes.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:15:47:19\Collection.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:15:47:19\invoices.xlsx" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:15:47:19\tracking_codes.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:16:24:46\Collection.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:16:24:46\invoices.xlsx" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:16:24:46\tracking_codes.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:16:41:34\Collection.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:16:41:34\invoices.xlsx" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:16:41:34\tracking_codes.pdf" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:16:50:09\Collection.zip" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:16:50:09\invoices.xlsx" />
+      <_ContentIncludedByDefault Remove="wwwroot\2022-07-27:16:50:09\tracking_codes.pdf" />
     </ItemGroup>
 
 </Project>
