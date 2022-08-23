@@ -29,21 +29,25 @@ public class ApplicationDbContextSeeder : ISeeder
 
     public void SeedAsync()
     {
-        if (db.Regions.Any()) return;
-        foreach (var region in GetRegions())
+        if (!db.Regions.Any())
         {
-            db.Regions.Add(region);
+            foreach (var region in GetRegions())
+            {
+                db.Regions.Add(region);
+            }
+            db.SaveChanges();
+        }
+
+
+        if (!db.Distributors.Any())
+        {
+            foreach (var distributor in GetDistributors())
+            {
+                db.Distributors.Add(distributor);
+            }
+            db.SaveChanges();
         }
         
-        db.SaveChanges();
-        
-        if (db.Distributors.Any()) return;
-        foreach (var distributor in GetDistributors())
-        {
-            db.Distributors.Add(distributor);
-        }
-        
-        db.SaveChanges();
     }
     
     private static IEnumerable<Region> GetRegions()
@@ -75,5 +79,6 @@ public class ApplicationDbContextSeeder : ISeeder
             new() { Name = Pharmnet },
         };
     
-
+    
+    
 }

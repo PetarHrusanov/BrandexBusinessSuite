@@ -6,6 +6,9 @@
 **/bin/*
 **/obj/*
 
+#Ignore appsettings 
+appsettings.json
+appsettings.Development.json
 
 # User-specific stuff
 .idea/**/workspace.xml
