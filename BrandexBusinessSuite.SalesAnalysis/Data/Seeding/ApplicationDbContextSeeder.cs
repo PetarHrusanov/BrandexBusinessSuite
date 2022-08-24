@@ -78,7 +78,5 @@ public class ApplicationDbContextSeeder : ISeeder
             new() { Name = Sting },
             new() { Name = Pharmnet },
         };
-    
-    
-    
+
 }

@@ -43,7 +43,8 @@ public class ApplicationDbContextSeeder : ISeeder
 
         var seeders = new List<ISeeder>
         {
-            new RolesSeeder(_dbContext, _serviceProvider),
+            // new RolesSeeder(_dbContext, _serviceProvider),
+            new RolesSeeder(_serviceProvider),
             new AdministratorSeeder(_dbContext, _serviceProvider, _adminSettings)
         };
 
