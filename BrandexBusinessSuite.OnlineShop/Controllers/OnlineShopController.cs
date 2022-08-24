@@ -111,13 +111,10 @@ public class OnlineShopController : ApiController
             double orderAmountSpeedy = 0;
             if (order.payment_method_title == "Наложен платеж") orderAmountSpeedy = (double)order.total;
 
-            var serviceCodeSpeedy = 2;
-            if ( string.Equals(order.shipping.city, "София", StringComparison.OrdinalIgnoreCase)) serviceCodeSpeedy = 113;
-            
             var newSpeedyInput = new SpeedyInputOrder(
                 _speedyUserSettings.UsernameSpeedy,
                 _speedyUserSettings.PasswordSpeedy,
-                new SpeedyInputOrder._Service(serviceCodeSpeedy, orderAmountSpeedy),
+                new SpeedyInputOrder._Service(505, orderAmountSpeedy),
                 new SpeedyInputOrder._Recipient(order),
                 order.id.ToString()
                 );
@@ -130,9 +127,10 @@ public class OnlineShopController : ApiController
             
             if(responseContentJObj.ContainsKey("error")) continue;
 
-            var orderStatus = new Order();
-
-            orderStatus.status = "shipped";
+            var orderStatus = new Order
+            {
+                status = "shipped"
+            };
 
             await wc.Order.Update( (int)order.id, orderStatus);
             
