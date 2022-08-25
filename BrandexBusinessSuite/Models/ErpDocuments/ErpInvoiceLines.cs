@@ -17,6 +17,7 @@ public class ErpInvoiceLines
         InvoiceOrderLine = new ErpCharacteristicId(invoiceOrderLine.Id);
         LineNo = linesOutput.LineNo;
         Product = linesOutput.Product;
+        LineCustomDiscountPercent = invoiceOrderLine.LineCustomDiscountPercent;
 
     }
     public ErpCharacteristicProductName ProductDescription { get; set; }
@@ -31,6 +32,8 @@ public class ErpInvoiceLines
     public ErpCharacteristicId SalesOrder { get; set; }
     public ErpCharacteristicId InvoiceOrderLine { get; set; }
     public ErpCharacteristicId Product { get; set; }
+    
+    public decimal LineCustomDiscountPercent { get; set; }
     
     public int LineNo { get; set; }
 

@@ -13,4 +13,6 @@ public class ErpInvoiceOrderLines
     public ErpCharacteristicUnitPrice LineAmount { get; set; }
     public ErpCharacteristicUnitPrice UnitPrice { get; set; }
     
+    public decimal LineCustomDiscountPercent { get; set; }
+    
 }
