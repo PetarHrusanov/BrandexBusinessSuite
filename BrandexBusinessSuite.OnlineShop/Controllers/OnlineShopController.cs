@@ -183,7 +183,7 @@ public class OnlineShopController : ApiController
 
             if (sample!=null && (string)sample != "няма")
             {
-                var sampleCode = productsDb.Where(s => s.WooCommerceSampleName == (string)sample).Select(s => s.ErpSampleCode);
+                var sampleCode = productsDb.Where(s => s.WooCommerceSampleName == (string)sample).Select(s => s.ErpSampleCode).FirstOrDefault();
                 
                 var line = new ErpSalesLines(
                     $"General_Products_Products({sampleCode})",
