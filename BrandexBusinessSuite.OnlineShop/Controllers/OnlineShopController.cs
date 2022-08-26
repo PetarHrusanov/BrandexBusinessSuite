@@ -206,6 +206,7 @@ public class OnlineShopController : ApiController
             if (!responseContentJObj.ContainsKey(ErpDocuments.ODataId)) continue;
             
             var newDocumentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
+
             await ChangeStateToRelease(Client, newDocumentId);
 
             responseContentJObj = await JObjectByUriGetRequest(Client, $"https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrderLines?$top=20&$filter=SalesOrder%20eq%20'{newDocumentId}'");
@@ -219,9 +220,16 @@ public class OnlineShopController : ApiController
                 responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_InvoiceOrderLines?$top=20&$filter=SalesOrderLine%20eq%20'{orderLine.Id}'");
                 var listInvoiceOrderLine = JsonConvert.DeserializeObject<List<ErpInvoiceOrderLines>>(responseContentJObj["value"].ToString());
 
+                if (listInvoiceOrderLine == null || listInvoiceOrderLine.Count==0) continue; 
+                
                 var invoiceLine = new ErpInvoiceLines(listInvoiceOrderLine![0], orderLine, newDocumentId);
                 
                 invoiceNew.Lines.Add(invoiceLine);
+            }
+
+            if (invoiceNew.Lines.Count == 0)
+            {
+                continue;
             }
 
             jsonPostString = JsonConvert.SerializeObject(invoiceNew, Formatting.Indented);
