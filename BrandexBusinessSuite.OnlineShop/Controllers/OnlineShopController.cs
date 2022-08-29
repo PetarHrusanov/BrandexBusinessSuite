@@ -126,13 +126,6 @@ public class OnlineShopController : ApiController
             var responseContentJObj = await JObjectByUriPostRequest(Client, speedyLink, jsonPostString);
             
             if(responseContentJObj.ContainsKey("error")) continue;
-
-            var orderStatus = new Order
-            {
-                status = "shipped"
-            };
-
-            await wc.Order.Update( (int)order.id, orderStatus);
             
             var speedyTracking = responseContentJObj["id"]!.ToString();
             speedyTrackingList.Add(speedyTracking);
@@ -148,6 +141,20 @@ public class OnlineShopController : ApiController
                 speedyTracking);
             
             salesInvoicesCheck.Add(saleInvoiceCheck);
+
+            var orderStatus = new Order
+            {
+                status = "shipped"
+            };
+
+            try
+            {
+                await wc.Order.Update( (int)order.id, orderStatus);
+            }
+            catch
+            {
+                continue;
+            }
 
             var erpSale = new ErpOnlineSale(order.id.ToString(), $"{order.date_created:yyyy-MM-dd}");
 
@@ -200,24 +207,45 @@ public class OnlineShopController : ApiController
             
             var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
             Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-            
-            responseContentJObj = await JObjectByUriPostRequest(Client, "https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrders", jsonPostString);
+
+            try
+            {
+                responseContentJObj = await JObjectByUriPostRequest(Client, "https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrders", jsonPostString);
+            }
+            catch
+            {
+                continue;
+            }
 
             if (!responseContentJObj.ContainsKey(ErpDocuments.ODataId)) continue;
             
             var newDocumentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
 
-            await ChangeStateToRelease(Client, newDocumentId);
+            try
+            {
+                await ChangeStateToRelease(Client, newDocumentId);
+                responseContentJObj = await JObjectByUriGetRequest(Client, $"https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrderLines?$top=20&$filter=SalesOrder%20eq%20'{newDocumentId}'");
+            }
+            catch
+            {
+                continue;
+            }
 
-            responseContentJObj = await JObjectByUriGetRequest(Client, $"https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrderLines?$top=20&$filter=SalesOrder%20eq%20'{newDocumentId}'");
-            
             var orderLinesList = JsonConvert.DeserializeObject<List<ErpSalesLinesOutput>>(responseContentJObj["value"].ToString());
 
             var invoiceNew = new ErpInvoice(order.id.ToString(), $"{order.date_created:yyyy-MM-dd}");
 
             foreach (var orderLine in orderLinesList)
             {
-                responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_InvoiceOrderLines?$top=20&$filter=SalesOrderLine%20eq%20'{orderLine.Id}'");
+                try
+                {
+                    responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_InvoiceOrderLines?$top=20&$filter=SalesOrderLine%20eq%20'{orderLine.Id}'");
+                }
+                catch
+                {
+                    continue;
+                }
+                
                 var listInvoiceOrderLine = JsonConvert.DeserializeObject<List<ErpInvoiceOrderLines>>(responseContentJObj["value"].ToString());
 
                 if (listInvoiceOrderLine == null || listInvoiceOrderLine.Count==0) continue; 
@@ -234,15 +262,29 @@ public class OnlineShopController : ApiController
 
             jsonPostString = JsonConvert.SerializeObject(invoiceNew, Formatting.Indented);
 
-            responseContentJObj = await JObjectByUriPostRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_Invoices/", jsonPostString);
-            
+            try
+            {
+                responseContentJObj = await JObjectByUriPostRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_Invoices/", jsonPostString);
+            }
+            catch
+            {
+                continue;
+            }
+
             if (!responseContentJObj.ContainsKey(ErpDocuments.ODataId)) continue;
             
             var newInvoiceId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
 
             saleInvoiceCheck.InvoiceNumber = responseContentJObj[ErpDocuments.DocumentNo]!.ToString();
-            
-            await ChangeStateToRelease(Client, newInvoiceId);
+
+            try
+            {
+                await ChangeStateToRelease(Client, newInvoiceId);
+            }
+            catch
+            {
+                continue;
+            }
 
         }
         
