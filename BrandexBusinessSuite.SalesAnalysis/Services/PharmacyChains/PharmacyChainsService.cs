@@ -20,10 +20,10 @@ using static  BrandexBusinessSuite.Common.Constants;
 
 public class PharmacyChainsService : IPharmacyChainsService
 {
-    SpravkiDbContext db;
+    SalesAnalysisDbContext db;
     private readonly IConfiguration _configuration;
 
-    public PharmacyChainsService(SpravkiDbContext db , IConfiguration configuration)
+    public PharmacyChainsService(SalesAnalysisDbContext db , IConfiguration configuration)
     {
         this.db = db;
         _configuration = configuration;

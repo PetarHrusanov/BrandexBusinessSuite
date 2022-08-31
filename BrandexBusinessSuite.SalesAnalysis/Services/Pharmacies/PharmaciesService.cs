@@ -20,10 +20,10 @@ using static  Common.Constants;
 
 public class PharmaciesService : IPharmaciesService
 {
-    SpravkiDbContext db;
+    SalesAnalysisDbContext db;
     private readonly IConfiguration _configuration;
 
-    public PharmaciesService(SpravkiDbContext db, IConfiguration configuration)
+    public PharmaciesService(SalesAnalysisDbContext db, IConfiguration configuration)
     {
         this.db = db;
         _configuration = configuration;

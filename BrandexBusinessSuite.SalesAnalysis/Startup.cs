@@ -39,7 +39,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services
-            .AddWebService<SpravkiDbContext>(_configuration)
+            .AddWebService<SalesAnalysisDbContext>(_configuration)
             .AddTransient<ICitiesService, CitiesService>()
             .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()
             .AddTransient<IDistributorService, DistributorService>()

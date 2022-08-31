@@ -97,7 +97,7 @@ public class OnlineShopController : ApiController
         var orderList = await wc.Order.GetAll(new Dictionary < string, string > ()
         {
             { "status","processing" },
-            { "per_page","100" },
+            { "per_page","40" },
         });
         
         var salesInvoicesCheck = new List<SaleInvoiceCheck>();
@@ -108,6 +108,9 @@ public class OnlineShopController : ApiController
         
         foreach (var order in orderList)
         {
+            
+            
+            
             double orderAmountSpeedy = 0;
             if (order.payment_method_title == "Наложен платеж") orderAmountSpeedy = (double)order.total;
 
@@ -283,9 +286,8 @@ public class OnlineShopController : ApiController
             }
             catch
             {
-                continue;
+                // ignored
             }
-
         }
         
         var speedyPrintRequest = new SpeedyPrintRequest(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy);

@@ -19,9 +19,9 @@ using static Common.InputOutputConstants.SingleStringConstants;
 
 public class DistributorsController :AdministrationController
 {
-    private readonly SpravkiDbContext _context;
+    private readonly SalesAnalysisDbContext _context;
 
-    public DistributorsController(SpravkiDbContext context) => _context = context;
+    public DistributorsController(SalesAnalysisDbContext context) => _context = context;
 
     [HttpGet]
     public async Task<DistributorOutputModel[]> GetDistributors()

@@ -12,9 +12,9 @@ using SalesAnalysis.Models.Products;
 
 public class ProductsService : IProductsService
 {
-    SpravkiDbContext db;
+    SalesAnalysisDbContext db;
 
-    public ProductsService(SpravkiDbContext db)
+    public ProductsService(SalesAnalysisDbContext db)
     {
         this.db = db;
     }

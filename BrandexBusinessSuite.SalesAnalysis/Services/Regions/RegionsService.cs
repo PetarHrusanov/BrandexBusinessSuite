@@ -11,9 +11,9 @@ using SalesAnalysis.Models.Regions;
 
 public class RegionsService : IRegionsService
 {
-    private readonly SpravkiDbContext db;
+    private readonly SalesAnalysisDbContext db;
 
-    public RegionsService(SpravkiDbContext db)
+    public RegionsService(SalesAnalysisDbContext db)
     {
         this.db = db;
     }

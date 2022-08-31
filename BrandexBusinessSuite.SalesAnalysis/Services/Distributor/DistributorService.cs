@@ -8,9 +8,9 @@ using Data;
 
 public class DistributorService :IDistributorService
 {
-    SpravkiDbContext db;
+    SalesAnalysisDbContext db;
 
-    public DistributorService(SpravkiDbContext db)
+    public DistributorService(SalesAnalysisDbContext db)
     { 
         this.db = db;
     }

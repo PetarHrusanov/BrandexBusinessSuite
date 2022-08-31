@@ -16,11 +16,11 @@ using static BrandexBusinessSuite.Common.ExcelDataConstants.Ditributors;
 public class ApplicationDbContextSeeder : ISeeder
 {
     
-    private readonly SpravkiDbContext db;
+    private readonly SalesAnalysisDbContext db;
     // private readonly ApplicationSettings applicationSettings;
 
     public ApplicationDbContextSeeder(
-        SpravkiDbContext db,
+        SalesAnalysisDbContext db,
         IOptions<ApplicationSettings> applicationSettings)
     {
         this.db = db;

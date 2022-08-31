@@ -19,10 +19,10 @@ using static Common.Constants;
 
 public class SalesService :ISalesService
 {
-    SpravkiDbContext db;
+    SalesAnalysisDbContext db;
     private readonly IConfiguration _configuration;
 
-    public SalesService(SpravkiDbContext db, IConfiguration configuration)
+    public SalesService(SalesAnalysisDbContext db, IConfiguration configuration)
     {
         this.db = db;
         _configuration = configuration;

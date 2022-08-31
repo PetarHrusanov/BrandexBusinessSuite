@@ -10,10 +10,10 @@ using Microsoft.EntityFrameworkCore;
 using SalesAnalysis.Data.Models;
 using BrandexBusinessSuite.Data.Models.Common;
 
-public class SpravkiDbContext : DbContext
+public class SalesAnalysisDbContext : DbContext
 {
      
-    public SpravkiDbContext(DbContextOptions<SpravkiDbContext> options)
+    public SalesAnalysisDbContext(DbContextOptions<SalesAnalysisDbContext> options)
         : base(options)
     {
     }
