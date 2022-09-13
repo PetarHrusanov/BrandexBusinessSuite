@@ -109,8 +109,6 @@ public class OnlineShopController : ApiController
         foreach (var order in orderList)
         {
             
-            
-            
             double orderAmountSpeedy = 0;
             if (order.payment_method_title == "Наложен платеж") orderAmountSpeedy = (double)order.total;
 
@@ -382,22 +380,34 @@ public class OnlineShopController : ApiController
     {
         var rest = new RestAPI("https://botanic.cc/wp-json/wc/v3",_wooCommerceSettings.Key, _wooCommerceSettings.Secret);
         var wc = new WCObject(rest);
-        
+
+        var dateFormat = date.Date.ToString("yyyy-MM-dd'T'HH:mm:ss");
+
         var orderList = await wc.Order.GetAll(new Dictionary < string, string > ()
         {
-            { "created_at_min",date.Date.ToString() },
+            { "before", dateFormat},
+            { "status","shipped,completed,processing"},
             { "per_page","100" },
         });
 
-        var ordersDatabse = await _salesAnalysisService.GetCheckModelsByDate(date.Date);
+        var ordersDatabase = await _salesAnalysisService.GetCheckModelsByDate(date.Date);
 
-        orderList = orderList.Where(order => ordersDatabse.All(p => p.OrderNumber != order.number)).ToList();
+        // orderList = orderList.Where(order => ordersDatabase. All(p => p.OrderNumber != order.number)).ToList();
+        
+        // orderList = orderList.Except(ordersDatabase);
+        
+        orderList.RemoveAll(x=> ordersDatabase.Any(y=>y.OrderNumber==x.number));
+        
+        // orderList = orderList.Where(order => !ordersDatabase[Order].Contains())
 
         var productsDb = await _productsService.GetCheckModels();
-
+        
         var ordersForAnalysis = (from order in orderList
             let sample = order.meta_data.Where(p => p.key == "sample").Select(p => p.value).FirstOrDefault()
-            let adSource = order.meta_data.Where(p => p.key == "order_details_information_source").Select(p => p.value).FirstOrDefault()
+            let adSource =
+                order.meta_data.Where(p => p.key == "order_details_information_source")
+                    .Select(p => p.value)
+                    .FirstOrDefault()
             from orderLine in order.line_items
             select new SalesOnlineAnalysisInput
             {

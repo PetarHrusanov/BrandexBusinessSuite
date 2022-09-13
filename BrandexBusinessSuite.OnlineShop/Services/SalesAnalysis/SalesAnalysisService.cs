@@ -87,7 +87,7 @@ public class SalesAnalysisService :ISalesAnalysisService
     }
 
     public async Task<List<SaleOnlineAnalysis>> GetCheckModelsByDate(DateTime date)
-        => await _db.SaleOnline.Where(d=>d.Date>=date).ToListAsync();
+        => await _db.SaleOnline.Where(d=>d.Date<=date).ToListAsync();
     
     
 }

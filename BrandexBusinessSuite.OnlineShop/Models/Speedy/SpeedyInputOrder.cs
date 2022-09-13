@@ -86,7 +86,7 @@ public class SpeedyInputOrder
         [JsonProperty("parcelsCount")]
         public int ParcelCount { get; set; } = 1;
         [JsonProperty("totalWeight")]
-        public double TotalWeight { get; set; } = 0.4;
+        public double TotalWeight { get; set; } = 0.3;
         [JsonProperty("contents")]
         public string Contents { get; set; } = "ХРАНИТЕЛНА ДОБАВКА";
         [JsonProperty("package")]
