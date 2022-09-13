@@ -221,10 +221,12 @@ public class ConversionController : ApiController
         var sheet = hssfwb.GetSheetAt(0);
 
         var fieldsValues = new List<string>();
-        var fieldsGoogle = typeof(GoogleMarketing).GetFields(BindingFlags.Public | BindingFlags.Static);
-        fieldsValues.AddRange(fieldsGoogle.Select(field => (string)field.GetValue(null)!));
+        // var fieldsGoogle = typeof(GoogleMarketing).GetFields(BindingFlags.Public | BindingFlags.Static);
+        
+        var fieldsProducts = typeof(CheckNames).GetFields(BindingFlags.Public | BindingFlags.Static);
+        fieldsValues.AddRange(fieldsProducts.Select(field => (string)field.GetValue(null)!));
 
-        for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++) //Read Excel File
+        for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)
         {
             var row = sheet.GetRow(i);
 
@@ -234,16 +236,27 @@ public class ConversionController : ApiController
             if (productRow == null) continue;
 
             var product = productRow.ToString()?.TrimEnd();
-            if (string.IsNullOrEmpty(product)) continue;
-            if (!fieldsValues.Contains(product)) continue;
 
-            foreach (var field in typeof(GoogleMarketing).GetFields())
+            if (string.IsNullOrEmpty(product)) continue;
+            // if (!fieldsValues.Contains(product)) continue;
+
+            if (!fieldsValues.Any(element => product.Contains(element, StringComparison.CurrentCultureIgnoreCase)))
+                continue;
+
+            foreach (var field in typeof(CheckNames).GetFields())
             {
-                if ((string)field.GetValue(null)! != product) continue;
+                if (!product.Contains((string)field.GetValue(null)!, StringComparison.CurrentCultureIgnoreCase))
+                    continue;
                 var fieldName = field.Name;
                 var fieldErp =
                     typeof(GoogleMarketingErp).GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
                 product = (string)fieldErp!.GetValue(null)!;
+
+                // if ((string)field.GetValue(null)! != product) continue;
+                // var fieldName = field.Name;
+                // var fieldErp =
+                //     typeof(GoogleMarketingErp).GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
+                // product = (string)fieldErp!.GetValue(null)!;
             }
 
             var priceRow = row.GetCell(4).ToString()?.TrimEnd();
