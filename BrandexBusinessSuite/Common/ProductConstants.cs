@@ -22,6 +22,27 @@ public class ProductConstants
         public const string Sleep = "Sleep";
         public const string Ceget = "Ceget";
     }
+    
+    public class CheckNames
+    {
+        public const string ZinSeD = "ZinSeD";
+        public const string EnzyMill = "EnzyMill";
+        public const string CystiRen = "CystiRen";
+        public const string LadyHarmonia = "Lady Harmonia";
+        public const string DetoxiFive = "DetoxiFive";
+        public const string LaxaL = "LaxaL";
+        public const string Bland = "Bland";
+        public const string DiabeForGluco = "DiabeForGluco";
+        public const string DiabeForProtect = "DiabeForProtect";
+        public const string GinkgoVin = "GinkgoVin";
+        // public const string GinkgoVinCentella = "GinkgoVinCentella";
+        public const string Venaxin = "Venaxin";
+        public const string ForFlex = "ForFlex";
+        public const string Flexen = "Flexen";
+        public const string ProstaRen = "ProstaRen";
+        public const string Sleep = "Sleep";
+        public const string Ceget = "Ceget";
+    }
 
     public class ShortName
     {
