@@ -27,7 +27,8 @@ public class AdMediasService :IAdMediasService
         table.TableName = AdMedias;
             
         table.Columns.Add(Name, typeof(string));
-        table.Columns.Add(MediaType, typeof(int));
+        table.Columns.Add(CompanyId, typeof(int));
+        
         table.Columns.Add(CreatedOn);
         table.Columns.Add(IsDeleted, typeof(bool));
             
@@ -35,14 +36,15 @@ public class AdMediasService :IAdMediasService
         {
             var row = table.NewRow();
             row[Name] = media.Name;
-            row[MediaType] = media.MediaType.Name;
+            row[CompanyId] = media.CompanyId;
+            
             row[CreatedOn] = DateTime.Now;
             row[IsDeleted] = false;
             
             table.Rows.Add(row);
         }
 
-        string connection = _configuration.GetConnectionString(DefaultConnection);
+        var connection = _configuration.GetConnectionString(DefaultConnection);
             
         var con = new SqlConnection(connection);
             
@@ -51,7 +53,7 @@ public class AdMediasService :IAdMediasService
         objbulk.DestinationTableName = AdMedias;
             
         objbulk.ColumnMappings.Add(Name, Name);
-        objbulk.ColumnMappings.Add(MediaType, MediaType);
+        objbulk.ColumnMappings.Add(CompanyId, CompanyId);
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
         objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
 

@@ -1,6 +1,4 @@
-using BrandexBusinessSuite.MarketingAnalysis.Data.Seeding;
-using BrandexBusinessSuite.MarketingAnalysis.Services.MarketingActivities;
-using BrandexBusinessSuite.Services.Data;
+using BrandexBusinessSuite.MarketingAnalysis.Services.MediaTypes;
 
 namespace BrandexBusinessSuite.MarketingAnalysis;
 
@@ -9,11 +7,16 @@ using Services.Products;
 using Infrastructure;
 using Data;
 
+using BrandexBusinessSuite.MarketingAnalysis.Data.Seeding;
+using BrandexBusinessSuite.MarketingAnalysis.Services.Companies;
+using BrandexBusinessSuite.MarketingAnalysis.Services.MarketingActivities;
+using BrandexBusinessSuite.Services.Data;
+
 public class Startup
 {
-    public Startup(IConfiguration configuration) => this.Configuration = configuration;
-
     public IConfiguration Configuration { get; }
+    
+    public Startup(IConfiguration configuration) => this.Configuration = configuration;
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -24,6 +27,8 @@ public class Startup
             .AddTransient<IAdMediasService, AdMediasService>()
             .AddTransient<IProductsService, ProductsService>()
             .AddTransient<IMarketingActivitesService, MarketingActivitiesService>()
+            .AddTransient<ICompaniesService, CompaniesService>()
+            .AddTransient<IMediaTypesService, MediaTypesService>()
             .AddTransient<ISeeder, ApplicationDbContextSeeder>();
     }
 

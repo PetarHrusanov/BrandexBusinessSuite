@@ -8,7 +8,7 @@ using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
 
 using BrandexBusinessSuite.Controllers;
-
+using Services.Companies;
 using Infrastructure;
 using Models.AdMedias;
 using Services.AdMedias;
@@ -20,12 +20,13 @@ public class AdMediaController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly IAdMediasService _adMediasService;
-
-    public AdMediaController(IWebHostEnvironment hostEnvironment, IAdMediasService adMediasService)
+    private readonly ICompaniesService _companiesService;
+    public AdMediaController(IWebHostEnvironment hostEnvironment, IAdMediasService adMediasService, ICompaniesService companiesService)
 
     {
         _hostEnvironment = hostEnvironment;
         _adMediasService = adMediasService;
+        _companiesService = companiesService;
     }
 
     [HttpPost]
@@ -36,6 +37,7 @@ public class AdMediaController : AdministrationController
         var errorDictionary = new List<string>();
 
         var adMediasCheck = await _adMediasService.GetCheckModels();
+        var companies = await _companiesService.GetCheckModels();
 
         var uniqueMedias = new List<AdMediaInputModel>();
 
@@ -51,7 +53,7 @@ public class AdMediaController : AdministrationController
         var hssfwb = new XSSFWorkbook(stream);
         var sheet = hssfwb.GetSheetAt(0);
 
-        for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++)
+        for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)
         {
             var row = sheet.GetRow(i);
 
@@ -63,11 +65,16 @@ public class AdMediaController : AdministrationController
 
             newAdMedia.Name = nameRow.ToString()?.TrimEnd().ToUpper() ?? throw new InvalidOperationException();
 
-            var typeRow = row.GetCell(1);
+            var companyName = row.GetCell(1);
 
-            if (typeRow != null)
+            if (companyName != null)
             {
-                // newAdMedia.MediaType = (MediaType)Enum.Parse(typeof(MediaType), typeRow.ToString()!.TrimEnd(), true);
+                var companyNameConverted = companyName.ToString()?.TrimEnd().ToUpper();
+                var companyId = companies.Where(c =>
+                    string.Equals(c.Name, companyNameConverted, StringComparison.CurrentCultureIgnoreCase))
+                    .Select(i => i.Id).FirstOrDefault();
+
+                newAdMedia.CompanyId = companyId;
             }
 
             if (adMediasCheck.All(c =>

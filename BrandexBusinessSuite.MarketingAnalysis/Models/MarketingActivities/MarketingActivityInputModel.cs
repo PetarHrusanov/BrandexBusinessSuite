@@ -10,6 +10,8 @@ public class MarketingActivityInputModel
 
     public int AdMediaId { get; set; }
     
+    public int MediaTypeId { get; set; }
+    
     public decimal Price { get; set; }
     
 }

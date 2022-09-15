@@ -1,3 +1,5 @@
+using BrandexBusinessSuite.MarketingAnalysis.Services.MediaTypes;
+
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
 using System.Globalization;
@@ -29,16 +31,19 @@ public class MarketingActivityController : AdministrationController
     private readonly IMarketingActivitesService _marketingActivitiesService;
     private readonly IProductsService _productsService;
     private readonly IAdMediasService _adMediasService;
+    private readonly IMediaTypesService _mediaTypesService;
 
     public MarketingActivityController(IWebHostEnvironment hostEnvironment,
         IMarketingActivitesService marketingActivitesService, IProductsService productsService,
-        IAdMediasService adMediasService)
+        IAdMediasService adMediasService,
+        IMediaTypesService mediaTypesService)
 
     {
         _hostEnvironment = hostEnvironment;
         _marketingActivitiesService = marketingActivitesService;
         _productsService = productsService;
         _adMediasService = adMediasService;
+        _mediaTypesService = mediaTypesService;
     }
 
     [HttpPost]
@@ -61,6 +66,7 @@ public class MarketingActivityController : AdministrationController
 
         var products = await _productsService.GetCheckModels();
         var adMedias = await _adMediasService.GetCheckModels();
+        var mediaTypes = await _mediaTypesService.GetCheckModels();
 
         await using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
@@ -95,7 +101,7 @@ public class MarketingActivityController : AdministrationController
                 marketingActivityInput.Price = sum;
 
                 marketingActivityInput.ProductId = products
-                    .Where(p => p.Name == productString)
+                    .Where(p => string.Equals(p.Name, productString, StringComparison.CurrentCultureIgnoreCase))
                     .Select(p => p.Id)
                     .FirstOrDefault();
 
@@ -103,8 +109,20 @@ public class MarketingActivityController : AdministrationController
 
                 if (adMediaRow == null) throw new ArgumentException("GRESHNO ID BRAT");
 
+                var adMediaString = adMediaRow.ToString()!.TrimEnd().ToUpper();
+                
                 marketingActivityInput.AdMediaId = adMedias
-                    .Where(p => p.Name == adMediaRow.ToString()!.TrimEnd().ToUpper())
+                    .Where(p => string.Equals(p.Name, adMediaString, StringComparison.CurrentCultureIgnoreCase))
+                    .Select(p => p.Id)
+                    .FirstOrDefault();
+
+                var activityType = row.GetCell(2);
+                if (activityType == null) throw new ArgumentException("GRESHNO ID BRAT");
+
+                var activityTypeString = activityType.ToString()!.TrimEnd().ToUpper();
+                
+                marketingActivityInput.MediaTypeId = mediaTypes
+                    .Where(p => string.Equals(p.Name, activityTypeString, StringComparison.CurrentCultureIgnoreCase))
                     .Select(p => p.Id)
                     .FirstOrDefault();
 

@@ -30,10 +30,13 @@ public class MarketingActivitiesService :IMarketingActivitesService
         table.TableName = MarketingActivities;
             
         table.Columns.Add(Description, typeof(string));
+        table.Columns.Add(Notes, typeof(string));
         table.Columns.Add(Date, typeof(DateTime));
         table.Columns.Add(Price, typeof(decimal));
         table.Columns.Add(ProductId);
+        table.Columns.Add(Paid, typeof(double));
         table.Columns.Add(AdMediaId);
+        table.Columns.Add(MediaTypeId);
         
         
         table.Columns.Add(CreatedOn);
@@ -43,10 +46,13 @@ public class MarketingActivitiesService :IMarketingActivitesService
         {
             var row = table.NewRow();
             row[Description] = activity.Description;
+            row[Notes] = "";
             row[Date] = activity.Date;
             row[Price] = activity.Price;
             row[ProductId] = activity.ProductId;
+            row[Paid] = true;
             row[AdMediaId] = activity.AdMediaId;
+            row[MediaTypeId] = activity.MediaTypeId;
 
             row[CreatedOn] = DateTime.Now;
             row[IsDeleted] = false;
@@ -63,10 +69,13 @@ public class MarketingActivitiesService :IMarketingActivitesService
         objbulk.DestinationTableName = MarketingActivities;
             
         objbulk.ColumnMappings.Add(Description, Description);
+        objbulk.ColumnMappings.Add(Notes, Notes);
         objbulk.ColumnMappings.Add(Date, Date);
         objbulk.ColumnMappings.Add(Price, Price);
         objbulk.ColumnMappings.Add(ProductId, ProductId);
+        objbulk.ColumnMappings.Add(Paid, Paid);
         objbulk.ColumnMappings.Add(AdMediaId, AdMediaId);
+        objbulk.ColumnMappings.Add(MediaTypeId, MediaTypeId);
         
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
         objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
