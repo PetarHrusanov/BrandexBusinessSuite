@@ -28,6 +28,12 @@ public class AdMediaController : AdministrationController
         _adMediasService = adMediasService;
         _companiesService = companiesService;
     }
+    
+    [HttpGet]
+    public async Task<List<AdMediaCheckModel>> GetAdMedias()
+    {
+        return await _adMediasService.GetCheckModels();
+    }
 
     [HttpPost]
     [Consumes("multipart/form-data")]

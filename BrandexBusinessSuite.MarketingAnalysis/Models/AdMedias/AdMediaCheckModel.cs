@@ -8,5 +8,5 @@ public class AdMediaCheckModel
     
     public string Name { get; set; }
     
-    public MediaType MediaType { get; set; }
+    // public MediaType MediaType { get; set; }
 }

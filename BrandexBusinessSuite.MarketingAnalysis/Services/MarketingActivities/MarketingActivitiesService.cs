@@ -1,3 +1,5 @@
+using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
+
 namespace BrandexBusinessSuite.MarketingAnalysis.Services.MarketingActivities;
 
 using System.Data;
@@ -60,7 +62,7 @@ public class MarketingActivitiesService :IMarketingActivitesService
             table.Rows.Add(row);
         }
 
-        string connection = _configuration.GetConnectionString(DefaultConnection);
+        var connection = _configuration.GetConnectionString(DefaultConnection);
             
         var con = new SqlConnection(connection);
             
@@ -95,8 +97,33 @@ public class MarketingActivitiesService :IMarketingActivitesService
             Date = n.Date.ToString("dd-MM-yyyy"),
             Price = n.Price,
             ProductName = n.Product.Name,
-            AdMediaName = n.AdMedia.Name
+            AdMediaName = n.AdMedia.Name,
+            AdMediaType = n.MediaType.Name,
+            Paid = n.Paid
             
         }).ToArrayAsync();
+    }
+
+    public async Task UploadMarketingActivity(MarketingActivityInputModel inputModel)
+    {
+        if (db.Products.Any(x=> x.Id == inputModel.ProductId) && db.AdMedias.Any(x=> x.Id == inputModel.AdMediaId)
+            && db.MediaTypes.Any(x=> x.Id == inputModel.MediaTypeId))
+        {
+            var dbModel = new MarketingActivity()
+            {
+                ProductId = inputModel.ProductId,
+                AdMediaId = inputModel.AdMediaId,
+                MediaTypeId = inputModel.MediaTypeId,
+                Date = inputModel.Date,
+                Description = inputModel.Description,
+                Paid = false,
+                Price = inputModel.Price,
+                Notes = ""
+            };
+
+            await db.MarketingActivities.AddAsync(dbModel);
+            await db.SaveChangesAsync();
+        }
+        // return BadRequest(Result.Failure("Category does not exist.")); 
     }
 }

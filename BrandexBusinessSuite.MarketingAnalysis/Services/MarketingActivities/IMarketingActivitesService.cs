@@ -8,4 +8,6 @@ public interface IMarketingActivitesService
 
     Task<MarketingActivityOutputModel[]> GetMarketingActivitiesByDate(DateTime date);
 
+    Task UploadMarketingActivity(MarketingActivityInputModel inputModel);
+
 }

@@ -15,4 +15,8 @@ public class MarketingActivityOutputModel
         
     public string AdMediaName { get; set; }
     // public virtual AdMedia AdMedia { get; set; }
+    
+    public string AdMediaType { get; set; }
+    
+    public bool Paid { get; set; }
 }

@@ -27,6 +27,12 @@ public class ProductController : AdministrationController
         _hostEnvironment = hostEnvironment;
         _productsService = productsService;
     }
+    
+    [HttpGet]
+    public async Task<List<ProductCheckModel>> GetProducts()
+    {
+        return await _productsService.GetCheckModels();
+    }
 
     [HttpPost]
     [Consumes("multipart/form-data")]

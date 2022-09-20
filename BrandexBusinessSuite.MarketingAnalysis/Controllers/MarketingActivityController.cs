@@ -1,4 +1,5 @@
-using BrandexBusinessSuite.MarketingAnalysis.Services.MediaTypes;
+using BrandexBusinessSuite.MarketingAnalysis.Models.MediaTypes;
+using BrandexBusinessSuite.Services;
 
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
@@ -17,6 +18,7 @@ using BrandexBusinessSuite.Models;
 
 using Models.MarketingActivities;
 using Services.MarketingActivities;
+using Services.MediaTypes;
 using Services.Products;
 using Infrastructure;
 using Services.AdMedias;
@@ -44,6 +46,21 @@ public class MarketingActivityController : AdministrationController
         _productsService = productsService;
         _adMediasService = adMediasService;
         _mediaTypesService = mediaTypesService;
+    }
+    
+    [HttpGet]
+    public async Task<List<MediaTypesCheckModel>> GetAdMediaTypes()
+    {
+        return await _mediaTypesService.GetCheckModels();
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult> UploadMarketingActivity(MarketingActivityInputModel inputModel)
+    {
+        
+        await _marketingActivitiesService.UploadMarketingActivity(inputModel);
+        
+        return Result.Success;
     }
 
     [HttpPost]
@@ -147,6 +164,8 @@ public class MarketingActivityController : AdministrationController
 
         return JsonConvert.SerializeObject(errorDictionary.ToArray());
     }
+    
+    
 
     [HttpPost]
     [Authorize(Roles = AdministratorRoleName)]
