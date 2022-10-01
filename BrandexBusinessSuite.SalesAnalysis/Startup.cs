@@ -49,6 +49,7 @@ public class Startup
             .AddTransient<IRegionsService, RegionsService>()
             .AddTransient<ISalesService, SalesService>()
             .AddTransient<ISeeder, ApplicationDbContextSeeder>();
+        // .AddMessaging(_configuration);
 
     }
 
