@@ -1,8 +1,7 @@
 namespace BrandexBusinessSuite.MarketingAnalysis.Models.Companies;
 
-public class CompaniesCheckModel
+public class CompaniesInputModel
 {
-    public int Id { get; set; }
     public string Name { get; set; }
     
     public string ErpId { get; set; }

@@ -8,6 +8,7 @@ using NPOI.XSSF.UserModel;
 using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Services;
 using Infrastructure;
+using Models.Companies;
 using Services.Companies;
 using Common;
 
@@ -33,7 +34,7 @@ public class CompanyController : AdministrationController
 
         var companiesCheck = await _companiesService.GetCheckModels();
 
-        var uniqueCompanies = new List<string>();
+        var uniqueCompanies = new List<CompaniesInputModel>();
 
         if (!CheckXlsx(file)) return BadRequest(Constants.Errors.IncorrectFileFormat);
 
@@ -58,11 +59,21 @@ public class CompanyController : AdministrationController
             if (name == null) continue;
 
             var companyName = name.ToString()!.TrimEnd();
+
+            var erpIdRow = row.GetCell(1);
             
-            if (companiesCheck.All(c => !string.Equals(c.Name, companyName, StringComparison.CurrentCultureIgnoreCase)))
+            if (erpIdRow == null) continue;
+
+            var erpId = erpIdRow.ToString()!.TrimEnd();
+
+            if (companiesCheck.Any(c => string.Equals(c.Name, companyName, StringComparison.CurrentCultureIgnoreCase))) continue;
+            
+            var companyNew = new CompaniesInputModel()
             {
-                uniqueCompanies.Add(companyName);
-            }
+                Name = companyName,
+                ErpId = erpId
+            };
+            uniqueCompanies.Add(companyNew);
         }
 
         await _companiesService.UploadBulk(uniqueCompanies);

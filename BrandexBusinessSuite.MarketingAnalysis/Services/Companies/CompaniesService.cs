@@ -1,15 +1,14 @@
-using BrandexBusinessSuite.MarketingAnalysis.Models.Companies;
-using Microsoft.EntityFrameworkCore;
-
 namespace BrandexBusinessSuite.MarketingAnalysis.Services.Companies;
 
 using System.Data;
 
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
-using BrandexBusinessSuite.MarketingAnalysis.Data;
+using Data;
+using BrandexBusinessSuite.MarketingAnalysis.Models.Companies;
 
-using static Common.ExcelDataConstants.PharmacyCompaniesColumns;
+using static Common.ExcelDataConstants.CompaniesColumns;
 using static Common.Constants;
 
 public class CompaniesService : ICompaniesService
@@ -24,13 +23,13 @@ public class CompaniesService : ICompaniesService
         _configuration = configuration;
     }
     
-    
-    public async Task UploadBulk(List<string> companies)
+    public async Task UploadBulk(List<CompaniesInputModel> companies)
     {
         var table = new DataTable();
         table.TableName = PharmacyCompanies;
             
         table.Columns.Add(Name, typeof(string));
+        table.Columns.Add(ErpId, typeof(string));
         
         table.Columns.Add(CreatedOn);
         table.Columns.Add(IsDeleted, typeof(bool));
@@ -38,7 +37,8 @@ public class CompaniesService : ICompaniesService
         foreach (var company in companies)
         {
             var row = table.NewRow();
-            row[Name] = company;
+            row[Name] = company.Name;
+            row[ErpId] = company.ErpId;
             
             row[CreatedOn] = DateTime.Now;
             row[IsDeleted] = false;
@@ -55,6 +55,7 @@ public class CompaniesService : ICompaniesService
         objbulk.DestinationTableName = PharmacyCompanies;
             
         objbulk.ColumnMappings.Add(Name, Name);
+        objbulk.ColumnMappings.Add(ErpId, ErpId);
         
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
         objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);

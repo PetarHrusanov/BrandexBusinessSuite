@@ -22,6 +22,11 @@ public class Startup
     {
 
         services.AddWebService<MarketingAnalysisDbContext>(Configuration);
+        
+        services
+            .Configure<ErpUserSettings>(
+                Configuration.GetSection(nameof(ErpUserSettings)), 
+                config => config.BindNonPublicProperties = true);
 
         services
             .AddTransient<IAdMediasService, AdMediasService>()

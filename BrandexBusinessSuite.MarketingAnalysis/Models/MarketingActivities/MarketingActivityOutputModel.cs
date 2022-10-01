@@ -1,10 +1,15 @@
 namespace BrandexBusinessSuite.MarketingAnalysis.Models.MarketingActivities;
 
+using AutoMapper;
+using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
+
 public class MarketingActivityOutputModel
 {
     public int Id { get; set; }
         
     public string Description { get; set; }
+    
+    public string Notes { get; set; }
         
     public string Date { get; set; }
     
@@ -18,5 +23,13 @@ public class MarketingActivityOutputModel
     
     public string AdMediaType { get; set; }
     
+    public string CompanyName { get; set; }
+    
     public bool Paid { get; set; }
+    
+    public bool ErpPublished { get; set; }
+    
+    // public virtual void Mapping(Profile mapper)
+    //     => mapper
+    //         .CreateMap<MarketingActivity, MarketingActivityOutputModel>();
 }

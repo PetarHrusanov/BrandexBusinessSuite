@@ -1,12 +1,11 @@
-using BrandexBusinessSuite.MarketingAnalysis.Models.MediaTypes;
-using BrandexBusinessSuite.Services;
-
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
 using System.Globalization;
+using System.Text;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -14,7 +13,9 @@ using NPOI.XSSF.UserModel;
 using Newtonsoft.Json;
 
 using BrandexBusinessSuite.Controllers;
-using BrandexBusinessSuite.Models;
+using BrandexBusinessSuite.Models.ErpDocuments;
+using Models.MediaTypes;
+using BrandexBusinessSuite.Services;
 
 using Models.MarketingActivities;
 using Services.MarketingActivities;
@@ -23,10 +24,14 @@ using Services.Products;
 using Infrastructure;
 using Services.AdMedias;
 
-using static Methods.ExcelMethods;
 using static Common.Constants;
+using static Common.ErpConstants;
 
-public class MarketingActivityController : AdministrationController
+using static Methods.ExcelMethods;
+using static Requests.RequestsMethods;
+using static Methods.FieldsValuesMethods;
+
+public class MarketingActivityController : ApiController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -34,14 +39,20 @@ public class MarketingActivityController : AdministrationController
     private readonly IProductsService _productsService;
     private readonly IAdMediasService _adMediasService;
     private readonly IMediaTypesService _mediaTypesService;
+    
+    private readonly ErpUserSettings _userSettings;
+
+    private static readonly HttpClient Client = new();
 
     public MarketingActivityController(IWebHostEnvironment hostEnvironment,
+        IOptions<ErpUserSettings> userSettings,
         IMarketingActivitesService marketingActivitesService, IProductsService productsService,
         IAdMediasService adMediasService,
         IMediaTypesService mediaTypesService)
 
     {
         _hostEnvironment = hostEnvironment;
+        _userSettings = userSettings.Value;
         _marketingActivitiesService = marketingActivitesService;
         _productsService = productsService;
         _adMediasService = adMediasService;
@@ -49,21 +60,33 @@ public class MarketingActivityController : AdministrationController
     }
     
     [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<List<MediaTypesCheckModel>> GetAdMediaTypes()
     {
         return await _mediaTypesService.GetCheckModels();
     }
     
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    [Route(Id)]
+    public async Task<ActionResult<MarketingActivityEditModel>> Details(int id)
+        => await _marketingActivitiesService.GetDetails(id) ?? throw new InvalidOperationException();
+    
     [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<ActionResult> UploadMarketingActivity(MarketingActivityInputModel inputModel)
     {
-        
         await _marketingActivitiesService.UploadMarketingActivity(inputModel);
-        
         return Result.Success;
     }
+    
+    [HttpPut]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<ActionResult<MarketingActivityEditModel>> Edit(MarketingActivityEditModel input)
+        => await _marketingActivitiesService.Edit(input) ?? throw new InvalidOperationException();
 
     [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<string>> Import([FromForm] MarketingBulkInputModel marketingBulkInputModel)
     {
@@ -164,19 +187,64 @@ public class MarketingActivityController : AdministrationController
 
         return JsonConvert.SerializeObject(errorDictionary.ToArray());
     }
-    
-    
 
-    [HttpPost]
-    [Authorize(Roles = AdministratorRoleName)]
-    public async Task<MarketingActivityOutputModel[]> GetMarketingActivitiesByDate(
-        [FromBody] SingleStringInputModel singleStringInputModel)
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<MarketingActivityOutputModel[]> GetMarketingActivitiesByDate(string dateFormatted)
     {
-        var date = DateTime.ParseExact(singleStringInputModel.SingleStringValue, "MM-yyyy",
+        var date = DateTime.ParseExact(dateFormatted, "MM-yyyy",
             CultureInfo.InvariantCulture);
 
         var marketingActivitiesArray = await _marketingActivitiesService.GetMarketingActivitiesByDate(date);
 
         return marketingActivitiesArray;
+    }
+    
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task PostMarketingActivitiesToErp(int id)
+    {
+
+        var marketingActivity = await _marketingActivitiesService.GetDetailsErp(id);
+        
+        var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), marketingActivity.Date.ToString("MMMM"));
+        var yearErp = marketingActivity.Date.ToString("yyyy");
+
+        var activityObject = new MarketingActivityCm(
+            $"Задача / {marketingActivity.CompanyName}",
+            marketingActivity.Date,
+            marketingActivity.CompanyErpId,
+            monthErp,
+            yearErp,
+            "",
+            marketingActivity.Description,
+            marketingActivity.MediaType,
+            marketingActivity.AdMedia,
+            decimal.ToDouble(marketingActivity.Price),
+            marketingActivity.ProductName);
+
+        var jsonPostString = JsonConvert.SerializeObject(activityObject, Formatting.Indented);
+
+        var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.User}:{_userSettings.Password}");
+        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+        var responseContentJObj = await  JObjectByUriPostRequest(Client, $"{ErpRequests.BaseUrl}General_Contacts_Activities/", jsonPostString);
+
+        var documentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
+
+        await ChangeStateToRelease(Client, documentId);
+
+        await _marketingActivitiesService.ErpPublishMarketingActivity(id);
+
+    }
+    
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<ActionResult> PayMarketingActivity(int id)
+    {
+
+        await _marketingActivitiesService.PayMarketingActivity(id);
+        return Result.Success;
+
     }
 }

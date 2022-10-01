@@ -14,5 +14,8 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder
             .Property(c => c.Name)
             .IsRequired();
+        builder
+            .Property(c => c.ErpId)
+            .IsRequired();
     }
 }

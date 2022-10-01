@@ -10,4 +10,15 @@ public interface IMarketingActivitesService
 
     Task UploadMarketingActivity(MarketingActivityInputModel inputModel);
 
+    Task<MarketingActivityEditModel?> GetDetails(int id);
+    
+    Task<MarketingActivityErpModel?> GetDetailsErp(int id);
+
+    Task<MarketingActivityEditModel?> Edit(MarketingActivityEditModel inputModel);
+    
+    Task PayMarketingActivity(int id);
+    
+    Task ErpPublishMarketingActivity(int id);
+    
+
 }

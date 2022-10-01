@@ -17,6 +17,7 @@ public class MarketingDataConstants
     public const string Date = "Date";
     public const string Price = "Price";
     public const string Paid = "Paid";
+    public const string ErpPublished = "ErpPublished";
     
     public const string ProductId = "ProductId";
     public const string AdMediaId = "AdMediaId";

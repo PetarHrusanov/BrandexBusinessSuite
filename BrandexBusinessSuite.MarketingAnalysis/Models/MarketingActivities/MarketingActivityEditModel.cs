@@ -4,9 +4,13 @@ using AutoMapper;
 using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
 using BrandexBusinessSuite.Models;
 
-public class MarketingActivityInputModel: IMapFrom<MarketingActivity>
+public class MarketingActivityEditModel: IMapFrom<MarketingActivity>
 {
+    public int Id { get; set; }
+    
     public string Description { get; set; }
+    
+    public string Notes { get; set; }
         
     public DateTime Date { get; set; }
         
@@ -19,8 +23,11 @@ public class MarketingActivityInputModel: IMapFrom<MarketingActivity>
     public decimal Price { get; set; }
     
     public bool Paid { get; set; }
+    
+    public bool ErpPublished { get; set; }
 
     public virtual void Mapping(Profile mapper)
-        => mapper.CreateMap<MarketingActivity, MarketingActivityInputModel>();
+        => mapper
+            .CreateMap<MarketingActivity, MarketingActivityEditModel>();
 
 }

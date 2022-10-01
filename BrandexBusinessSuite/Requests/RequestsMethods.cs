@@ -1,9 +1,11 @@
+namespace BrandexBusinessSuite.Requests;
+
 using System.Text;
-using BrandexBusinessSuite.Common;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace BrandexBusinessSuite.Requests;
+using Common;
 
 public static class RequestsMethods
 {

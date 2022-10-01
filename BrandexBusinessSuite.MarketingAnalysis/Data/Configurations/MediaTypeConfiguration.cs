@@ -14,5 +14,9 @@ public class MediaTypeConfiguration : IEntityTypeConfiguration<MediaType>
         builder
             .Property(c => c.Name)
             .IsRequired();
+        
+        builder
+            .Property(c => c.NameBg)
+            .IsRequired();
     }
 }

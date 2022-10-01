@@ -1,6 +1,4 @@
-namespace BrandexBusinessSuite.Accounting.Models;
-
-using BrandexBusinessSuite.Models.ErpDocuments;
+namespace BrandexBusinessSuite.Models.ErpDocuments;
 
 public class MarketingActivityCm : ErpDocument
 {

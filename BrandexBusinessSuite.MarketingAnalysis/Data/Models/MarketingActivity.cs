@@ -22,6 +22,7 @@ public class MarketingActivity :IAuditInfo, IDeletableEntity
     public virtual Product Product { get; set; }
     
     public bool Paid { get; set; }
+    public bool ErpPublished { get; set; }
 
     public int AdMediaId { get; set; }
     public virtual AdMedia AdMedia { get; set; }

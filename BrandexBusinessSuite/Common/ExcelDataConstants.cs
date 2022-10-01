@@ -58,11 +58,12 @@ public class ExcelDataConstants
         public const string Name = "Name";
     }
         
-    public class PharmacyCompaniesColumns
+    public class CompaniesColumns
     {
         public const string PharmacyCompanies = "Companies";
         public const string Name = "Name";
         public const string Owner = "Owner";
+        public const string ErpId = "ErpId";
         public const string VAT = "VAT";
     }
         

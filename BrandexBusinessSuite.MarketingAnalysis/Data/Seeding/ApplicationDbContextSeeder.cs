@@ -36,101 +36,111 @@ public class ApplicationDbContextSeeder : ISeeder
         {
             new()
             {
-                Name = GenericNames.ZinSeD,
+                Name = MarketingNames.ZinSeD,
                 ShortName = ShortName.ZinSeD
             },
             new()
             {
-                Name = GenericNames.EnzyMill,
+                Name = MarketingNames.EnzyMill,
                 ShortName = ShortName.EnzyMill
             },
             new()
             {
-                Name = GenericNames.CystiRen,
+                Name = MarketingNames.CystiRen,
                 ShortName = ShortName.CystiRen
             },
             new()
             {
-                Name = GenericNames.LadyHarmonia,
+                Name = MarketingNames.LadyHarmonia,
                 ShortName = ShortName.LadyHarmonia
             },
             new()
             {
-                Name = GenericNames.DetoxiFive,
+                Name = MarketingNames.DetoxiFive,
                 ShortName = ShortName.DetoxiFive
             },
             new()
             {
-                Name = GenericNames.LaxaL,
+                Name = MarketingNames.LaxaL,
                 ShortName = ShortName.LaxaL
             },
             new()
             {
-                Name = GenericNames.Bland,
+                Name = MarketingNames.Bland,
                 ShortName = ShortName.Bland
             },
             new()
             {
-                Name = GenericNames.DiabeForGluco,
+                Name = MarketingNames.DiabeForGluco,
                 ShortName = ShortName.DiabeForGluco
             },
             new()
             {
-                Name = GenericNames.DiabeForProtect,
+                Name = MarketingNames.DiabeForProtect,
                 ShortName = ShortName.DiabeForProtect
             },
             new()
             {
-                Name = GenericNames.GinkgoVin,
+                Name = MarketingNames.GinkgoVin,
                 ShortName = ShortName.GinkgoVin
             },
             new()
             {
-                Name = GenericNames.GinkgoVinCentella,
+                Name = MarketingNames.GinkgoVinCentella,
                 ShortName = ShortName.GinkgoVinCentella
             },
             new()
             {
-                Name = GenericNames.Venaxin,
+                Name = MarketingNames.Venaxin,
                 ShortName = ShortName.Venaxin
             },
             new()
             {
-                Name = GenericNames.ForFlex,
+                Name = MarketingNames.ForFlex,
                 ShortName = ShortName.ForFlex
             },
             new()
             {
-                Name = GenericNames.Flexen,
+                Name = MarketingNames.Flexen,
                 ShortName = ShortName.Flexen
             },
             new()
             {
-                Name = GenericNames.ProstaRen,
+                Name = MarketingNames.ProstaRen,
                 ShortName = ShortName.ProstaRen
             },
             new()
             {
-                Name = GenericNames.Sleep,
+                Name = MarketingNames.Sleep,
                 ShortName = ShortName.Sleep
             },
             new()
             {
-                Name = GenericNames.Ceget,
+                Name = MarketingNames.Ceget,
                 ShortName = ShortName.Ceget
+            },
+            new()
+            {
+                Name = MarketingNames.ViruFor,
+                ShortName = ShortName.ViruFor
+            },
+            new()
+            {
+                Name = MarketingNames.Botanic,
+                ShortName = ShortName.Botanic
             }
         };
     
     private static IEnumerable<MediaType> GetMediaTypes() =>
         new List<MediaType>
         {
-            new() { Name = "Radio" },
-            new() { Name = "Tv" },
-            new() { Name = "Print" },
-            new() { Name = "Facebook" },
-            new() { Name = "Google" },
-            new() { Name = "Digital" },
-            new() { Name = "Pharmacies" },
+            new() { Name = "Radio", NameBg = "радио"},
+            new() { Name = "Tv", NameBg = "TV"},
+            new() { Name = "Print", NameBg = "принт"},
+            new() { Name = "Facebook", NameBg = "Facebook"},
+            new() { Name = "Google", NameBg = "Google"},
+            new() { Name = "Digital", NameBg = "интернет"},
+            new() { Name = "Pharmacies", NameBg = "аптеки"},
         };
 }
 

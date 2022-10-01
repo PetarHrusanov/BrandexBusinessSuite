@@ -4,6 +4,6 @@ using BrandexBusinessSuite.MarketingAnalysis.Models.Companies;
 
 public interface ICompaniesService
 {
-    Task UploadBulk(List<string> medias);
+    Task UploadBulk(List<CompaniesInputModel> medias);
     Task<List<CompaniesCheckModel>> GetCheckModels();
 }
