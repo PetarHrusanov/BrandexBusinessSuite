@@ -251,12 +251,7 @@ public class ConversionController : ApiController
                 var fieldErp =
                     typeof(GoogleMarketingErp).GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
                 product = (string)fieldErp!.GetValue(null)!;
-
-                // if ((string)field.GetValue(null)! != product) continue;
-                // var fieldName = field.Name;
-                // var fieldErp =
-                //     typeof(GoogleMarketingErp).GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
-                // product = (string)fieldErp!.GetValue(null)!;
+                
             }
 
             var priceRow = row.GetCell(4).ToString()?.TrimEnd();
