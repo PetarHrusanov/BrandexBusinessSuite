@@ -50,7 +50,7 @@ public class ProductConstants
     public class CheckNames
     {
         public const string ZinSeD = "ZinSeD";
-        public const string EnzyMill = "EnzyMill";
+        public const string EnzyMill = "Enzy-Mill";
         public const string CystiRen = "CystiRen";
         public const string LadyHarmonia = "Lady Harmonia";
         public const string DetoxiFive = "DetoxiFive";
