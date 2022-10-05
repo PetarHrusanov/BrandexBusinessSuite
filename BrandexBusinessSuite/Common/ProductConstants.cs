@@ -22,6 +22,7 @@ public class ProductConstants
         public const string Sleep = "Sleep";
         public const string Ceget = "Ceget";
         public const string ViruFor = "ViruFor";
+        public const string Botanic = "Botanic";
     }
     
     public class MarketingNames
@@ -306,20 +307,25 @@ public class ProductConstants
     
     public class GoogleMarketing
     {
-        public const string ZinSeD = "ZinSeD | traffic";
+        public const string ZinSeD = "ZinSeD";
         public const string EnzyMill = "Enzy-Mill";
         public const string CystiRen = "CystiRen";
-        public const string LadyHarmonia = "Lady Harmonia | Traffic";
-        public const string DetoxiFive = "DetoxiFive | Traffic";
-        public const string LaxaL = "LaxaL | Traffic";
+        public const string LadyHarmonia = "Lady Harmonia";
+        public const string DetoxiFive = "DetoxiFive";
+        public const string LaxaL = "LaxaL";
         public const string Bland = "Bland";
         public const string DiabeForGluco = "DiabeFor Gluco";
+        public const string DiabeForProtect = "DiabeFor Protect";
         public const string GinkgoVin = "GinkgoVin";
+        public const string GinkgoVinCentella = "GinkgoVinCentella";
         public const string Venaxin = "Venaxin";
-        public const string ForFlex = "ForFlex | Sales";
+        public const string ForFlex = "ForFlex";
+        public const string Flexen = "Flexen";
         public const string ProstaRen = "ProstaRen";
         public const string Sleep = "Sleep";
-        // public const string Botanic = "BOTANIC";
+        public const string Ceget = "Ceget";
+        public const string ViruFor = "ViruFor";
+        public const string Botanic = "Botanic";
     }
     
     public class GoogleMarketingErp

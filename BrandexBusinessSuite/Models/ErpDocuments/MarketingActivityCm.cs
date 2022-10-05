@@ -1,5 +1,8 @@
 namespace BrandexBusinessSuite.Models.ErpDocuments;
 
+using static Common.ErpConstants;
+using static Methods.FieldsValuesMethods;
+
 public class MarketingActivityCm : ErpDocument
 {
 
@@ -10,8 +13,8 @@ public class MarketingActivityCm : ErpDocument
     public MarketingActivityCm(string subject,
         DateTime date,
         string partyId,
-        string monthErp,
-        string yearErp,
+        // string monthErp,
+        // string yearErp,
         string measure,
         string type,
         string media,
@@ -33,8 +36,8 @@ public class MarketingActivityCm : ErpDocument
         ResponsiblePerson = new ErpCharacteristicId("General_Contacts_Persons(623ed5c7-2eec-4e5b-a0c1-42c6faab3309)");
         ToParty = new ErpCharacteristicId($"General_Contacts_Parties({partyId})");
         TargetParty = new ErpCharacteristicId($"General_Contacts_Parties({partyId})");
-        CustomProperty_МЕСЕЦ = new ErpCharacteristicValue(monthErp);
-        CustomProperty_1579648 = new ErpCharacteristicValue(yearErp);
+        CustomProperty_МЕСЕЦ = new ErpCharacteristicValue(ReturnValueByClassAndName(typeof(ErpMonths), date.ToString("MMMM")));
+        CustomProperty_1579648 = new ErpCharacteristicValue(date.ToString("yyyy"));
         CustomProperty_Размер = new ErpCharacteristicValue(measure);
         CustomProperty_тип_u0020реклама = new ErpCharacteristicValue(type);
         CustomProperty_ре = new ErpCharacteristicValue(media);

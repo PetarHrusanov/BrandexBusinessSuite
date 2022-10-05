@@ -4,14 +4,14 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+
+using Newtonsoft.Json;
 
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -20,14 +20,17 @@ using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
 
 using BrandexBusinessSuite.Controllers;
-using Services;
+using BrandexBusinessSuite.Accounting.Data.Models;
 using BrandexBusinessSuite.Models.ErpDocuments;
+using Data;
+using Services;
 using Infrastructure;
 using Models;
+using Common;
 
-using static Common.ProductConstants;
 using static  Common.Constants;
 using static Common.ErpConstants;
+using static Common.MarketingDataConstants;
 
 using static Methods.ExcelMethods;
 using static Requests.RequestsMethods;
@@ -41,27 +44,17 @@ public class ConversionController : ApiController
 
     private static readonly HttpClient Client = new();
     
-    private const string FacebookEng = "Facebook";
-    private const string FacebookBgCapital = "Фейсбук";
-    private const string FacebookBgLower = "фейсбук";
+    private readonly AccountingDbContext _context;
 
-    private const string Google = "Google";
-    private const string GoogleAdWordsLower = "google adwords";
-    private const string GoogleAdWordsCapital = "Ad Words";
-
-    private const string Click = "клик";
-    private const string Impressions = "впечатления";
-
-    private const double EuroRate = 1.9894;
-    
     private static readonly Regex RegexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
     private static readonly Regex PriceRegex = new (@"[0-9]+[.,][0-9]*");
     private static readonly Regex FacebookInvoiceRegex = new (@"FBADS-[0-9]{3}-[0-9]{9}");
 
-    public ConversionController(IWebHostEnvironment hostEnvironment, IOptions<ErpUserSettings> userSettings)
+    public ConversionController(IWebHostEnvironment hostEnvironment, IOptions<ErpUserSettings> userSettings, AccountingDbContext context)
     {
         _hostEnvironment = hostEnvironment;
         _userSettings = userSettings.Value;
+        _context = context;
     }
 
     [HttpPost]
@@ -83,34 +76,33 @@ public class ConversionController : ApiController
 
         var dateString = RegexDate.Matches(file.FileName)[0];
         var date = DateTime.ParseExact(dateString.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        
+        var products = await _context.Products.ToListAsync();
 
-        var productsPrices = ProductPriceDictionaryFromText(rawText);
-
-        var productNames = typeof(Facebook).GetFields().Select(field => field.Name).ToList();
+        var productsPrices = ProductPriceDictionaryFromText(rawText, products);
 
         var productCodesPrices = new Dictionary<string, Dictionary<string, decimal>>();
 
-        foreach (var product in productNames)
+        var euro = await _context.Currencies.Where(c => c.Name == Euro).Select(c => c.Value).FirstOrDefaultAsync();
+        
+        foreach (var product in products)
         {
-            var valueFacebook = ReturnValueByClassAndName(typeof(Facebook), product);
-            var valueErp = ReturnValueByClassAndName(typeof(ERP_Accounting), product);
-            var valueErpCode = ReturnValueByClassAndName(typeof(ErpCodesNumber), product);
+           
+            if (!productsPrices.ContainsKey(product.FacebookName)) continue;
 
-            if (!productsPrices.ContainsKey(valueFacebook)) continue;
-
-            var priceDouble = productsPrices[valueFacebook];
-            var price = (double)priceDouble * EuroRate;
+            var priceDouble = productsPrices[product.FacebookName];
+            var price = (double)priceDouble * euro;
             var priceRounded = Math.Round(price, 2);
 
-            RenameKey(productsPrices, valueFacebook, valueErp);
+            RenameKey(productsPrices, product.FacebookName, product.AccountingName);
 
-            productCodesPrices.Add(valueErp, new Dictionary<string, decimal>() { { valueErpCode, (decimal)priceRounded } });
+            productCodesPrices.Add(product.AccountingName, new Dictionary<string, decimal>() { {product.AccountingErpNumber, (decimal)priceRounded } });
         }
 
         var facebookInvoiceNumber = FacebookInvoiceRegex.Matches(rawText)[0].ToString();
         var primaryDocument = new LogisticsProcurementReceivingOrder(facebookInvoiceNumber, date);
 
-        foreach (var erpLine in productsPrices.Select(product => (double)product.Value * EuroRate)
+        foreach (var erpLine in productsPrices.Select(product => (double)product.Value * euro)
                      .Select(price => Math.Round(price, 2))
                      .Select(priceRounded => new ErpOrderLinesAccounting(
                          new ErpCharacteristicId("General_Products_Products(ee6e5c65-6dc7-41d7-9d57-ba87b19aa56c)"),
@@ -154,7 +146,7 @@ public class ConversionController : ApiController
             var productCode = productCodesPrices[productName!].Keys.FirstOrDefault();
 
             line.CustomProperty_Продукт_u002Dпокупки = new ErpCharacteristicValueDescriptionBg(productCode, new ErpCharacteristicValueDescriptionBg._Description(productName));
-            line.CustomProperty_ВРМ_u002Dпокупки = new ErpCharacteristicValueDescriptionBg("83", new ErpCharacteristicValueDescriptionBg._Description(FacebookBgCapital));
+            line.CustomProperty_ВРМ_u002Dпокупки = new ErpCharacteristicValueDescriptionBg("83", new ErpCharacteristicValueDescriptionBg._Description("Фейсбук"));
 
             var uri = new Uri($"{ErpRequests.BaseUrl}Logistics_Procurement_PurchaseInvoiceLines({line.Id})");
             jsonPostString = JsonConvert.SerializeObject(line, Formatting.Indented);
@@ -187,15 +179,19 @@ public class ConversionController : ApiController
         await file.CopyToAsync(streamRead);
 
         var rawText = PdfText(fullPath);
+        
+        var products = await _context.Products.ToListAsync();
+        var euro = await _context.Currencies.Where(c => c.Name == Euro).Select(c => c.Value).FirstOrDefaultAsync();
 
-        var productsPrices = ProductPriceDictionaryFromText(rawText);
+        var productsPrices = ProductPriceDictionaryFromText(rawText, products);
+        var facebookActivity = await _context.MarketingActivityDetails.Where(c => c.Name == MarketingDataConstants.Facebook).FirstOrDefaultAsync();
 
         foreach (var (key, value) in productsPrices)
         {
-            var price = (double)value * EuroRate;
+            var price = (double)value * euro;
             var priceRounded = Math.Round(price, 2);
 
-            await PostMarketingActivitiesToErp(FacebookEng, key, priceRounded, date);
+            await PostMarketingActivitiesToErp(facebookActivity!, key, priceRounded, date);
         }
         
         return Result.Success;
@@ -220,11 +216,9 @@ public class ConversionController : ApiController
         var hssfwb = new XSSFWorkbook(stream);
         var sheet = hssfwb.GetSheetAt(0);
 
-        var fieldsValues = new List<string>();
-        // var fieldsGoogle = typeof(GoogleMarketing).GetFields(BindingFlags.Public | BindingFlags.Static);
+        var products = await _context.Products.ToListAsync();
         
-        var fieldsProducts = typeof(CheckNames).GetFields(BindingFlags.Public | BindingFlags.Static);
-        fieldsValues.AddRange(fieldsProducts.Select(field => (string)field.GetValue(null)!));
+        var googleActivity = await _context.MarketingActivityDetails.Where(c => c.Name == Google).FirstOrDefaultAsync();
 
         for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)
         {
@@ -238,21 +232,11 @@ public class ConversionController : ApiController
             var product = productRow.ToString()?.TrimEnd();
 
             if (string.IsNullOrEmpty(product)) continue;
-            // if (!fieldsValues.Contains(product)) continue;
 
-            if (!fieldsValues.Any(element => product.Contains(element, StringComparison.CurrentCultureIgnoreCase)))
-                continue;
+            product = products.Where(e => product.Contains(e.GoogleName, StringComparison.CurrentCultureIgnoreCase))
+                .Select(e => e.GoogleName).FirstOrDefault();
 
-            foreach (var field in typeof(CheckNames).GetFields())
-            {
-                if (!product.Contains((string)field.GetValue(null)!, StringComparison.CurrentCultureIgnoreCase))
-                    continue;
-                var fieldName = field.Name;
-                var fieldErp =
-                    typeof(GoogleMarketingErp).GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
-                product = (string)fieldErp!.GetValue(null)!;
-                
-            }
+            if (product == null) continue;
 
             var priceRow = row.GetCell(4).ToString()?.TrimEnd();
             var priceString = PriceRegex.Matches(priceRow)[0].ToString();
@@ -261,7 +245,7 @@ public class ConversionController : ApiController
             var dateRow = row.GetCell(0).ToString().TrimEnd();
             var date = DateTime.ParseExact(dateRow, "MMM d, yyyy", CultureInfo.InvariantCulture);
 
-            await PostMarketingActivitiesToErp(Google, product, price, date);
+            await PostMarketingActivitiesToErp(googleActivity!, product, price, date);
         }
 
         return Result.Success;
@@ -280,33 +264,29 @@ public class ConversionController : ApiController
         return text;
     }
 
-    private static Dictionary<string, decimal> ProductPriceDictionaryFromText(string rawText)
+    private static Dictionary<string, decimal> ProductPriceDictionaryFromText(string rawText, List<Product> products)
     {
         var productsPrices = new Dictionary<string, decimal>();
 
         var rawTextSplit = rawText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-        var fieldsFacebook = typeof(Facebook).GetFields(BindingFlags.Public | BindingFlags.Static);
-
-        foreach (var productField in fieldsFacebook)
+        foreach (var product in products)
         {
-            var product = (string)productField.GetValue(null)!;
-
-            var lines = rawTextSplit.Where(element => element.Contains(product)).ToList();
-
+            
+            var lines = rawTextSplit.Where(element => element.Contains(product.FacebookName)).ToList();
             if (lines.Count==0) continue;
             
             foreach (var line in lines)
             {
-                if (!productsPrices.ContainsKey(product))
+                if (!productsPrices.ContainsKey(product.FacebookName))
                 {
-                    productsPrices.Add(product,0);
+                    productsPrices.Add(product.FacebookName,0);
                 }
 
                 var priceString = PriceRegex.Matches(line)[0].ToString();
                 var price = decimal.Parse(priceString, new NumberFormatInfo { NumberDecimalSeparator = "," });
                 
-                productsPrices[product] += price;
+                productsPrices[product.FacebookName] += price;
             }
         }
 
@@ -322,50 +302,13 @@ public class ConversionController : ApiController
         dic[toKey] = value;
     }
 
-    private async Task PostMarketingActivitiesToErp(string digital, string product, double price, DateTime date)
+    private async Task PostMarketingActivitiesToErp(MarketingActivityDetails activity, string product, double price, DateTime date)
     {
-
-        var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), date.ToString("MMMM"));
-
-        var yearErp = date.ToString("yyyy");
-
+        
         if (product == "General Audience") product = "Botanic"; 
         
-        var activityObject = new MarketingActivityCm();
-
-        switch (digital)
-        {
-            case FacebookEng:
-                activityObject = new MarketingActivityCm(
-                    "Задача / FACEBOOK IRELAND LIMITED", 
-                    date, 
-                    "b21c6bc3-a4d8-43b9-a3df-b2d39ddf552f", 
-                    monthErp, 
-                    yearErp,
-                    Impressions,
-                    FacebookBgCapital,
-                    FacebookBgLower,
-                    FacebookEng, 
-                    price, 
-                    product
-                );
-                break;
-            case Google:
-                activityObject = new MarketingActivityCm(
-                    "Задача / GOOGLE IRELAND LIMITED", 
-                    date, 
-                    "e5a6cfc4-d407-4424-a22e-d479136a28aa", 
-                    monthErp, 
-                    yearErp,
-                    Click,
-                    GoogleAdWordsLower,
-                    Google,
-                    GoogleAdWordsCapital, 
-                    price, 
-                    product
-                );
-                break;
-        }
+        var activityObject = new MarketingActivityCm(activity.Subject, date, activity.PartyId,
+            activity.Measure, activity.Type, activity.Media, activity.Type,price, product);
 
         var jsonPostString = JsonConvert.SerializeObject(activityObject, Formatting.Indented);
 

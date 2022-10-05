@@ -22,5 +22,10 @@ public class MarketingDataConstants
     public const string ProductId = "ProductId";
     public const string AdMediaId = "AdMediaId";
     public const string MediaTypeId = "MediaTypeId";
+    
+    public const string Euro = "Euro";
+    
+    public const string Facebook = "Facebook";
+    public const string Google = "Google";
 
 }

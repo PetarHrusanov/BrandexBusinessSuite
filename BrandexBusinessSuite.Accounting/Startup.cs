@@ -1,20 +1,15 @@
 namespace BrandexBusinessSuite.Accounting;
 
-using System.Reflection;
-using System.Text;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 
-using BrandexBusinessSuite.Models;
-using Services.Identity;
+using Data;
+using Services.Data;
+using Data.Seeding;
 using Infrastructure;
-using Requests;
 
 
 public class Startup
@@ -44,63 +39,73 @@ public class Startup
                 config => config.BindNonPublicProperties = true);
 
         services
-            .AddAutoMapper(
-                (_, config) => config
-                    .AddProfile(new MappingProfile(Assembly.GetCallingAssembly())),
-                Array.Empty<Assembly>());
+            .AddWebService<AccountingDbContext>(_configuration)
+            .AddTransient<ISeeder, ApplicationDbContextSeeder>();
+        
+        
+        // .AddTransient<ISeeder, ApplicationDbContextSeeder>()
+        // .AddTransient<IProductsService, ProductsService>()
+        // .AddTransient<ISalesAnalysisService, SalesAnalysisService>();
 
-        JwtBearerEvents events = null;
-
-        var secret = _configuration
-            .GetSection(nameof(ApplicationSettings))
-            .GetValue<string>(nameof(ApplicationSettings.Secret));
-
-        var key = Encoding.ASCII.GetBytes(secret);
-
-        services
-            .AddAuthentication(authentication =>
-            {
-                authentication.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                authentication.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(bearer =>
-            {
-                bearer.RequireHttpsMetadata = false;
-                bearer.SaveToken = true;
-                bearer.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-
-                if (events != null)
-                {
-                    bearer.Events = events;
-                }
-            });
-
-        services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-
-        services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(
-                builder =>
-                {
-                    builder.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
-                });
-        });
-
-        services.AddControllers();
+        // services
+        //     .AddAutoMapper(
+        //         (_, config) => config
+        //             .AddProfile(new MappingProfile(Assembly.GetCallingAssembly())),
+        //         Array.Empty<Assembly>());
+        //
+        // JwtBearerEvents events = null;
+        //
+        // var secret = _configuration
+        //     .GetSection(nameof(ApplicationSettings))
+        //     .GetValue<string>(nameof(ApplicationSettings.Secret));
+        //
+        // var key = Encoding.ASCII.GetBytes(secret);
+        //
+        // services
+        //     .AddAuthentication(authentication =>
+        //     {
+        //         authentication.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        //         authentication.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        //     })
+        //     .AddJwtBearer(bearer =>
+        //     {
+        //         bearer.RequireHttpsMetadata = false;
+        //         bearer.SaveToken = true;
+        //         bearer.TokenValidationParameters = new TokenValidationParameters
+        //         {
+        //             ValidateIssuerSigningKey = true,
+        //             IssuerSigningKey = new SymmetricSecurityKey(key),
+        //             ValidateIssuer = false,
+        //             ValidateAudience = false
+        //         };
+        //
+        //         if (events != null)
+        //         {
+        //             bearer.Events = events;
+        //         }
+        //     });
+        //
+        // services.AddHttpContextAccessor();
+        // services.AddScoped<ICurrentUserService, CurrentUserService>();
+        //
+        // services.AddCors(options =>
+        // {
+        //     options.AddDefaultPolicy(
+        //         builder =>
+        //         {
+        //             builder.AllowAnyOrigin()
+        //                 .AllowAnyHeader()
+        //                 .AllowAnyMethod();
+        //         });
+        // });
+        //
+        // services.AddControllers();
     }
 
         
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        app.UseWebService(env);
+        app.UseWebService(env)
+            .Initialize();
     }
 }
