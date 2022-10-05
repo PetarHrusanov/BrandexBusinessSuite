@@ -20,7 +20,7 @@ using static Common.InputOutputConstants.SingleStringConstants;
 public class DistributorsController :AdministrationController
 {
     private readonly SalesAnalysisDbContext _context;
-
+    
     public DistributorsController(SalesAnalysisDbContext context) => _context = context;
 
     [HttpGet]

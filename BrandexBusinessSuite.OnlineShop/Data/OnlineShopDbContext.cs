@@ -1,9 +1,9 @@
-using BrandexBusinessSuite.Data.Models.Common;
-using BrandexBusinessSuite.OnlineShop.Data.Models;
-
 namespace BrandexBusinessSuite.OnlineShop.Data;
 
 using Microsoft.EntityFrameworkCore;
+
+using BrandexBusinessSuite.Data.Models.Common;
+using Models;
 
 public class OnlineShopDbContext : DbContext
 {

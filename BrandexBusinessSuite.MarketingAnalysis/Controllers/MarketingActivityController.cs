@@ -208,15 +208,15 @@ public class MarketingActivityController : ApiController
 
         var marketingActivity = await _marketingActivitiesService.GetDetailsErp(id);
         
-        var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), marketingActivity.Date.ToString("MMMM"));
-        var yearErp = marketingActivity.Date.ToString("yyyy");
+        // var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), marketingActivity.Date.ToString("MMMM"));
+        // var yearErp = marketingActivity.Date.ToString("yyyy");
 
         var activityObject = new MarketingActivityCm(
             $"Задача / {marketingActivity.CompanyName}",
             marketingActivity.Date,
             marketingActivity.CompanyErpId,
-            monthErp,
-            yearErp,
+            // monthErp,
+            // yearErp,
             "",
             marketingActivity.Description,
             marketingActivity.MediaType,
