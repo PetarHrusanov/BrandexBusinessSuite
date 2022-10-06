@@ -17,7 +17,7 @@ using static Common.Constants;
 public class MarketingActivitiesService : IMarketingActivitesService
 {
     
-    MarketingAnalysisDbContext _db;
+    private readonly MarketingAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
 
@@ -28,13 +28,6 @@ public class MarketingActivitiesService : IMarketingActivitesService
         _mapper = mapper;
 
     }
-
-    // public MarketingActivitiesService(DbContext db, IPublisher publisher, IMapper mapper, IConfiguration configuration)
-    //     : base(db, publisher)
-    // {
-    //     this.mapper = mapper;
-    //     _configuration = configuration;
-    // }
 
     public async Task UploadBulk(List<MarketingActivityInputModel> marketingActivities)
     {
@@ -197,6 +190,35 @@ public class MarketingActivitiesService : IMarketingActivitesService
         var marketingActivity = await _db.MarketingActivities.Where(m => m.Id == id).FirstOrDefaultAsync();
         marketingActivity!.ErpPublished = !marketingActivity.ErpPublished;
         await _db.SaveChangesAsync();
+    }
+    
+    public async Task<DateTime> MarketingActivitiesTemplate()
+    {
+        var date = _db.MarketingActivities.Max(m => m.Date);
+        var marketingActivities = await _db.MarketingActivities
+            .Where(m => m.Date.Month == date.Month && m.Date.Year == date.Year).Where(m => m.AdMedia.Name == "FACEBOOK" || m.AdMedia.Name == "GOOGLE ADS")
+            .ToListAsync();
+        
+        date = date.AddMonths(1);
+
+        foreach (var newActivity in marketingActivities.Select(activity => new MarketingActivity()
+                 {
+                     Description = activity.Description,
+                     Notes = activity.Notes,
+                     Date = date,
+                     Price = activity.Price,
+                     ProductId = activity.ProductId,
+                     Paid = true,
+                     ErpPublished = true,
+                     AdMediaId = activity.AdMediaId,
+                     MediaTypeId = activity.MediaTypeId
+                 }))
+        {
+            await _db.MarketingActivities.AddAsync(newActivity);
+            await _db.SaveChangesAsync();
+        }
+
+        return date;
     }
 
     // await mapper

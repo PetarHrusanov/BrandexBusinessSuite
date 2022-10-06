@@ -19,6 +19,8 @@ public interface IMarketingActivitesService
     Task PayMarketingActivity(int id);
     
     Task ErpPublishMarketingActivity(int id);
-    
+
+    Task<DateTime> MarketingActivitiesTemplate();
+
 
 }

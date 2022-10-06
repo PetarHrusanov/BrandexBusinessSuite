@@ -1,3 +1,5 @@
+using BrandexBusinessSuite.Services.Identity;
+
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
 using System.Globalization;
@@ -40,6 +42,8 @@ public class MarketingActivityController : ApiController
     private readonly IAdMediasService _adMediasService;
     private readonly IMediaTypesService _mediaTypesService;
     
+    private readonly ICurrentUserService _currentUser;
+
     private readonly ErpUserSettings _userSettings;
 
     private static readonly HttpClient Client = new();
@@ -48,7 +52,9 @@ public class MarketingActivityController : ApiController
         IOptions<ErpUserSettings> userSettings,
         IMarketingActivitesService marketingActivitesService, IProductsService productsService,
         IAdMediasService adMediasService,
-        IMediaTypesService mediaTypesService)
+        IMediaTypesService mediaTypesService,
+        ICurrentUserService currentUser
+    )
 
     {
         _hostEnvironment = hostEnvironment;
@@ -57,6 +63,7 @@ public class MarketingActivityController : ApiController
         _productsService = productsService;
         _adMediasService = adMediasService;
         _mediaTypesService = mediaTypesService;
+        _currentUser = currentUser;
     }
     
     [HttpGet]
@@ -192,6 +199,9 @@ public class MarketingActivityController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<MarketingActivityOutputModel[]> GetMarketingActivitiesByDate(string dateFormatted)
     {
+        
+        var userId = _currentUser.UserId;
+
         var date = DateTime.ParseExact(dateFormatted, "MM-yyyy",
             CultureInfo.InvariantCulture);
 
@@ -207,16 +217,11 @@ public class MarketingActivityController : ApiController
     {
 
         var marketingActivity = await _marketingActivitiesService.GetDetailsErp(id);
-        
-        // var monthErp = ReturnValueByClassAndName(typeof(ErpMonths), marketingActivity.Date.ToString("MMMM"));
-        // var yearErp = marketingActivity.Date.ToString("yyyy");
 
         var activityObject = new MarketingActivityCm(
             $"Задача / {marketingActivity.CompanyName}",
             marketingActivity.Date,
             marketingActivity.CompanyErpId,
-            // monthErp,
-            // yearErp,
             "",
             marketingActivity.Description,
             marketingActivity.MediaType,
@@ -232,7 +237,6 @@ public class MarketingActivityController : ApiController
         var responseContentJObj = await  JObjectByUriPostRequest(Client, $"{ErpRequests.BaseUrl}General_Contacts_Activities/", jsonPostString);
 
         var documentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
-
         await ChangeStateToRelease(Client, documentId);
 
         await _marketingActivitiesService.ErpPublishMarketingActivity(id);
@@ -246,6 +250,17 @@ public class MarketingActivityController : ApiController
 
         await _marketingActivitiesService.PayMarketingActivity(id);
         return Result.Success;
+
+    }
+    
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<DateTime> CreateTemplate()
+    {
+
+        // await _marketingActivitiesService.PayMarketingActivity(id);
+        // return Result.Success;
+        return await _marketingActivitiesService.MarketingActivitiesTemplate();
 
     }
 }
