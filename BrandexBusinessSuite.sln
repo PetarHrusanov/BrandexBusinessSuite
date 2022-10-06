@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.Accoun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.OnlineShop", "BrandexBusinessSuite.OnlineShop\BrandexBusinessSuite.OnlineShop.csproj", "{FE8C8F72-ED30-472E-8046-A8F849843A55}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.FuelReport", "BrandexBusinessSuite.FuelReport\BrandexBusinessSuite.FuelReport.csproj", "{E466F0F7-D860-46A7-B3FB-862CAB9E824B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,5 +45,9 @@ Global
 		{FE8C8F72-ED30-472E-8046-A8F849843A55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE8C8F72-ED30-472E-8046-A8F849843A55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE8C8F72-ED30-472E-8046-A8F849843A55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E466F0F7-D860-46A7-B3FB-862CAB9E824B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E466F0F7-D860-46A7-B3FB-862CAB9E824B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E466F0F7-D860-46A7-B3FB-862CAB9E824B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E466F0F7-D860-46A7-B3FB-862CAB9E824B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

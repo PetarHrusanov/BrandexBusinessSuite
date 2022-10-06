@@ -228,9 +228,7 @@ public class ConversionController : ApiController
 
             var productRow = row.GetCell(2);
             if (productRow == null) continue;
-
             var product = productRow.ToString()?.TrimEnd();
-
             if (string.IsNullOrEmpty(product)) continue;
 
             product = products.Where(e => product.Contains(e.GoogleName, StringComparison.CurrentCultureIgnoreCase))
