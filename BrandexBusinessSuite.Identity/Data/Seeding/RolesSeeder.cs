@@ -33,7 +33,6 @@ internal class RolesSeeder : ISeeder
             .Run(async () =>
             {
                 var roleManager = _serviceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-
                 await SeedRoleAsync(roleManager, AdministratorRoleName);
             })
             .GetAwaiter()
