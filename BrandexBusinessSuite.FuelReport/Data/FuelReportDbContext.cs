@@ -15,7 +15,9 @@ public class FuelReportDbContext: DbContext
     public DbSet<CarBrand> CarBrands { get; set; }
     public DbSet<CarModel> CarModels { get; set; }
     public DbSet<Driver> Drivers { get; set; }
-    // public DbSet<DriverCar> DriversCars { get; set; }
+    
+    public DbSet<DriverCar> DriversCars { get; set; }
+    
     public DbSet<DriverRegion> DriverRegions { get; set; }
     public DbSet<Region> Regions { get; set; }
     public DbSet<RouteLog> RouteLogs { get; set; }

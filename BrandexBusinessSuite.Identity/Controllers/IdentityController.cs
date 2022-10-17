@@ -59,6 +59,14 @@ public class IdentityController : ApiController
         // if (!result.Succeeded) return BadRequest(result.Errors);
 
     }
+    
+    [HttpGet]
+    [AuthorizeAdministrator]
+    public async Task<UsersIds[] > GetUsers()
+    {
+        return await _identity.GetUsers();
+
+    }
 
     [HttpPost]
     public async Task<ActionResult<UserOutputModel>> Login(UserInputModel input)

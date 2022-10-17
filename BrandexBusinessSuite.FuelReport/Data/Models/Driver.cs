@@ -13,12 +13,9 @@ public class Driver : IAuditInfo, IDeletableEntity
     
     public bool Active { get; set; }
     
-    // public int CarId { get; set; }
-    // public virtual Car Car { get; set; }
-    
     public virtual ICollection<DriverCar> DriverCars { get; set; }
     
-    public virtual ICollection<DriverRegion> RegionsDriver { get; set; }
+    public virtual ICollection<DriverRegion> DriverRegions { get; set; }
 
     public DateTime CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }

@@ -1,4 +1,8 @@
 using BrandexBusinessSuite.FuelReport.Data.Seeding;
+using BrandexBusinessSuite.FuelReport.Services.CarBrands;
+using BrandexBusinessSuite.FuelReport.Services.CarModels;
+using BrandexBusinessSuite.FuelReport.Services.Cars;
+using BrandexBusinessSuite.FuelReport.Services.Drivers;
 using BrandexBusinessSuite.Services.Data;
 
 namespace BrandexBusinessSuite.FuelReport;
@@ -31,6 +35,10 @@ public class Startup
     {
         services
             .AddWebService<FuelReportDbContext>(_configuration)
+            .AddTransient<ICarBrandService, CarBrandService>()
+            .AddTransient<ICarModelService, CarModelService>()
+            .AddTransient<ICarService, CarService>()
+            .AddTransient<IDriverService, DriverService>()
             .AddTransient<ISeeder, ApplicationDbContextSeeder>();
         //     .AddTransient<ICitiesService, CitiesService>()
         //     .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()

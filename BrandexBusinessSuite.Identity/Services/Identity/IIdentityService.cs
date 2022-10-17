@@ -12,5 +12,7 @@ public interface IIdentityService
     Task<Result<UserOutputModel>> Login(UserInputModel userInput);
     Task CreateRole(string input);
     Task<string[]> GetRoles();
+    
+    Task<UsersIds[]> GetUsers();
     Task<Result> ChangePassword(string userId, ChangePasswordInputModel changePasswordInput);
 }

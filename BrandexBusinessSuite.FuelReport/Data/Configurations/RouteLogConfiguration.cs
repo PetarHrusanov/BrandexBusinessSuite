@@ -25,9 +25,8 @@ public class RouteLogConfiguration: IEntityTypeConfiguration<RouteLog>
         
         builder
             .HasOne(c => c.DriverCar)
-            .WithMany(c => c.RouteLogs);
-            
-            // .HasForeignKey(c => new {c.DriverId, c.CarId});
+            .WithMany(c => c.RouteLogs)
+            .HasForeignKey(c => new {c.DriverCarDriverId, c.DriverCarCarId});
 
     }
 }

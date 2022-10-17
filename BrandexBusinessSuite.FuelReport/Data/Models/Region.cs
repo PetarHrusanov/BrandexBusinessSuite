@@ -8,7 +8,7 @@ public class Region : IAuditInfo, IDeletableEntity
     
     public string Name { get; set; }
     
-    public virtual ICollection<DriverRegion> RegionsDriver { get; set; }
+    public virtual ICollection<DriverRegion> DriverRegions { get; set; }
     
     public DateTime CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }

@@ -54,9 +54,9 @@ public class ApplicationDbContextSeeder : ISeeder
     private static IEnumerable<CarBrand> GetCarBrands()
         => new List<CarBrand>
         {
-            new() { Name = "Renault" },
-            new() { Name = "Citroen" },
-            new() { Name = "Toyota" },
+            new() { Name = "RENAULT" },
+            new() { Name = "CITROEN" },
+            new() { Name = "TOYOTA" },
         };
     
 }

@@ -12,6 +12,16 @@ public class DriverRegionConfiguration: IEntityTypeConfiguration<DriverRegion>
         builder
             .Property(c => c.Active)
             .IsRequired();
+        
+        builder
+            .HasOne(c => c.Region)
+            .WithMany(c => c.DriverRegions)
+            .HasForeignKey(c => c.RegionId);
+        
+        builder
+            .HasOne(c => c.Driver)
+            .WithMany(c => c.DriverRegions)
+            .HasForeignKey(c => c.DriverId);
 
     }
 }

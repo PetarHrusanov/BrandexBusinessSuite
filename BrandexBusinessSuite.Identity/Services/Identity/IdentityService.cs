@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.Identity.Services.Identity;
+﻿using AutoMapper;
+
+namespace BrandexBusinessSuite.Identity.Services.Identity;
 
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,15 +19,19 @@ public class IdentityService : IIdentityService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly ITokenGeneratorService _jwtTokenGenerator;
+    private readonly IMapper _mapper;
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         RoleManager<ApplicationRole> roleManager,
-        ITokenGeneratorService jwtTokenGenerator)
+        ITokenGeneratorService jwtTokenGenerator,
+        IMapper mapper
+        )
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _mapper = mapper;
     }
 
     public async Task<Result<ApplicationUser>> Register(UserInputModel userInput)
@@ -83,6 +89,11 @@ public class IdentityService : IIdentityService
     public async Task<string[]> GetRoles()
     {
         return await _roleManager.Roles.Select(r => r.Name).ToArrayAsync();
+    }
+
+    public async Task<UsersIds[]> GetUsers()
+    {
+        return await _mapper.ProjectTo<UsersIds>(_userManager.Users).ToArrayAsync();
     }
 
     public async Task<Result> ChangePassword(

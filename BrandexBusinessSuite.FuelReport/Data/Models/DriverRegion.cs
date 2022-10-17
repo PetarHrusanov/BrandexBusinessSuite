@@ -9,7 +9,7 @@ public class DriverRegion : IAuditInfo, IDeletableEntity
     public virtual Driver Driver { get; set; }
     
     public int RegionId { get; set; }
-    public Region Region { get; set; }
+    public virtual Region Region { get; set; }
     
     public bool Active { get; set; }
     public DateTime CreatedOn { get; set; }

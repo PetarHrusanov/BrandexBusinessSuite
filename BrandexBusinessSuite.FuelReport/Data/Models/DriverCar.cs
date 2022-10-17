@@ -7,10 +7,10 @@ using BrandexBusinessSuite.Data.Models.Common;
 public class DriverCar : IAuditInfo, IDeletableEntity
 {
     public int DriverId { get; set; }
-    public Driver Driver { get; set; }
+    public virtual Driver Driver { get; set; }
     
     public int CarId { get; set; }
-    public Car Car { get; set; }
+    public virtual Car Car { get; set; }
 
     public bool Active { get; set; }
     
