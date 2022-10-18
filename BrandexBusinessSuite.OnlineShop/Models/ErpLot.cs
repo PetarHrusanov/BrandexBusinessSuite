@@ -1,6 +1,6 @@
 using BrandexBusinessSuite.Models.ErpDocuments;
 
-namespace BrandexBusinessSuite.OnlineShop.Data.Models;
+namespace BrandexBusinessSuite.OnlineShop.Models;
 
 public class ErpLot
 {

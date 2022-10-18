@@ -1,3 +1,5 @@
+using BrandexBusinessSuite.OnlineShop.Services.DeliveryPrices;
+
 namespace BrandexBusinessSuite.OnlineShop.Controllers;
 
 using System.Text;
@@ -16,7 +18,6 @@ using WooCommerceNET;
 using WooCommerceNET.WooCommerce.v3;
 
 using BrandexBusinessSuite.Models.ErpDocuments;
-using BrandexBusinessSuite.OnlineShop.Data.Models;
 using Models.Speedy;
 using Services.SalesAnalysis;
 using Services.Products;
@@ -41,6 +42,7 @@ public class OnlineShopController : ApiController
     
     private readonly IProductsService _productsService;
     private readonly ISalesAnalysisService _salesAnalysisService;
+    private readonly IDeliveryPriceService _deliveryPriceService;
 
     private static readonly HttpClient Client = new();
     
@@ -49,7 +51,8 @@ public class OnlineShopController : ApiController
         IOptions<ErpUserSettings> erpUserSettings,
         IOptions<WooCommerceSettings> wooCommerceSettings,
         IProductsService productsService,
-        ISalesAnalysisService salesAnalysisService
+        ISalesAnalysisService salesAnalysisService,
+        IDeliveryPriceService deliveryPriceService
     )
     {
         _hostEnvironment = hostEnvironment;
@@ -58,6 +61,7 @@ public class OnlineShopController : ApiController
         _wooCommerceSettings = wooCommerceSettings.Value;
         _productsService = productsService;
         _salesAnalysisService = salesAnalysisService;
+        _deliveryPriceService = deliveryPriceService;
     }
 
     [HttpGet]
@@ -176,12 +180,15 @@ public class OnlineShopController : ApiController
 
             if (order.shipping_total!=0)
             {
+
+                var delivery = await _deliveryPriceService.GetDeliveryPrice();
+                
                 var line = new ErpSalesLines(
-                    $"General_Products_Products(2753534d-23b6-4bde-afa3-889ebc41f18f)",
+                    $"General_Products_Products({delivery.ErpId})",
                     1,
                     0,
-                    $"Crm_ProductPrices(48621f6d-7dbe-4995-8c22-e39fc91b7ec5)",
-                    (decimal)4.58
+                    $"Crm_ProductPrices({delivery.ErpPriceId})",
+                    delivery.Price
                 );
                 
                 erpSale.Lines.Add(line);
@@ -392,13 +399,7 @@ public class OnlineShopController : ApiController
 
         var ordersDatabase = await _salesAnalysisService.GetCheckModelsByDate(date.Date);
 
-        // orderList = orderList.Where(order => ordersDatabase. All(p => p.OrderNumber != order.number)).ToList();
-        
-        // orderList = orderList.Except(ordersDatabase);
-        
         orderList.RemoveAll(x=> ordersDatabase.Any(y=>y.OrderNumber==x.number));
-        
-        // orderList = orderList.Where(order => !ordersDatabase[Order].Contains())
 
         var productsDb = await _productsService.GetCheckModels();
         

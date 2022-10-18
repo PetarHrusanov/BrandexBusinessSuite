@@ -44,16 +44,6 @@ public class Startup
             .AddTransient<IRegionsService, RegionsService>()
             .AddTransient<IRouteLogService, RouteLogService>()
             .AddTransient<ISeeder, ApplicationDbContextSeeder>();
-        //     .AddTransient<ICitiesService, CitiesService>()
-        //     .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()
-        //     .AddTransient<IDistributorService, DistributorService>()
-        //     .AddTransient<IPharmaciesService, PharmaciesService>()
-        //     .AddTransient<IPharmacyChainsService, PharmacyChainsService>()
-        //     .AddTransient<IProductsService, ProductsService>()
-        //     .AddTransient<IRegionsService, RegionsService>()
-        //     .AddTransient<ISalesService, SalesService>()
-        // // .AddMessaging(_configuration);
-
     }
 
         

@@ -1,3 +1,6 @@
+using BrandexBusinessSuite.OnlineShop.Data.Models;
+using BrandexBusinessSuite.OnlineShop.Services.DeliveryPrices;
+
 namespace BrandexBusinessSuite.OnlineShop;
 
 using Microsoft.AspNetCore.Builder;
@@ -46,7 +49,8 @@ public class Startup
             .AddWebService<OnlineShopDbContext>(_configuration)
             .AddTransient<ISeeder, ApplicationDbContextSeeder>()
             .AddTransient<IProductsService, ProductsService>()
-            .AddTransient<ISalesAnalysisService, SalesAnalysisService>();
+            .AddTransient<ISalesAnalysisService, SalesAnalysisService>()
+            .AddTransient<IDeliveryPriceService, DeliveryPriceService>();
 
     }
 

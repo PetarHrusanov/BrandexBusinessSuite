@@ -8,21 +8,30 @@ using static Common.ProductConstants;
 public class ApplicationDbContextSeeder : ISeeder
 {
     
-    private readonly OnlineShopDbContext db;
+    private readonly OnlineShopDbContext _db;
 
     public ApplicationDbContextSeeder(OnlineShopDbContext db)
     {
-        this.db = db;
+        _db = db;
     }
     
     public void SeedAsync()
     {
-        if (db.Products.Any()) return;
+        if (!_db.DeliveryPrices.Any())
+        {
+            foreach (var delivery in GetDeliveryPrice())
+            {
+                _db.DeliveryPrices.Add(delivery);
+            }
+            _db.SaveChanges();
+        }
+        
+        if (_db.Products.Any()) return;
         foreach (var product in GetProducts())
         {
-            db.Products.Add(product);
+            _db.Products.Add(product);
         }
-        db.SaveChanges();
+        _db.SaveChanges();
     }
 
     private static IEnumerable<Product> GetProducts() =>
@@ -216,4 +225,16 @@ public class ApplicationDbContextSeeder : ISeeder
                 ErpSampleCode = ErpSampleCodes.Ceget
             }
         };
+
+    private static IEnumerable<DeliveryPrice> GetDeliveryPrice() =>
+        new List<DeliveryPrice>
+        {
+            new()
+            {
+                ErpId = "2753534d-23b6-4bde-afa3-889ebc41f18f",
+                ErpPriceId = "48621f6d-7dbe-4995-8c22-e39fc91b7ec5",
+                Price = (decimal)4.58
+            }
+        };
+
 }
