@@ -24,6 +24,10 @@ public class RouteLogConfiguration: IEntityTypeConfiguration<RouteLog>
             .IsRequired();
         
         builder
+            .Property(c => c.Date)
+            .IsRequired();
+        
+        builder
             .HasOne(c => c.DriverCar)
             .WithMany(c => c.RouteLogs)
             .HasForeignKey(c => new {c.DriverCarDriverId, c.DriverCarCarId});

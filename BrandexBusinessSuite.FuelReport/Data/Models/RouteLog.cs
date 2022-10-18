@@ -15,6 +15,8 @@ public class RouteLog : IAuditInfo, IDeletableEntity
     
     [Column(TypeName = "decimal(18,4)")]
     public decimal MileageEnd { get; set; }
+    
+    public DateTime Date { get; set; }
 
     public int DriverCarDriverId { get; set; }
     public int DriverCarCarId { get; set; }

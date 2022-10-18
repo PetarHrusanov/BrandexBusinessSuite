@@ -14,6 +14,10 @@ using BrandexBusinessSuite.FuelReport.Models.Drivers;
 using BrandexBusinessSuite.FuelReport.Services.Cars;
 using BrandexBusinessSuite.FuelReport.Services.Drivers;
 using BrandexBusinessSuite.FuelReport.Models.DriverCar;
+using BrandexBusinessSuite.FuelReport.Models.DriverRegion;
+using BrandexBusinessSuite.FuelReport.Models.Regions;
+using BrandexBusinessSuite.FuelReport.Services.Regions;
+
 
 public class AdminController : AdministrationController
 {
@@ -21,13 +25,16 @@ public class AdminController : AdministrationController
     private readonly ICarModelService _carModelService;
     private readonly ICarService _carService;
     private readonly IDriverService _driverService;
+    private readonly IRegionsService _regionsService;
 
-    public AdminController(ICarBrandService carBrandService, ICarModelService carModelService, ICarService carService, IDriverService driverService)
+    public AdminController(ICarBrandService carBrandService, ICarModelService carModelService, ICarService carService,
+        IDriverService driverService, IRegionsService regionsService)
     {
         _carBrandService = carBrandService;
         _carModelService = carModelService;
         _carService = carService;
         _driverService = driverService;
+        _regionsService = regionsService;
     }
     
     [HttpGet]
@@ -46,6 +53,12 @@ public class AdminController : AdministrationController
     public async Task<CarAssignmentModel[]> GetCars()
     {
         return await _carService.GetAllRegistrationId();
+    }
+    
+    [HttpGet]
+    public async Task<RegionOutputModel[]> GetRegions()
+    {
+        return await _regionsService.GetAll();
     }
     
     [HttpGet]
@@ -86,6 +99,13 @@ public class AdminController : AdministrationController
     public async Task<ActionResult> UploadDriverCar([FromBody] DriverCarInputModel driverCarInput)
     {
         await _driverService.UploadDriverCar(driverCarInput);
+        return Result.Success;
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult> UploadDriverRegion([FromBody] DriverRegionInputModel driverRegionInput)
+    {
+        await _driverService.UploadDriverRegion(driverRegionInput);
         return Result.Success;
     }
 

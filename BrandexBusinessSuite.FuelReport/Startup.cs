@@ -3,6 +3,8 @@ using BrandexBusinessSuite.FuelReport.Services.CarBrands;
 using BrandexBusinessSuite.FuelReport.Services.CarModels;
 using BrandexBusinessSuite.FuelReport.Services.Cars;
 using BrandexBusinessSuite.FuelReport.Services.Drivers;
+using BrandexBusinessSuite.FuelReport.Services.Regions;
+using BrandexBusinessSuite.FuelReport.Services.RouteLogs;
 using BrandexBusinessSuite.Services.Data;
 
 namespace BrandexBusinessSuite.FuelReport;
@@ -39,6 +41,8 @@ public class Startup
             .AddTransient<ICarModelService, CarModelService>()
             .AddTransient<ICarService, CarService>()
             .AddTransient<IDriverService, DriverService>()
+            .AddTransient<IRegionsService, RegionsService>()
+            .AddTransient<IRouteLogService, RouteLogService>()
             .AddTransient<ISeeder, ApplicationDbContextSeeder>();
         //     .AddTransient<ICitiesService, CitiesService>()
         //     .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()
