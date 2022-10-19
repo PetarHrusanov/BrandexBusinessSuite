@@ -1,4 +1,4 @@
-using BrandexBusinessSuite.OnlineShop.Services.DeliveryPrices;
+using BrandexBusinessSuite.OnlineShop.Data.Models;
 
 namespace BrandexBusinessSuite.OnlineShop.Controllers;
 
@@ -18,12 +18,12 @@ using WooCommerceNET;
 using WooCommerceNET.WooCommerce.v3;
 
 using BrandexBusinessSuite.Models.ErpDocuments;
+using BrandexBusinessSuite.Services;
+using BrandexBusinessSuite.Controllers;
 using Models.Speedy;
 using Services.SalesAnalysis;
 using Services.Products;
-using BrandexBusinessSuite.Services;
-
-using BrandexBusinessSuite.Controllers;
+using Services.DeliveryPrices;
 using Requests;
 using Models;
 
@@ -62,6 +62,20 @@ public class OnlineShopController : ApiController
         _productsService = productsService;
         _salesAnalysisService = salesAnalysisService;
         _deliveryPriceService = deliveryPriceService;
+    }
+
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    public async Task<DeliveryPrice> GetDeliveryPrice()
+    {
+        return await _deliveryPriceService.GetDeliveryPrice();
+    }
+    
+    [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    public async Task EditDeliveryPrice(DeliveryPrice deliveryPrice)
+    { 
+        await _deliveryPriceService.EditDeliveryPrice(deliveryPrice);
     }
 
     [HttpGet]

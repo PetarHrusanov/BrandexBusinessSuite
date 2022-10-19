@@ -1,8 +1,8 @@
+namespace BrandexBusinessSuite.OnlineShop.Services.DeliveryPrices;
+
 using BrandexBusinessSuite.OnlineShop.Data;
 using BrandexBusinessSuite.OnlineShop.Data.Models;
 using Microsoft.EntityFrameworkCore;
-
-namespace BrandexBusinessSuite.OnlineShop.Services.DeliveryPrices;
 
 public class DeliveryPriceService :IDeliveryPriceService
 {
@@ -16,5 +16,15 @@ public class DeliveryPriceService :IDeliveryPriceService
     public async Task<DeliveryPrice> GetDeliveryPrice()
     {
         return (await _db.DeliveryPrices.FirstOrDefaultAsync())!;
+    }
+
+    public async Task EditDeliveryPrice(DeliveryPrice deliveryPriceEdit)
+    {
+        var deliveryPrice = await _db.DeliveryPrices.Where(d => d.Id == deliveryPriceEdit.Id).FirstOrDefaultAsync();
+        deliveryPrice.ErpId = deliveryPriceEdit.ErpId;
+        deliveryPrice.ErpPriceId = deliveryPriceEdit.ErpPriceId;
+        deliveryPrice.Price = deliveryPriceEdit.Price;
+
+        await _db.SaveChangesAsync();
     }
 }
