@@ -1,5 +1,3 @@
-using BrandexBusinessSuite.Services.Identity;
-
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
 using System.Globalization;
@@ -25,13 +23,13 @@ using Services.MediaTypes;
 using Services.Products;
 using Infrastructure;
 using Services.AdMedias;
+using BrandexBusinessSuite.Services.Identity;
 
 using static Common.Constants;
 using static Common.ErpConstants;
 
 using static Methods.ExcelMethods;
 using static Requests.RequestsMethods;
-using static Methods.FieldsValuesMethods;
 
 public class MarketingActivityController : ApiController
 {
@@ -91,6 +89,15 @@ public class MarketingActivityController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<ActionResult<MarketingActivityEditModel>> Edit(MarketingActivityEditModel input)
         => await _marketingActivitiesService.Edit(input) ?? throw new InvalidOperationException();
+
+    [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<ActionResult> Delete([FromForm] string id)
+    {
+        var shema = Int32.Parse(id);
+        await _marketingActivitiesService.Delete(shema);
+        return Result.Success;
+    }
 
     [HttpPost]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
@@ -257,10 +264,6 @@ public class MarketingActivityController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<DateTime> CreateTemplate()
     {
-
-        // await _marketingActivitiesService.PayMarketingActivity(id);
-        // return Result.Success;
         return await _marketingActivitiesService.MarketingActivitiesTemplate();
-
     }
 }

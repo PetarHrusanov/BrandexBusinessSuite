@@ -178,6 +178,14 @@ public class MarketingActivitiesService : IMarketingActivitesService
 
     }
 
+    public async Task Delete(int id)
+    {
+        var activity = await _db.MarketingActivities.Where(m => m.Id == id).FirstOrDefaultAsync();
+        _db.Remove(activity);
+        await _db.SaveChangesAsync();
+
+    }
+
     public async Task PayMarketingActivity(int id)
     {
         var marketingActivity = await _db.MarketingActivities.Where(m => m.Id == id).FirstOrDefaultAsync();

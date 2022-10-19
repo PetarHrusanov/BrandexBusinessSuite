@@ -16,6 +16,8 @@ public interface IMarketingActivitesService
 
     Task<MarketingActivityEditModel?> Edit(MarketingActivityEditModel inputModel);
     
+    Task Delete(int id);
+    
     Task PayMarketingActivity(int id);
     
     Task ErpPublishMarketingActivity(int id);
