@@ -1,5 +1,6 @@
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using NPOI.SS.UserModel;
@@ -14,10 +15,9 @@ using Models.Products;
 using Services.Products;
 
 using static Methods.ExcelMethods;
-
 using static Common.Constants;
 
-public class ProductController : AdministrationController
+public class ProductController : ApiController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly IProductsService _productsService;
@@ -29,12 +29,14 @@ public class ProductController : AdministrationController
     }
     
     [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<List<ProductCheckModel>> GetProducts()
     {
         return await _productsService.GetCheckModels();
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<string>> Import([FromForm] IFormFile file)
     {

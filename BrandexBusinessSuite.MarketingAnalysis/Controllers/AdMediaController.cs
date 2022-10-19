@@ -1,5 +1,6 @@
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
@@ -16,7 +17,7 @@ using Services.AdMedias;
 using static Methods.ExcelMethods;
 using static Common.Constants;
 
-public class AdMediaController : AdministrationController
+public class AdMediaController : ApiController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly IAdMediasService _adMediasService;
@@ -30,12 +31,14 @@ public class AdMediaController : AdministrationController
     }
     
     [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<List<AdMediaCheckModel>> GetAdMedias()
     {
         return await _adMediasService.GetCheckModels();
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<string>> Import([FromForm] IFormFile file)
     {

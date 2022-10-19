@@ -1,5 +1,6 @@
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using NPOI.SS.UserModel;
@@ -13,8 +14,9 @@ using Services.Companies;
 using Common;
 
 using static Methods.ExcelMethods;
+using static Common.Constants;
 
-public class CompanyController : AdministrationController
+public class CompanyController : ApiController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly ICompaniesService _companiesService;
@@ -26,12 +28,11 @@ public class CompanyController : AdministrationController
     }
     
     [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult> Import([FromForm] IFormFile file)
     {
-
-        // var errorDictionary = new List<string>();
-
+        
         var companiesCheck = await _companiesService.GetCheckModels();
 
         var uniqueCompanies = new List<CompaniesInputModel>();
@@ -79,8 +80,7 @@ public class CompanyController : AdministrationController
         await _companiesService.UploadBulk(uniqueCompanies);
         
         return Result.Success;
-
-        // return JsonConvert.SerializeObject(errorDictionary.ToArray());
+        
     }
     
 }
