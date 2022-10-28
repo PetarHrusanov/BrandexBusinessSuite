@@ -14,16 +14,15 @@ using Newtonsoft.Json;
 
 using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Models.ErpDocuments;
-using Models.MediaTypes;
 using BrandexBusinessSuite.Services;
 
 using Models.MarketingActivities;
+using Models.MediaTypes;
 using Services.MarketingActivities;
 using Services.MediaTypes;
 using Services.Products;
 using Infrastructure;
 using Services.AdMedias;
-using BrandexBusinessSuite.Services.Identity;
 
 using static Common.Constants;
 using static Common.ErpConstants;
@@ -39,8 +38,6 @@ public class MarketingActivityController : ApiController
     private readonly IProductsService _productsService;
     private readonly IAdMediasService _adMediasService;
     private readonly IMediaTypesService _mediaTypesService;
-    
-    private readonly ICurrentUserService _currentUser;
 
     private readonly ErpUserSettings _userSettings;
 
@@ -48,31 +45,28 @@ public class MarketingActivityController : ApiController
 
     public MarketingActivityController(IWebHostEnvironment hostEnvironment,
         IOptions<ErpUserSettings> userSettings,
-        IMarketingActivitesService marketingActivitesService, IProductsService productsService,
+        IMarketingActivitesService marketingActivitiesService, IProductsService productsService,
         IAdMediasService adMediasService,
-        IMediaTypesService mediaTypesService,
-        ICurrentUserService currentUser
+        IMediaTypesService mediaTypesService
     )
 
     {
         _hostEnvironment = hostEnvironment;
         _userSettings = userSettings.Value;
-        _marketingActivitiesService = marketingActivitesService;
+        _marketingActivitiesService = marketingActivitiesService;
         _productsService = productsService;
         _adMediasService = adMediasService;
         _mediaTypesService = mediaTypesService;
-        _currentUser = currentUser;
     }
     
     [HttpGet]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
-    public async Task<List<MediaTypesCheckModel>> GetAdMediaTypes()
-    {
-        return await _mediaTypesService.GetCheckModels();
-    }
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<List<MediaTypesCheckModel>> GetAdMediaTypes() 
+        => await _mediaTypesService.GetCheckModels();
+    
     
     [HttpGet]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     [Route(Id)]
     public async Task<ActionResult<MarketingActivityEditModel>> Details(int id)
         => await _marketingActivitiesService.GetDetails(id) ?? throw new InvalidOperationException();
@@ -92,10 +86,9 @@ public class MarketingActivityController : ApiController
 
     [HttpPost]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
-    public async Task<ActionResult> Delete([FromForm] string id)
+    public async Task<ActionResult> Delete([FromForm] int id)
     {
-        var shema = Int32.Parse(id);
-        await _marketingActivitiesService.Delete(shema);
+        await _marketingActivitiesService.Delete(id);
         return Result.Success;
     }
 
@@ -105,8 +98,6 @@ public class MarketingActivityController : ApiController
     public async Task<ActionResult<string>> Import([FromForm] MarketingBulkInputModel marketingBulkInputModel)
     {
         var dateForDb = DateTime.ParseExact(marketingBulkInputModel.Date, "dd-MM-yyyy", null);
-
-        var sheetName = marketingBulkInputModel.Sheet;
 
         var file = marketingBulkInputModel.ImageFile;
 
@@ -128,7 +119,7 @@ public class MarketingActivityController : ApiController
         stream.Position = 0;
 
         var hssfwb = new XSSFWorkbook(stream);
-        var sheet = hssfwb.GetSheet(sheetName);
+        var sheet = hssfwb.GetSheet(marketingBulkInputModel.Sheet);
 
         for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++) //Read Excel File
         {
@@ -137,31 +128,28 @@ public class MarketingActivityController : ApiController
             if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
             var sumRow = row.GetCell(6);
+            var productRow = row.GetCell(0);
 
-            if (sumRow == null) continue;
+            if (sumRow == null || productRow == null) continue;
 
             var sumString = sumRow.ToString()!.TrimEnd();
-
-            var productRow = row.GetCell(0);
-            if (productRow == null) continue;
-
             var productString = productRow.ToString()!.TrimEnd().ToUpper();
 
             if (!string.IsNullOrEmpty(sumString) & decimal.TryParse(sumString, out var sum) &
                 !string.IsNullOrEmpty(productString))
             {
-                var marketingActivityInput = new MarketingActivityInputModel();
-
-                marketingActivityInput.Price = sum;
-
-                marketingActivityInput.ProductId = products
-                    .Where(p => string.Equals(p.Name, productString, StringComparison.CurrentCultureIgnoreCase))
-                    .Select(p => p.Id)
-                    .FirstOrDefault();
+                var marketingActivityInput = new MarketingActivityInputModel
+                {
+                    Price = sum,
+                    ProductId = products
+                        .Where(p => string.Equals(p.Name, productString, StringComparison.CurrentCultureIgnoreCase))
+                        .Select(p => p.Id)
+                        .FirstOrDefault()
+                };
 
                 var adMediaRow = row.GetCell(1);
 
-                if (adMediaRow == null) throw new ArgumentException("GRESHNO ID BRAT");
+                if (adMediaRow == null) throw new ArgumentException("Incorrect Ad Media");
 
                 var adMediaString = adMediaRow.ToString()!.TrimEnd().ToUpper();
                 
@@ -203,19 +191,11 @@ public class MarketingActivityController : ApiController
     }
 
     [HttpGet]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
-    public async Task<MarketingActivityOutputModel[]> GetMarketingActivitiesByDate(string dateFormatted)
-    {
-        
-        var userId = _currentUser.UserId;
-
-        var date = DateTime.ParseExact(dateFormatted, "MM-yyyy",
-            CultureInfo.InvariantCulture);
-
-        var marketingActivitiesArray = await _marketingActivitiesService.GetMarketingActivitiesByDate(date);
-
-        return marketingActivitiesArray;
-    }
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<MarketingActivityOutputModel[]> GetMarketingActivitiesByDate(string dateFormatted) 
+        => await _marketingActivitiesService.GetMarketingActivitiesByDate(DateTime.ParseExact(dateFormatted, "MM-yyyy", 
+            CultureInfo.InvariantCulture));
+    
     
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
@@ -254,16 +234,13 @@ public class MarketingActivityController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<ActionResult> PayMarketingActivity(int id)
     {
-
         await _marketingActivitiesService.PayMarketingActivity(id);
         return Result.Success;
-
     }
     
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
-    public async Task<DateTime> CreateTemplate()
-    {
-        return await _marketingActivitiesService.MarketingActivitiesTemplate();
-    }
+    public async Task<DateTime> CreateTemplate() 
+        => await _marketingActivitiesService.MarketingActivitiesTemplate();
+    
 }

@@ -16,9 +16,7 @@ public class IdentityController : ApiController
     private readonly IIdentityService _identity;
     private readonly ICurrentUserService _currentUser;
 
-    public IdentityController(
-        IIdentityService identity,
-        ICurrentUserService currentUser)
+    public IdentityController(IIdentityService identity, ICurrentUserService currentUser)
     {
         _identity = identity;
         _currentUser = currentUser;
@@ -89,6 +87,5 @@ public class IdentityController : ApiController
             NewPassword = input.NewPassword
         });
     }
-    
-    
+
 }
