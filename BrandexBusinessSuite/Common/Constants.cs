@@ -5,6 +5,7 @@ public class Constants
     public const string AdministratorRoleName = "Administrator";
     public const string AccountantRoleName = "Accountant";
     public const string MarketingRoleName = "Marketing";
+    public const string ViewerExecutive = "Viewer Executive";
 
     public const string DefaultConnection = "DefaultConnection";
 
