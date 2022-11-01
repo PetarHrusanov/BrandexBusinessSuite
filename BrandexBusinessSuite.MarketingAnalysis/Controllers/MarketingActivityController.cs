@@ -199,8 +199,7 @@ public class MarketingActivityController : ApiController
     
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
-    [IgnoreAntiforgeryToken]
-    public async Task PostMarketingActivitiesToErp(int id)
+    public async Task PostMarketingActivitiesToErp([FromQuery] int id)
     {
 
         var marketingActivity = await _marketingActivitiesService.GetDetailsErp(id);

@@ -14,19 +14,17 @@ using BrandexBusinessSuite.Services.Data;
 
 public class Startup
 {
-    public IConfiguration Configuration { get; }
+    private readonly IConfiguration _configuration;
     
-    public Startup(IConfiguration configuration) => this.Configuration = configuration;
+    public Startup(IConfiguration configuration) => _configuration = configuration;
 
     public void ConfigureServices(IServiceCollection services)
     {
 
-        services.AddWebService<MarketingAnalysisDbContext>(Configuration);
-        
-        services
-            .Configure<ErpUserSettings>(
-                Configuration.GetSection(nameof(ErpUserSettings)), 
-                config => config.BindNonPublicProperties = true);
+        services.AddWebService<MarketingAnalysisDbContext>(_configuration);
+
+        services.Configure<ErpUserSettings>(_configuration.GetSection(nameof(ErpUserSettings)),
+            config => config.BindNonPublicProperties = true);
 
         services
             .AddTransient<IAdMediasService, AdMediasService>()
