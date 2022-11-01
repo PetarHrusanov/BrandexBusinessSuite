@@ -30,8 +30,6 @@ public static class ApplicationBuilderExtensions
                 .AllowAnyMethod())
             .UseAuthentication()
             .UseAuthorization()
-            // .UseEndpoints(endpoints => endpoints
-            //     .MapControllers());
             .UseEndpoints(endpoints =>
             {
                     
