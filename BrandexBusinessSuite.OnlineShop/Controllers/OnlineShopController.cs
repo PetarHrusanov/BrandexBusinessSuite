@@ -100,7 +100,6 @@ public class OnlineShopController : ApiController
         }
         
         return Result.Success;
-
     }
 
     [HttpGet]
