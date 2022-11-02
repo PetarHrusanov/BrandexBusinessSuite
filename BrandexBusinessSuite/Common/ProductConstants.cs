@@ -73,6 +73,7 @@ public class ProductConstants
     {
         public const string ZinSeD = "ЗИ-60";
         public const string EnzyMill = "ЕН-60";
+        public const string EnzyMillCompact = "ЕК-15";
         public const string CystiRen = "ЦИ-30";
         public const string LadyHarmonia = "ЛЕ-60";
         public const string DetoxiFive = "ДЕ-60";
@@ -157,17 +158,23 @@ public class ProductConstants
     {
         public const string ZinSeD = "ЗинСеД";
         public const string EnzyMill = "Ензи-Мил";
+        public const string EnzyMillCompact = "Ензи-мил компакт";
         public const string CystiRen = "Цистирен";
         public const string LadyHarmonia = "Лейди Хармония";
         public const string DetoxiFive = "ДетоксиФайв";
         public const string LaxaL = "Лаксал (псилиум)";
         public const string Bland = "Бланд 30 табл.";
         public const string DiabeForGluco = "ДиабеФор Глюко";
+        public const string DiabeForProtect = "ДиабеФор Протект";
         public const string GinkgoVin = "Гинко Вин";
+        public const string GinkgoVinCentella = "Гинко Вин+ Центела";
         public const string Venaxin = "Венаксин";
         public const string ForFlex = "Форфлекс";
+        public const string Flexen = "Флексен";
         public const string ProstaRen = "ПростаРен";
         public const string Sleep = "Слийп 30 табл.";
+        public const string Ceget = "Цегет+ ( с добавен Селен)";
+        public const string ViruFor = "ВируФор";
         public const string Botanic = "Ботаник";
         
         // Workaround - permanent solution should be considered
@@ -201,6 +208,7 @@ public class ProductConstants
     {
         public const string ZinSeD = "b84ee3e7-01d8-4a4e-9cef-5cc14e94f0d2";
         public const string EnzyMill = "e56d7f1b-212d-4821-985e-efcde41dcb0d";
+        public const string EnzyMillCompact = "804b0e3d-032d-4db0-8e24-268b3799a9cc";
         public const string CystiRen = "9237a1a9-5287-4724-a46b-9763c2fddaa3";
         public const string LadyHarmonia = "e619709a-c6b1-4abd-bf84-79a605b94791";
         public const string DetoxiFive = "17b1cf6f-216d-41fc-8795-65d1e24b31f4";
@@ -216,6 +224,8 @@ public class ProductConstants
         public const string ProstaRen = "cd744098-4a98-47ed-9cdc-c6aecf2e4ee3";
         public const string Sleep = "ba354fd5-eaae-4c78-ba4e-f7a1b29394a8";
         public const string Ceget = "a85cc41c-8715-4760-b53f-579fa7420f8a";
+        public const string ViruFor = "2749583b-1c80-42ea-b3cb-e5278f90cbb6";
+        
         public const string Botanic = "97eaee94-a96b-492d-89db-51e4d3d2a3cd";
         
         // Workaround - permanent solution should be considered
@@ -285,6 +295,29 @@ public class ProductConstants
         public const decimal Ceget = (decimal)9.075;
     }
     
+    public class PriceNoVat
+    {
+        public const double ZinSeD = 12.00;
+        public const double EnzyMill = 18.25;
+        public const double EnzyMillCompact = 8.00;
+        public const double CystiRen = 12.00;
+        public const double LadyHarmonia = 17.25;
+        public const double DetoxiFive = 17.25;
+        public const double LaxaL = 10.50;
+        public const double Bland = 8.25;
+        public const double DiabeForGluco = 14.25;
+        public const double DiabeForProtect = 14.25;
+        public const double GinkgoVin = 17.25;
+        public const double GinkgoVinCentella = 10.50;
+        public const double Venaxin = 21.00;
+        public const double ForFlex = 21.00;
+        public const double Flexen = 17.25;
+        public const double ProstaRen = 17.25;
+        public const double Sleep = 8.25;
+        public const double Ceget = 8.25;
+        public const double ViruFor = 18.25;
+    }
+    
     
 
     public class ErpMarketing
@@ -325,6 +358,30 @@ public class ProductConstants
         public const string Sleep = "Sleep";
         public const string Ceget = "Ceget";
         public const string ViruFor = "ViruFor";
+        public const string Botanic = "Botanic";
+    }
+    
+    public class BrandexId
+    {
+        public const int ZinSeD = 184701;
+        public const int EnzyMill = 183301;
+        public const int EnzyMillCompact = 183311;
+        public const int CystiRen = 183501;
+        public const int LadyHarmonia = 184101;
+        public const int DetoxiFive = 183901;
+        public const int LaxaL = 182301;
+        public const int Bland = 181111;
+        public const int DiabeForGluco = 184301;
+        public const int DiabeForProtect = 184501;
+        public const int GinkgoVin = 182701;
+        public const int GinkgoVinCentella = 182703;
+        public const int Venaxin = 184901;
+        public const int ForFlex = 182601;
+        public const int Flexen = 182501;
+        public const int ProstaRen = 183701;
+        public const int Sleep = 181311;
+        public const int Ceget = 183103;
+        public const int ViruFor = 185101;
         public const string Botanic = "Botanic";
     }
     

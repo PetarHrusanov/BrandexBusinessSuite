@@ -1,4 +1,4 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Data.Confirugations;
+﻿namespace BrandexBusinessSuite.SalesBrandex.Data.Configurations;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -23,10 +23,7 @@ internal class SaleConfiguration
             .HasOne(p => p.Pharmacy)
             .WithMany(s => s.Sales)
             .HasForeignKey(s => s.PharmacyId);
-
-        builder
-            .HasOne(p => p.Distributor)
-            .WithMany(s => s.Sales)
-            .HasForeignKey(s => s.DistributorId);
+        
+        
     }
 }

@@ -7,7 +7,7 @@ public class CrmCustomer
     public string Id { get; set; }
     
     [JsonProperty("CustomProperty_GRAD_u002DKLIENT")]
-    public ErpCharacteristicValueValueId City { get; set; }
+    public ErpCharacteristicValueValueId? City { get; set; }
     
     [JsonProperty("CustomProperty_Klas_u0020Klient")]
     public ErpCharacteristicValueValueId? Class { get; set; } = null;

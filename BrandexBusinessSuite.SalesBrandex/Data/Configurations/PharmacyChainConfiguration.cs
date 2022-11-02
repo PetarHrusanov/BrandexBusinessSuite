@@ -1,8 +1,9 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Data.Confirugations;
+﻿namespace BrandexBusinessSuite.SalesBrandex.Data.Configurations;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SalesAnalysis.Data.Models;
+
+using Models;
 
 internal class PharmacyChainConfiguration : IEntityTypeConfiguration<PharmacyChain>
 {

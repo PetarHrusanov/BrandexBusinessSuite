@@ -1,14 +1,50 @@
-using System.Collections.Immutable;
-using System.Text;
-using BrandexBusinessSuite.Controllers;
-using Microsoft.AspNetCore.Mvc;
-
 namespace BrandexBusinessSuite.SalesBrandex.Controllers;
+
+using System.Text;
+using System.Collections.Immutable;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+
+using Newtonsoft.Json;
+
+using Services;
+using BrandexBusinessSuite.Controllers;
+using Models.ErpDocuments;
+
+using static  Common.Constants;
+using static Common.ErpConstants;
+using static Requests.RequestsMethods;
 
 public class SalesController : ApiController
 {
+    private readonly ErpUserSettings _erpUserSettings;
+    private static readonly HttpClient Client = new();
     
+    public SalesController(IOptions<ErpUserSettings> erpUserSettings)
+    {
+        _erpUserSettings = erpUserSettings.Value;
+    }
     
+    [HttpGet]
+    [IgnoreAntiforgeryToken]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    public async Task<ActionResult> GetSales()
+    {
+        // var productsDb = await _productsService.GetCheckModels();
+        
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
+        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+        var responseContentJObj = await JObjectByUriGetRequest(Client,
+            $"{ErpRequests.BaseUrl}Crm_Sales_SalesOrders?$top=10000&$filter=CreationTime%20ge%202022-10-01T00:00:00.000Z%20and%20CreationTime%20le%202022-10-31T00:00:00.000Z&$select=DocumentDate,Id,ShipToCustomer&$expand=Lines($expand=Product($select=Id,Name);$select=Id,LineAmount,Product,Quantity),ShipToCustomer($expand=Party($select=CustomProperty_RETREG,PartyCode,PartyName);$select=CustomProperty_GRAD_u002DKLIENT,CustomProperty_Klas_u0020Klient,CustomProperty_STOR3,Id),ShipToPartyContactMechanism($expand=ContactMechanism;$select=ContactMechanism),ToParty($select=PartyName)");
+        var batchesList = JsonConvert.DeserializeObject<List<ErpSalesOrderAnalysis>>(responseContentJObj["value"].ToString());
+        
+        return Result.Success;
+
+    }
+
     private static readonly ImmutableDictionary<char, string> cyrillicToLatinMapping = new Dictionary<char, string>
     {
         { 'а', "a"}, { 'А', "A"},

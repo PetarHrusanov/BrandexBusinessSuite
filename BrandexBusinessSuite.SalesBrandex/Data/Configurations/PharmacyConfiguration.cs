@@ -1,9 +1,9 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Data.Confirugations;
+﻿namespace BrandexBusinessSuite.SalesBrandex.Data.Configurations;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SalesAnalysis.Data.Models;
 
+using Models;
 internal class PharmacyConfiguration
     : IEntityTypeConfiguration<Pharmacy>
 {
@@ -17,11 +17,6 @@ internal class PharmacyConfiguration
             .IsRequired();
 
         builder
-            .HasOne(c => c.PharmacyChain)
-            .WithMany(c => c.Pharmacies)
-            .HasForeignKey(c => c.PharmacyChainId);
-
-        builder
             .HasOne(c => c.Company)
             .WithMany(c => c.Pharmacies)
             .HasForeignKey(c => c.CompanyId);
@@ -30,11 +25,7 @@ internal class PharmacyConfiguration
             .HasOne(c => c.City)
             .WithMany(c => c.Pharmacies)
             .HasForeignKey(c => c.CityId);
-
-        builder
-            .HasOne(c => c.Region)
-            .WithMany(c => c.Pharmacies)
-            .HasForeignKey(c => c.RegionId);
+        
 
     }
 }

@@ -1,20 +1,19 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Data.Models;
-
-using System;
-using System.Collections.Generic;
-
 using BrandexBusinessSuite.Data.Models.Common;
 
-public class City : IAuditInfo, IDeletableEntity
+namespace BrandexBusinessSuite.SalesBrandex.Data.Models;
+
+public class Region : IAuditInfo, IDeletableEntity
 {
-    public City()
+    public Region()
     {
+
         Pharmacies = new HashSet<Pharmacy>();
     }
-
     public int Id { get; set; }
     public string Name { get; set; }
+
     public virtual ICollection<Pharmacy> Pharmacies { get; set; }
+    
     public DateTime CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }
     public bool IsDeleted { get; set; }
