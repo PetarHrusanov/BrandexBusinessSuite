@@ -31,7 +31,9 @@ public class ExcelDataConstants
     {
         public const string Pharmacies = "Pharmacies";
         public const string BrandexId = "BrandexId";
+        public const string ErpId = "ErpId";
         public const string Name = "Name";
+        public const string PartyCode = "PartyCode";
         public const string PharmacyClass = "PharmacyClass";
         public const string Active = "Active";
         public const string CompanyId = "CompanyId";

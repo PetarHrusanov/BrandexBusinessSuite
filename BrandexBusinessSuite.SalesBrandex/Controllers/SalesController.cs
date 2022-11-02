@@ -9,9 +9,9 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 
-using Services;
+using BrandexBusinessSuite.Services;
 using BrandexBusinessSuite.Controllers;
-using Models.ErpDocuments;
+using BrandexBusinessSuite.Models.ErpDocuments;
 
 using static  Common.Constants;
 using static Common.ErpConstants;
@@ -39,7 +39,12 @@ public class SalesController : ApiController
 
         var responseContentJObj = await JObjectByUriGetRequest(Client,
             $"{ErpRequests.BaseUrl}Crm_Sales_SalesOrders?$top=10000&$filter=CreationTime%20ge%202022-10-01T00:00:00.000Z%20and%20CreationTime%20le%202022-10-31T00:00:00.000Z&$select=DocumentDate,Id,ShipToCustomer&$expand=Lines($expand=Product($select=Id,Name);$select=Id,LineAmount,Product,Quantity),ShipToCustomer($expand=Party($select=CustomProperty_RETREG,PartyCode,PartyName);$select=CustomProperty_GRAD_u002DKLIENT,CustomProperty_Klas_u0020Klient,CustomProperty_STOR3,Id),ShipToPartyContactMechanism($expand=ContactMechanism;$select=ContactMechanism),ToParty($select=PartyName)");
-        var batchesList = JsonConvert.DeserializeObject<List<ErpSalesOrderAnalysis>>(responseContentJObj["value"].ToString());
+        var orderAnalyses = JsonConvert.DeserializeObject<List<ErpSalesOrderAnalysis>>(responseContentJObj["value"].ToString());
+
+        var cities = orderAnalyses.Select(c => c.ShipToCustomer.City.Value).ToList();
+        var pharmacyChains = orderAnalyses.Select(c => c.ShipToCustomer.PharmacyChain.Value).ToList();
+        
+        
         
         return Result.Success;
 

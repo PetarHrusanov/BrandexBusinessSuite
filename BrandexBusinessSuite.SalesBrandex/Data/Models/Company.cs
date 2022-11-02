@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 using BrandexBusinessSuite.Data.Models.Common;
 
-public class Company : IAuditInfo, IDeletableEntity
+public class                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   Company : IAuditInfo, IDeletableEntity
 {
     public Company()
     {
