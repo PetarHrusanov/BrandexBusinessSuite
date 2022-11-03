@@ -16,6 +16,7 @@ using Microsoft.Data.SqlClient;
 using Data.Models;
     
 using static BrandexBusinessSuite.Common.ExcelDataConstants.PharmacyChainsColumns;
+using static Common.ExcelDataConstants.Generic;
 using static  BrandexBusinessSuite.Common.Constants;
 
 public class PharmacyChainsService : IPharmacyChainsService

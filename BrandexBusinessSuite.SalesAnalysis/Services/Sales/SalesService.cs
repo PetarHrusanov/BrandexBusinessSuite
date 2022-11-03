@@ -15,6 +15,7 @@ using Models.Sales;
 using Microsoft.Extensions.Configuration;
 
 using static Common.ExcelDataConstants.SalesColumns;
+using static Common.ExcelDataConstants.Generic;
 using static Common.Constants;
 
 public class SalesService :ISalesService

@@ -11,8 +11,10 @@ public class ErpSalesOrderAnalysis
 
     public ICollection<ErpSalesLineAnalysis> Lines { get; set; } = new HashSet<ErpSalesLineAnalysis>();
     
-    public CrmCustomer ShipToCustomer { get; set; }
+    public CrmCustomer? ShipToCustomer { get; set; }
 
     public ErpShipToPartyContactMechanism ShipToPartyContactMechanism { get; set; }
+    
+    public ErpToPartyAnalysis ToParty { get; set; }
     
 }

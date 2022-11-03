@@ -1,4 +1,4 @@
-namespace BrandexBusinessSuite.Models;
+namespace BrandexBusinessSuite.Models.DataModels;
 
 public class BasicCheckModel
 {

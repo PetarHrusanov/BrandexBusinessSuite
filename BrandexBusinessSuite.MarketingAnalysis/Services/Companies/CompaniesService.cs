@@ -10,6 +10,7 @@ using BrandexBusinessSuite.MarketingAnalysis.Models.Companies;
 
 using static Common.ExcelDataConstants.CompaniesColumns;
 using static Common.Constants;
+using static Common.ExcelDataConstants.Generic;
 
 public class CompaniesService : ICompaniesService
 {

@@ -15,6 +15,7 @@ using SalesAnalysis.Data.Models;
 using SalesAnalysis.Models.Cities;
 
 using static Common.ExcelDataConstants.CitiesColumns;
+using static Common.ExcelDataConstants.Generic;
 using static Common.Constants;
 
 public class CitiesService :ICitiesService

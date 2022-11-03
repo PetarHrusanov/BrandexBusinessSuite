@@ -16,6 +16,7 @@ using Models.PharmacyCompanies;
 using Microsoft.Data.SqlClient;
     
 using static Common.ExcelDataConstants.CompaniesColumns;
+using static Common.ExcelDataConstants.Generic;
 using static  Common.Constants;
 
 public class PharmacyCompaniesService : IPharmacyCompaniesService

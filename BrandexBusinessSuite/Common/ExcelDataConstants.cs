@@ -2,6 +2,16 @@
 
 public class ExcelDataConstants
 {
+
+    public class Generic
+    {
+        public const string ErpId = "ErpId";
+        public const string Name = "Name";
+        public const string Date = "Date";
+        public const string Count = "Count";
+        public const string Regions = "Regions";
+    }
+    
     public class Ditributors
     {
         public const string Sopharma = "СОФАРМА";
@@ -23,16 +33,12 @@ public class ExcelDataConstants
         public const string PharmacyId = "PharmacyId";
         public const string ProductId = "ProductId";
         public const string DistributorId = "DistributorId";
-        public const string Date = "Date";
-        public const string Count = "Count";
     }
 
     public class PharmacyColumns
     {
         public const string Pharmacies = "Pharmacies";
         public const string BrandexId = "BrandexId";
-        public const string ErpId = "ErpId";
-        public const string Name = "Name";
         public const string PartyCode = "PartyCode";
         public const string PharmacyClass = "PharmacyClass";
         public const string Active = "Active";
@@ -51,21 +57,17 @@ public class ExcelDataConstants
     public class CitiesColumns
     {
         public const string Cities = "Cities";
-        public const string Name = "Name";
     }
         
     public class PharmacyChainsColumns
     {
         public const string PharmacyChains = "PharmacyChains";
-        public const string Name = "Name";
     }
         
     public class CompaniesColumns
     {
         public const string PharmacyCompanies = "Companies";
-        public const string Name = "Name";
         public const string Owner = "Owner";
-        public const string ErpId = "ErpId";
         public const string VAT = "VAT";
     }
         
