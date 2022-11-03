@@ -1,3 +1,5 @@
+using BrandexBusinessSuite.Models.Dates;
+
 namespace BrandexBusinessSuite.SalesBrandex.Controllers;
 
 using System.Text;
@@ -64,10 +66,10 @@ public class SalesController : ApiController
         _salesService = salesService;
     }
     
-    [HttpGet]
+    [HttpPost]
     [IgnoreAntiforgeryToken]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
-    public async Task<ActionResult> GetSales()
+    public async Task<ActionResult> GetSales([FromBody] DateStartEndInputModel dateStartEndInputModel)
     {
         var citiesCheck = await _citiesService.GetCitiesCheck();
         var companiesCheck = await _companiesService.GetPharmacyCompaniesCheck();
@@ -79,8 +81,11 @@ public class SalesController : ApiController
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
+        var dateStart = dateStartEndInputModel.DateStart.ToString("yyyy-MM-ddThh:mm:ss'Z'", CultureInfo.InvariantCulture);
+        var dateEnd = dateStartEndInputModel.DateEnd.ToString("yyyy-MM-ddThh:mm:ss'Z'", CultureInfo.InvariantCulture);
+
         string queryDate =
-            "Crm_Sales_SalesOrders?$top=10000&$filter=CreationTime%20ge%202022-10-01T00:00:00.000Z%20and%20CreationTime%20le%202022-10-31T00:00:00.000Z&$select=DocumentDate,Id,ShipToCustomer&$expand=Lines($expand=Product($select=Id,Name);$select=Id,LineAmount,Product,Quantity),ShipToCustomer($expand=Party($select=CustomProperty_RETREG,PartyCode,PartyName);$select=CustomProperty_GRAD_u002DKLIENT,CustomProperty_Klas_u0020Klient,CustomProperty_STOR3,Id),ShipToPartyContactMechanism($expand=ContactMechanism;$select=ContactMechanism),ToParty($select=PartyId,PartyName)";
+            $"Crm_Sales_SalesOrders?$top=10000&$filter=CreationTime%20ge%20{dateStart}%20and%20CreationTime%20le%20{dateEnd}&$select=DocumentDate,Id,ShipToCustomer&$expand=Lines($expand=Product($select=Id,Name);$select=Id,LineAmount,Product,Quantity),ShipToCustomer($expand=Party($select=CustomProperty_RETREG,PartyCode,PartyName);$select=CustomProperty_GRAD_u002DKLIENT,CustomProperty_Klas_u0020Klient,CustomProperty_STOR3,Id),ShipToPartyContactMechanism($expand=ContactMechanism;$select=ContactMechanism),ToParty($select=PartyId,PartyName)";
         
         var responseContentJObj = await JObjectByUriGetRequest(Client,
             $"{ErpRequests.BaseUrl}{queryDate}");
@@ -95,7 +100,6 @@ public class SalesController : ApiController
                 Name = c.ShipToCustomer.City.Value,
                 ErpId = c.ShipToCustomer.City.ValueId,
             }).ToList();
-
         var citiesNew = (from city in citiesSales 
             where citiesCheck.All(c => !string.Equals(c.ErpId, city.ErpId, StringComparison.CurrentCultureIgnoreCase)) 
             select city).ToList();
@@ -154,9 +158,6 @@ public class SalesController : ApiController
 
         foreach (var order in ordersDistinctClients)
         {
-            
-            Console.WriteLine(order.Id);
-            
             var newPharmacy = new PharmacyDbInputModel()
             {
                 BrandexId = 0,
@@ -189,7 +190,7 @@ public class SalesController : ApiController
             if (order.ShipToCustomer?.Class?.Value!=null)
             {
                 newPharmacy.PharmacyClass = (PharmacyClass)Enum.Parse(typeof(PharmacyClass),
-                    order.ShipToCustomer.Class?.Value?.ToString()?.TrimEnd() ?? string.Empty, true);
+                    order.ShipToCustomer.Class?.Value.TrimEnd() ?? string.Empty, true);
             }
 
             if (order.ToParty?.PartyId!=null)
