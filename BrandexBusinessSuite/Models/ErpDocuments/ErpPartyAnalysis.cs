@@ -4,8 +4,8 @@ namespace BrandexBusinessSuite.Models.ErpDocuments;
 
 public class ErpPartyAnalysis
 {
-    public string PartyCode { get; set; }
-    
+    public string? PartyCode { get; set; }
+
     [JsonProperty("CustomProperty_RETREG")]
     public ErpCharacteristicValueValueId Region { get; set; }
     

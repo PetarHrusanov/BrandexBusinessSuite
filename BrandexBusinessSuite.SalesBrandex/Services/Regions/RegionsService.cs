@@ -84,15 +84,4 @@ public class RegionsService :IRegionsService
         }).ToListAsync();
     }
 
-    public async Task<string> UploadCity(string city)
-    {
-        var cityModel = new City
-        {
-            Name = city
-        };
-        await _db.Cities.AddAsync(cityModel);
-        await _db.SaveChangesAsync();
-        return cityModel.Name;
-    }
-    
 }

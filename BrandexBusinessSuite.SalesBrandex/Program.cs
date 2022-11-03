@@ -6,7 +6,9 @@ using BrandexBusinessSuite.SalesBrandex.Services.Cities;
 using BrandexBusinessSuite.SalesBrandex.Services.Pharmacies;
 using BrandexBusinessSuite.SalesBrandex.Services.PharmacyChains;
 using BrandexBusinessSuite.SalesBrandex.Services.PharmacyCompanies;
+using BrandexBusinessSuite.SalesBrandex.Services.Products;
 using BrandexBusinessSuite.SalesBrandex.Services.Regions;
+using BrandexBusinessSuite.SalesBrandex.Services.Sales;
 using BrandexBusinessSuite.Services.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,8 +26,8 @@ builder.Services
     .AddTransient<IPharmaciesService, PharmaciesService>()
     .AddTransient<IPharmacyChainsService, PharmacyChainsService>()
     .AddTransient<IRegionsService, RegionsService>()
-    // .AddTransient<ISalesService, SalesService>()
-    // .AddTransient<IProductsService, ProductsService>()
+    .AddTransient<ISalesService, SalesService>()
+    .AddTransient<IProductsService, ProductsService>()
     .AddTransient<ISeeder, ApplicationDbContextSeeder>();
 
 var app = builder.Build();

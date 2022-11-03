@@ -15,6 +15,6 @@ public class CrmCustomer
     [JsonProperty("CustomProperty_STOR3")]
     public ErpCharacteristicValueValueId? PharmacyChain { get; set; } = null;
     
-    public ErpPartyAnalysis Party { get; set; }
+    public ErpPartyAnalysis? Party { get; set; }
     
 }

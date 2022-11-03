@@ -23,14 +23,14 @@ public class ApplicationDbContextSeeder : ISeeder
 
     public void SeedAsync()
     {
-        if (!_db.Regions.Any())
-        {
-            foreach (var region in GetRegions())
-            {
-                _db.Regions.Add(region);
-            }
-            _db.SaveChanges();
-        }
+        // if (!_db.Regions.Any())
+        // {
+        //     foreach (var region in GetRegions())
+        //     {
+        //         _db.Regions.Add(region);
+        //     }
+        //     _db.SaveChanges();
+        // }
         
         if (!_db.Products.Any())
         {
@@ -43,24 +43,24 @@ public class ApplicationDbContextSeeder : ISeeder
 
     }
     
-    private static IEnumerable<Region> GetRegions()
-            => new List<Region>
-            {
-                new() { Name = CentralOfficeSofia, ErpId = "kir"},
-                new() { Name = Ruse , ErpId = "kir"},
-                new() { Name = Varna , ErpId = "kir"},
-                new() { Name = Burgas , ErpId = "kir"},
-                new() { Name = StaraZagora , ErpId = "kir"},
-                new() { Name = SofiaLiulin , ErpId = "kir"},
-                new() { Name = SofiaMladost, ErpId = "kir" },
-                new() { Name = SofiaKrasnoSelo , ErpId = "kir"},
-                new() { Name = SofiaDrujba , ErpId = "kir"},
-                new() { Name = Plovdiv , ErpId = "kir"},
-                new() { Name = Pleven , ErpId = "kir"},
-                new() { Name = Vidin , ErpId = "kir"},
-                new() { Name = Unserviced , ErpId = "kir"},
-                new() { Name = Common.ExcelDataConstants.Regions.OnlineShop , ErpId = "kir"},
-            };
+    // private static IEnumerable<Region> GetRegions()
+    //         => new List<Region>
+    //         {
+    //             new() { Name = CentralOfficeSofia, ErpId = "kir"},
+    //             new() { Name = Ruse , ErpId = "kir"},
+    //             new() { Name = Varna , ErpId = "kir"},
+    //             new() { Name = Burgas , ErpId = "kir"},
+    //             new() { Name = StaraZagora , ErpId = "kir"},
+    //             new() { Name = SofiaLiulin , ErpId = "kir"},
+    //             new() { Name = SofiaMladost, ErpId = "kir" },
+    //             new() { Name = SofiaKrasnoSelo , ErpId = "kir"},
+    //             new() { Name = SofiaDrujba , ErpId = "kir"},
+    //             new() { Name = Plovdiv , ErpId = "kir"},
+    //             new() { Name = Pleven , ErpId = "kir"},
+    //             new() { Name = Vidin , ErpId = "kir"},
+    //             new() { Name = Unserviced , ErpId = "kir"},
+    //             new() { Name = Common.ExcelDataConstants.Regions.OnlineShop , ErpId = "kir"},
+    //         };
     
     private static IEnumerable<Product> GetProducts() =>
         new List<Product>

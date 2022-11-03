@@ -13,7 +13,7 @@ public class ErpSalesOrderAnalysis
     
     public CrmCustomer? ShipToCustomer { get; set; }
 
-    public ErpShipToPartyContactMechanism ShipToPartyContactMechanism { get; set; }
+    public ErpShipToPartyContactMechanism? ShipToPartyContactMechanism { get; set; }
     
     public ErpToPartyAnalysis ToParty { get; set; }
     

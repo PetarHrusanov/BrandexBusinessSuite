@@ -15,8 +15,8 @@ public class Pharmacy : IAuditInfo, IDeletableEntity
     public string ErpId { get; set; }
 
     public string Name { get; set; }
-    
-    public string PartyCode { get; set; }
+
+    public string PartyCode { get; set; } 
 
     public PharmacyClass? PharmacyClass{ get;set; }
 
