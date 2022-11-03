@@ -11,5 +11,11 @@ internal class CompanyConfiguration :IEntityTypeConfiguration<Company>
     {
         builder
             .HasKey(c => c.Id);
+        builder
+            .Property(c => c.Name)
+            .IsRequired();
+        builder
+            .Property(c => c.ErpId)
+            .IsRequired();
     }
 }

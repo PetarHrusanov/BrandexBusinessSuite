@@ -1,6 +1,6 @@
 ﻿using BrandexBusinessSuite.Models.DataModels;
 
-namespace BrandexBusinessSuite.SalesBrandex.Services.Cities;
+namespace BrandexBusinessSuite.SalesBrandex.Services.Regions;
 
 using System;
 using System.Data;
@@ -20,12 +20,12 @@ using static Common.ExcelDataConstants.CitiesColumns;
 using static Common.Constants;
 using static Common.ExcelDataConstants.Generic;
 
-public class CitiesService :ICitiesService
+public class RegionsService :IRegionsService
 {
     private readonly BrandexSalesAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
 
-    public CitiesService(BrandexSalesAnalysisDbContext db, IConfiguration configuration)
+    public RegionsService(BrandexSalesAnalysisDbContext db, IConfiguration configuration)
     {
         _db = db;
         _configuration = configuration;
@@ -34,7 +34,7 @@ public class CitiesService :ICitiesService
     public async Task UploadBulk(List<BasicErpInputModel> cities)
     {
         var table = new DataTable();
-        table.TableName = Cities;
+        table.TableName = Regions;
             
         table.Columns.Add(Name, typeof(string));
         table.Columns.Add(ErpId, typeof(string));
@@ -60,7 +60,7 @@ public class CitiesService :ICitiesService
             
         var objbulk = new SqlBulkCopy(con);  
             
-        objbulk.DestinationTableName = Cities;
+        objbulk.DestinationTableName = Regions;
             
         objbulk.ColumnMappings.Add(Name, Name);
         objbulk.ColumnMappings.Add(ErpId, ErpId);
@@ -74,7 +74,7 @@ public class CitiesService :ICitiesService
             
     }
 
-    public async Task<List<BasicCheckErpModel>> GetCitiesCheck()
+    public async Task<List<BasicCheckErpModel>> GetRegionsCheck()
     {
         return await _db.Cities.Select(p => new BasicCheckErpModel()
         {

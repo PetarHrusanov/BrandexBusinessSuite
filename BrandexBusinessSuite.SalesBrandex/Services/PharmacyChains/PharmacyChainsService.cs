@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.SalesBrandex.Services.PharmacyChains;
+﻿using BrandexBusinessSuite.Models.DataModels;
+
+namespace BrandexBusinessSuite.SalesBrandex.Services.PharmacyChains;
 
 using System;
 using System.Threading.Tasks;
@@ -15,6 +17,7 @@ using Data;
     
 using static Common.ExcelDataConstants.PharmacyChainsColumns;
 using static Common.Constants;
+using static Common.ExcelDataConstants.Generic;
 
 public class PharmacyChainsService : IPharmacyChainsService
 {
@@ -27,12 +30,13 @@ public class PharmacyChainsService : IPharmacyChainsService
         _configuration = configuration;
     }
         
-    public async Task UploadBulk(List<string> pharmacyChains)
+    public async Task UploadBulk(List<BasicErpInputModel> pharmacyChains)
     {
         var table = new DataTable();
         table.TableName = PharmacyChains;
             
         table.Columns.Add(Name, typeof(string));
+        table.Columns.Add(ErpId, typeof(string));
         
         table.Columns.Add(CreatedOn);
         table.Columns.Add(IsDeleted, typeof(bool));
@@ -40,7 +44,8 @@ public class PharmacyChainsService : IPharmacyChainsService
         foreach (var pharmacyChain in pharmacyChains)
         {
             var row = table.NewRow();
-            row[Name] = pharmacyChain;
+            row[Name] = pharmacyChain.Name;
+            row[ErpId] = pharmacyChain.ErpId;
             
             row[CreatedOn] = DateTime.Now;
             row[IsDeleted] = false;
@@ -57,6 +62,7 @@ public class PharmacyChainsService : IPharmacyChainsService
         objbulk.DestinationTableName = PharmacyChains;
             
         objbulk.ColumnMappings.Add(Name, Name);
+        objbulk.ColumnMappings.Add(ErpId, ErpId);
         
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
         objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
@@ -80,12 +86,13 @@ public class PharmacyChainsService : IPharmacyChainsService
 
     }
     
-    public async Task<List<BasicCheckModel>> GetPharmacyChainsCheck()
+    public async Task<List<BasicCheckErpModel>> GetPharmacyChainsCheck()
     {
-        return await _db.PharmacyChains.Select(p => new BasicCheckModel()
+        return await _db.PharmacyChains.Select(p => new BasicCheckErpModel()
         {
             Id = p.Id,
-            Name = p.Name
+            Name = p.Name,
+            ErpId = p.ErpId
         }).ToListAsync();
     }
 }

@@ -17,6 +17,7 @@ using Models.Pharmacies;
 
 using static Common.ExcelDataConstants.PharmacyColumns;
 using static  Common.Constants;
+using static Common.ExcelDataConstants.Generic;
 
 public class PharmaciesService : IPharmaciesService
 {

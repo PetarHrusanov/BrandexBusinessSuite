@@ -46,20 +46,20 @@ public class ApplicationDbContextSeeder : ISeeder
     private static IEnumerable<Region> GetRegions()
             => new List<Region>
             {
-                new() { Name = CentralOfficeSofia },
-                new() { Name = Ruse },
-                new() { Name = Varna },
-                new() { Name = Burgas },
-                new() { Name = StaraZagora },
-                new() { Name = SofiaLiulin },
-                new() { Name = SofiaMladost },
-                new() { Name = SofiaKrasnoSelo },
-                new() { Name = SofiaDrujba },
-                new() { Name = Plovdiv },
-                new() { Name = Pleven },
-                new() { Name = Vidin },
-                new() { Name = Unserviced },
-                new() { Name = Common.ExcelDataConstants.Regions.OnlineShop },
+                new() { Name = CentralOfficeSofia, ErpId = "kir"},
+                new() { Name = Ruse , ErpId = "kir"},
+                new() { Name = Varna , ErpId = "kir"},
+                new() { Name = Burgas , ErpId = "kir"},
+                new() { Name = StaraZagora , ErpId = "kir"},
+                new() { Name = SofiaLiulin , ErpId = "kir"},
+                new() { Name = SofiaMladost, ErpId = "kir" },
+                new() { Name = SofiaKrasnoSelo , ErpId = "kir"},
+                new() { Name = SofiaDrujba , ErpId = "kir"},
+                new() { Name = Plovdiv , ErpId = "kir"},
+                new() { Name = Pleven , ErpId = "kir"},
+                new() { Name = Vidin , ErpId = "kir"},
+                new() { Name = Unserviced , ErpId = "kir"},
+                new() { Name = Common.ExcelDataConstants.Regions.OnlineShop , ErpId = "kir"},
             };
     
     private static IEnumerable<Product> GetProducts() =>

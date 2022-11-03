@@ -8,11 +8,6 @@ using Enums;
 
 public class Pharmacy : IAuditInfo, IDeletableEntity
 {
-    public Pharmacy()
-    {
-        Sales = new HashSet<Sale>();
-    }
-
     public int Id { get; set; }
 
     public int BrandexId { get; set; }
@@ -39,7 +34,7 @@ public class Pharmacy : IAuditInfo, IDeletableEntity
     public int? RegionId { get; set; }
     public virtual Region Region { get; set; }   
 
-    public virtual ICollection<Sale> Sales { get; set; }
+    public virtual ICollection<Sale> Sales { get; set; } = new HashSet<Sale>();
 
     public DateTime CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }

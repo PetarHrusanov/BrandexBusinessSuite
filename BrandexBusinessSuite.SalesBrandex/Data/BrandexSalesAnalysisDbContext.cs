@@ -12,7 +12,6 @@ public class BrandexSalesAnalysisDbContext :DbContext
     {
     }
 
-   
     public DbSet<City> Cities { get; set; }
     public DbSet<Company> Companies { get; set; }
     public DbSet<PharmacyChain> PharmacyChains { get; set; }
