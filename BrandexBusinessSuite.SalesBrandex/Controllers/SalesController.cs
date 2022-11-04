@@ -1,5 +1,3 @@
-using BrandexBusinessSuite.Models.Dates;
-
 namespace BrandexBusinessSuite.SalesBrandex.Controllers;
 
 using System.Text;
@@ -15,6 +13,7 @@ using BrandexBusinessSuite.Services;
 using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Models.ErpDocuments;
 using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.Dates;
 using Models.Sales;
 using Data.Enums;
 using Models.Pharmacies;
@@ -77,6 +76,7 @@ public class SalesController : ApiController
         var regionsCheck = await _regionsService.GetRegionsCheck();
         var pharmaciesCheck = await _pharmaciesService.GetPharmaciesCheck();
         var productsCheck = await _productsService.GetProductsCheck();
+        var salesIds = await _salesService.QuickCheckListErpIdByDates(dateStartEndInputModel);
 
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
@@ -85,7 +85,7 @@ public class SalesController : ApiController
         var dateEnd = dateStartEndInputModel.DateEnd.ToString("yyyy-MM-ddThh:mm:ss'Z'", CultureInfo.InvariantCulture);
 
         string queryDate =
-            $"Crm_Sales_SalesOrders?$top=10000&$filter=CreationTime%20ge%20{dateStart}%20and%20CreationTime%20le%20{dateEnd}&$select=DocumentDate,Id,ShipToCustomer&$expand=Lines($expand=Product($select=Id,Name);$select=Id,LineAmount,Product,Quantity),ShipToCustomer($expand=Party($select=CustomProperty_RETREG,PartyCode,PartyName);$select=CustomProperty_GRAD_u002DKLIENT,CustomProperty_Klas_u0020Klient,CustomProperty_STOR3,Id),ShipToPartyContactMechanism($expand=ContactMechanism;$select=ContactMechanism),ToParty($select=PartyId,PartyName)";
+            $"Crm_Sales_SalesOrders?$filter=DocumentDate%20ge%20{dateStart}%20and%20DocumentDate%20le%20{dateEnd}&$select=DocumentDate,Id,ShipToCustomer&$expand=Lines($expand=Product($select=Id,Name);$select=Id,LineAmount,Product,Quantity),ShipToCustomer($expand=Party($select=CustomProperty_RETREG,PartyCode,PartyName);$select=CustomProperty_GRAD_u002DKLIENT,CustomProperty_Klas_u0020Klient,CustomProperty_STOR3,Id),ShipToPartyContactMechanism($expand=ContactMechanism;$select=ContactMechanism),ToParty($select=PartyName)";
         
         var responseContentJObj = await JObjectByUriGetRequest(Client,
             $"{ErpRequests.BaseUrl}{queryDate}");
@@ -120,7 +120,9 @@ public class SalesController : ApiController
         await _pharmacyChainsService.UploadBulk(pharmacyChainsNew);
         pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
 
-        var companiesSales = orderAnalyses.Select(c => new PharmacyCompanyInputModel()
+        var companiesSales = orderAnalyses
+            .Where(c=>c.ToParty?.PartyId!=null)
+            .Select(c => new PharmacyCompanyInputModel()
         {
             Name = c.ToParty.PartyName.BG,
             ErpId = c.ToParty.PartyId
@@ -226,9 +228,11 @@ public class SalesController : ApiController
         
         pharmaciesCheck = await _pharmaciesService.GetPharmaciesCheck();
 
+        var ordersUnique = orderAnalyses.Where(order => !salesIds.Contains(order.Id)).ToList();
+
         var salesNew = new List<SaleDbInputModel>();
 
-        foreach (var sale in orderAnalyses)
+        foreach (var sale in ordersUnique)
         {
             Console.WriteLine(sale.Id);
             foreach (var line in sale.Lines)

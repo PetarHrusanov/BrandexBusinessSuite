@@ -1,4 +1,7 @@
-﻿namespace BrandexBusinessSuite.SalesBrandex.Services.Sales;
+﻿using BrandexBusinessSuite.Models.Dates;
+using Microsoft.EntityFrameworkCore;
+
+namespace BrandexBusinessSuite.SalesBrandex.Services.Sales;
 
 using System;
 using System.Collections.Generic;
@@ -79,7 +82,11 @@ public class SalesService :ISalesService
             
     }
 
-
+    public async Task<List<string>> QuickCheckListErpIdByDates(DateStartEndInputModel dateStartEndInputModel)
+        => await _db.Sales
+            .Where(d => d.Date >= dateStartEndInputModel.DateStart && d.Date <= dateStartEndInputModel.DateEnd)
+            .Select(d => d.ErpId).ToListAsync();
+    
     // public async Task<int> ProductCountSumByIdDate(int productId, DateTime? dateBegin, DateTime? dateEnd, int? regionId)
     // {
     //
