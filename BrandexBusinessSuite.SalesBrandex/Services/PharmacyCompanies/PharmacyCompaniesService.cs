@@ -40,7 +40,7 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
         var table = new DataTable();
         table.TableName = PharmacyCompanies;
             
-        table.Columns.Add(Name, typeof(string));
+        table.Columns.Add(Name);
         table.Columns.Add(ErpId);
 
         table.Columns.Add(CreatedOn);

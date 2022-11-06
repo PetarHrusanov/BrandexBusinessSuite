@@ -76,7 +76,7 @@ public class RegionsService :IRegionsService
 
     public async Task<List<BasicCheckErpModel>> GetRegionsCheck()
     {
-        return await _db.Cities.Select(p => new BasicCheckErpModel()
+        return await _db.Regions.Select(p => new BasicCheckErpModel()
         {
             Id = p.Id,
             Name = p.Name,

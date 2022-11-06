@@ -85,7 +85,7 @@ public class SalesController : ApiController
         var dateEnd = dateStartEndInputModel.DateEnd.ToString("yyyy-MM-ddThh:mm:ss'Z'", CultureInfo.InvariantCulture);
 
         string queryDate =
-            $"Crm_Sales_SalesOrders?$filter=DocumentDate%20ge%20{dateStart}%20and%20DocumentDate%20le%20{dateEnd}&$select=DocumentDate,Id,ShipToCustomer&$expand=Lines($expand=Product($select=Id,Name);$select=Id,LineAmount,Product,Quantity),ShipToCustomer($expand=Party($select=CustomProperty_RETREG,PartyCode,PartyName);$select=CustomProperty_GRAD_u002DKLIENT,CustomProperty_Klas_u0020Klient,CustomProperty_STOR3,Id),ShipToPartyContactMechanism($expand=ContactMechanism;$select=ContactMechanism),ToParty($select=PartyName)";
+            $"Crm_Sales_SalesOrders?$filter=DocumentDate%20ge%20{dateStart}%20and%20DocumentDate%20le%20{dateEnd}&$select=DocumentDate,Id,ShipToCustomer&$expand=Lines($expand=Product($select=Id,Name);$select=Id,LineAmount,Product,Quantity),ShipToCustomer($expand=Party($select=CustomProperty_RETREG,PartyCode,PartyName);$select=CustomProperty_GRAD_u002DKLIENT,CustomProperty_Klas_u0020Klient,CustomProperty_STOR3,Id),ShipToPartyContactMechanism($expand=ContactMechanism;$select=ContactMechanism),ToParty($select=PartyId,PartyName)";
         
         var responseContentJObj = await JObjectByUriGetRequest(Client,
             $"{ErpRequests.BaseUrl}{queryDate}");
@@ -178,6 +178,7 @@ public class SalesController : ApiController
             if (order.ShipToCustomer?.Party.PartyCode!=null)
             {
                 newPharmacy.BrandexId = int.Parse(order.ShipToCustomer?.Party?.PartyCode ?? string.Empty);
+                newPharmacy.PartyCode = order.ShipToCustomer?.Party?.PartyCode;
                 newPharmacy.Name = companyLocations
                     .Where(c => c.PartyCode == order.ShipToCustomer?.Party?.PartyCode)
                     .Select(c => c.LocationName.BG).FirstOrDefault();
@@ -187,8 +188,7 @@ public class SalesController : ApiController
                 newPharmacy.RegionId = regionsCheck.Where(c => c.ErpId == order.ShipToCustomer?.Party?.Region.ValueId)
                     .Select(c => c.Id).FirstOrDefault();
             }
-            
-            
+
             if (order.ShipToCustomer?.Class?.Value!=null)
             {
                 newPharmacy.PharmacyClass = (PharmacyClass)Enum.Parse(typeof(PharmacyClass),
