@@ -14,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 
 using BrandexBusinessSuite.SalesBrandex.Data.Models;
 using Data;
-using BrandexBusinessSuite.Models;
 
 using static Common.ExcelDataConstants.CitiesColumns;
 using static Common.Constants;

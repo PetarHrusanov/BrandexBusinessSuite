@@ -44,6 +44,7 @@ public class SalesController : ApiController
     private readonly ISalesService _salesService;
 
     private const string PersonalClient = "Personal Client";
+    private const string DateErpFormat = "yyyy-MM-ddThh:mm:ss'Z'";
 
     public SalesController(IOptions<ErpUserSettings> erpUserSettings,
         IPharmaciesService pharmaciesService,
@@ -81,24 +82,23 @@ public class SalesController : ApiController
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
-        var dateStart = dateStartEndInputModel.DateStart.ToString("yyyy-MM-ddThh:mm:ss'Z'", CultureInfo.InvariantCulture);
-        var dateEnd = dateStartEndInputModel.DateEnd.ToString("yyyy-MM-ddThh:mm:ss'Z'", CultureInfo.InvariantCulture);
+        var dateStart = dateStartEndInputModel.DateStart.ToString(DateErpFormat, CultureInfo.InvariantCulture);
+        var dateEnd = dateStartEndInputModel.DateEnd.ToString(DateErpFormat, CultureInfo.InvariantCulture);
 
         string queryDate =
             $"Crm_Sales_SalesOrders?$filter=DocumentDate%20ge%20{dateStart}%20and%20DocumentDate%20le%20{dateEnd}&$select=DocumentDate,Id,ShipToCustomer&$expand=Lines($expand=Product($select=Id,Name);$select=Id,LineAmount,Product,Quantity),ShipToCustomer($expand=Party($select=CustomProperty_RETREG,PartyCode,PartyName);$select=CustomProperty_GRAD_u002DKLIENT,CustomProperty_Klas_u0020Klient,CustomProperty_STOR3,Id),ShipToPartyContactMechanism($expand=ContactMechanism;$select=ContactMechanism),ToParty($select=PartyId,PartyName)";
         
-        var responseContentJObj = await JObjectByUriGetRequest(Client,
-            $"{ErpRequests.BaseUrl}{queryDate}");
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{queryDate}");
         
-        var orderAnalyses = JsonConvert.DeserializeObject<List<ErpSalesOrderAnalysis>>(responseContentJObj["value"].ToString());
+        var orderAnalyses = JsonConvert.DeserializeObject<List<ErpSalesOrderAnalysis>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
 
-        var citiesSales = orderAnalyses
+        var citiesSales = orderAnalyses?
             .Where(c=>c.ShipToCustomer?.City?.Value != null)
-            .DistinctBy(c=>c.ShipToCustomer.City.ValueId)
+            .DistinctBy(c=>c.ShipToCustomer?.City?.ValueId)
             .Select(c => new BasicErpInputModel()
             {
-                Name = c.ShipToCustomer.City.Value,
-                ErpId = c.ShipToCustomer.City.ValueId,
+                Name = c.ShipToCustomer?.City?.Value,
+                ErpId = c.ShipToCustomer?.City?.ValueId,
             }).ToList();
         var citiesNew = (from city in citiesSales 
             where citiesCheck.All(c => !string.Equals(c.ErpId, city.ErpId, StringComparison.CurrentCultureIgnoreCase)) 
@@ -106,13 +106,13 @@ public class SalesController : ApiController
         await _citiesService.UploadBulk(citiesNew);
         citiesCheck = await _citiesService.GetCitiesCheck();
 
-        var pharmacyChainsSales = orderAnalyses
+        var pharmacyChainsSales = orderAnalyses?
             .Where(c=>c.ShipToCustomer?.PharmacyChain?.Value!=null)
-            .DistinctBy(c=>c.ShipToCustomer.PharmacyChain.ValueId)
+            .DistinctBy(c=>c.ShipToCustomer?.PharmacyChain?.ValueId)
             .Select(c => new BasicErpInputModel()
             {
-                Name = c.ShipToCustomer.PharmacyChain.Value,
-                ErpId = c.ShipToCustomer.PharmacyChain.ValueId
+                Name = c.ShipToCustomer?.PharmacyChain?.Value,
+                ErpId = c.ShipToCustomer?.PharmacyChain?.ValueId
             }).ToList();
         var pharmacyChainsNew = (from pharmacyChain in pharmacyChainsSales 
             where pharmacyChainsCheck.All(c => !string.Equals(c.ErpId, pharmacyChain.ErpId, StringComparison.CurrentCultureIgnoreCase)) 
@@ -120,7 +120,7 @@ public class SalesController : ApiController
         await _pharmacyChainsService.UploadBulk(pharmacyChainsNew);
         pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
 
-        var companiesSales = orderAnalyses
+        var companiesSales = orderAnalyses?
             .Where(c=>c.ToParty?.PartyId!=null)
             .Select(c => new PharmacyCompanyInputModel()
         {
@@ -133,7 +133,7 @@ public class SalesController : ApiController
         await _companiesService.UploadBulk(companiesNew);
         companiesCheck = await _companiesService.GetPharmacyCompaniesCheck();
         
-        var regionsSales = orderAnalyses
+        var regionsSales = orderAnalyses?
             .Where(c=>c.ShipToCustomer?.Party?.Region.Value!=null)
             .DistinctBy(c=>c.ShipToCustomer?.Party?.Region.ValueId)
             .Select(c => new BasicErpInputModel()
@@ -147,16 +147,15 @@ public class SalesController : ApiController
         await _regionsService.UploadBulk(regionsNew);
         regionsCheck = await _regionsService.GetRegionsCheck();
         
-        var queryCompanyLocations=
-            "General_Contacts_CompanyLocations?$top=600000&$select=Id,LocationName,PartyCode";
+        const string queryCompanyLocations = "General_Contacts_CompanyLocations?$top=600000&$select=Id,LocationName,PartyCode";
         
         responseContentJObj = await JObjectByUriGetRequest(Client,
             $"{ErpRequests.BaseUrl}{queryCompanyLocations}");
-        var companyLocations = JsonConvert.DeserializeObject<List<ErpGeneralContactsCompanyLocations>>(responseContentJObj["value"].ToString());
+        var companyLocations = JsonConvert.DeserializeObject<List<ErpGeneralContactsCompanyLocations>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException());
 
         var pharmaciesSales = new List<PharmacyDbInputModel>();
 
-        var ordersDistinctClients = orderAnalyses.DistinctBy(c => c.ShipToCustomer?.Id).ToList();
+        var ordersDistinctClients = orderAnalyses!.DistinctBy(c => c.ShipToCustomer?.Id).ToList();
 
         foreach (var order in ordersDistinctClients)
         {
@@ -175,11 +174,11 @@ public class SalesController : ApiController
                 newPharmacy.ErpId = order.ShipToCustomer.Id;
             }
 
-            if (order.ShipToCustomer?.Party.PartyCode!=null)
+            if (order.ShipToCustomer?.Party?.PartyCode!=null)
             {
                 newPharmacy.BrandexId = int.Parse(order.ShipToCustomer?.Party?.PartyCode ?? string.Empty);
                 newPharmacy.PartyCode = order.ShipToCustomer?.Party?.PartyCode;
-                newPharmacy.Name = companyLocations
+                newPharmacy.Name = companyLocations!
                     .Where(c => c.PartyCode == order.ShipToCustomer?.Party?.PartyCode)
                     .Select(c => c.LocationName.BG).FirstOrDefault();
             }
@@ -225,23 +224,21 @@ public class SalesController : ApiController
             where pharmaciesCheck.All(c => !string.Equals(c.ErpId, pharmacy.ErpId, StringComparison.CurrentCultureIgnoreCase)) 
             select pharmacy).ToList();
         await _pharmaciesService.UploadBulk(pharmaciesNew);
-        
         pharmaciesCheck = await _pharmaciesService.GetPharmaciesCheck();
 
-        var ordersUnique = orderAnalyses.Where(order => !salesIds.Contains(order.Id)).ToList();
+        var ordersUnique = orderAnalyses!.Where(order => !salesIds.Contains(order.Id)).ToList();
 
         var salesNew = new List<SaleDbInputModel>();
 
         foreach (var sale in ordersUnique)
         {
-            Console.WriteLine(sale.Id);
             foreach (var line in sale.Lines)
             {
                 var newSale = new SaleDbInputModel()
                 {
                     ErpId = sale.Id,
                     ProductId = productsCheck.Where(p=>p.ErpId==line.Product.Id).Select(p=>p.Id).FirstOrDefault(),
-                    Date = DateTime.ParseExact(sale.DocumentDate, "yyyy-MM-ddThh:mm:ss'Z'", CultureInfo.InvariantCulture),
+                    Date = DateTime.ParseExact(sale.DocumentDate, DateErpFormat, CultureInfo.InvariantCulture),
                     Count = Convert.ToInt32(line.Quantity.Value)
                 };
 
@@ -266,7 +263,6 @@ public class SalesController : ApiController
         await _salesService.UploadBulk(salesNew);
 
         return Result.Success;
-
+        
     }
-    
 }
