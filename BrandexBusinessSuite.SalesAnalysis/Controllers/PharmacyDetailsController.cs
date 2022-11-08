@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
+﻿using BrandexBusinessSuite.Models.DataModels;
+
+namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
 
 using System;
 using System.Collections.Generic;
@@ -145,9 +147,9 @@ public class PharmacyDetailsController : AdministrationController
         return JsonConvert.SerializeObject(errorDictionary);
     }
 
-    private static void CreatePharmacyInputModel(IEnumerable<CityCheckModel> citiesIdsForCheck,
+    private static void CreatePharmacyInputModel(IEnumerable<BasicCheckErpModel> citiesIdsForCheck,
         IEnumerable<PharmacyCompanyCheckModel> pharmacyCompanyIdsForCheck,
-        IEnumerable<PharmacyChainCheckModel> pharmacyChainsIdsForCheck,
+        IEnumerable<BasicCheckErpModel> pharmacyChainsIdsForCheck,
         IEnumerable<RegionOutputModel> regionIdsForCheck, PharmacyDbInputModel newPharmacy, IRow row, int i,
         ICollection<string> errorDictionary)
     {

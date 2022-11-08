@@ -1,4 +1,13 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
+﻿using System.Net.Http;
+using System.Text;
+using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
+using BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
+using BrandexBusinessSuite.SalesAnalysis.Services.PharmacyCompanies;
+using BrandexBusinessSuite.Services;
+using Microsoft.Extensions.Options;
+
+namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
 
 using System;
 using System.Collections.Generic;
@@ -21,6 +30,7 @@ using Models.Pharmacies;
 using Models.Products;
 using Models.Sales;
 
+using Services.Cities;
 using Services.Distributor;
 using Services.Pharmacies;
 using Services.Products;
@@ -28,18 +38,26 @@ using Services.Sales;
 
 using static Methods.ExcelMethods;
 
+using static Common.ErpConstants;
 using static Common.ExcelDataConstants.Ditributors;
 using static Common.ExcelDataConstants.ExcelLineErrors;
 using static Common.Constants;
+using static Requests.RequestsMethods;
 
 public class SalesController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
+    
+    private readonly ErpUserSettings _erpUserSettings;
+    private static readonly HttpClient Client = new();
 
     private readonly ISalesService _salesService;
     private readonly IProductsService _productsService;
     private readonly IPharmaciesService _pharmaciesService;
     private readonly IDistributorService _distributorService;
+    private readonly ICitiesService _citiesService;
+    private readonly IPharmacyChainsService _pharmacyChainsService;
+    private readonly IPharmacyCompaniesService _pharmacyCompaniesService;
 
     private const int BrandexDateColumn = 0;
     private const int BrandexProductIdColumn = 1;
@@ -48,8 +66,12 @@ public class SalesController : AdministrationController
 
     private const int ProductCounter = 4;
 
-    public SalesController(IWebHostEnvironment hostEnvironment, ISalesService salesService,
-        IProductsService productsService, IPharmaciesService pharmaciesService, IDistributorService distributorService)
+    public SalesController(IWebHostEnvironment hostEnvironment,
+        IOptions<ErpUserSettings> erpUserSettings,
+        ISalesService salesService,
+        IProductsService productsService, IPharmaciesService pharmaciesService, IDistributorService distributorService,
+        ICitiesService citiesService, IPharmacyChainsService pharmacyChainsService, IPharmacyCompaniesService pharmacyCompaniesService
+        )
 
     {
         _hostEnvironment = hostEnvironment;
@@ -57,6 +79,10 @@ public class SalesController : AdministrationController
         _productsService = productsService;
         _pharmaciesService = pharmaciesService;
         _distributorService = distributorService;
+        _citiesService = citiesService;
+        _erpUserSettings = erpUserSettings.Value;
+        _pharmacyChainsService = pharmacyChainsService;
+        _pharmacyCompaniesService = pharmacyCompaniesService;
     }
 
     [HttpPost]
@@ -226,6 +252,51 @@ public class SalesController : AdministrationController
         };
 
         return JsonConvert.SerializeObject(outputModel);
+    }
+
+    [HttpGet]
+    [IgnoreAntiforgeryToken]
+    public async Task<ActionResult> AddErpIds()
+    {
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
+        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+        var citiesCheck = await _citiesService.GetCitiesCheck();
+        const string citiesQuery = "Crm_Customers?$top=60000&$select=CustomProperty_GRAD_u002DKLIENT";
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{citiesQuery}");
+        var citiesErp = JsonConvert.DeserializeObject<List<ErpCityCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+        var citiesErpDistinct = citiesErp!.Where(c => c.City is { Value: { } }).DistinctBy(c => c.City.ValueId).ToList();
+        var citiesForUpdate = (from city in citiesCheck
+            let erpCity = citiesErpDistinct.FirstOrDefault(c => c.City!.Value!.TrimEnd().Equals(city!.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
+            where erpCity != null
+            select new BasicCheckErpModel() { Id = city.Id, Name = city.Name.ToUpper().TrimEnd(), ErpId = erpCity!.City!.ValueId! }).ToList();
+        await _citiesService.BulkUpdateData(citiesForUpdate);
+        
+        var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
+        const string pharmacyChainsQuery = "General_Contacts_CompanyLocations?$top=600000&$select=CustomProperty_%D0%92%D0%95%D0%A0%D0%98%D0%93%D0%90";
+        responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{pharmacyChainsQuery}");
+        var pharmacyChainsErp = JsonConvert.DeserializeObject<List<ErpPharmacyChainCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+        var pharmacyChainsErpDistinct = pharmacyChainsErp!.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
+        var pharmacyChainsForUpdate = (from pharmacyChain in pharmacyChainsCheck
+            let pharmacyChainErp = pharmacyChainsErpDistinct.FirstOrDefault(c => string.Equals(c.PharmacyChain!.Value!.TrimEnd(), pharmacyChain.Name, StringComparison.InvariantCultureIgnoreCase)) 
+            where pharmacyChainErp != null
+            select new BasicCheckErpModel { Id = pharmacyChain.Id, Name = pharmacyChain.Name!.ToUpper().TrimEnd(), ErpId = pharmacyChainErp!.PharmacyChain!.ValueId! }).ToList();
+        await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
+        
+        var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesErpCheck();
+        const string pharmacyCompaniesErpQuery = "General_Contacts_CompanyLocations?$top=600000&$select=Id&$expand=ParentParty($select=PartyId,PartyName)";
+        responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{pharmacyCompaniesErpQuery}");
+        var pharmacyCompaniesErp = JsonConvert.DeserializeObject<List<ErpPharmacyCompanyCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+        var pharmacyCompaniesErpDistinct = pharmacyCompaniesErp!.Where(c => c.ParentParty != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
+        var pharmacyCompaniesForUpdate = (from pharmacyCompany in pharmacyCompaniesErpCheck
+            let pharmacyCompanyErp = pharmacyCompaniesErpDistinct.FirstOrDefault(c => string.Equals(c.ParentParty!.PartyName.BG.TrimEnd(), pharmacyCompany.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
+            where pharmacyCompanyErp != null
+            select new BasicCheckErpModel { Id = pharmacyCompany.Id, Name = pharmacyCompany.Name!.ToUpper().TrimEnd(), ErpId = pharmacyCompanyErp!.ParentParty!.PartyId! }).ToList();
+        await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
+        
+        
+        
+        return Result.Success;
     }
     
 

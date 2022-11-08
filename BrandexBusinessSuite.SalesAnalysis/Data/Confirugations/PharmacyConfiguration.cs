@@ -15,6 +15,9 @@ internal class PharmacyConfiguration
         builder
             .Property(c => c.Name)
             .IsRequired();
+        
+        builder
+            .Property(c => c.ErpId);
 
         builder
             .HasOne(c => c.PharmacyChain)

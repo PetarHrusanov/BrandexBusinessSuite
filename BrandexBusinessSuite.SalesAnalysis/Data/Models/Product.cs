@@ -15,6 +15,7 @@ public class Product : IAuditInfo, IDeletableEntity
     public int Id { get; set; }
 
     public string Name { get; set; }
+    public string ErpId { get; set; }
 
     public string ShortName { get; set; }
 

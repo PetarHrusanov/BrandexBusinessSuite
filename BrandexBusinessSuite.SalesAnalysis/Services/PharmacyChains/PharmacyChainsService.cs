@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
+﻿using BrandexBusinessSuite.Models.DataModels;
+
+namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
 
 using System;
 using System.Linq;
@@ -19,14 +21,17 @@ using static BrandexBusinessSuite.Common.ExcelDataConstants.PharmacyChainsColumn
 using static Common.ExcelDataConstants.Generic;
 using static  BrandexBusinessSuite.Common.Constants;
 
+using static Methods.DataMethods;
+
+
 public class PharmacyChainsService : IPharmacyChainsService
 {
-    SalesAnalysisDbContext db;
+    private readonly SalesAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
 
     public PharmacyChainsService(SalesAnalysisDbContext db , IConfiguration configuration)
     {
-        this.db = db;
+        _db = db;
         _configuration = configuration;
     }
         
@@ -77,18 +82,56 @@ public class PharmacyChainsService : IPharmacyChainsService
             Name = chainName
         };
 
-        await db.PharmacyChains.AddAsync(chainInput);
-        await db.SaveChangesAsync();
+        await _db.PharmacyChains.AddAsync(chainInput);
+        await _db.SaveChangesAsync();
         return chainName;
 
     }
     
-    public async Task<List<PharmacyChainCheckModel>> GetPharmacyChainsCheck()
+    public async Task<List<BasicCheckErpModel>> GetPharmacyChainsCheck()
     {
-        return await db.PharmacyChains.Select(p => new PharmacyChainCheckModel()
+        return await _db.PharmacyChains.Select(p => new BasicCheckErpModel()
         {
             Id = p.Id,
-            Name = p.Name
+            Name = p.Name,
+            ErpId = p.ErpId
         }).ToListAsync();
+    }
+    
+    public async Task BulkUpdateData(List<BasicCheckErpModel> list)
+    {
+        
+        var dt = new DataTable(PharmacyChains);
+        dt = ConvertToDataTable(list);
+        
+        var connection = _configuration.GetConnectionString("DefaultConnection");
+
+        await using var conn = new SqlConnection(connection);
+        await using var command = new SqlCommand($"CREATE TABLE #TmpTable(Id smallint NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(50) NOT NULL)", conn);
+        try
+        {
+            conn.Open();
+            command.ExecuteNonQuery();
+
+            using (var bulkCopy = new SqlBulkCopy(conn))
+            {
+                bulkCopy.BulkCopyTimeout = 6600;
+                bulkCopy.DestinationTableName = "#TmpTable";
+                await bulkCopy.WriteToServerAsync(dt);
+                bulkCopy.Close();
+            }
+
+            command.CommandTimeout = 3000;
+            command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{PharmacyChains}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
+            command.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            // Handle exception properly
+        }
+        finally
+        {
+            conn.Close();
+        }
     }
 }

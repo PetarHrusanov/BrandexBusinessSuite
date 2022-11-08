@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
+﻿using BrandexBusinessSuite.Models.DataModels;
+
+namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
 
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -9,5 +11,7 @@ public interface IPharmacyChainsService
 {
     Task UploadBulk(List<string> pharmacyChain);
     Task<string> UploadPharmacyChain(string chainName);
-    Task<List<PharmacyChainCheckModel>> GetPharmacyChainsCheck();
+    Task<List<BasicCheckErpModel>> GetPharmacyChainsCheck();
+    
+    Task BulkUpdateData(List<BasicCheckErpModel> list);
 }

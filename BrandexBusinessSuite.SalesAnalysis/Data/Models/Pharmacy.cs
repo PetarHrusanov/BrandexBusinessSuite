@@ -18,6 +18,7 @@ public class Pharmacy : IAuditInfo, IDeletableEntity
     public int BrandexId { get; set; }
 
     public string Name { get; set; }
+    public string ErpId { get; set; }
 
     public PharmacyClass PharmacyClass{ get;set; }
 

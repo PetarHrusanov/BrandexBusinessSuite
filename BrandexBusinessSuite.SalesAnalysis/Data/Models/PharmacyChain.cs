@@ -12,8 +12,8 @@ public class PharmacyChain : IAuditInfo, IDeletableEntity
         Pharmacies = new HashSet<Pharmacy>();
     }
     public int Id { get; set; }
-
     public string Name { get; set; }
+    public string ErpId { get; set; }
 
     public virtual ICollection<Pharmacy> Pharmacies { get; set; }
     public DateTime CreatedOn { get; set; }

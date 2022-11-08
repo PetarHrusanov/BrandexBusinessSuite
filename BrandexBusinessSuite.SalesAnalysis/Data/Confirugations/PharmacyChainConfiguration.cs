@@ -10,5 +10,8 @@ internal class PharmacyChainConfiguration : IEntityTypeConfiguration<PharmacyCha
     {
         builder
             .HasKey(c => c.Id);
+        
+        builder
+            .Property(c => c.ErpId);
     }
 }

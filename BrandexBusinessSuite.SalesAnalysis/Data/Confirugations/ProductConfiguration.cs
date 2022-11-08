@@ -17,6 +17,9 @@ internal class ProductConfiguration
         builder
             .Property(c => c.Name)
             .IsRequired();
+        
+        builder
+            .Property(c => c.ErpId);
 
     }
 }

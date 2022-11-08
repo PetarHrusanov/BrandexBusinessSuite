@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyCompanies;
+﻿using BrandexBusinessSuite.Models.DataModels;
+
+namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyCompanies;
 
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,8 @@ using Microsoft.Data.SqlClient;
 using static Common.ExcelDataConstants.CompaniesColumns;
 using static Common.ExcelDataConstants.Generic;
 using static  Common.Constants;
+
+using static Methods.DataMethods;
 
 public class PharmacyCompaniesService : IPharmacyCompaniesService
 {
@@ -99,5 +103,52 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
             Name = p.Name,
             VAT = p.VAT
         }).ToListAsync();
+    }
+    
+    public async Task<List<BasicCheckErpModel>> GetPharmacyCompaniesErpCheck()
+    {
+        return await db.Companies.Select(p => new BasicCheckErpModel()
+        {
+            Id = p.Id,
+            Name = p.Name,
+            ErpId = p.ErpId
+        }).ToListAsync();
+    }
+    
+    public async Task BulkUpdateData(List<BasicCheckErpModel> list)
+    {
+        
+        var dt = new DataTable(PharmacyCompanies);
+        dt = ConvertToDataTable(list);
+        
+        var connection = _configuration.GetConnectionString("DefaultConnection");
+
+        await using var conn = new SqlConnection(connection);
+        await using var command = new SqlCommand($"CREATE TABLE #TmpTable(Id smallint NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(400) NOT NULL)", conn);
+        try
+        {
+            conn.Open();
+            command.ExecuteNonQuery();
+
+            using (var bulkCopy = new SqlBulkCopy(conn))
+            {
+                bulkCopy.BulkCopyTimeout = 6600;
+                bulkCopy.DestinationTableName = "#TmpTable";
+                await bulkCopy.WriteToServerAsync(dt);
+                bulkCopy.Close();
+            }
+
+            command.CommandTimeout = 3000;
+            command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{PharmacyCompanies}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
+            command.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            // Handle exception properly
+        }
+        finally
+        {
+            conn.Close();
+        }
     }
 }

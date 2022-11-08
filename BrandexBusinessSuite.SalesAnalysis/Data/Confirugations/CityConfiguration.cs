@@ -15,5 +15,8 @@ internal class CityConfiguration : IEntityTypeConfiguration<City>
             .Property(c => c.Name)
             .IsRequired();
 
+        builder
+            .Property(c => c.ErpId);
+
     }
 }

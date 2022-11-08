@@ -14,6 +14,7 @@ public class Company : IAuditInfo, IDeletableEntity
 
     public int Id { get; set; }
     public string Name { get; set; }
+    public string ErpId { get; set; }
     public string Owner { get; set; }
     public string VAT { get; set; }
 
