@@ -3,15 +3,19 @@
   <component name="EfCoreCommonOptions">
     <option name="migrationsToStartupProjects">
       <map>
+        <entry key="2f4db71a-d889-4470-83b2-091163c0d3bd" value="2f4db71a-d889-4470-83b2-091163c0d3bd" />
         <entry key="3ef23d1d-0852-4e8e-ac68-f50a3bd1f1f1" value="3ef23d1d-0852-4e8e-ac68-f50a3bd1f1f1" />
         <entry key="40a69a05-37ed-4df9-ae8c-022694e38e78" value="40a69a05-37ed-4df9-ae8c-022694e38e78" />
+        <entry key="89deeab2-3299-4885-8dc9-54054d0acff8" value="89deeab2-3299-4885-8dc9-54054d0acff8" />
         <entry key="e466f0f7-d860-46a7-b3fb-862cab9e824b" value="e466f0f7-d860-46a7-b3fb-862cab9e824b" />
         <entry key="fe8c8f72-ed30-472e-8046-a8f849843a55" value="fe8c8f72-ed30-472e-8046-a8f849843a55" />
       </map>
     </option>
     <option name="startupToMigrationsProjects">
       <map>
+        <entry key="2f4db71a-d889-4470-83b2-091163c0d3bd" value="2f4db71a-d889-4470-83b2-091163c0d3bd" />
         <entry key="3ef23d1d-0852-4e8e-ac68-f50a3bd1f1f1" value="3ef23d1d-0852-4e8e-ac68-f50a3bd1f1f1" />
+        <entry key="89deeab2-3299-4885-8dc9-54054d0acff8" value="89deeab2-3299-4885-8dc9-54054d0acff8" />
         <entry key="e466f0f7-d860-46a7-b3fb-862cab9e824b" value="e466f0f7-d860-46a7-b3fb-862cab9e824b" />
         <entry key="fe8c8f72-ed30-472e-8046-a8f849843a55" value="fe8c8f72-ed30-472e-8046-a8f849843a55" />
       </map>
