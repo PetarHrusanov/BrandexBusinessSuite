@@ -13,6 +13,7 @@ public class Constants
     public const string UploadPdf = "UploadPdf";
 
     public const string CreatedOn = "CreatedOn";
+    public const string ModifiedOn = "ModifiedOn";
     public const string IsDeleted = "IsDeleted";
 
     public class RequestConstants

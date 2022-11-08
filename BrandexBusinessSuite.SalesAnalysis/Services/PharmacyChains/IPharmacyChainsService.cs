@@ -1,4 +1,5 @@
 ﻿using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
 
 namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
 
@@ -10,6 +11,7 @@ using SalesAnalysis.Models.PharmacyChains;
 public interface IPharmacyChainsService
 {
     Task UploadBulk(List<string> pharmacyChain);
+    Task UploadBulkFromErp(List<ErpPharmacyChainCheck> pharmacyChains);
     Task<string> UploadPharmacyChain(string chainName);
     Task<List<BasicCheckErpModel>> GetPharmacyChainsCheck();
     

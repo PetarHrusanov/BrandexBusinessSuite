@@ -1,25 +1,25 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Cities;
-
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-
-using Microsoft.EntityFrameworkCore;
+using BrandexBusinessSuite.Common;
+using BrandexBusinessSuite.Methods;
+using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
+using BrandexBusinessSuite.SalesAnalysis.Data;
+using BrandexBusinessSuite.SalesAnalysis.Data.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-using Data;
-using SalesAnalysis.Data.Models;
+namespace BrandexBusinessSuite.SalesAnalysis.Services.Cities;
 
-using BrandexBusinessSuite.Models.DataModels;
+using static ExcelDataConstants.CitiesColumns;
+using static ExcelDataConstants.Generic;
+using static Constants;
 
-using static Common.ExcelDataConstants.CitiesColumns;
-using static Common.ExcelDataConstants.Generic;
-using static Common.Constants;
-
-using static Methods.DataMethods;
+using static DataMethods;
 
 public class CitiesService :ICitiesService
 {
@@ -72,9 +72,51 @@ public class CitiesService :ICitiesService
             
     }
 
+    public async Task UploadBulkFromErp(List<ErpCityCheck> cities)
+    {
+        var table = new DataTable();
+        table.TableName = Cities;
+            
+        table.Columns.Add(Name);
+        table.Columns.Add(ErpId);
+        
+        table.Columns.Add(CreatedOn);
+        table.Columns.Add(IsDeleted, typeof(bool));
+            
+        foreach (var city in cities)
+        {
+            var row = table.NewRow();
+            row[Name] = city!.City!.Value!.TrimEnd().ToUpper();
+            row[ErpId] = city!.City!.ValueId!;
+            
+            row[CreatedOn] = DateTime.Now;
+            row[IsDeleted] = false;
+            
+            table.Rows.Add(row);
+        }
+
+        var connection = _configuration.GetConnectionString("DefaultConnection");
+        
+        var con = new SqlConnection(connection);
+            
+        var objbulk = new SqlBulkCopy(con);  
+            
+        objbulk.DestinationTableName = Cities;
+            
+        objbulk.ColumnMappings.Add(Name, Name);
+        objbulk.ColumnMappings.Add(ErpId, ErpId);
+        
+        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
+        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
+
+        con.Open();
+        await objbulk.WriteToServerAsync(table);  
+        con.Close();
+    }
+
     public async Task<List<BasicCheckErpModel>> GetCitiesCheck()
     {
-        return await db.Cities.Select(p => new BasicCheckErpModel()
+        return await db.Cities.Select(p => new BasicCheckErpModel
         {
             Id = p.Id,
             Name = p.Name,

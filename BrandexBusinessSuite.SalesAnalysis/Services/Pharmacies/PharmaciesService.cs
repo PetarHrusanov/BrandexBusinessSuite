@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Pharmacies;
+﻿using BrandexBusinessSuite.Models.DataModels;
+
+namespace BrandexBusinessSuite.SalesAnalysis.Services.Pharmacies;
 
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,8 @@ using Models.Sales;
 using static Common.ExcelDataConstants.PharmacyColumns;
 using static Common.ExcelDataConstants.Generic;
 using static  Common.Constants;
+
+using static Methods.DataMethods;
 
 public class PharmaciesService : IPharmaciesService
 {
@@ -179,20 +183,57 @@ public class PharmaciesService : IPharmaciesService
             await db.SaveChangesAsync();
         }
     }
+
+    public async Task BulkUpdateData(List<BasicCheckErpModel> list)
+    {
+        var dt = ConvertToDataTable(list);
         
+        var connection = _configuration.GetConnectionString("DefaultConnection");
+
+        await using var conn = new SqlConnection(connection);
+        await using var command = new SqlCommand("CREATE TABLE #TmpTable(Id int NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(400) NOT NULL)", conn);
+        try
+        {
+            conn.Open();
+            command.ExecuteNonQuery();
+
+            using (var bulkCopy = new SqlBulkCopy(conn))
+            {
+                bulkCopy.BulkCopyTimeout = 6600;
+                bulkCopy.DestinationTableName = "#TmpTable";
+                await bulkCopy.WriteToServerAsync(dt);
+                bulkCopy.Close();
+            }
+
+            command.CommandTimeout = 3000;
+            command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{Pharmacies}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
+            command.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            // Handle exception properly
+        }
+        finally
+        {
+            conn.Close();
+        }
+    }
+
 
     public async Task<List<PharmacyCheckModel>> GetPharmaciesCheck()
     {
         return await db.Pharmacies.Select(p => new PharmacyCheckModel
         {
             Id = p.Id,
+            Name = p.Name,
+            ErpId = p.ErpId,
             BrandexId = p.BrandexId,
             PhoenixId = p.PhoenixId,
             PharmnetId = p.PharmnetId,
             StingId = p.StingId,
             SopharmaId = p.SopharmaId
         }).ToListAsync();
-
     }
+    
     
 }

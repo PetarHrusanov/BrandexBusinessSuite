@@ -3,6 +3,8 @@
 public class PharmacyCheckModel
 {
     public int Id { get; set; }
+    public string Name { get; set; }
+    public string ErpId { get; set; }
     public int BrandexId { get; set; }
     public int? PharmnetId { get; set; }
     public int? PhoenixId { get; set; }

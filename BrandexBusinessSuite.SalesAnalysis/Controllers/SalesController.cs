@@ -1,13 +1,4 @@
-﻿using System.Net.Http;
-using System.Text;
-using BrandexBusinessSuite.Models.DataModels;
-using BrandexBusinessSuite.Models.ErpDocuments;
-using BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
-using BrandexBusinessSuite.SalesAnalysis.Services.PharmacyCompanies;
-using BrandexBusinessSuite.Services;
-using Microsoft.Extensions.Options;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
 
 using System;
 using System.Collections.Generic;
@@ -15,9 +6,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Text;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 
@@ -25,6 +19,10 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
+using BrandexBusinessSuite.Services;
+
 using Infrastructure;
 using Models.Pharmacies;
 using Models.Products;
@@ -35,6 +33,8 @@ using Services.Distributor;
 using Services.Pharmacies;
 using Services.Products;
 using Services.Sales;
+using Services.PharmacyChains;
+using Services.PharmacyCompanies;
 
 using static Methods.ExcelMethods;
 
@@ -269,7 +269,7 @@ public class SalesController : AdministrationController
         var citiesForUpdate = (from city in citiesCheck
             let erpCity = citiesErpDistinct.FirstOrDefault(c => c.City!.Value!.TrimEnd().Equals(city!.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
             where erpCity != null
-            select new BasicCheckErpModel() { Id = city.Id, Name = city.Name.ToUpper().TrimEnd(), ErpId = erpCity!.City!.ValueId! }).ToList();
+            select new BasicCheckErpModel { Id = city.Id, Name = city.Name!.ToUpper().TrimEnd(), ErpId = erpCity!.City!.ValueId! }).ToList();
         await _citiesService.BulkUpdateData(citiesForUpdate);
         
         var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
@@ -294,9 +294,81 @@ public class SalesController : AdministrationController
             select new BasicCheckErpModel { Id = pharmacyCompany.Id, Name = pharmacyCompany.Name!.ToUpper().TrimEnd(), ErpId = pharmacyCompanyErp!.ParentParty!.PartyId! }).ToList();
         await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
         
-        
+        var pharmaciesErpCheck = await _pharmaciesService.GetPharmaciesCheck();
+        const string pharmaciesErpQuery = "General_Contacts_CompanyLocations?$top=600000&$select=CustomProperty_ADDRES,CustomProperty_ID_u002DA_u002DKI_u002DFarmnet,CustomProperty_ID_u002DA_u002DKI_u002DPhoenix,CustomProperty_ID_u002DA_u002DKI_u002DSOPHARMA,CustomProperty_ID_u002DA_u002DKI_u002DSting,Id,LocationName,PartyCode,PartyId";
+        responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{pharmaciesErpQuery}");
+        var pharmaciesErp = JsonConvert.DeserializeObject<List<ErpPharmacyCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+        var pharmaciesErpDistinct = pharmaciesErp!.Where(c => c.PartyId != null).DistinctBy(c => c.PartyId).ToList();
+        var pharmaciesForUpdate = (from pharmacy in pharmaciesErpCheck
+            let pharmacyErp = pharmaciesErpDistinct.FirstOrDefault(c =>int.Parse(c.PartyCode!)== pharmacy.BrandexId) 
+            where pharmacyErp != null
+            select new BasicCheckErpModel { Id = pharmacy.Id, Name = pharmacy.Name!.ToUpper().TrimEnd(), ErpId = pharmacyErp!.PartyId }).ToList();
+        await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
         
         return Result.Success;
+    }
+    
+    [HttpGet]
+    [IgnoreAntiforgeryToken]
+    public async Task<ActionResult> AddNewErpData()
+    {
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
+        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+        var citiesCheck = await _citiesService.GetCitiesCheck();
+        var citiesErpDistinct = await GetCitiesErp();
+        var citiesNew = citiesErpDistinct.Where(c => citiesCheck.All(i => i.ErpId != c.City!.ValueId)).ToList();
+        await _citiesService.UploadBulkFromErp(citiesNew);
+
+        var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
+        var pharmacyChainsErpDistinct = await GetPharmacyChainsErp();
+        var pharmacyChainsNew = pharmacyChainsErpDistinct
+            .Where(p => pharmacyChainsCheck.All(i => i.ErpId != p.PharmacyChain!.ValueId)).ToList();
+        await _pharmacyChainsService.UploadBulkFromErp(pharmacyChainsNew);
+        
+        var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesErpCheck();
+        var pharmacyCompaniesErpDistinct = await GetPharmacyCompaniesErp();
+        var pharmacyCompaniesNew = pharmacyCompaniesErpDistinct
+            .Where(p => pharmacyCompaniesErpCheck.All(i => i.ErpId != p.ParentParty!.PartyId)).ToList();
+        await _pharmacyCompaniesService.UploadBulkFromErp(pharmacyCompaniesNew);
+   
+        
+        // var pharmaciesErpCheck = await _pharmaciesService.GetPharmaciesCheck();
+        // const string pharmaciesErpQuery = "General_Contacts_CompanyLocations?$top=600000&$select=CustomProperty_ADDRES,CustomProperty_ID_u002DA_u002DKI_u002DFarmnet,CustomProperty_ID_u002DA_u002DKI_u002DPhoenix,CustomProperty_ID_u002DA_u002DKI_u002DSOPHARMA,CustomProperty_ID_u002DA_u002DKI_u002DSting,Id,LocationName,PartyCode,PartyId";
+        // responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{pharmaciesErpQuery}");
+        // var pharmaciesErp = JsonConvert.DeserializeObject<List<ErpPharmacyCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+        // var pharmaciesErpDistinct = pharmaciesErp!.Where(c => c.PartyId != null).DistinctBy(c => c.PartyId).ToList();
+        // var pharmaciesForUpdate = (from pharmacy in pharmaciesErpCheck
+        //     let pharmacyErp = pharmaciesErpDistinct.FirstOrDefault(c =>int.Parse(c.PartyCode!)== pharmacy.BrandexId) 
+        //     where pharmacyErp != null
+        //     select new BasicCheckErpModel { Id = pharmacy.Id, Name = pharmacy.Name!.ToUpper().TrimEnd(), ErpId = pharmacyErp!.PartyId }).ToList();
+        // await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
+        
+        return Result.Success;
+    }
+
+    private static async Task<List<ErpCityCheck>> GetCitiesErp()
+    {
+        const string citiesQuery = "Crm_Customers?$top=60000&$select=CustomProperty_GRAD_u002DKLIENT";
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{citiesQuery}");
+        var citiesErp = JsonConvert.DeserializeObject<List<ErpCityCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+        return citiesErp!.Where(c => c.City is { Value: { } }).DistinctBy(c => c.City.ValueId).ToList();
+    }
+    
+    private static async Task<List<ErpPharmacyChainCheck>> GetPharmacyChainsErp()
+    {
+        const string pharmacyChainsQuery = "General_Contacts_CompanyLocations?$top=600000&$select=CustomProperty_%D0%92%D0%95%D0%A0%D0%98%D0%93%D0%90";
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{pharmacyChainsQuery}");
+        var pharmacyChainsErp = JsonConvert.DeserializeObject<List<ErpPharmacyChainCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+        return pharmacyChainsErp!.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
+    }
+    
+    private static async Task<List<ErpPharmacyCompanyCheck>> GetPharmacyCompaniesErp()
+    {
+        const string pharmacyCompaniesErpQuery = "General_Contacts_CompanyLocations?$top=600000&$select=Id&$expand=ParentParty($select=PartyId,PartyName)";
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{pharmacyCompaniesErpQuery}");
+        var pharmacyCompaniesErp = JsonConvert.DeserializeObject<List<ErpPharmacyCompanyCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+        return pharmacyCompaniesErp!.Where(c => c.ParentParty != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
     }
     
 

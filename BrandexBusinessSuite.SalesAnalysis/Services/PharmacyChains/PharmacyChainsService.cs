@@ -1,4 +1,5 @@
 ﻿using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
 
 namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
 
@@ -73,6 +74,48 @@ public class PharmacyChainsService : IPharmacyChainsService
         await objbulk.WriteToServerAsync(table);  
         con.Close();  
             
+    }
+
+    public async Task UploadBulkFromErp(List<ErpPharmacyChainCheck> pharmacyChains)
+    {
+        var table = new DataTable();
+        table.TableName = PharmacyChains;
+            
+        table.Columns.Add(Name);
+        table.Columns.Add(ErpId);
+        
+        table.Columns.Add(CreatedOn);
+        table.Columns.Add(IsDeleted, typeof(bool));
+
+        foreach (var pharmacyChain in pharmacyChains)
+        {
+            var row = table.NewRow();
+            row[Name] = pharmacyChain.PharmacyChain!.Value!.TrimEnd().ToUpper();
+            row[ErpId] = pharmacyChain.PharmacyChain!.ValueId!;
+            
+            row[CreatedOn] = DateTime.Now;
+            row[IsDeleted] = false;
+            
+            table.Rows.Add(row);
+        }
+
+        string connection = _configuration.GetConnectionString("DefaultConnection");
+            
+        var con = new SqlConnection(connection);
+            
+        var objbulk = new SqlBulkCopy(con);  
+            
+        objbulk.DestinationTableName = PharmacyChains;
+            
+        objbulk.ColumnMappings.Add(Name, Name);
+        objbulk.ColumnMappings.Add(ErpId, ErpId);
+        
+        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
+        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
+
+        con.Open();
+        await objbulk.WriteToServerAsync(table);  
+        con.Close();  
     }
 
     public async Task<string> UploadPharmacyChain(string chainName)

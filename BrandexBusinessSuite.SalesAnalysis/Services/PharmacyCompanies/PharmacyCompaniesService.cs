@@ -1,4 +1,5 @@
 ﻿using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
 
 namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyCompanies;
 
@@ -80,6 +81,48 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
             
     }
 
+    public async Task UploadBulkFromErp(List<ErpPharmacyCompanyCheck> pharmacyCompanies)
+    {
+        var table = new DataTable();
+        table.TableName = PharmacyCompanies;
+            
+        table.Columns.Add(Name);
+        table.Columns.Add(ErpId);
+
+        table.Columns.Add(CreatedOn);
+        table.Columns.Add(IsDeleted, typeof(bool));
+            
+        foreach (var pharmacyCompany in pharmacyCompanies)
+        {
+            var row = table.NewRow();
+            row[Name] = pharmacyCompany.ParentParty!.PartyName.BG.ToUpper().TrimEnd();
+            row[ErpId] = pharmacyCompany.ParentParty!.PartyId;
+
+            row[CreatedOn] = DateTime.Now;
+            row[IsDeleted] = false;
+            
+            table.Rows.Add(row);
+        }
+
+        var connection = _configuration.GetConnectionString("DefaultConnection");
+            
+        var con = new SqlConnection(connection);
+            
+        var objbulk = new SqlBulkCopy(con);  
+            
+        objbulk.DestinationTableName = PharmacyCompanies;
+            
+        objbulk.ColumnMappings.Add(Name, Name);
+        objbulk.ColumnMappings.Add(ErpId, ErpId);
+
+        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
+        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
+
+        con.Open();
+        await objbulk.WriteToServerAsync(table);  
+        con.Close();  
+    }
+
     public async Task<string> UploadCompany(PharmacyCompanyInputModel company)
     {
         if (company.Name == null) return "";
@@ -117,9 +160,7 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
     
     public async Task BulkUpdateData(List<BasicCheckErpModel> list)
     {
-        
-        var dt = new DataTable(PharmacyCompanies);
-        dt = ConvertToDataTable(list);
+        var dt = ConvertToDataTable(list);
         
         var connection = _configuration.GetConnectionString("DefaultConnection");
 
