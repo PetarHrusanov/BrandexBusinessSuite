@@ -91,6 +91,10 @@ public class SalesController : AdministrationController
         _regionsService = regionsService;
     }
 
+    [HttpGet]
+    public async Task<List<BasicCheckModel>> GetDistributors()
+        => await _distributorService.GetDistributors();
+
     [HttpPost]
     [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Generate([FromBody] SalesRegionDateInputModel inputModel)
@@ -290,8 +294,16 @@ public class SalesController : AdministrationController
 
         var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
         var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
+
+        var tapaPutka = pharmaciesErp.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.Value)
+            .Where(c => c.PharmacyChain.ValueId == "63c291dc-ebf4-4e36-b932-19eb2d13645b").ToList();
+        foreach (var putka in tapaPutka)
+        {
+            Console.WriteLine(putka.PharmacyChain.Value);
+        }
+        
         var pharmacyChainsForUpdate = (from pharmacyChain in pharmacyChainsCheck
-            let pharmacyChainErp = pharmacyChainsErpDistinct.FirstOrDefault(c => string.Equals(c.PharmacyChain!.Value!.TrimEnd(), pharmacyChain.Name, StringComparison.InvariantCultureIgnoreCase)) 
+            let pharmacyChainErp = pharmacyChainsErpDistinct.FirstOrDefault(c => string.Equals(c.PharmacyChain!.Value!.TrimEnd().ToUpper(), pharmacyChain.Name, StringComparison.InvariantCultureIgnoreCase)) 
             where pharmacyChainErp != null
             select new BasicCheckErpModel { Id = pharmacyChain.Id, Name = pharmacyChain.Name!.ToUpper().TrimEnd(), ErpId = pharmacyChainErp!.PharmacyChain!.ValueId! }).ToList();
         await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);

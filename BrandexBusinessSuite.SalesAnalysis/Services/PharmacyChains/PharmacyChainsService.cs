@@ -141,9 +141,7 @@ public class PharmacyChainsService : IPharmacyChainsService
     
     public async Task BulkUpdateData(List<BasicCheckErpModel> list)
     {
-        
-        var dt = new DataTable(PharmacyChains);
-        dt = ConvertToDataTable(list);
+        var dt = ConvertToDataTable(list);
         
         var connection = _configuration.GetConnectionString("DefaultConnection");
 
