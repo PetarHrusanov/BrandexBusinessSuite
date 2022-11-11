@@ -23,12 +23,12 @@ using static DataMethods;
 
 public class CitiesService :ICitiesService
 {
-    SalesAnalysisDbContext db;
+    private readonly SalesAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
 
     public CitiesService(SalesAnalysisDbContext db, IConfiguration configuration)
     {
-        this.db = db;
+        _db = db;
         _configuration = configuration;
     }
         
@@ -116,7 +116,7 @@ public class CitiesService :ICitiesService
 
     public async Task<List<BasicCheckErpModel>> GetCitiesCheck()
     {
-        return await db.Cities.Select(p => new BasicCheckErpModel
+        return await _db.Cities.Select(p => new BasicCheckErpModel
         {
             Id = p.Id,
             Name = p.Name,
@@ -131,8 +131,8 @@ public class CitiesService :ICitiesService
         {
             Name = city
         };
-        await db.Cities.AddAsync(cityModel);
-        await db.SaveChangesAsync();
+        await _db.Cities.AddAsync(cityModel);
+        await _db.SaveChangesAsync();
         return cityModel.Name;
     }
 
@@ -161,7 +161,7 @@ public class CitiesService :ICitiesService
             command.CommandText = "UPDATE P SET P.[ErpId]= T.[ErpId] FROM [Cities] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
             command.ExecuteNonQuery();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Handle exception properly
         }

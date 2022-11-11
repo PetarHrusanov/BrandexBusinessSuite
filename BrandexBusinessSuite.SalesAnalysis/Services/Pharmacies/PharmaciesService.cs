@@ -53,6 +53,8 @@ public class PharmaciesService : IPharmaciesService
         table.Columns.Add(SopharmaId);
         table.Columns.Add(StingId);
         table.Columns.Add(RegionId);
+        
+        table.Columns.Add(ErpId);
             
         table.Columns.Add(CreatedOn);
         table.Columns.Add(IsDeleted, typeof(bool));
@@ -75,6 +77,8 @@ public class PharmaciesService : IPharmaciesService
             row[StingId] = pharmacy.StingId;
                 
             row[RegionId] = pharmacy.RegionId;
+            
+            row[ErpId] = pharmacy.ErpId;
             
             row[CreatedOn] = DateTime.Now;
             row[IsDeleted] = false;
@@ -105,6 +109,8 @@ public class PharmaciesService : IPharmaciesService
         objbulk.ColumnMappings.Add(SopharmaId, SopharmaId); 
         objbulk.ColumnMappings.Add(StingId, StingId); 
         objbulk.ColumnMappings.Add(RegionId, RegionId); 
+        
+        objbulk.ColumnMappings.Add(ErpId, ErpId); 
         
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
         objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
@@ -209,7 +215,7 @@ public class PharmaciesService : IPharmaciesService
             command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{Pharmacies}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
             command.ExecuteNonQuery();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Handle exception properly
         }

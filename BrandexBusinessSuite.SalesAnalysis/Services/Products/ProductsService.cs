@@ -54,12 +54,12 @@ public class ProductsService : IProductsService
         }).ToListAsync();
     }
 
-    public async Task<IEnumerable<string>> GetProductsNames()
+    public async Task<List<string>> GetProductsNames()
     {
         return await db.Products.Select(p => p.Name).ToListAsync();
     }
 
-    public async Task<IEnumerable<ProductShortOutputModel>> GetProductsIdPrices()
+    public async Task<List<ProductShortOutputModel>> GetProductsIdPrices()
     {
         return await db.Products.Select(p => new ProductShortOutputModel
         {

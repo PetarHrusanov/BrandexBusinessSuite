@@ -18,5 +18,8 @@ internal class RegionConfiguration
             .Property(c => c.Name)
             .IsRequired();
 
+        builder
+            .Property(c => c.ErpId);
+
     }
 }

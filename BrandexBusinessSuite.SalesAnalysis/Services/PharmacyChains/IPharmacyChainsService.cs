@@ -11,7 +11,7 @@ using SalesAnalysis.Models.PharmacyChains;
 public interface IPharmacyChainsService
 {
     Task UploadBulk(List<string> pharmacyChain);
-    Task UploadBulkFromErp(List<ErpPharmacyChainCheck> pharmacyChains);
+    Task UploadBulkFromErp(List<ErpPharmacyCheck> pharmacyChains);
     Task<string> UploadPharmacyChain(string chainName);
     Task<List<BasicCheckErpModel>> GetPharmacyChainsCheck();
     

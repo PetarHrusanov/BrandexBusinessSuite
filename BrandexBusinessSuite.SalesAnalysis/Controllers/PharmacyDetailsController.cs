@@ -22,10 +22,7 @@ using Data.Enums;
 using Infrastructure;
 
 using Models.Pharmacies;
-using Models.Cities;
-using Models.PharmacyChains;
 using Models.PharmacyCompanies;
-using Models.Regions;
 
 using Services.Cities;
 using Services.Pharmacies;
@@ -150,7 +147,7 @@ public class PharmacyDetailsController : AdministrationController
     private static void CreatePharmacyInputModel(IEnumerable<BasicCheckErpModel> citiesIdsForCheck,
         IEnumerable<PharmacyCompanyCheckModel> pharmacyCompanyIdsForCheck,
         IEnumerable<BasicCheckErpModel> pharmacyChainsIdsForCheck,
-        IEnumerable<RegionOutputModel> regionIdsForCheck, PharmacyDbInputModel newPharmacy, IRow row, int i,
+        IEnumerable<BasicCheckErpModel> regionIdsForCheck, PharmacyDbInputModel newPharmacy, IRow row, int i,
         ICollection<string> errorDictionary)
     {
         var brandexId = row.GetCell(BrandexIdColumn);

@@ -1,4 +1,6 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
+﻿using BrandexBusinessSuite.Models.DataModels;
+
+namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
 
 using System.Collections.Generic;
 using System.IO;
@@ -41,7 +43,7 @@ public class RegionsController : AdministrationController
     }
 
     [HttpGet]
-    public async Task<RegionOutputModel[]> GetRegions()
+    public async Task<List<BasicCheckErpModel>> GetRegions()
     {
         return await _regionService.AllRegions();
     }

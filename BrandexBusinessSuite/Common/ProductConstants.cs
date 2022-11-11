@@ -107,6 +107,7 @@ public class ProductConstants
         public const string ForFlex = "ForFlex";
         public const string ProstaRen = "ProstaRen";
         public const string Sleep = "Sleep";
+        public const string ViruFor = "ViruFor";
         
         // Workaround - permanent solution should be considered
         public const string GeneralAudience = "General Audience";
@@ -198,6 +199,7 @@ public class ProductConstants
         public const string ProstaRen = "183701";
         public const string Sleep = "181311";
         public const string Botanic = "999998";
+        public const string ViruFor = "185101";
         
         // Workaround - permanent solution should be considered
         public const string GeneralAudience = "999998";

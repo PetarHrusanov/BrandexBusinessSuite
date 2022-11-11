@@ -11,7 +11,7 @@ public interface IProductsService
 
     Task<List<ProductCheckModel>> GetProductsCheck();
 
-    Task<IEnumerable<string>> GetProductsNames();
+    Task<List<string>> GetProductsNames();
 
-    Task<IEnumerable<ProductShortOutputModel>> GetProductsIdPrices();
+    Task<List<ProductShortOutputModel>> GetProductsIdPrices();
 }

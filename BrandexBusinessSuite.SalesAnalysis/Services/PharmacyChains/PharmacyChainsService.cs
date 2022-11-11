@@ -76,7 +76,7 @@ public class PharmacyChainsService : IPharmacyChainsService
             
     }
 
-    public async Task UploadBulkFromErp(List<ErpPharmacyChainCheck> pharmacyChains)
+    public async Task UploadBulkFromErp(List<ErpPharmacyCheck> pharmacyChains)
     {
         var table = new DataTable();
         table.TableName = PharmacyChains;
@@ -168,7 +168,7 @@ public class PharmacyChainsService : IPharmacyChainsService
             command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{PharmacyChains}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
             command.ExecuteNonQuery();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Handle exception properly
         }
