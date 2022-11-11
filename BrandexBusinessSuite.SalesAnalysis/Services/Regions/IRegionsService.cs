@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using BrandexBusinessSuite.Models.DataModels;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Regions;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Regions;
 
 using System.Threading.Tasks;
-using SalesAnalysis.Models.Regions;
+using System.Collections.Generic;
+
+using BrandexBusinessSuite.Models.DataModels;
 
 public interface IRegionsService
 {

@@ -20,12 +20,12 @@ using static Common.Constants;
 
 public class SalesService :ISalesService
 {
-    SalesAnalysisDbContext db;
+    private readonly SalesAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
 
     public SalesService(SalesAnalysisDbContext db, IConfiguration configuration)
     {
-        this.db = db;
+        _db = db;
         _configuration = configuration;
     }
 
@@ -90,13 +90,13 @@ public class SalesService :ISalesService
             
         if (regionId != null)
         {
-            return await db.Sales
+            return await _db.Sales
                 .Where(p => p.Pharmacy.RegionId == regionId)
                 .Where(d => d.Date >= dateBegin && d.Date <= dateEnd)
                 .Where(p => p.ProductId == productId).SumAsync(c => c.Count);
         }
             
-        return await db.Sales
+        return await _db.Sales
             .Where(d => d.Date >= dateBegin && d.Date <= dateEnd)
             .Where(p => p.ProductId == productId).SumAsync(c => c.Count);
             
@@ -104,7 +104,7 @@ public class SalesService :ISalesService
 
     public async Task<List<DateTime>> GetDistinctDatesByMonths()
     {
-        var datesRough = await this.db.Sales.Select(s => s.Date).Distinct().ToListAsync();
+        var datesRough = await this._db.Sales.Select(s => s.Date).Distinct().ToListAsync();
         var dates = datesRough.Select(t => new DateTime(t.Year, t.Month, 1)).Distinct().ToList();
         return dates;
     }

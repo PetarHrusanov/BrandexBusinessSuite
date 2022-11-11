@@ -6,7 +6,6 @@ namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using SalesAnalysis.Models.PharmacyChains;
 
 public interface IPharmacyChainsService
 {

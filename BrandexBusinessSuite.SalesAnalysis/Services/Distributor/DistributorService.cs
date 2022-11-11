@@ -8,15 +8,12 @@ using Data;
 
 public class DistributorService :IDistributorService
 {
-    SalesAnalysisDbContext db;
+    private readonly SalesAnalysisDbContext _db;
 
-    public DistributorService(SalesAnalysisDbContext db)
-    { 
-        this.db = db;
-    }
+    public DistributorService(SalesAnalysisDbContext db) 
+        => _db = db;
 
     public async Task<int> IdByName(string input)
-    {
-        return await db.Distributors.Where(d => d.Name == input).Select(d => d.Id).FirstOrDefaultAsync();
-    }
+    => await _db.Distributors.Where(d => d.Name == input).Select(d => d.Id).FirstOrDefaultAsync();
+   
 }

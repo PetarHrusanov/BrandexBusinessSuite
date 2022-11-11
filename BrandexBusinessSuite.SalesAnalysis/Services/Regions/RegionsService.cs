@@ -1,7 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Regions;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Regions;
 
 using System;
 using System.Collections.Generic;
@@ -9,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 using BrandexBusinessSuite.Models.DataModels;
 using Data;

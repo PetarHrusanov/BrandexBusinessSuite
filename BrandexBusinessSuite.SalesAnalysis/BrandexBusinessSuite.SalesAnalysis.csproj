@@ -17,7 +17,6 @@
     <Folder Include="Data\Migrations\" />
     <Folder Include="wwwroot\UploadExcel" />
     <Folder Include="wwwroot\UploadExcel\" />
-    <Folder Include="Models\Distributor\" />
     <Folder Include="Models\Pharmacies\" />
     <Folder Include="Models\Sales\" />
     <Folder Include="Services\" />
@@ -26,15 +25,11 @@
     <Folder Include="Services\Pharmacies\" />
     <Folder Include="Services\Distributor\" />
     <Folder Include="Services\Cities\" />
-    <Folder Include="Models\Cities\" />
     <Folder Include="Services\PharmacyCompanies\" />
     <Folder Include="Models\PharmacyCompanies\" />
-    <Folder Include="Models\PharmacyChains\" />
     <Folder Include="Services\PharmacyChains\" />
     <Folder Include="Services\Regions\" />
-    <Folder Include="Models\Regions\" />
     <Folder Include="Models\Products\" />
-    <Folder Include="Models\Map\" />
   </ItemGroup>
   <ItemGroup>
 <!--    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />-->

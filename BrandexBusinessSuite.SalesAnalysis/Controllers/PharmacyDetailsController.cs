@@ -1,6 +1,4 @@
-﻿using BrandexBusinessSuite.Models.DataModels;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Controllers;
 
 using System;
 using System.Collections.Generic;
@@ -18,6 +16,7 @@ using NPOI.XSSF.UserModel;
 using Newtonsoft.Json;
 
 using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Models.DataModels;
 using Data.Enums;
 using Infrastructure;
 

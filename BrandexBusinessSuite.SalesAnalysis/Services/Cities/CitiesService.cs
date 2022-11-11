@@ -1,25 +1,25 @@
-﻿using System;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Cities;
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using BrandexBusinessSuite.Common;
-using BrandexBusinessSuite.Methods;
-using BrandexBusinessSuite.Models.DataModels;
-using BrandexBusinessSuite.Models.ErpDocuments;
-using BrandexBusinessSuite.SalesAnalysis.Data;
-using BrandexBusinessSuite.SalesAnalysis.Data.Models;
+
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Cities;
+using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
+using BrandexBusinessSuite.SalesAnalysis.Data.Models;
+using Data;
 
-using static ExcelDataConstants.CitiesColumns;
-using static ExcelDataConstants.Generic;
-using static Constants;
+using static BrandexBusinessSuite.Common.ExcelDataConstants.CitiesColumns;
+using static Common.ExcelDataConstants.Generic;
+using static Common.Constants;
 
-using static DataMethods;
+using static Methods.DataMethods;
 
 public class CitiesService :ICitiesService
 {

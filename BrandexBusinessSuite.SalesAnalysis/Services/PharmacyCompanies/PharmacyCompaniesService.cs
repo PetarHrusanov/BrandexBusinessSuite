@@ -26,12 +26,12 @@ using static Methods.DataMethods;
 
 public class PharmacyCompaniesService : IPharmacyCompaniesService
 {
-    SalesAnalysisDbContext db;
+    private readonly SalesAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
 
     public PharmacyCompaniesService(SalesAnalysisDbContext db ,IConfiguration configuration)
     {
-        this.db = db;
+        _db = db;
         _configuration = configuration;
     }
         
@@ -133,14 +133,14 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
             Owner = company.Owner
         };
 
-        await db.Companies.AddAsync(companyModel);
-        await db.SaveChangesAsync();
+        await _db.Companies.AddAsync(companyModel);
+        await _db.SaveChangesAsync();
         return company.Name;
     }
     
     public async Task<List<PharmacyCompanyCheckModel>> GetPharmacyCompaniesCheck()
     {
-        return await db.Companies.Select(p => new PharmacyCompanyCheckModel()
+        return await _db.Companies.Select(p => new PharmacyCompanyCheckModel()
         {
             Id = p.Id,
             Name = p.Name,
@@ -150,7 +150,7 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
     
     public async Task<List<BasicCheckErpModel>> GetPharmacyCompaniesErpCheck()
     {
-        return await db.Companies.Select(p => new BasicCheckErpModel()
+        return await _db.Companies.Select(p => new BasicCheckErpModel()
         {
             Id = p.Id,
             Name = p.Name,

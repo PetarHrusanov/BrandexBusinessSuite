@@ -12,12 +12,9 @@ using SalesAnalysis.Models.Products;
 
 public class ProductsService : IProductsService
 {
-    SalesAnalysisDbContext db;
-
+    private readonly SalesAnalysisDbContext _db;
     public ProductsService(SalesAnalysisDbContext db)
-    {
-        this.db = db;
-    }
+    => _db = db;
 
     public async Task<string> CreateProduct(ProductInputModel productInputModel)
     {
@@ -35,15 +32,15 @@ public class ProductsService : IProductsService
             StingId = productInputModel.StingId
         };
 
-        await db.Products.AddAsync(productDBModel);
-        await db.SaveChangesAsync();
+        await _db.Products.AddAsync(productDBModel);
+        await _db.SaveChangesAsync();
         return productDBModel.Name;
 
     }
 
     public async Task<List<ProductCheckModel>> GetProductsCheck()
     {
-        return await db.Products.Select(p => new ProductCheckModel
+        return await _db.Products.Select(p => new ProductCheckModel
         {
             Id = p.Id,
             BrandexId = p.BrandexId,
@@ -56,12 +53,12 @@ public class ProductsService : IProductsService
 
     public async Task<List<string>> GetProductsNames()
     {
-        return await db.Products.Select(p => p.Name).ToListAsync();
+        return await _db.Products.Select(p => p.Name).ToListAsync();
     }
 
     public async Task<List<ProductShortOutputModel>> GetProductsIdPrices()
     {
-        return await db.Products.Select(p => new ProductShortOutputModel
+        return await _db.Products.Select(p => new ProductShortOutputModel
         {
             Name = p.Name,
             Id = p.Id,
