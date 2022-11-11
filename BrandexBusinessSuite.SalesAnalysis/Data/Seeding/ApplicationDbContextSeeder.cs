@@ -3,51 +3,36 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.Extensions.Options;
-
 using Models;
-
-using BrandexBusinessSuite;
 using BrandexBusinessSuite.Services.Data;
 
-using static BrandexBusinessSuite.Common.ExcelDataConstants.Regions;
-using static BrandexBusinessSuite.Common.ExcelDataConstants.Ditributors;
+using static Common.ExcelDataConstants.Regions;
+using static Common.ExcelDataConstants.Ditributors;
 
 public class ApplicationDbContextSeeder : ISeeder
 {
     
-    private readonly SalesAnalysisDbContext db;
-    // private readonly ApplicationSettings applicationSettings;
-
-    public ApplicationDbContextSeeder(
-        SalesAnalysisDbContext db,
-        IOptions<ApplicationSettings> applicationSettings)
-    {
-        this.db = db;
-        // this.applicationSettings = applicationSettings.Value;
-    }
+    private readonly SalesAnalysisDbContext _db;
+    public ApplicationDbContextSeeder(SalesAnalysisDbContext db)
+        => _db = db;
 
     public void SeedAsync()
     {
-        if (!db.Regions.Any())
+        if (!_db.Regions.Any())
         {
             foreach (var region in GetRegions())
             {
-                db.Regions.Add(region);
+                _db.Regions.Add(region);
             }
-            db.SaveChanges();
+            _db.SaveChanges();
         }
 
-
-        if (!db.Distributors.Any())
+        if (_db.Distributors.Any()) return;
+        foreach (var distributor in GetDistributors())
         {
-            foreach (var distributor in GetDistributors())
-            {
-                db.Distributors.Add(distributor);
-            }
-            db.SaveChanges();
+            _db.Distributors.Add(distributor);
         }
-        
+        _db.SaveChanges();
     }
     
     private static IEnumerable<Region> GetRegions()

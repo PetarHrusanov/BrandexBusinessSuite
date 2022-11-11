@@ -11,7 +11,6 @@ public class Region : IAuditInfo, IDeletableEntity
     public string Name { get; set; }
     public string ErpId { get; set; }
     public virtual ICollection<Pharmacy> Pharmacies { get; set; } = new HashSet<Pharmacy>();
-
     public DateTime CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }
     public bool IsDeleted { get; set; }

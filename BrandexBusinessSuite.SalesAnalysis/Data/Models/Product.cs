@@ -7,11 +7,6 @@ using System.Collections.Generic;
 
 public class Product : IAuditInfo, IDeletableEntity
 {
-    public Product()
-    {
-        Sales = new HashSet<Sale>();
-    }
-
     public int Id { get; set; }
 
     public string Name { get; set; }
@@ -34,7 +29,7 @@ public class Product : IAuditInfo, IDeletableEntity
     public double DiscountPrice
         => Price * 0.88;
 
-    public virtual ICollection<Sale> Sales { get; set; }
+    public virtual ICollection<Sale> Sales { get; set; } = new HashSet<Sale>();
     public DateTime CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }
     public bool IsDeleted { get; set; }

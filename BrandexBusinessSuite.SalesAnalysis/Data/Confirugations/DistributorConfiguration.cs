@@ -12,6 +12,5 @@ internal class DistributorConfiguration : IEntityTypeConfiguration<Distributor>
     {
         builder
             .HasKey(c => c.Id);
-
     }
 }
