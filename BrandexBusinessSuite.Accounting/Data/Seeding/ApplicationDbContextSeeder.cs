@@ -197,14 +197,14 @@ public class ApplicationDbContextSeeder : ISeeder
             //     AccountingName = ERP_Accounting.Ceget,
             //     AccountingErpNumber = ErpCodesNumber.Ceget
             // },
-            // new()
-            // {
-            //     Name = MarketingNames.ViruFor,
-            //     FacebookName = Facebook.ViruFor,
-            //     GoogleName = GenericNames.ViruFor,
-            //     AccountingName = ERP_Accounting.ViruFor,
-            //     AccountingErpNumber = ErpCodesNumber.ViruFor
-            // },
+            new()
+            {
+                Name = MarketingNames.ViruFor,
+                FacebookName = ProductConstants.Facebook.ViruFor,
+                GoogleName = GenericNames.ViruFor,
+                AccountingName = ERP_Accounting.ViruFor,
+                AccountingErpNumber = ErpCodesNumber.ViruFor
+            },
             new()
             {
                 Name = MarketingNames.Botanic,
