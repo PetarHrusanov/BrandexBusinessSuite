@@ -267,7 +267,7 @@ public class OnlineShopController : ApiController
                     continue;
                 }
                 
-                var listInvoiceOrderLine = JsonConvert.DeserializeObject<List<ErpInvoiceOrderLines>>(responseContentJObj["value"].ToString());
+                var listInvoiceOrderLine = JsonConvert.DeserializeObject<List<ErpInvoiceOrderLines>>(responseContentJObj["value"]!.ToString());
 
                 if (listInvoiceOrderLine == null || listInvoiceOrderLine.Count==0) continue; 
                 

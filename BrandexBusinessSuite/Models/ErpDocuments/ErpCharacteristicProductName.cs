@@ -12,5 +12,5 @@ public class ErpCharacteristicProductName
     {
         BG = value;
     }
-    public string BG { get; set; }
+    public string? BG { get; set; }
 }

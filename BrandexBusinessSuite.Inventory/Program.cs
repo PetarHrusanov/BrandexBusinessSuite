@@ -1,25 +1,27 @@
+using BrandexBusinessSuite;
+using BrandexBusinessSuite.Infrastructure;
+using BrandexBusinessSuite.Services.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services
+    .Configure<ApplicationSettings>(
+        builder.Configuration.GetSection(nameof(ApplicationSettings)),
+        config => config.BindNonPublicProperties = true)
+    .Configure<ErpUserSettings>(
+        builder.Configuration.GetSection(nameof(ErpUserSettings)),
+        config => config.BindNonPublicProperties = true);
+    // .AddWebService<BrandexSalesAnalysisDbContext>(builder.Configuration)
+    // .AddTransient<ICitiesService, CitiesService>()
+    // .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()
+    // .AddTransient<IPharmaciesService, PharmaciesService>()
+    // .AddTransient<IPharmacyChainsService, PharmacyChainsService>()
+    // .AddTransient<IRegionsService, RegionsService>()
+    // .AddTransient<ISalesService, SalesService>()
+    // .AddTransient<IProductsService, ProductsService>()
+    // .AddTransient<ISeeder, ApplicationDbContextSeeder>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
+app.UseWebService(builder.Environment).Initialize();
 app.Run();

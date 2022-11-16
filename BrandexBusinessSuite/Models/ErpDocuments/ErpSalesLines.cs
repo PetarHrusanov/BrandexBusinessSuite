@@ -2,10 +2,10 @@ namespace BrandexBusinessSuite.Models.ErpDocuments;
 
 public class ErpSalesLines
 {
-    public ErpSalesLines()
-    {
-        
-    }
+    // public ErpSalesLines()
+    // {
+    //     
+    // }
     
     public ErpSalesLines(string productId, decimal quantity, decimal discount, decimal unitPrice)
     {
@@ -34,7 +34,6 @@ public class ErpSalesLines
         LineCustomDiscountPercent = discount;
         ProductPrice = new ErpCharacteristicId(priceId);
         UnitPrice = new ErpCharacteristicUnitPrice(unitPrice);
-        // LineAmount = new ErpCharacteristicUnitPrice(unitPrice * quantity);
         Lot = new ErpCharacteristicId(lot);
     }
 
