@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.FuelRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.SalesBrandex", "BrandexBusinessSuite.SalesBrandex\BrandexBusinessSuite.SalesBrandex.csproj", "{89DEEAB2-3299-4885-8DC9-54054D0ACFF8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandexBusinessSuite.Inventory", "BrandexBusinessSuite.Inventory\BrandexBusinessSuite.Inventory.csproj", "{9B685D53-36BF-4D62-A4D5-1EE732B11707}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,5 +57,9 @@ Global
 		{89DEEAB2-3299-4885-8DC9-54054D0ACFF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89DEEAB2-3299-4885-8DC9-54054D0ACFF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89DEEAB2-3299-4885-8DC9-54054D0ACFF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B685D53-36BF-4D62-A4D5-1EE732B11707}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B685D53-36BF-4D62-A4D5-1EE732B11707}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B685D53-36BF-4D62-A4D5-1EE732B11707}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B685D53-36BF-4D62-A4D5-1EE732B11707}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

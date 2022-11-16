@@ -37,8 +37,6 @@ public class ErpSalesLines
         // LineAmount = new ErpCharacteristicUnitPrice(unitPrice * quantity);
         Lot = new ErpCharacteristicId(lot);
     }
-    
-    
 
     public ErpCharacteristicId Product { get; set; }
     public  ErpCharacteristicValueDecimal Quantity { get; set; }
