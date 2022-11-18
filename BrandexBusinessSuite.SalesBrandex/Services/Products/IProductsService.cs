@@ -1,6 +1,6 @@
-using BrandexBusinessSuite.Models.DataModels;
-
 namespace BrandexBusinessSuite.SalesBrandex.Services.Products;
+
+using BrandexBusinessSuite.Models.DataModels;
 
 public interface IProductsService
 {
