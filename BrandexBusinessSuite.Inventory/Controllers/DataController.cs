@@ -1,6 +1,3 @@
-using BrandexBusinessSuite.Inventory.Models.Materials;
-using BrandexBusinessSuite.Inventory.Services.Materials;
-
 namespace BrandexBusinessSuite.Inventory.Controllers;
 
 using System.Text;
@@ -14,7 +11,12 @@ using Newtonsoft.Json;
 using BrandexBusinessSuite.Services;
 using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Models.ErpDocuments;
+using Models.Suppliers;
+using Services.Orders;
+using Services.Suppliers;
 
+using Models.Materials;
+using Services.Materials;
 using Services.Products;
 
 using static  Common.Constants;
@@ -29,15 +31,17 @@ public class DataController :ApiController
     
     private readonly IProductsService _productsService;
     private readonly IMaterialsService _materialsService;
-    
+    private readonly ISuppliersService _suppliersService;
+
     private const string queryDate = "General_Products_Products?$top=10000&$filter=Active%20eq%20true";
 
     public DataController(IOptions<ErpUserSettings> erpUserSettings, IProductsService productsService,
-        IMaterialsService materialsService)
+        IMaterialsService materialsService, ISuppliersService suppliersService, IOrdersService ordersService)
     {
         _erpUserSettings = erpUserSettings.Value;
         _productsService = productsService;
         _materialsService = materialsService;
+        _suppliersService = suppliersService;
     }
     
     [HttpPost]
@@ -95,6 +99,15 @@ public class DataController :ApiController
         
         await _materialsService.UploadBulk(materialsUnique, rawMaterialInputModel.MaterialsType, rawMaterialInputModel.MaterialsMeasure);
 
+        return Result.Success;
+    }
+    
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    public async Task<ActionResult> PostSupplier(SupplierInputModel inputModel)
+    {
+        await _suppliersService.Upload(inputModel);
         return Result.Success;
     }
 }

@@ -2,7 +2,9 @@ using BrandexBusinessSuite;
 using BrandexBusinessSuite.Infrastructure;
 using BrandexBusinessSuite.Inventory.Data;
 using BrandexBusinessSuite.Inventory.Services.Materials;
+using BrandexBusinessSuite.Inventory.Services.Orders;
 using BrandexBusinessSuite.Inventory.Services.Products;
+using BrandexBusinessSuite.Inventory.Services.Suppliers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,8 @@ builder.Services
     .AddWebService<InventoryDbContext>(builder.Configuration)
     .AddTransient<IMaterialsService, MaterialsService>()
     .AddTransient<IProductsService, ProductsService>()
+    .AddTransient<ISuppliersService, SuppliersService>()
+    .AddTransient<IOrdersService, OrdersService>()
     // .AddTransient<ISeeder, ApplicationDbContextSeeder>();
     ;
 
