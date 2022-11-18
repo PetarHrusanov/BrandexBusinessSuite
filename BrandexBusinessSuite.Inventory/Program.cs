@@ -1,6 +1,8 @@
 using BrandexBusinessSuite;
 using BrandexBusinessSuite.Infrastructure;
-using BrandexBusinessSuite.Services.Data;
+using BrandexBusinessSuite.Inventory.Data;
+using BrandexBusinessSuite.Inventory.Services.Materials;
+using BrandexBusinessSuite.Inventory.Services.Products;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,16 +12,12 @@ builder.Services
         config => config.BindNonPublicProperties = true)
     .Configure<ErpUserSettings>(
         builder.Configuration.GetSection(nameof(ErpUserSettings)),
-        config => config.BindNonPublicProperties = true);
-    // .AddWebService<BrandexSalesAnalysisDbContext>(builder.Configuration)
-    // .AddTransient<ICitiesService, CitiesService>()
-    // .AddTransient<IPharmacyCompaniesService, PharmacyCompaniesService>()
-    // .AddTransient<IPharmaciesService, PharmaciesService>()
-    // .AddTransient<IPharmacyChainsService, PharmacyChainsService>()
-    // .AddTransient<IRegionsService, RegionsService>()
-    // .AddTransient<ISalesService, SalesService>()
-    // .AddTransient<IProductsService, ProductsService>()
+        config => config.BindNonPublicProperties = true)
+    .AddWebService<InventoryDbContext>(builder.Configuration)
+    .AddTransient<IMaterialsService, MaterialsService>()
+    .AddTransient<IProductsService, ProductsService>()
     // .AddTransient<ISeeder, ApplicationDbContextSeeder>();
+    ;
 
 var app = builder.Build();
 

@@ -8,5 +8,5 @@ public class ErpSalesLineAnalysis
     
     public ErpCharacteristicValueDecimal Quantity { get; set; }
     
-    public ErpProductAnalysis Product { get; set; }
+    public ErpProduct Product { get; set; }
 }

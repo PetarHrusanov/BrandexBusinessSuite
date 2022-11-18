@@ -10,6 +10,7 @@ public class ExcelDataConstants
         public const string Date = "Date";
         public const string Count = "Count";
         public const string Regions = "Regions";
+        public const string PartNumber = "PartNumber";
     }
     
     public class Ditributors

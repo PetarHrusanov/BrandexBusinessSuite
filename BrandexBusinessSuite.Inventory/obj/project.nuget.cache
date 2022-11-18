@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "0abXOz0seD7f+uHuD/tLGVgK6GmY3D8kZwmMP4UZbWuEMqERMw+qJJampzO3sIGCGH/PPWie3ILFGQ5MjNVGlA==",
+  "dgSpecHash": "ZWmjqVNc9YYHgvETty3M2bvlTd3dp/O9y7PhKfM88rwQyRK/u0I2xFB7bRPob81jWTP63U7QKuVFn++DHan/Vw==",
   "success": true,
   "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite.Inventory/BrandexBusinessSuite.Inventory.csproj",
   "expectedPackageFiles": [
@@ -17,6 +17,7 @@
     "/Users/Petar/.nuget/packages/hangfire.aspnetcore/1.7.28/hangfire.aspnetcore.1.7.28.nupkg.sha512",
     "/Users/Petar/.nuget/packages/hangfire.core/1.7.28/hangfire.core.1.7.28.nupkg.sha512",
     "/Users/Petar/.nuget/packages/hangfire.sqlserver/1.7.28/hangfire.sqlserver.1.7.28.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/humanizer.core/2.8.26/humanizer.core.2.8.26.nupkg.sha512",
     "/Users/Petar/.nuget/packages/masstransit/7.0.0/masstransit.7.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/masstransit.aspnetcore/7.0.0/masstransit.aspnetcore.7.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/masstransit.extensions.dependencyinjection/7.0.0/masstransit.extensions.dependencyinjection.7.0.0.nupkg.sha512",
@@ -29,8 +30,10 @@
     "/Users/Petar/.nuget/packages/microsoft.entityframeworkcore/6.0.0/microsoft.entityframeworkcore.6.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/microsoft.entityframeworkcore.abstractions/6.0.0/microsoft.entityframeworkcore.abstractions.6.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/microsoft.entityframeworkcore.analyzers/6.0.0/microsoft.entityframeworkcore.analyzers.6.0.0.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/microsoft.entityframeworkcore.design/6.0.0/microsoft.entityframeworkcore.design.6.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/microsoft.entityframeworkcore.relational/6.0.0/microsoft.entityframeworkcore.relational.6.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/microsoft.entityframeworkcore.sqlserver/6.0.0/microsoft.entityframeworkcore.sqlserver.6.0.0.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/microsoft.entityframeworkcore.tools/6.0.0/microsoft.entityframeworkcore.tools.6.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/microsoft.extensions.apidescription.server/3.0.0/microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/microsoft.extensions.caching.abstractions/6.0.0/microsoft.extensions.caching.abstractions.6.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/microsoft.extensions.caching.memory/6.0.0/microsoft.extensions.caching.memory.6.0.0.nupkg.sha512",

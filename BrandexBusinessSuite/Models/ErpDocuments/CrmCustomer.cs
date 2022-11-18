@@ -1,6 +1,6 @@
-using Newtonsoft.Json;
-
 namespace BrandexBusinessSuite.Models.ErpDocuments;
+
+using Newtonsoft.Json;
 
 public class CrmCustomer
 {
