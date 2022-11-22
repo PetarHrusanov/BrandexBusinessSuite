@@ -4,6 +4,7 @@ using BrandexBusinessSuite.Inventory.Data;
 using BrandexBusinessSuite.Inventory.Services.Materials;
 using BrandexBusinessSuite.Inventory.Services.Orders;
 using BrandexBusinessSuite.Inventory.Services.Products;
+using BrandexBusinessSuite.Inventory.Services.Recipes;
 using BrandexBusinessSuite.Inventory.Services.Suppliers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ builder.Services
     .AddTransient<IProductsService, ProductsService>()
     .AddTransient<ISuppliersService, SuppliersService>()
     .AddTransient<IOrdersService, OrdersService>()
+    .AddTransient<IRecipesService, RecipesService>()
     // .AddTransient<ISeeder, ApplicationDbContextSeeder>();
     ;
 
