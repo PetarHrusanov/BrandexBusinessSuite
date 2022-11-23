@@ -11,6 +11,5 @@ public class ErpCharacteristicValue
     {
         Value = value;
     }
-    // [JsonProperty("@odata.id")]
     public string? Value { get; set; }
 }

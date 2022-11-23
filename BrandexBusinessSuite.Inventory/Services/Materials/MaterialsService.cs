@@ -50,7 +50,7 @@ public class MaterialsService : IMaterialsService
         foreach (var product in products)
         {
             var row = table.NewRow();
-            row[Name] = product.Name.BG;
+            row[Name] = product.Name.BG.TrimEnd();
             row[ErpId] = product.Id;
             row[PartNumber] = product.PartNumber;
             row[Type] = materialType;

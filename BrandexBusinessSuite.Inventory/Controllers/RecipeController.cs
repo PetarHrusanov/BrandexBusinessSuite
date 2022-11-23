@@ -1,32 +1,26 @@
-using BrandexBusinessSuite.Inventory.Services.Materials;
-using BrandexBusinessSuite.Inventory.Services.Products;
-using BrandexBusinessSuite.Inventory.Services.Recipes;
-using BrandexBusinessSuite.Inventory.Services.Suppliers;
-using BrandexBusinessSuite.Models.DataModels;
-
 namespace BrandexBusinessSuite.Inventory.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using Models.Recipes;
+using BrandexBusinessSuite.Models.DataModels;
 using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Services;
+using Models.Recipes;
+using Services.Products;
+using Services.Recipes;
 
 using static  Common.Constants;
-
 
 public class RecipeController :ApiController
 {
     
     private readonly IProductsService _productsService;
-    private readonly IMaterialsService _materialsService;
     private readonly IRecipesService _recipesService;
 
-    public RecipeController(IProductsService productsService, IMaterialsService materialsService, IRecipesService recipesService)
+    public RecipeController(IProductsService productsService, IRecipesService recipesService)
     {
         _productsService = productsService;
-        _materialsService = materialsService;
         _recipesService = recipesService;
     }
     

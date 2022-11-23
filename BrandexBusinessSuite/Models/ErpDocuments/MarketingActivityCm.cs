@@ -13,8 +13,6 @@ public class MarketingActivityCm : ErpDocument
     public MarketingActivityCm(string subject,
         DateTime date,
         string partyId,
-        // string monthErp,
-        // string yearErp,
         string measure,
         string type,
         string media,

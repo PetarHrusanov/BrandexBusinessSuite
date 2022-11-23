@@ -12,4 +12,6 @@ public interface IRecipesService
     Task EditRecipe(RecipeInputModel inputModel);
 
     Task<List<RecipeDisplayModel>> GetRecipesDisplay();
+    
+    Task<List<RecipeErpQuantity>> GetRecipesErpIds();
 }

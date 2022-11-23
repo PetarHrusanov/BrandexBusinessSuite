@@ -46,4 +46,16 @@ public class RecipesService :IRecipesService
             ProductName = r.Product.Name,
             QuantityRequired = r.QuantityRequired
         }).ToListAsync();
+
+    public async Task<List<RecipeErpQuantity>> GetRecipesErpIds()
+        => await _db.Recipes.Select(r => new RecipeErpQuantity()
+        {
+            MaterialId = r.MaterialId,
+            MaterialName = r.Material.Name,
+            MaterialErpId = r.Material.ErpId,
+            MaterialType = r.Material.Type,
+            ProductId = r.ProductId,
+            ProductPills = r.Product.Pills,
+            QuantityRequired = r.QuantityRequired
+        }).ToListAsync();
 }
