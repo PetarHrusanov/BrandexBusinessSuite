@@ -1,3 +1,5 @@
+using BrandexBusinessSuite.Inventory.Models.Materials;
+
 namespace BrandexBusinessSuite.Inventory.Controllers;
 
 using System.Text;
@@ -30,9 +32,8 @@ public class InventoryController : ApiController
     private static readonly HttpClient Client = new();
     
     private readonly IProductsService _productsService;
-    private readonly IMaterialsService _materialsService;
-    private readonly ISuppliersService _suppliersService;
     private readonly IRecipesService _recipesService;
+    private readonly IOrdersService _ordersService;
     
     private const string QueryLots = "Logistics_Inventory_Lots?$top=100000&$select=ExpiryDate,Id,Number,ReceiptDate&$expand=Product($select=Id)";
 
@@ -43,13 +44,11 @@ public class InventoryController : ApiController
         "Logistics_Inventory_CurrentBalances?$top=1000000&$filter=Store%20eq%20'Logistics_Inventory_Stores(38f4c900-8428-4f94-bc6a-76159b53fb3f)'&$select=QuantityBase&$expand=Lot($select=Id),Product($select=Id,Name)";
 
     public InventoryController(IOptions<ErpUserSettings> erpUserSettings, IProductsService productsService,
-        IMaterialsService materialsService, ISuppliersService suppliersService, IOrdersService ordersService,
-        IRecipesService recipesService)
+        IOrdersService ordersService, IRecipesService recipesService)
     {
         _erpUserSettings = erpUserSettings.Value;
         _productsService = productsService;
-        _materialsService = materialsService;
-        _suppliersService = suppliersService;
+        _ordersService = ordersService;
         _recipesService = recipesService;
     }
     
@@ -112,7 +111,7 @@ public class InventoryController : ApiController
 
                 var productMaterial = new ProductMaterialQuantities(product.Name!, recipe.MaterialName);
                 
-                if (recipe.MaterialType is MaterialType.Extract or MaterialType.Excipient ) productMaterial.Quantity = substanceStock /recipe.QuantityRequired; 
+                if (recipe.MaterialType is MaterialType.Extract or MaterialType.Excipient ) productMaterial.Quantity = substanceStock /(recipe.QuantityRequired*recipe.ProductPills); 
                 else productMaterial.Quantity = substanceStock /recipe.QuantityRequired;
                 
                 productQuantities.Add(productMaterial);
@@ -121,6 +120,29 @@ public class InventoryController : ApiController
         }
 
         return productQuantities;
+
+    }
+    
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<List<MaterialsQuantitiesOutputModel>> GetMaterials()
+    {
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
+        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesMaterials}");
+        var currentBalances = JsonConvert.DeserializeObject<List<ErpCurrentBalances>>(responseContentJObj["value"].ToString());
+
+        var ordersLatest = await _ordersService.GetLatest();
+        
+        foreach (var order in ordersLatest)
+        {
+            var stockQuantity = currentBalances!.Where(c => c.Product.Id == order.MaterialErpId)
+                .Select(o => o.QuantityBase.Value).FirstOrDefault();
+            order.QuantityStock = stockQuantity;
+        }
+
+        return ordersLatest;
 
     }
     

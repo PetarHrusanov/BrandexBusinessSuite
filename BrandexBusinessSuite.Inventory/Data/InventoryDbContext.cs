@@ -15,7 +15,6 @@ public class InventoryDbContext: DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
-    public DbSet<Stock> Stocks { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
 
     public override int SaveChanges() => SaveChanges(true);
@@ -59,9 +58,6 @@ public class InventoryDbContext: DbContext
         }
     }
     
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Recipe>().HasKey(vf=> new {vf.MaterialId, vf.ProductId});
-        // modelBuilder.Entity<DriverCar>().HasKey(vf=> new {vf.DriverId, vf.CarId});
-    }
+    protected override void OnModelCreating(ModelBuilder modelBuilder) 
+        => modelBuilder.Entity<Recipe>().HasKey(vf=> new {vf.MaterialId, vf.ProductId});
 }
