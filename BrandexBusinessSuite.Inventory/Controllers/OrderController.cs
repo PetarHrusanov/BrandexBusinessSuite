@@ -9,7 +9,6 @@ using BrandexBusinessSuite.Services;
 using Models.Orders;
 using Services.Materials;
 using Services.Orders;
-using Services.Products;
 using Services.Suppliers;
 
 using static  Common.Constants;
@@ -53,4 +52,38 @@ public class OrderController : ApiController
         await _ordersService.Upload(inputModel);
         return Result.Success;
     }
+
+    [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<ActionResult> DeleteOrder([FromForm] int orderId)
+    {
+        await _ordersService.Delete(orderId);
+        return Result.Success;
+    }
+    
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    [Route(Id)]
+    public async Task<ActionResult<OrderEditModel>> Details(int id)
+        => await _ordersService.GetOrder(id) ?? throw new InvalidOperationException();
+    
+    [HttpPut]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<ActionResult<OrderEditModel>> Edit(OrderEditModel input)
+        => await _ordersService.Edit(input) ?? throw new InvalidOperationException();
+    
+    [HttpPut]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<ActionResult> DeliverOrder([FromForm] int orderId)
+    {
+        await _ordersService.DeliverOrder(orderId);
+        return Result.Success;
+    }
+    
+    
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<List<OrderOutputModel>> GetOrdersUndelivered()
+        => await _ordersService.GetUndelivered();
+    
 }

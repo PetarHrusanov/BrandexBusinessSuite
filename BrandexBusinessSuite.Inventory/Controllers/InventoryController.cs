@@ -110,12 +110,15 @@ public class InventoryController : ApiController
                     .FirstOrDefault();
 
                 var productMaterial = new ProductMaterialQuantities(product.Name!, recipe.MaterialName);
-                
-                if (recipe.MaterialType is MaterialType.Extract or MaterialType.Excipient ) productMaterial.Quantity = substanceStock /(recipe.QuantityRequired*recipe.ProductPills); 
-                else productMaterial.Quantity = substanceStock /recipe.QuantityRequired;
-                
-                productQuantities.Add(productMaterial);
 
+                productMaterial.Quantity = recipe.MaterialType switch
+                {
+                    MaterialType.Extract or MaterialType.Excipient => substanceStock / (recipe.QuantityRequired * recipe.ProductPills),
+                    MaterialType.Blisters => substanceStock / (recipe.QuantityRequired * recipe.ProductBlisters),
+                    _ => substanceStock / recipe.QuantityRequired
+                };
+
+                productQuantities.Add(productMaterial);
             }
         }
 

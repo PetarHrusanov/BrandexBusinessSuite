@@ -1,21 +1,25 @@
-using BrandexBusinessSuite.Inventory.Data;
+namespace BrandexBusinessSuite.Inventory.Services.Orders;
+
+using Microsoft.EntityFrameworkCore;
+
+using AutoMapper;
+
 using BrandexBusinessSuite.Inventory.Data.Models;
 using BrandexBusinessSuite.Inventory.Models.Materials;
 using BrandexBusinessSuite.Inventory.Models.Orders;
-using Microsoft.EntityFrameworkCore;
-
-namespace BrandexBusinessSuite.Inventory.Services.Orders;
+using Data;
 
 public class OrdersService :IOrdersService
 {
     private readonly InventoryDbContext _db;
+    private readonly IMapper _mapper;
 
-    public OrdersService(InventoryDbContext db)
+    public OrdersService(InventoryDbContext db, IMapper mapper)
     {
+        _mapper = mapper;
         _db = db;
     }
 
-    
     public async Task Upload(OrderInputModel inputModel)
     {
         var order = new Order()
@@ -24,11 +28,45 @@ public class OrdersService :IOrdersService
             SupplierId = inputModel.SupplierId,
             Quantity = inputModel.Quantity,
             Price = inputModel.Price,
+            Notes = inputModel.Notes ?? string.Empty,
             OrderDate = inputModel.OrderDate,
-            Delivered = inputModel.Delivered
+            DeliveryDate = inputModel.DeliveryDate,
         };
         
         await _db.Orders.AddAsync(order);
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task Delete(int id)
+    {
+        var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id==id);
+        _db.Orders.Remove(order!);
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task<OrderEditModel> GetOrder(int id)
+        => (await _mapper.ProjectTo<OrderEditModel>(_db.Orders.Where(m => m.Id == id))
+            .FirstOrDefaultAsync())!;
+    
+
+    public async Task<OrderEditModel> Edit(OrderEditModel inputModel)
+    {
+        var order = await _db.Orders.Where(m => m.Id == inputModel.Id).FirstOrDefaultAsync();
+        order.MaterialId = inputModel.MaterialId;
+        order.SupplierId = inputModel.SupplierId;
+        order.Quantity = inputModel.Quantity;
+        order.Price = inputModel.Price;
+        order.OrderDate = inputModel.OrderDate;
+        order.Notes = inputModel.Notes;
+        order.DeliveryDate = inputModel.DeliveryDate;
+        await _db.SaveChangesAsync();
+        return inputModel;
+    }
+
+    public async Task DeliverOrder(int id)
+    {
+        var order = await _db.Orders.Where(m => m.Id == id).FirstOrDefaultAsync();
+        order!.DeliveryDate = DateTime.Now;
         await _db.SaveChangesAsync();
     }
 
@@ -48,10 +86,11 @@ public class OrdersService :IOrdersService
                     MaterialErpId = o.Material.ErpId,
                     SupplierName = o.Supplier.Name,
                     Price = o.Price,
+                    Notes = o.Notes,
                     QuantityOrdered = o.Quantity,
                     PriceQuantity = o.Price/o.Quantity,
-                    DateOrdered = o.OrderDate.ToString("yyyy-MM-dd"),
-                    Delivered = o.Delivered
+                    OrderDate = o.OrderDate.ToString("yyyy-MM-dd"),
+                    DeliveryDate = o.DeliveryDate != null ? o.DeliveryDate.Value.ToString("yyyy-MM-dd") : null,
                 }).FirstOrDefaultAsync();
             
             if (order!=null) materialsList.Add(order!);
@@ -59,4 +98,8 @@ public class OrdersService :IOrdersService
 
         return materialsList;
     }
+
+    public async Task<List<OrderOutputModel>> GetUndelivered() 
+        => await _mapper.ProjectTo<OrderOutputModel>(_db.Orders.Where(m => m.DeliveryDate == null))
+            .ToListAsync();
 }

@@ -20,9 +20,6 @@ public class OrderConfiguration: IEntityTypeConfiguration<Order>
             .IsRequired();
         
         builder
-            .Property(c => c.Delivered)
-            .IsRequired();
-        builder
             .Property(c => c.OrderDate)
             .IsRequired();
         builder

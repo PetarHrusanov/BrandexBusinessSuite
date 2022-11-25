@@ -20,6 +20,7 @@ public class ProductsService : IProductsService
     private readonly IConfiguration _configuration;
 
     private const string Pills = "Pills";
+    private const string Blisters = "Blisters";
 
     public ProductsService(InventoryDbContext db, IConfiguration configuration)
     {
@@ -35,7 +36,7 @@ public class ProductsService : IProductsService
             ErpId = p.ErpId 
         }).ToListAsync();
 
-    public async Task UploadBulk(List<ErpProduct> products, int pills)
+    public async Task UploadBulk(List<ErpProduct> products, int pills, int blisters)
     {
         var table = new DataTable();
         table.TableName = "Products";
@@ -44,6 +45,7 @@ public class ProductsService : IProductsService
         table.Columns.Add(ErpId);
         table.Columns.Add(PartNumber);
         table.Columns.Add(Pills);
+        table.Columns.Add(Blisters);
         
         table.Columns.Add(CreatedOn);
         table.Columns.Add(IsDeleted, typeof(bool));
@@ -55,6 +57,7 @@ public class ProductsService : IProductsService
             row[ErpId] = product.Id;
             row[PartNumber] = product.PartNumber;
             row[Pills] = pills;
+            row[Blisters] = blisters;
             
             row[CreatedOn] = DateTime.Now;
             row[IsDeleted] = false;
@@ -74,6 +77,7 @@ public class ProductsService : IProductsService
         objbulk.ColumnMappings.Add(ErpId, ErpId);
         objbulk.ColumnMappings.Add(PartNumber, PartNumber);
         objbulk.ColumnMappings.Add(Pills, Pills);
+        objbulk.ColumnMappings.Add(Blisters, Blisters);
         
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
         objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);

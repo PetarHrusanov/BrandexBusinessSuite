@@ -6,6 +6,7 @@ public class RecipeErpQuantity
 {
     public int ProductId { get; set; }
     public int ProductPills { get; set; }
+    public int ProductBlisters { get; set; }
     public int MaterialId { get; set; }
     public string MaterialName { get; set; }
     public MaterialType MaterialType { get; set; }

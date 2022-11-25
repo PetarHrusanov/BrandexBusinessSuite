@@ -69,7 +69,7 @@ public class DataController :ApiController
             where productsCheck.All(c => !string.Equals(c.ErpId, product.Id, StringComparison.CurrentCultureIgnoreCase)) 
             select product).ToList();
         
-        await _productsService.UploadBulk(productsUnique, inputModel.Pills);
+        await _productsService.UploadBulk(productsUnique, inputModel.Pills, inputModel.Blisters);
 
         return Result.Success;
     }
