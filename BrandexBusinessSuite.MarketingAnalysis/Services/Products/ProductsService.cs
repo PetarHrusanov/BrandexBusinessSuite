@@ -1,3 +1,5 @@
+using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
+
 namespace BrandexBusinessSuite.MarketingAnalysis.Services.Products;
 
 using System.Data;
@@ -14,12 +16,12 @@ using static Common.Constants;
 public class ProductsService :IProductsService
 {
     
-    private MarketingAnalysisDbContext db;
+    private MarketingAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
     
     public ProductsService(MarketingAnalysisDbContext db, IConfiguration configuration)
     {
-        this.db = db;
+        _db = db;
         _configuration = configuration;
     }
     
@@ -31,7 +33,6 @@ public class ProductsService :IProductsService
         table.Columns.Add(Name, typeof(string));
         table.Columns.Add(ShortName, typeof(string));
         
-        table.Columns.Add(MediaType, typeof(int));
         table.Columns.Add(CreatedOn);
         table.Columns.Add(IsDeleted, typeof(bool));
             
@@ -65,10 +66,22 @@ public class ProductsService :IProductsService
         await objbulk.WriteToServerAsync(table);  
         con.Close();
     }
-    
+
+    public async Task Upload(ProductInputModel inputModel)
+    {
+        var product = new Product()
+        {
+            Name = inputModel.Name!.ToUpper().TrimEnd(),
+            ShortName = inputModel.ShortName!
+        };
+
+        await _db.Products.AddAsync(product);
+        await _db.SaveChangesAsync();
+    }
+
     public async Task<List<ProductCheckModel>> GetCheckModels()
     {
-        return await db.Products.Select(p => new ProductCheckModel()
+        return await _db.Products.Select(p => new ProductCheckModel()
         {
             Id = p.Id,
             Name = p.Name,

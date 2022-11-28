@@ -1,3 +1,6 @@
+using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
+using BrandexBusinessSuite.Models.DataModels;
+
 namespace BrandexBusinessSuite.MarketingAnalysis.Services.AdMedias;
 
 using System.Data;
@@ -12,12 +15,12 @@ using static Common.Constants;
 
 public class AdMediasService :IAdMediasService
 {
-    private MarketingAnalysisDbContext db;
+    private MarketingAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
     
     public AdMediasService(MarketingAnalysisDbContext db, IConfiguration configuration)
     {
-        this.db = db;
+        _db = db;
         _configuration = configuration;
     }
     
@@ -62,10 +65,21 @@ public class AdMediasService :IAdMediasService
         con.Close();  
         
     }
-    
+
+    public async Task Upload(BasicCheckModel inputModel)
+    {
+        var adMedia = new AdMedia()
+        {
+            Name = inputModel.Name.ToUpper().TrimEnd(),
+            CompanyId = inputModel.Id
+        };
+        await _db.AdMedias.AddAsync(adMedia);
+        await _db.SaveChangesAsync();
+    }
+
     public async Task<List<AdMediaCheckModel>> GetCheckModels()
     {
-        return await db.AdMedias.Select(p => new AdMediaCheckModel()
+        return await _db.AdMedias.Select(p => new AdMediaCheckModel()
         {
             Id = p.Id,
             Name = p.Name,

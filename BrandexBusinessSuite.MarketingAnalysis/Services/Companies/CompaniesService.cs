@@ -1,3 +1,6 @@
+using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
+using BrandexBusinessSuite.Models.DataModels;
+
 namespace BrandexBusinessSuite.MarketingAnalysis.Services.Companies;
 
 using System.Data;
@@ -64,6 +67,18 @@ public class CompaniesService : ICompaniesService
         con.Open();
         await objbulk.WriteToServerAsync(table);  
         con.Close();
+    }
+
+    public async Task Upload(BasicErpInputModel inputModel)
+    {
+        var company = new Company
+        {
+            Name = inputModel.Name!.ToUpper().TrimEnd(),
+            ErpId = inputModel.ErpId!
+        };
+
+        await _db.Companies.AddAsync(company);
+        await _db.SaveChangesAsync();
     }
 
     public async Task<List<CompaniesCheckModel>> GetCheckModels()
