@@ -99,6 +99,19 @@ public class OrdersService :IOrdersService
         return materialsList;
     }
 
+    public async Task<List<OrderOutputModel>> GetSpecificOrders(int ordersNumber, int? materialId)
+    {
+
+        if (materialId!=null)
+        {
+            return await _mapper.ProjectTo<OrderOutputModel>(_db.Orders.OrderByDescending(o=>o.OrderDate).Where(m => m.MaterialId == materialId)).Take(ordersNumber)
+                .ToListAsync();
+        }
+        
+        return await _mapper.ProjectTo<OrderOutputModel>(_db.Orders.OrderByDescending(o=>o.OrderDate).Take(ordersNumber))
+            .ToListAsync();
+    }
+
     public async Task<List<OrderOutputModel>> GetUndelivered() 
         => await _mapper.ProjectTo<OrderOutputModel>(_db.Orders.Where(m => m.DeliveryDate == null))
             .ToListAsync();

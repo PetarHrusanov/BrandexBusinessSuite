@@ -15,5 +15,7 @@ public interface IOrdersService
     
     Task<List<MaterialsQuantitiesOutputModel>> GetLatest();
     
+    Task<List<OrderOutputModel>> GetSpecificOrders(int ordersNumber, int? materialId);
+    
     Task<List<OrderOutputModel>> GetUndelivered();
 }

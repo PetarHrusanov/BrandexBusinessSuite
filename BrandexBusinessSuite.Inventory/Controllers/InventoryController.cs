@@ -1,5 +1,3 @@
-using BrandexBusinessSuite.Inventory.Models.Materials;
-
 namespace BrandexBusinessSuite.Inventory.Controllers;
 
 using System.Text;
@@ -14,11 +12,10 @@ using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Models.ErpDocuments;
 using Data.Enums;
 using Models.Products;
-using Services.Materials;
+using Models.Materials;
 using Services.Orders;
 using Services.Products;
 using Services.Recipes;
-using Services.Suppliers;
 
 using static  Common.Constants;
 using static Common.ErpConstants;

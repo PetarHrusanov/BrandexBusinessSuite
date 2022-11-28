@@ -80,10 +80,23 @@ public class OrderController : ApiController
         return Result.Success;
     }
     
-    
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<OrderOutputModel>> GetOrdersUndelivered()
         => await _ordersService.GetUndelivered();
+
+
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<List<OrderOutputModel>> GetSpecificOrders([FromQuery] int ordersNumber,
+        [FromQuery] string? materialId)
+    {
+        if (int.TryParse(materialId, out var materialConverted))
+        {
+            return await _ordersService.GetSpecificOrders(ordersNumber, materialConverted);
+        }
+        return await _ordersService.GetSpecificOrders(ordersNumber, null);
+    }
+        
     
 }
