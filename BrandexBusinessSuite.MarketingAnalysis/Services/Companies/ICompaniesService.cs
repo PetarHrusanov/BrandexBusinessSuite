@@ -8,5 +8,8 @@ public interface ICompaniesService
 {
     Task UploadBulk(List<CompaniesInputModel> medias);
     Task Upload(BasicErpInputModel inputModel);
-    Task<List<CompaniesCheckModel>> GetCheckModels();
+    Task<List<BasicCheckModel>> GetCheckModels();
+    Task<BasicCheckErpModel> Details(int id);
+    Task<BasicCheckErpModel> Edit(BasicCheckErpModel inputModel);
+    Task Delete(int id);
 }

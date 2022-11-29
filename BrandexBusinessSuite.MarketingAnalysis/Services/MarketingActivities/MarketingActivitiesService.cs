@@ -228,14 +228,5 @@ public class MarketingActivitiesService : IMarketingActivitesService
 
         return date;
     }
-
-    // await mapper
-            // .ProjectTo<MarketingActivityInputModel>( this .All()
-            //     .Where(c => c.Id == id))
-            // .FirstOrDefaultAsync();
     
-    // private IQueryable<MarketingActivityInputModel> AllAvailable()
-    //     => this
-    //         .All()
-    //         .Where(car => car.IsAvailable);
 }

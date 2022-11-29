@@ -1,5 +1,3 @@
-using BrandexBusinessSuite.MarketingAnalysis.Models.Products;
-
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
 using Microsoft.AspNetCore.Authorization;
@@ -8,24 +6,20 @@ using Microsoft.Extensions.Options;
 
 using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Models.DataModels;
-using Models.MarketingActivities;
-
+using BrandexBusinessSuite.Services;
+using Models.AdMedias;
+using Models.Products;
 using Services.Companies;
 using Services.AdMedias;
-using Services.MarketingActivities;
-using Services.MediaTypes;
 using Services.Products;
-using BrandexBusinessSuite.Services;
 
 using static Common.Constants;
 
 public class DataController : ApiController
 {
-
-    private readonly IMarketingActivitesService _marketingActivitiesService;
+    
     private readonly IProductsService _productsService;
     private readonly IAdMediasService _adMediasService;
-    private readonly IMediaTypesService _mediaTypesService;
     private readonly ICompaniesService _companiesService;
 
     private readonly ErpUserSettings _userSettings;
@@ -33,20 +27,20 @@ public class DataController : ApiController
     private static readonly HttpClient Client = new();
 
     public DataController(IOptions<ErpUserSettings> userSettings,
-        IMarketingActivitesService marketingActivitiesService, IProductsService productsService,
+        IProductsService productsService,
         IAdMediasService adMediasService,
-        IMediaTypesService mediaTypesService,
         ICompaniesService companiesService
     )
 
     {
         _userSettings = userSettings.Value;
-        _marketingActivitiesService = marketingActivitiesService;
         _productsService = productsService;
         _adMediasService = adMediasService;
-        _mediaTypesService = mediaTypesService;
         _companiesService = companiesService;
     }
+    
+    
+    // COMPANY LOGIC
     
     [HttpPost]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
@@ -56,6 +50,33 @@ public class DataController : ApiController
         return Result.Success;
     }
     
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<List<BasicCheckModel>> GetCompanies() 
+        =>  await _companiesService.GetCheckModels();
+    
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    [Route(Id)]
+    public async Task<ActionResult<BasicCheckErpModel>> CompanyDetails(int id)
+        => await _companiesService.Details(id) ?? throw new InvalidOperationException();
+    
+    [HttpPut]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<ActionResult<BasicCheckErpModel>> CompanyEdit(BasicCheckErpModel input)
+        => await _companiesService.Edit(input) ?? throw new InvalidOperationException();
+    
+    [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<ActionResult> CompanyDelete([FromForm] int id)
+    {
+        await _companiesService.Delete(id);
+        return Result.Success;
+    }
+    
+
+    // AD MEDIA LOGIC
+    
     [HttpPost]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<ActionResult> UploadAdMedia(BasicCheckModel inputModel)
@@ -64,6 +85,34 @@ public class DataController : ApiController
         return Result.Success;
     }
     
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<List<AdMediaDisplayModel>> GetAdMedias() 
+        => await _adMediasService.GetDisplayModels();
+
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    [Route(Id)]
+    public async Task<ActionResult<AdMediaCheckModel>> AdMediaDetails(int id)
+        => await _adMediasService.GetDetails(id) ?? throw new InvalidOperationException();
+    
+    [HttpPut]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<ActionResult<AdMediaCheckModel>> AdMediaEdit(AdMediaCheckModel input)
+        => await _adMediasService.Edit(input) ?? throw new InvalidOperationException();
+    
+    
+    [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<ActionResult> AdMediaDelete([FromForm] int id)
+    {
+        await _adMediasService.Delete(id);
+        return Result.Success;
+    }
+    
+
+    // PRODUCT LOGIC
+    
     [HttpPost]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<ActionResult> UploadProduct(ProductInputModel inputModel)
@@ -71,19 +120,11 @@ public class DataController : ApiController
         await _productsService.Upload(inputModel);
         return Result.Success;
     }
-
-    [HttpGet]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
-    [Route(Id)]
-    public async Task<ActionResult<MarketingActivityEditModel>> Details(int id)
-        => await _marketingActivitiesService.GetDetails(id) ?? throw new InvalidOperationException();
-
-    [HttpGet]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
-    public async Task<List<BasicCheckModel>> GetCompanies()
-    {
-        var companiesGet = await _companiesService.GetCheckModels();
-        return companiesGet.Select(company => new BasicCheckModel() { Name = company.Name, Id = company.Id }).ToList();
-    }
     
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<List<ProductCheckModel>> GetProducts() 
+        => await _productsService.GetCheckModels();
+    
+
 }

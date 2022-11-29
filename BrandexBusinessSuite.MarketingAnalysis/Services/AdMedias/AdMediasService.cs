@@ -1,3 +1,5 @@
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
 using BrandexBusinessSuite.Models.DataModels;
 
@@ -15,13 +17,15 @@ using static Common.Constants;
 
 public class AdMediasService :IAdMediasService
 {
-    private MarketingAnalysisDbContext _db;
+    private readonly MarketingAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
+    private readonly IMapper _mapper;
     
-    public AdMediasService(MarketingAnalysisDbContext db, IConfiguration configuration)
+    public AdMediasService(MarketingAnalysisDbContext db, IConfiguration configuration, IMapper mapper)
     {
         _db = db;
         _configuration = configuration;
+        _mapper = mapper;
     }
     
     public async Task UploadBulk(List<AdMediaInputModel> medias)
@@ -77,13 +81,37 @@ public class AdMediasService :IAdMediasService
         await _db.SaveChangesAsync();
     }
 
-    public async Task<List<AdMediaCheckModel>> GetCheckModels()
+    public async Task<List<AdMediaDisplayModel>> GetDisplayModels()
+        => await _mapper.ProjectTo<AdMediaDisplayModel>(_db.AdMedias).ToListAsync();
+
+    public async Task<AdMediaCheckModel?> GetDetails(int id)
+    => await _mapper.ProjectTo<AdMediaCheckModel>(_db.AdMedias.Where(a=>a.Id==id)).FirstOrDefaultAsync();
+
+    public async Task<List<BasicCheckModel>> GetCheckModels()
     {
-        return await _db.AdMedias.Select(p => new AdMediaCheckModel()
+        return await _db.AdMedias.Select(p => new BasicCheckModel()
         {
             Id = p.Id,
             Name = p.Name,
             // MediaType = p.MediaType
         }).ToListAsync();
+    }
+
+    public async Task<AdMediaCheckModel> Edit(AdMediaCheckModel inputModel)
+    {
+        var adMedia = await _db.AdMedias.Where(a => a.Id == inputModel.Id).FirstOrDefaultAsync();
+        adMedia!.Name = inputModel.Name;
+        adMedia.CompanyId = inputModel.CompanyId;
+
+        await _db.SaveChangesAsync();
+        return inputModel;
+    }
+
+    public async Task Delete(int id)
+    {
+        var adMedia = await _db.AdMedias.Where(m => m.Id == id).FirstOrDefaultAsync();
+        _db.Remove(adMedia);
+        await _db.SaveChangesAsync();
+
     }
 }

@@ -81,12 +81,39 @@ public class CompaniesService : ICompaniesService
         await _db.SaveChangesAsync();
     }
 
-    public async Task<List<CompaniesCheckModel>> GetCheckModels()
+    public async Task<List<BasicCheckModel>> GetCheckModels()
     {
-        return await _db.Companies.Select(p => new CompaniesCheckModel()
+        return await _db.Companies.Select(p => new BasicCheckModel()
         {
             Id = p.Id,
             Name = p.Name
         }).ToListAsync();
+    }
+
+    public async Task<BasicCheckErpModel> Details(int id)
+    {
+        return (await _db.Companies.Where(c=>c.Id == id).Select(p => new BasicCheckErpModel()
+        {
+            Id = p.Id,
+            Name = p.Name,
+            ErpId = p.ErpId
+        }).FirstOrDefaultAsync())!;
+    }
+
+    public async Task<BasicCheckErpModel> Edit(BasicCheckErpModel inputModel)
+    {
+        var company = await _db.Companies.Where(c => c.Id == inputModel.Id).FirstOrDefaultAsync();
+        company.Name = inputModel.Name;
+        company.ErpId = inputModel.ErpId;
+        
+        await _db.SaveChangesAsync();
+        return inputModel;
+    }
+
+    public async Task Delete(int id)
+    {
+        var company = await _db.Companies.Where(m => m.Id == id).FirstOrDefaultAsync();
+        _db.Remove(company);
+        await _db.SaveChangesAsync();
     }
 }
