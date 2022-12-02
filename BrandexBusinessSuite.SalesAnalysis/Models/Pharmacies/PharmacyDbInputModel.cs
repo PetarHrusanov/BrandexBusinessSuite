@@ -17,6 +17,5 @@ public class PharmacyDbInputModel
     public int? SopharmaId { get; set; }
     public int? StingId { get; set; }
     public int RegionId { get; set; }
-    
     public string ErpId { get; set; }
 }

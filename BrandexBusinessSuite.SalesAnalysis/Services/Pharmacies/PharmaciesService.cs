@@ -117,10 +117,27 @@ public class PharmaciesService : IPharmaciesService
             
     }
 
-
-    public Task<List<PharmacyCheckErpModel>> GetAllCheckErp()
+    public async Task<List<PharmacyCheckErpModel>> GetAllCheckErp()
     {
-        throw new NotImplementedException();
+        return await _db.Pharmacies.Select(p => new PharmacyCheckErpModel
+        {
+            Id = p.Id,
+            Name = p.Name,
+            ErpId = p.ErpId,
+            Address = p.Address,
+            
+            RegionErp = p.Region.ErpId,
+            PharmacyChainErp = p.PharmacyChain.ErpId,
+            
+            IsActive = p.Active,
+            CompanyIdErp = p.Company.ErpId,
+            
+            PhoenixId = p.PhoenixId,
+            PharmnetId = p.PharmnetId,
+            StingId = p.StingId,
+            SopharmaId = p.SopharmaId
+        }).ToListAsync();
+        
     }
 
     public async Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime? dateBegin, DateTime? dateEnd, int? regionId)
@@ -191,7 +208,7 @@ public class PharmaciesService : IPharmaciesService
         }
     }
 
-    public async Task BulkUpdateData(List<BasicCheckErpModel> list)
+    public async Task BulkUpdateData(List<PharmacyDbUpdateModel> list)
     {
         var dt = ConvertToDataTable(list);
         
