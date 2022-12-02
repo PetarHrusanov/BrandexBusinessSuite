@@ -51,20 +51,6 @@ public class PharmaciesController : AdministrationController
     private readonly IPharmacyChainsService _pharmacyChainsService;
     private readonly ICitiesService _citiesService;
 
-    // private const int BrandexIdColumn = 19;
-    // private const int NameColumn = 4;
-    // private const int PharmacyClassColumn = 2;
-    // private const int ActiveColumn = 1;
-    // private const int PharmacyCompanyColumn = 3;
-    // private const int PharmacyChainColumn = 5;
-    // private const int AddressColumn = 6;
-    // private const int CityColumn = 20;
-    // private const int PharmnetIdColumn = 14;
-    // private const int PhoenixIdColumn = 15;
-    // private const int SopharmaIdColumn = 16;
-    // private const int StingIdColumn = 17;
-    // private const int RegionColumn = 8;
-
     public PharmaciesController(IWebHostEnvironment hostEnvironment, IOptions<ErpUserSettings> erpUserSettings, IPharmaciesService pharmaciesService,
         IPharmacyCompaniesService pharmacyCompaniesService, IPharmacyChainsService pharmacyChainsService,
         IRegionsService regionsService, ICitiesService citiesService)
@@ -146,67 +132,67 @@ public class PharmaciesController : AdministrationController
         return pharmaciesFile.Where(pharmacy => !pharmaciesErpSelected.Contains(pharmacy.Code)).ToList();
     }
     
-    [HttpGet]
-    [IgnoreAntiforgeryToken]
-    public async Task<ActionResult> AddErpIds()
-    {
-        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-        
-        var pharmaciesErp = await GetPharmaciesErp(true);
-
-        var regionsCheck = await _regionsService.AllRegions();
-        var regionsErpDistinct = pharmaciesErp!.Where(c=>c.Region!=null).DistinctBy(c => c.Region!.ValueId).ToList();
-        var regionsForUpdate = regionsCheck.Select(region => new BasicCheckErpModel()
-            {
-                Id = region.Id,
-                Name = region.Name,
-                ErpId = regionsErpDistinct.Where(r => r.Region!.Value!.ToUpper().TrimEnd()
-                        .Equals(region.Name, StringComparison.InvariantCultureIgnoreCase))
-                    .Select(r => r.Region!.ValueId)
-                    .FirstOrDefault()
-            })
-            .ToList();
-        await _regionsService.BulkUpdateData(regionsForUpdate);
-
-        var citiesCheck = await _citiesService.GetCitiesCheck();
-
-        var citiesErpDistinct = await GetCitiesErp(false);
-        var citiesForUpdate = (from city in citiesCheck
-            let erpCity = citiesErpDistinct.FirstOrDefault(c => c.City!.Value!.TrimEnd().Equals(city!.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
-            where erpCity != null
-            select new BasicCheckErpModel { Id = city.Id, Name = city.Name!.ToUpper().TrimEnd(), ErpId = erpCity!.City!.ValueId! }).ToList();
-        await _citiesService.BulkUpdateData(citiesForUpdate);
-
-        var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
-        var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
-
-        var pharmacyChainsForUpdate = (from pharmacyChain in pharmacyChainsCheck
-            let pharmacyChainErp = pharmacyChainsErpDistinct.FirstOrDefault(c => string.Equals(c.PharmacyChain!.Value!.TrimEnd().ToUpper(), pharmacyChain.Name, StringComparison.InvariantCultureIgnoreCase)) 
-            where pharmacyChainErp != null
-            select new BasicCheckErpModel { Id = pharmacyChain.Id, Name = pharmacyChain.Name!.ToUpper().TrimEnd(), ErpId = pharmacyChainErp!.PharmacyChain!.ValueId! }).ToList();
-        await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
-        
-        var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesErpCheck();
-        var pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
-        var pharmacyCompaniesForUpdate = (from pharmacyCompany in pharmacyCompaniesErpCheck
-            let pharmacyCompanyErp = pharmacyCompaniesErpDistinct.FirstOrDefault(c => string.Equals(c.ParentParty!.PartyName!.BG.TrimEnd(), pharmacyCompany.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
-            where pharmacyCompanyErp != null
-            select new BasicCheckErpModel { Id = pharmacyCompany.Id, Name = pharmacyCompany.Name!.ToUpper().TrimEnd(), ErpId = pharmacyCompanyErp!.ParentParty!.PartyId! }).ToList();
-        await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
-        
-        var pharmaciesErpCheck = await _pharmaciesService.GetPharmaciesCheck();
-        var pharmaciesErpDistinct = pharmaciesErp!
-            .Where(c => c.PartyId != null)
-            .Where(p=>p.Address!=null && (bool)p.IsActive!).DistinctBy(c => c.PartyId).ToList();
-        var pharmaciesForUpdate = (from pharmacy in pharmaciesErpCheck
-            let pharmacyErp = pharmaciesErpDistinct.FirstOrDefault(c =>int.Parse(c.PartyCode!)== pharmacy.BrandexId) 
-            where pharmacyErp != null
-            select new BasicCheckErpModel { Id = pharmacy.Id, Name = pharmacy.Name!.ToUpper().TrimEnd(), ErpId = pharmacyErp!.PartyId }).ToList();
-        await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
-        
-        return Result.Success;
-    }
+    // [HttpGet]
+    // [IgnoreAntiforgeryToken]
+    // public async Task<ActionResult> AddErpIds()
+    // {
+    //     var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
+    //     Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+    //     
+    //     var pharmaciesErp = await GetPharmaciesErp(true);
+    //
+    //     var regionsCheck = await _regionsService.AllRegions();
+    //     var regionsErpDistinct = pharmaciesErp!.Where(c=>c.Region!=null).DistinctBy(c => c.Region!.ValueId).ToList();
+    //     var regionsForUpdate = regionsCheck.Select(region => new BasicCheckErpModel()
+    //         {
+    //             Id = region.Id,
+    //             Name = region.Name,
+    //             ErpId = regionsErpDistinct.Where(r => r.Region!.Value!.ToUpper().TrimEnd()
+    //                     .Equals(region.Name, StringComparison.InvariantCultureIgnoreCase))
+    //                 .Select(r => r.Region!.ValueId)
+    //                 .FirstOrDefault()
+    //         })
+    //         .ToList();
+    //     await _regionsService.BulkUpdateData(regionsForUpdate);
+    //
+    //     var citiesCheck = await _citiesService.GetCitiesCheck();
+    //
+    //     var citiesErpDistinct = await GetCitiesErp(false);
+    //     var citiesForUpdate = (from city in citiesCheck
+    //         let erpCity = citiesErpDistinct.FirstOrDefault(c => c.City!.Value!.TrimEnd().Equals(city!.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
+    //         where erpCity != null
+    //         select new BasicCheckErpModel { Id = city.Id, Name = city.Name!.ToUpper().TrimEnd(), ErpId = erpCity!.City!.ValueId! }).ToList();
+    //     await _citiesService.BulkUpdateData(citiesForUpdate);
+    //
+    //     var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
+    //     var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
+    //
+    //     var pharmacyChainsForUpdate = (from pharmacyChain in pharmacyChainsCheck
+    //         let pharmacyChainErp = pharmacyChainsErpDistinct.FirstOrDefault(c => string.Equals(c.PharmacyChain!.Value!.TrimEnd().ToUpper(), pharmacyChain.Name, StringComparison.InvariantCultureIgnoreCase)) 
+    //         where pharmacyChainErp != null
+    //         select new BasicCheckErpModel { Id = pharmacyChain.Id, Name = pharmacyChain.Name!.ToUpper().TrimEnd(), ErpId = pharmacyChainErp!.PharmacyChain!.ValueId! }).ToList();
+    //     await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
+    //     
+    //     var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesErpCheck();
+    //     var pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
+    //     var pharmacyCompaniesForUpdate = (from pharmacyCompany in pharmacyCompaniesErpCheck
+    //         let pharmacyCompanyErp = pharmacyCompaniesErpDistinct.FirstOrDefault(c => string.Equals(c.ParentParty!.PartyName!.BG.TrimEnd(), pharmacyCompany.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
+    //         where pharmacyCompanyErp != null
+    //         select new BasicCheckErpModel { Id = pharmacyCompany.Id, Name = pharmacyCompany.Name!.ToUpper().TrimEnd(), ErpId = pharmacyCompanyErp!.ParentParty!.PartyId! }).ToList();
+    //     await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
+    //     
+    //     var pharmaciesErpCheck = await _pharmaciesService.GetPharmaciesCheck();
+    //     var pharmaciesErpDistinct = pharmaciesErp!
+    //         .Where(c => c.PartyId != null)
+    //         .Where(p=>p.Address!=null && (bool)p.IsActive!).DistinctBy(c => c.PartyId).ToList();
+    //     var pharmaciesForUpdate = (from pharmacy in pharmaciesErpCheck
+    //         let pharmacyErp = pharmaciesErpDistinct.FirstOrDefault(c =>int.Parse(c.PartyCode!)== pharmacy.BrandexId) 
+    //         where pharmacyErp != null
+    //         select new BasicCheckErpModel { Id = pharmacy.Id, Name = pharmacy.Name!.ToUpper().TrimEnd(), ErpId = pharmacyErp!.PartyId }).ToList();
+    //     await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
+    //     
+    //     return Result.Success;
+    // }
     
     [HttpGet]
     [IgnoreAntiforgeryToken]
@@ -351,149 +337,5 @@ public class PharmaciesController : AdministrationController
         
         return pharmacy;
     }
-    
-    // [HttpPost]
-    // [Consumes("multipart/form-data")]
-    // public async Task<ActionResult<string>> Import([FromForm] IFormFile file)
-    // {
-    //     var errorDictionary = new List<string>();
-    //
-    //     var validPharmacyList = new List<PharmacyDbInputModel>();
-    //     var pharmaciesEdited = new List<PharmacyDbInputModel>();
-    //
-    //     var citiesIdsForCheck = await _citiesService.GetCitiesCheck();
-    //     var pharmacyCompaniesIdsForCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesCheck();
-    //     var pharmacyChainsIdsForCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
-    //     var regionIdsForCheck = await _regionsService.AllRegions();
-    //
-    //     var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
-    //
-    //     if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
-    //
-    //     var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
-    //     
-    //     await using var stream = new FileStream(fullPath, FileMode.Create);
-    //     await file.CopyToAsync(stream);
-    //     
-    //     stream.Position = 0;
-    //
-    //     var hssfwb = new XSSFWorkbook(stream);
-    //     var sheet = hssfwb.GetSheetAt(0);
-    //
-    //     for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++) //Read Excel File
-    //     {
-    //         var row = sheet.GetRow(i);
-    //
-    //         if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
-    //
-    //         if (row.GetCell(NameColumn) == null || row.GetCell(AddressColumn) == null)
-    //         {
-    //             errorDictionary.Add($"{i} Line: Null or blank Name or Address");
-    //             continue;
-    //         }
-    //
-    //         var newPharmacy = new PharmacyDbInputModel
-    //         {
-    //             PharmacyClass = PharmacyClass.Other,
-    //             Active = true,
-    //             Name = row.GetCell(NameColumn).ToString()?.TrimEnd(),
-    //             Address = row.GetCell(AddressColumn).ToString()?.TrimEnd()
-    //         };
-    //
-    //         CreatePharmacyInputModel(citiesIdsForCheck, pharmacyCompaniesIdsForCheck, pharmacyChainsIdsForCheck,
-    //             regionIdsForCheck, newPharmacy, row, i, errorDictionary);
-    //
-    //         if (newPharmacy.BrandexId == 0 || newPharmacy.Name == null || newPharmacy.PharmacyChainId == 0 ||
-    //             newPharmacy.RegionId == 0 || newPharmacy.CityId == 0 || newPharmacy.CompanyId == 0)
-    //             continue;
-    //
-    //         if (pharmacyIdsForCheck.Any(p => p.BrandexId == newPharmacy.BrandexId))
-    //         {
-    //             pharmaciesEdited.Add(newPharmacy);
-    //             continue;
-    //         }
-    //
-    //         validPharmacyList.Add(newPharmacy);
-    //     }
-    //
-    //     if (errorDictionary.Count != 0) return JsonConvert.SerializeObject(errorDictionary);
-    //     
-    //     await _pharmaciesService.UploadBulk(validPharmacyList);
-    //     await _pharmaciesService.Update(pharmaciesEdited);
-    //
-    //     return JsonConvert.SerializeObject(errorDictionary);
-    // }
-    
 
-    // private static void CreatePharmacyInputModel(IEnumerable<BasicCheckErpModel> citiesIdsForCheck,
-    //     IEnumerable<PharmacyCompanyCheckModel> pharmacyCompanyIdsForCheck,
-    //     IEnumerable<BasicCheckErpModel> pharmacyChainsIdsForCheck,
-    //     IEnumerable<BasicCheckErpModel> regionIdsForCheck, PharmacyDbInputModel newPharmacy, IRow row, int i,
-    //     ICollection<string> errorDictionary)
-    // {
-    //     var brandexId = row.GetCell(BrandexIdColumn);
-    //     var pharmacyClass = row.GetCell(PharmacyClassColumn);
-    //     var pharmacyActive = row.GetCell(ActiveColumn);
-    //     var companyIdRow = row.GetCell(PharmacyCompanyColumn);
-    //     var chainIdRow = row.GetCell(PharmacyChainColumn);
-    //     var regionIdRow = row.GetCell(RegionColumn);
-    //
-    //     var cityIdRow = row.GetCell(CityColumn);
-    //
-    //     if (brandexId == null || companyIdRow == null || chainIdRow == null || regionIdRow == null || cityIdRow == null)
-    //     {
-    //         errorDictionary.Add($"{i} Line: Null or blank value at a necessary field ");
-    //         return;
-    //     }
-    //
-    //     if (int.TryParse(brandexId.ToString()!.TrimEnd(), out var brandexIdConverted))
-    //     {
-    //         newPharmacy.BrandexId = brandexIdConverted;
-    //     }
-    //
-    //     else
-    //     {
-    //         errorDictionary.Add($"{i} Line: {IncorrectPharmacyId}");
-    //     }
-    //
-    //     if (pharmacyClass != null && !string.IsNullOrWhiteSpace(pharmacyClass.ToString()!.TrimEnd()))
-    //     {
-    //         newPharmacy.PharmacyClass = (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacyClass.ToString()!.TrimEnd(), true);
-    //     }
-    //
-    //     if (pharmacyActive != null && pharmacyActive.ToString()?.TrimEnd()[0] == '0') newPharmacy.Active = false;
-    //
-    //     newPharmacy.CompanyId = pharmacyCompanyIdsForCheck
-    //         .Where(p => p.Name == companyIdRow.ToString()!.TrimEnd().ToUpper())
-    //         .Select(p => p.Id)
-    //         .FirstOrDefault();
-    //
-    //     if (newPharmacy.CompanyId == 0) errorDictionary.Add($"{i} Line: {IncorrectPharmacyCompanyId}");
-    //
-    //     newPharmacy.PharmacyChainId = pharmacyChainsIdsForCheck
-    //         .Where(p => p.Name == chainIdRow.ToString()?.TrimEnd().ToUpper())
-    //         .Select(p => p.Id)
-    //         .FirstOrDefault();
-    //
-    //     if (newPharmacy.PharmacyChainId == 0) errorDictionary.Add($"{i} Line: {IncorrectPharmacyChainId}");
-    //
-    //     newPharmacy.RegionId = regionIdsForCheck.Where(r => r.Name == regionIdRow.ToString()!.TrimEnd())
-    //         .Select(r => r.Id)
-    //         .FirstOrDefault();
-    //
-    //     if (newPharmacy.RegionId == 0) errorDictionary.Add($"{i} Line: {IncorrectRegion}");
-    //
-    //     newPharmacy.CityId = citiesIdsForCheck.Where(c => c.Name == cityIdRow.ToString()!.TrimEnd().ToUpper())
-    //         .Select(c => c.Id)
-    //         .FirstOrDefault();
-    //
-    //     if (newPharmacy.CityId == 0) errorDictionary.Add($"{i} Line: {IncorrectCityName}");
-    //
-    //     if (ConvertRowToInt(row, PharmnetIdColumn) != 0) newPharmacy.PharmnetId = ConvertRowToInt(row, PharmnetIdColumn);
-    //     if (ConvertRowToInt(row, PhoenixIdColumn) != 0) newPharmacy.PhoenixId = ConvertRowToInt(row, PhoenixIdColumn);
-    //     if (ConvertRowToInt(row, SopharmaIdColumn) != 0) newPharmacy.SopharmaId = ConvertRowToInt(row, SopharmaIdColumn);
-    //     if (ConvertRowToInt(row, StingIdColumn) != 0) newPharmacy.StingId = ConvertRowToInt(row, StingIdColumn);
-    // }
-    
-    
 }

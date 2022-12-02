@@ -27,10 +27,7 @@ public class ProductsController : AdministrationController
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly IProductsService _productsService;
     
-    public ProductsController(
-        IWebHostEnvironment hostEnvironment,
-        IProductsService productsService)
-
+    public ProductsController(IWebHostEnvironment hostEnvironment, IProductsService productsService)
     {
         _hostEnvironment = hostEnvironment;
         _productsService = productsService;

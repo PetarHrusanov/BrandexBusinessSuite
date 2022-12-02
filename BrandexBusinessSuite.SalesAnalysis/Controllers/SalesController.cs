@@ -6,89 +6,53 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Net.Http;
-using System.Text;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Models.DataModels;
-using BrandexBusinessSuite.Models.ErpDocuments;
-using BrandexBusinessSuite.Services;
-using Data.Enums;
 
 using Infrastructure;
 using Models.Pharmacies;
 using Models.Products;
 using Models.Sales;
 
-using Services.Cities;
 using Services.Distributor;
 using Services.Pharmacies;
 using Services.Products;
-using Services.Regions;
 using Services.Sales;
-using Services.PharmacyChains;
-using Services.PharmacyCompanies;
 
 using static Methods.ExcelMethods;
 
-using static Common.ErpConstants;
 using static Common.ExcelDataConstants.Ditributors;
 using static Common.ExcelDataConstants.ExcelLineErrors;
 using static Common.Constants;
-using static Requests.RequestsMethods;
 
 public class SalesController : AdministrationController
 {
     private readonly IWebHostEnvironment _hostEnvironment;
-    
-    private readonly ErpUserSettings _erpUserSettings;
-    private static readonly HttpClient Client = new();
 
     private readonly ISalesService _salesService;
     private readonly IProductsService _productsService;
     private readonly IPharmaciesService _pharmaciesService;
     private readonly IDistributorService _distributorService;
-    private readonly ICitiesService _citiesService;
-    private readonly IPharmacyChainsService _pharmacyChainsService;
-    private readonly IPharmacyCompaniesService _pharmacyCompaniesService;
-    private readonly IRegionsService _regionsService;
-
-    private const int BrandexDateColumn = 0;
-    private const int BrandexProductIdColumn = 1;
-    private const int BrandexCountColumn = 2;
-    private const int BrandexPharmacyIdColumn = 3;
 
     private const int ProductCounter = 4;
 
-    public SalesController(IWebHostEnvironment hostEnvironment,
-        IOptions<ErpUserSettings> erpUserSettings,
-        ISalesService salesService,
-        IProductsService productsService, IPharmaciesService pharmaciesService, IDistributorService distributorService,
-        ICitiesService citiesService, IPharmacyChainsService pharmacyChainsService, IPharmacyCompaniesService pharmacyCompaniesService,
-        IRegionsService regionsService
-        )
-
+    public SalesController(IWebHostEnvironment hostEnvironment, ISalesService salesService,
+        IProductsService productsService, IPharmaciesService pharmaciesService, IDistributorService distributorService)
     {
         _hostEnvironment = hostEnvironment;
         _salesService = salesService;
         _productsService = productsService;
         _pharmaciesService = pharmaciesService;
         _distributorService = distributorService;
-        _citiesService = citiesService;
-        _erpUserSettings = erpUserSettings.Value;
-        _pharmacyChainsService = pharmacyChainsService;
-        _pharmacyCompaniesService = pharmacyCompaniesService;
-        _regionsService = regionsService;
     }
 
     [HttpGet]
@@ -221,8 +185,8 @@ public class SalesController : AdministrationController
             {
                 case Brandex:
                     CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale, errorDictionary,
-                        Brandex, BrandexDateColumn, BrandexProductIdColumn, BrandexPharmacyIdColumn,
-                        BrandexCountColumn);
+                        Brandex, 0, 1, 3,
+                        2);
                     break;
                 case Phoenix:
                     CreateSaleInputModel(productIdsForCheck, pharmacyIdsForCheck, row, i, newSale, errorDictionary,
