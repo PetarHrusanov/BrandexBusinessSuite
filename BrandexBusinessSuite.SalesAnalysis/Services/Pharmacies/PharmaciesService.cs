@@ -1,6 +1,4 @@
-﻿using BrandexBusinessSuite.Models.DataModels;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Pharmacies;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Pharmacies;
 
 using System;
 using System.Collections.Generic;
@@ -13,6 +11,7 @@ using Microsoft.Data.SqlClient;
     
 using System.Data;
 using Data;
+using BrandexBusinessSuite.Models.DataModels;
 
 using Models.Pharmacies;
 using Models.Sales;
@@ -25,14 +24,13 @@ using static Methods.DataMethods;
 
 public class PharmaciesService : IPharmaciesService
 {
-    SalesAnalysisDbContext db;
+    private readonly SalesAnalysisDbContext _db;
     private readonly IConfiguration _configuration;
 
     public PharmaciesService(SalesAnalysisDbContext db, IConfiguration configuration)
     {
-        this.db = db;
+        _db = db;
         _configuration = configuration;
-
     }
 
     public async Task UploadBulk(List<PharmacyDbInputModel> pharmacies)
@@ -85,9 +83,7 @@ public class PharmaciesService : IPharmaciesService
             
             table.Rows.Add(row);
         }
-            
-            
-            
+
         var connection = _configuration.GetConnectionString("DefaultConnection");
             
         var con = new SqlConnection(connection);
@@ -120,13 +116,18 @@ public class PharmaciesService : IPharmaciesService
         con.Close(); 
             
     }
-    
+
+
+    public Task<List<PharmacyCheckErpModel>> GetAllCheckErp()
+    {
+        throw new NotImplementedException();
+    }
 
     public async Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime? dateBegin, DateTime? dateEnd, int? regionId)
     {
         if (regionId!=null)
         {
-            return await db.Pharmacies
+            return await _db.Pharmacies
                 .Where(p => p.RegionId == regionId)
                 .Select(p => new PharmacyExcelModel
                 {
@@ -147,7 +148,7 @@ public class PharmaciesService : IPharmaciesService
                 }).ToListAsync();
         }
 
-        return await db.Pharmacies.Select(p => new PharmacyExcelModel
+        return await _db.Pharmacies.Select(p => new PharmacyExcelModel
         {
             Name = p.Name,
             Address = p.Address,
@@ -170,7 +171,7 @@ public class PharmaciesService : IPharmaciesService
     {
         foreach (var pharmacy in pharmacies)
         {
-            var pharmacyDb = await db.Pharmacies.Where(p => p.BrandexId == pharmacy.BrandexId)
+            var pharmacyDb = await _db.Pharmacies.Where(p => p.BrandexId == pharmacy.BrandexId)
                 .FirstOrDefaultAsync();
 
             pharmacyDb.Name = pharmacy.Name;
@@ -186,7 +187,7 @@ public class PharmaciesService : IPharmaciesService
             pharmacyDb.StingId  = pharmacy.StingId;
             pharmacyDb.RegionId  = pharmacy.RegionId;
                 
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
     }
 
@@ -225,10 +226,9 @@ public class PharmaciesService : IPharmaciesService
         }
     }
 
-
-    public async Task<List<PharmacyCheckModel>> GetPharmaciesCheck()
+    public async Task<List<PharmacyCheckModel>> GetAllCheck()
     {
-        return await db.Pharmacies.Select(p => new PharmacyCheckModel
+        return await _db.Pharmacies.Select(p => new PharmacyCheckModel
         {
             Id = p.Id,
             Name = p.Name,
@@ -240,6 +240,5 @@ public class PharmaciesService : IPharmaciesService
             SopharmaId = p.SopharmaId
         }).ToListAsync();
     }
-    
     
 }

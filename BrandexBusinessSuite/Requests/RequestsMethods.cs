@@ -33,7 +33,6 @@ public static class RequestsMethods
     {
         var uriChangeState = new Uri($"{GeneralRequest}{document}/ChangeState");
         await client.PostAsync(uriChangeState, StateContent);
-        // var response = await Client.PostAsync(uriChangeState, _stateContent);
     }
 
 }

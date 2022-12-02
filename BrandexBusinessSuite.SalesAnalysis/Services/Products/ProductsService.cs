@@ -38,7 +38,7 @@ public class ProductsService : IProductsService
 
     }
 
-    public async Task<List<ProductCheckModel>> GetProductsCheck()
+    public async Task<List<ProductCheckModel>> GetAllCheck()
     {
         return await _db.Products.Select(p => new ProductCheckModel
         {

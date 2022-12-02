@@ -18,7 +18,7 @@ public class DistributorService :IDistributorService
     public async Task<int> IdByName(string input) 
         => await _db.Distributors.Where(d => d.Name == input).Select(d => d.Id).FirstOrDefaultAsync();
 
-    public async Task<List<BasicCheckModel>> GetDistributors()
+    public async Task<List<BasicCheckModel>> GetAllCheck()
         => await _db.Distributors.Select(c => new BasicCheckModel
         {
             Name = c.Name,

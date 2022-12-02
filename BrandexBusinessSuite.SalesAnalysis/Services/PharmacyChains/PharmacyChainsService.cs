@@ -76,20 +76,7 @@ public class PharmacyChainsService : IPharmacyChainsService
         con.Close();  
     }
 
-    public async Task<string> UploadPharmacyChain(string chainName)
-    {
-        var chainInput = new PharmacyChain
-        {
-            Name = chainName
-        };
-
-        await _db.PharmacyChains.AddAsync(chainInput);
-        await _db.SaveChangesAsync();
-        return chainName;
-
-    }
-    
-    public async Task<List<BasicCheckErpModel>> GetPharmacyChainsCheck()
+    public async Task<List<BasicCheckErpModel>> GetAllCheck()
     {
         return await _db.PharmacyChains.Select(p => new BasicCheckErpModel()
         {

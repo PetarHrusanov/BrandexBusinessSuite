@@ -9,5 +9,5 @@ public interface IDistributorService
 {
     Task<int> IdByName(string input);
 
-    Task<List<BasicCheckModel>> GetDistributors();
+    Task<List<BasicCheckModel>> GetAllCheck();
 }

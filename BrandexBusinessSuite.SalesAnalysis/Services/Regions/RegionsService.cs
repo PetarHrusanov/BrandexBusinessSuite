@@ -25,22 +25,8 @@ public class RegionsService : IRegionsService
         _db = db;
         _configuration = configuration;
     }
-
-    public async Task<string> UploadRegion(string regionName)
-    {
-        if (regionName == null) return "";
-        var regionDbModel = new Region
-        {
-            Name = regionName
-        };
-
-        await _db.Regions.AddAsync(regionDbModel);
-        await _db.SaveChangesAsync();
-        return regionName;
-
-    }
-
-    public async Task<List<BasicCheckErpModel>> AllRegions() 
+    
+    public async Task<List<BasicCheckErpModel>> GetAllCheck() 
         =>await _db.Regions.Select(a => new BasicCheckErpModel
         {
             Id = a.Id,
@@ -70,7 +56,7 @@ public class RegionsService : IRegionsService
             }
 
             command.CommandTimeout = 3000;
-            command.CommandText = "UPDATE P SET P.[ErpId]= T.[ErpId] FROM [Regions] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
+            command.CommandText = "UPDATE P SET P.[Name]= T.[Name] FROM [Regions] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
             command.ExecuteNonQuery();
         }
         catch (Exception)

@@ -12,10 +12,9 @@ using Microsoft.Extensions.Configuration;
 
 using BrandexBusinessSuite.Models.DataModels;
 using BrandexBusinessSuite.Models.ErpDocuments;
-using BrandexBusinessSuite.SalesAnalysis.Data.Models;
 using Data;
 
-using static BrandexBusinessSuite.Common.ExcelDataConstants.CitiesColumns;
+using static Common.ExcelDataConstants.CitiesColumns;
 using static Common.ExcelDataConstants.Generic;
 using static Common.Constants;
 
@@ -74,7 +73,7 @@ public class CitiesService :ICitiesService
         con.Close();
     }
 
-    public async Task<List<BasicCheckErpModel>> GetCitiesCheck()
+    public async Task<List<BasicCheckErpModel>> GetAllCheck()
     {
         return await _db.Cities.Select(p => new BasicCheckErpModel
         {
@@ -82,18 +81,6 @@ public class CitiesService :ICitiesService
             Name = p.Name,
             ErpId = p.ErpId
         }).ToListAsync();
-    }
-
-    public async Task<string> UploadCity(string city)
-    {
-        if (city == null) return "";
-        var cityModel = new City
-        {
-            Name = city
-        };
-        await _db.Cities.AddAsync(cityModel);
-        await _db.SaveChangesAsync();
-        return cityModel.Name;
     }
 
     public async Task BulkUpdateData(List<BasicCheckErpModel> list)

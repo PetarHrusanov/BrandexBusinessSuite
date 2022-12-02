@@ -77,21 +77,6 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
         con.Close();  
     }
 
-    public async Task<string> UploadCompany(PharmacyCompanyInputModel company)
-    {
-        if (company.Name == null) return "";
-        var companyModel = new Company
-        {
-            Name = company.Name,
-            VAT = company.VAT,
-            Owner = company.Owner
-        };
-
-        await _db.Companies.AddAsync(companyModel);
-        await _db.SaveChangesAsync();
-        return company.Name;
-    }
-    
     public async Task<List<PharmacyCompanyCheckModel>> GetPharmacyCompaniesCheck()
     {
         return await _db.Companies.Select(p => new PharmacyCompanyCheckModel()
@@ -102,7 +87,7 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
         }).ToListAsync();
     }
     
-    public async Task<List<BasicCheckErpModel>> GetPharmacyCompaniesErpCheck()
+    public async Task<List<BasicCheckErpModel>> GetAllCheck()
     {
         return await _db.Companies.Select(p => new BasicCheckErpModel()
         {

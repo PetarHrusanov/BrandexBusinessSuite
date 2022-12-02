@@ -57,7 +57,7 @@ public class SalesController : AdministrationController
 
     [HttpGet]
     public async Task<List<BasicCheckModel>> GetDistributors()
-        => await _distributorService.GetDistributors();
+        => await _distributorService.GetAllCheck();
 
     [HttpPost]
     [IgnoreAntiforgeryToken]
@@ -155,8 +155,8 @@ public class SalesController : AdministrationController
 
         var validSalesList = new List<SaleInputModel>();
 
-        var pharmacyIdsForCheck = await _pharmaciesService.GetPharmaciesCheck();
-        var productIdsForCheck = await _productsService.GetProductsCheck();
+        var pharmacyIdsForCheck = await _pharmaciesService.GetAllCheck();
+        var productIdsForCheck = await _productsService.GetAllCheck();
 
         if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
         
@@ -298,7 +298,7 @@ public class SalesController : AdministrationController
 
     private async Task CreateHeaderColumnsAsync(IRow row)
     {
-        var products = await _productsService.GetProductsCheck();
+        var products = await _productsService.GetAllCheck();
         row.CreateCell(0).SetCellValue("Pharmacy Name");
         row.CreateCell(1).SetCellValue("Pharmacy Address");
         row.CreateCell(2).SetCellValue("Pharmacy Class");
