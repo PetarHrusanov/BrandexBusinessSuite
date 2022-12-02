@@ -34,54 +34,8 @@ public class PharmacyCompaniesService : IPharmacyCompaniesService
         _db = db;
         _configuration = configuration;
     }
-        
-    public async Task UploadBulk(List<PharmacyCompanyInputModel> pharmacyCompanies)
-    {
-        var table = new DataTable();
-        table.TableName = PharmacyCompanies;
-            
-        table.Columns.Add(Name, typeof(string));
-        table.Columns.Add(Owner);
-        table.Columns.Add(VAT);
-            
-        table.Columns.Add(CreatedOn);
-        table.Columns.Add(IsDeleted, typeof(bool));
-            
-        foreach (var pharmacyCompany in pharmacyCompanies)
-        {
-            var row = table.NewRow();
-            row[Name] = pharmacyCompany.Name.ToUpper();
-            row[Owner] = pharmacyCompany.Owner;
-            row[VAT] = pharmacyCompany.VAT;
-            
-            row[CreatedOn] = DateTime.Now;
-            row[IsDeleted] = false;
-            
-            table.Rows.Add(row);
-        }
 
-        var connection = _configuration.GetConnectionString("DefaultConnection");
-            
-        var con = new SqlConnection(connection);
-            
-        var objbulk = new SqlBulkCopy(con);  
-            
-        objbulk.DestinationTableName = PharmacyCompanies;
-            
-        objbulk.ColumnMappings.Add(Name, Name);
-        objbulk.ColumnMappings.Add(Owner, Owner);
-        objbulk.ColumnMappings.Add(VAT, VAT);
-        
-        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
-        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
-
-        con.Open();
-        await objbulk.WriteToServerAsync(table);  
-        con.Close();  
-            
-    }
-
-    public async Task UploadBulkFromErp(List<ErpPharmacyCheck> pharmacyCompanies)
+    public async Task UploadBulk(List<ErpPharmacyCheck> pharmacyCompanies)
     {
         var table = new DataTable();
         table.TableName = PharmacyCompanies;

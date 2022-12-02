@@ -50,12 +50,7 @@ public class ProductsService : IProductsService
             SopharmaId = p.SopharmaId
         }).ToListAsync();
     }
-
-    public async Task<List<string>> GetProductsNames()
-    {
-        return await _db.Products.Select(p => p.Name).ToListAsync();
-    }
-
+    
     public async Task<List<ProductShortOutputModel>> GetProductsIdPrices()
     {
         return await _db.Products.Select(p => new ProductShortOutputModel

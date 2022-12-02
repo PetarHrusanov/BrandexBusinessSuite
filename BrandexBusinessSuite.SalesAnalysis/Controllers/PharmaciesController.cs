@@ -132,67 +132,67 @@ public class PharmaciesController : AdministrationController
         return pharmaciesFile.Where(pharmacy => !pharmaciesErpSelected.Contains(pharmacy.Code)).ToList();
     }
     
-    // [HttpGet]
-    // [IgnoreAntiforgeryToken]
-    // public async Task<ActionResult> AddErpIds()
-    // {
-    //     var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-    //     Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-    //     
-    //     var pharmaciesErp = await GetPharmaciesErp(true);
-    //
-    //     var regionsCheck = await _regionsService.AllRegions();
-    //     var regionsErpDistinct = pharmaciesErp!.Where(c=>c.Region!=null).DistinctBy(c => c.Region!.ValueId).ToList();
-    //     var regionsForUpdate = regionsCheck.Select(region => new BasicCheckErpModel()
-    //         {
-    //             Id = region.Id,
-    //             Name = region.Name,
-    //             ErpId = regionsErpDistinct.Where(r => r.Region!.Value!.ToUpper().TrimEnd()
-    //                     .Equals(region.Name, StringComparison.InvariantCultureIgnoreCase))
-    //                 .Select(r => r.Region!.ValueId)
-    //                 .FirstOrDefault()
-    //         })
-    //         .ToList();
-    //     await _regionsService.BulkUpdateData(regionsForUpdate);
-    //
-    //     var citiesCheck = await _citiesService.GetCitiesCheck();
-    //
-    //     var citiesErpDistinct = await GetCitiesErp(false);
-    //     var citiesForUpdate = (from city in citiesCheck
-    //         let erpCity = citiesErpDistinct.FirstOrDefault(c => c.City!.Value!.TrimEnd().Equals(city!.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
-    //         where erpCity != null
-    //         select new BasicCheckErpModel { Id = city.Id, Name = city.Name!.ToUpper().TrimEnd(), ErpId = erpCity!.City!.ValueId! }).ToList();
-    //     await _citiesService.BulkUpdateData(citiesForUpdate);
-    //
-    //     var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
-    //     var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
-    //
-    //     var pharmacyChainsForUpdate = (from pharmacyChain in pharmacyChainsCheck
-    //         let pharmacyChainErp = pharmacyChainsErpDistinct.FirstOrDefault(c => string.Equals(c.PharmacyChain!.Value!.TrimEnd().ToUpper(), pharmacyChain.Name, StringComparison.InvariantCultureIgnoreCase)) 
-    //         where pharmacyChainErp != null
-    //         select new BasicCheckErpModel { Id = pharmacyChain.Id, Name = pharmacyChain.Name!.ToUpper().TrimEnd(), ErpId = pharmacyChainErp!.PharmacyChain!.ValueId! }).ToList();
-    //     await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
-    //     
-    //     var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesErpCheck();
-    //     var pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
-    //     var pharmacyCompaniesForUpdate = (from pharmacyCompany in pharmacyCompaniesErpCheck
-    //         let pharmacyCompanyErp = pharmacyCompaniesErpDistinct.FirstOrDefault(c => string.Equals(c.ParentParty!.PartyName!.BG.TrimEnd(), pharmacyCompany.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
-    //         where pharmacyCompanyErp != null
-    //         select new BasicCheckErpModel { Id = pharmacyCompany.Id, Name = pharmacyCompany.Name!.ToUpper().TrimEnd(), ErpId = pharmacyCompanyErp!.ParentParty!.PartyId! }).ToList();
-    //     await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
-    //     
-    //     var pharmaciesErpCheck = await _pharmaciesService.GetPharmaciesCheck();
-    //     var pharmaciesErpDistinct = pharmaciesErp!
-    //         .Where(c => c.PartyId != null)
-    //         .Where(p=>p.Address!=null && (bool)p.IsActive!).DistinctBy(c => c.PartyId).ToList();
-    //     var pharmaciesForUpdate = (from pharmacy in pharmaciesErpCheck
-    //         let pharmacyErp = pharmaciesErpDistinct.FirstOrDefault(c =>int.Parse(c.PartyCode!)== pharmacy.BrandexId) 
-    //         where pharmacyErp != null
-    //         select new BasicCheckErpModel { Id = pharmacy.Id, Name = pharmacy.Name!.ToUpper().TrimEnd(), ErpId = pharmacyErp!.PartyId }).ToList();
-    //     await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
-    //     
-    //     return Result.Success;
-    // }
+    [HttpGet]
+    [IgnoreAntiforgeryToken]
+    public async Task<ActionResult> AddErpIds()
+    {
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
+        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        
+        var pharmaciesErp = await GetPharmaciesErp(true);
+    
+        var regionsCheck = await _regionsService.AllRegions();
+        var regionsErpDistinct = pharmaciesErp!.Where(c=>c.Region!=null).DistinctBy(c => c.Region!.ValueId).ToList();
+        var regionsForUpdate = regionsCheck.Select(region => new BasicCheckErpModel()
+            {
+                Id = region.Id,
+                Name = region.Name,
+                ErpId = regionsErpDistinct.Where(r => r.Region!.Value!.ToUpper().TrimEnd()
+                        .Equals(region.Name, StringComparison.InvariantCultureIgnoreCase))
+                    .Select(r => r.Region!.ValueId)
+                    .FirstOrDefault()
+            })
+            .ToList();
+        await _regionsService.BulkUpdateData(regionsForUpdate);
+    
+        var citiesCheck = await _citiesService.GetCitiesCheck();
+    
+        var citiesErpDistinct = await GetCitiesErp(false);
+        var citiesForUpdate = (from city in citiesCheck
+            let erpCity = citiesErpDistinct.FirstOrDefault(c => c.City!.Value!.TrimEnd().Equals(city!.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
+            where erpCity != null
+            select new BasicCheckErpModel { Id = city.Id, Name = city.Name!.ToUpper().TrimEnd(), ErpId = erpCity!.City!.ValueId! }).ToList();
+        await _citiesService.BulkUpdateData(citiesForUpdate);
+    
+        var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
+        var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
+    
+        var pharmacyChainsForUpdate = (from pharmacyChain in pharmacyChainsCheck
+            let pharmacyChainErp = pharmacyChainsErpDistinct.FirstOrDefault(c => string.Equals(c.PharmacyChain!.Value!.TrimEnd().ToUpper(), pharmacyChain.Name, StringComparison.InvariantCultureIgnoreCase)) 
+            where pharmacyChainErp != null
+            select new BasicCheckErpModel { Id = pharmacyChain.Id, Name = pharmacyChain.Name!.ToUpper().TrimEnd(), ErpId = pharmacyChainErp!.PharmacyChain!.ValueId! }).ToList();
+        await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
+        
+        var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesErpCheck();
+        var pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
+        var pharmacyCompaniesForUpdate = (from pharmacyCompany in pharmacyCompaniesErpCheck
+            let pharmacyCompanyErp = pharmacyCompaniesErpDistinct.FirstOrDefault(c => string.Equals(c.ParentParty!.PartyName!.BG.TrimEnd(), pharmacyCompany.Name!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
+            where pharmacyCompanyErp != null
+            select new BasicCheckErpModel { Id = pharmacyCompany.Id, Name = pharmacyCompany.Name!.ToUpper().TrimEnd(), ErpId = pharmacyCompanyErp!.ParentParty!.PartyId! }).ToList();
+        await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
+        
+        var pharmaciesErpCheck = await _pharmaciesService.GetPharmaciesCheck();
+        var pharmaciesErpDistinct = pharmaciesErp!
+            .Where(c => c.PartyId != null)
+            .Where(p=>p.Address!=null && (bool)p.IsActive!).DistinctBy(c => c.PartyId).ToList();
+        var pharmaciesForUpdate = (from pharmacy in pharmaciesErpCheck
+            let pharmacyErp = pharmaciesErpDistinct.FirstOrDefault(c =>int.Parse(c.PartyCode!)== pharmacy.BrandexId) 
+            where pharmacyErp != null
+            select new BasicCheckErpModel { Id = pharmacy.Id, Name = pharmacy.Name!.ToUpper().TrimEnd(), ErpId = pharmacyErp!.PartyId }).ToList();
+        await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
+        
+        return Result.Success;
+    }
     
     [HttpGet]
     [IgnoreAntiforgeryToken]
@@ -206,21 +206,21 @@ public class PharmaciesController : AdministrationController
         var citiesCheck = await _citiesService.GetCitiesCheck();
         var citiesErpDistinct = await GetCitiesErp(false);
         var citiesNew = citiesErpDistinct.Where(c => citiesCheck.All(i => i.ErpId != c.City!.ValueId)).ToList();
-        await _citiesService.UploadBulkFromErp(citiesNew);
+        await _citiesService.UploadBulk(citiesNew);
         citiesCheck = await _citiesService.GetCitiesCheck();
 
         var pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
         var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
         var pharmacyChainsNew = pharmacyChainsErpDistinct
             .Where(p => pharmacyChainsCheck.All(i => i.ErpId != p.PharmacyChain!.ValueId)).ToList();
-        await _pharmacyChainsService.UploadBulkFromErp(pharmacyChainsNew);
+        await _pharmacyChainsService.UploadBulk(pharmacyChainsNew);
         pharmacyChainsCheck = await _pharmacyChainsService.GetPharmacyChainsCheck();
         
         var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesErpCheck();
         var pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
         var pharmacyCompaniesNew = pharmacyCompaniesErpDistinct
             .Where(p => pharmacyCompaniesErpCheck.All(i => i.ErpId != p.ParentParty!.PartyId)).ToList();
-        await _pharmacyCompaniesService.UploadBulkFromErp(pharmacyCompaniesNew);
+        await _pharmacyCompaniesService.UploadBulk(pharmacyCompaniesNew);
         pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetPharmacyCompaniesErpCheck();
         
         var pharmaciesErpCheck = await _pharmaciesService.GetPharmaciesCheck();

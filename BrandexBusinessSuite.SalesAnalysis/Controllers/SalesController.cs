@@ -298,7 +298,7 @@ public class SalesController : AdministrationController
 
     private async Task CreateHeaderColumnsAsync(IRow row)
     {
-        var products = await _productsService.GetProductsNames();
+        var products = await _productsService.GetProductsCheck();
         row.CreateCell(0).SetCellValue("Pharmacy Name");
         row.CreateCell(1).SetCellValue("Pharmacy Address");
         row.CreateCell(2).SetCellValue("Pharmacy Class");
@@ -306,7 +306,7 @@ public class SalesController : AdministrationController
 
         foreach (var product in products)
         {
-            row.CreateCell(row.Cells.Count()).SetCellValue(product);
+            row.CreateCell(row.Cells.Count()).SetCellValue(product.Name);
         }
 
         row.CreateCell(row.Cells.Count()).SetCellValue("SumSale");

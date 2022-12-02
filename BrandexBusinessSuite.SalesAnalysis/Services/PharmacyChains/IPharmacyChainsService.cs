@@ -9,8 +9,7 @@ using System.Collections.Generic;
 
 public interface IPharmacyChainsService
 {
-    Task UploadBulk(List<string> pharmacyChain);
-    Task UploadBulkFromErp(List<ErpPharmacyCheck> pharmacyChains);
+    Task UploadBulk(List<ErpPharmacyCheck> pharmacyChains);
     Task<string> UploadPharmacyChain(string chainName);
     Task<List<BasicCheckErpModel>> GetPharmacyChainsCheck();
     

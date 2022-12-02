@@ -11,7 +11,5 @@ public interface IProductsService
 
     Task<List<ProductCheckModel>> GetProductsCheck();
 
-    Task<List<string>> GetProductsNames();
-
     Task<List<ProductShortOutputModel>> GetProductsIdPrices();
 }

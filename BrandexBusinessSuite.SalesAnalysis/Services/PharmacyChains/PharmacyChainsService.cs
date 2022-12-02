@@ -33,48 +33,8 @@ public class PharmacyChainsService : IPharmacyChainsService
         _db = db;
         _configuration = configuration;
     }
-        
-    public async Task UploadBulk(List<string> pharmacyChains)
-    {
-        var table = new DataTable();
-        table.TableName = PharmacyChains;
-            
-        table.Columns.Add(Name, typeof(string));
-        
-        table.Columns.Add(CreatedOn);
-        table.Columns.Add(IsDeleted, typeof(bool));
 
-        foreach (var pharmacyChain in pharmacyChains)
-        {
-            var row = table.NewRow();
-            row[Name] = pharmacyChain;
-            
-            row[CreatedOn] = DateTime.Now;
-            row[IsDeleted] = false;
-            
-            table.Rows.Add(row);
-        }
-
-        string connection = _configuration.GetConnectionString("DefaultConnection");
-            
-        var con = new SqlConnection(connection);
-            
-        var objbulk = new SqlBulkCopy(con);  
-            
-        objbulk.DestinationTableName = PharmacyChains;
-            
-        objbulk.ColumnMappings.Add(Name, Name);
-        
-        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
-        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
-
-        con.Open();
-        await objbulk.WriteToServerAsync(table);  
-        con.Close();  
-            
-    }
-
-    public async Task UploadBulkFromErp(List<ErpPharmacyCheck> pharmacyChains)
+    public async Task UploadBulk(List<ErpPharmacyCheck> pharmacyChains)
     {
         var table = new DataTable();
         table.TableName = PharmacyChains;

@@ -9,8 +9,7 @@ using BrandexBusinessSuite.Models.DataModels;
 
 public interface ICitiesService
 {
-    Task UploadBulk(List<string> cities);
-    Task UploadBulkFromErp(List<ErpCityCheck> cities);
+    Task UploadBulk(List<ErpCityCheck> cities);
     Task<string> UploadCity(string city);
     Task<List<BasicCheckErpModel>> GetCitiesCheck();
     Task BulkUpdateData(List<BasicCheckErpModel> list);
