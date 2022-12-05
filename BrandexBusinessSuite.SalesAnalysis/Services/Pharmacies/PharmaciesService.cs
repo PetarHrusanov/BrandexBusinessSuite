@@ -126,10 +126,15 @@ public class PharmaciesService : IPharmaciesService
             ErpId = p.ErpId,
             Address = p.Address,
             
+            RegionId = p.RegionId,
             RegionErp = p.Region.ErpId,
+            
+            PharmacyChainId = p.PharmacyChainId,
             PharmacyChainErp = p.PharmacyChain.ErpId,
             
             IsActive = p.Active,
+            
+            CompanyId = p.CompanyId,
             CompanyIdErp = p.Company.ErpId,
             
             PhoenixId = p.PhoenixId,
@@ -184,30 +189,6 @@ public class PharmaciesService : IPharmaciesService
 
     }
 
-    public async Task Update(List<PharmacyDbInputModel> pharmacies)
-    {
-        foreach (var pharmacy in pharmacies)
-        {
-            var pharmacyDb = await _db.Pharmacies.Where(p => p.BrandexId == pharmacy.BrandexId)
-                .FirstOrDefaultAsync();
-
-            pharmacyDb.Name = pharmacy.Name;
-            pharmacyDb.PharmacyClass = pharmacy.PharmacyClass;
-            pharmacyDb.Active = pharmacy.Active;
-            pharmacyDb.CompanyId  = pharmacy.CompanyId;
-            pharmacyDb.PharmacyChainId  = pharmacy.PharmacyChainId;
-            pharmacyDb.Address  = pharmacy.Address;
-            pharmacyDb.CityId  = pharmacy.CityId;
-            pharmacyDb.PharmnetId  = pharmacy.PharmnetId;
-            pharmacyDb.PhoenixId  = pharmacy.PhoenixId;
-            pharmacyDb.SopharmaId  = pharmacy.SopharmaId;
-            pharmacyDb.StingId  = pharmacy.StingId;
-            pharmacyDb.RegionId  = pharmacy.RegionId;
-                
-            await _db.SaveChangesAsync();
-        }
-    }
-
     public async Task BulkUpdateData(List<PharmacyDbUpdateModel> list)
     {
         var dt = ConvertToDataTable(list);
@@ -215,7 +196,7 @@ public class PharmaciesService : IPharmaciesService
         var connection = _configuration.GetConnectionString("DefaultConnection");
 
         await using var conn = new SqlConnection(connection);
-        await using var command = new SqlCommand("CREATE TABLE #TmpTable(Id int NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(400) NOT NULL)", conn);
+        await using var command = new SqlCommand("CREATE TABLE #TmpTable(Id int NOT NULL, Name nvarchar(400) NOT NULL, CompanyId int NOT NULL, PharmacyChainId int NOT NULL, Address nvarchar(max) NOT NULL, PharmnetId int, PhoenixId int, SopharmaId int, StingId int, RegionId int NOT NULL)", conn);
         try
         {
             conn.Open();
@@ -230,7 +211,7 @@ public class PharmaciesService : IPharmaciesService
             }
 
             command.CommandTimeout = 3000;
-            command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{Pharmacies}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
+            command.CommandText = $"UPDATE P SET P.[Name]= T.[Name], P.[CompanyId]= T.[CompanyId], P.[PharmacyChainId]= T.[PharmacyChainId], P.[Address]= T.[Address], P.[PharmnetId]= T.[PharmnetId], P.[PhoenixId]= T.[PhoenixId], P.[SopharmaId]= T.[SopharmaId], P.[StingId]= T.[StingId], P.[RegionId]= T.[RegionId] FROM [{Pharmacies}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
             command.ExecuteNonQuery();
         }
         catch (Exception)

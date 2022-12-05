@@ -13,7 +13,6 @@ public interface IPharmaciesService
     Task<List<PharmacyCheckModel>> GetAllCheck();
     Task<List<PharmacyCheckErpModel>> GetAllCheckErp();
     Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime? dateBegin, DateTime? dateEnd, int? regionId);
-    Task Update(List<PharmacyDbInputModel> pharmacies);
     Task BulkUpdateData(List<PharmacyDbUpdateModel> list);
 
 }

@@ -139,73 +139,105 @@ public class PharmaciesController : AdministrationController
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
         Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
         
-        var pharmaciesErp = await GetPharmaciesErp(true);
+        var pharmaciesErp = await GetPharmaciesErp(false);
     
         var regionsCheck = await _regionsService.GetAllCheck();
-        var regionsErpDistinct = pharmaciesErp!.Where(c=>c.Region!=null).DistinctBy(c => c.Region!.ValueId).ToList();
-        var regionsForUpdate = regionsCheck.Select(region => new BasicCheckErpModel()
+        var regionsErpDistinct = pharmaciesErp!.Where(c=>c.Region is { Value: { } }).DistinctBy(c => c.Region!.ValueId).ToList();
+        var regionsForUpdate = (from region in regionsErpDistinct 
+            where regionsCheck.All(r => region.Region != null && r.Name!.ToUpper().TrimEnd() != region.Region.Value!.ToUpper().TrimEnd()) 
+            select new BasicCheckErpModel
             {
-                Id = region.Id,
-                Name = regionsErpDistinct.Where(r => r.Region!.ValueId!.ToUpper().TrimEnd()
-                        .Equals(region.ErpId, StringComparison.InvariantCultureIgnoreCase))
-                    .Select(r => r.Region!.Value)
-                    .FirstOrDefault(),
-                ErpId = region.ErpId
-            })
+                    Id = regionsCheck.Where(r => r.ErpId!.Equals(region.Region!.ValueId!)).Select(r => r.Id).FirstOrDefault(), 
+                    Name = region.Region!.Value!.ToUpper().TrimEnd(),
+                    ErpId = region.Region.ValueId })
             .ToList();
         await _regionsService.BulkUpdateData(regionsForUpdate);
-    
+
         var citiesCheck = await _citiesService.GetAllCheck();
         var citiesErpDistinct = await GetCitiesErp(false);
-        var citiesForUpdate = (from city in citiesCheck
-            let erpCity = citiesErpDistinct.FirstOrDefault(c => c.City!.ValueId!.TrimEnd().Equals(city!.ErpId!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
-            where erpCity != null
-            select new BasicCheckErpModel { Id = city.Id, Name = erpCity!.City!.Value!.ToUpper().TrimEnd(), ErpId = city.ErpId }).ToList();
+        var citiesForUpdate = (from city in citiesErpDistinct
+            where citiesCheck.All(c => c.Name!.ToUpper().TrimEnd() != city.City!.Value!.ToUpper().TrimEnd())
+            select new BasicCheckErpModel
+            {
+                Id = citiesCheck.Where(c => c.ErpId!.Equals(city.City!.ValueId!.TrimEnd()))
+                    .Select(c => c.Id)
+                    .FirstOrDefault(),
+                Name = city.City!.Value!.ToUpper().TrimEnd(),
+                ErpId = city.City.ValueId!.TrimEnd(),
+            }).ToList();
         await _citiesService.BulkUpdateData(citiesForUpdate);
     
         var pharmacyChainsCheck = await _pharmacyChainsService.GetAllCheck();
-        var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain != null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
-        var pharmacyChainsForUpdate = (from pharmacyChain in pharmacyChainsCheck
-            let pharmacyChainErp = pharmacyChainsErpDistinct.FirstOrDefault(c => string.Equals(c.PharmacyChain!.ValueId!.TrimEnd().ToUpper(), pharmacyChain.ErpId, StringComparison.InvariantCultureIgnoreCase)) 
-            where pharmacyChainErp != null
-            select new BasicCheckErpModel { Id = pharmacyChain.Id, Name = pharmacyChainErp!.PharmacyChain!.Value!.ToUpper().TrimEnd(), ErpId = pharmacyChain.Name }).ToList();
+        var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain is { Value: { } }).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
+        var pharmacyChainsForUpdate = (from pharmacyChain in pharmacyChainsErpDistinct
+            where pharmacyChainsCheck.All(ph => ph.Name!.ToUpper().TrimEnd() != pharmacyChain.PharmacyChain!.Value!.ToUpper().TrimEnd()) 
+            select new BasicCheckErpModel
+            {
+                Id = pharmacyChainsCheck.FirstOrDefault(c => string.Equals(c.ErpId!.TrimEnd(), pharmacyChain.PharmacyChain!.ValueId!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase))!.Id, 
+                Name = pharmacyChain.PharmacyChain!.Value!.ToUpper().TrimEnd(), 
+                ErpId = pharmacyChain.PharmacyChain!.ValueId!.TrimEnd()
+            }).ToList();
         await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
         
-        var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetAllCheck();
-        var pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
-        var pharmacyCompaniesForUpdate = (from pharmacyCompany in pharmacyCompaniesErpCheck
-            let pharmacyCompanyErp = pharmacyCompaniesErpDistinct.FirstOrDefault(c => string.Equals(c.ParentParty!.PartyId!.TrimEnd(), pharmacyCompany.ErpId!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase)) 
-            where pharmacyCompanyErp != null
-            select new BasicCheckErpModel { Id = pharmacyCompany.Id, Name = pharmacyCompanyErp!.ParentParty!.PartyName!.BG!.ToUpper().TrimEnd(), ErpId = pharmacyCompany.ErpId }).ToList();
+        var pharmacyCompaniesCheck = await _pharmacyCompaniesService.GetAllCheck();
+        var pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty?.PartyName?.BG != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
+
+        var pharmacyCompaniesForUpdate = (from pharmacyCompany in pharmacyCompaniesErpDistinct
+            where pharmacyCompaniesCheck.All(pc => pc.Name!.ToUpper().TrimEnd() != pharmacyCompany.ParentParty!.PartyName!.BG!.ToUpper().TrimEnd()) 
+            select new BasicCheckErpModel
+            {
+                Id = pharmacyCompaniesCheck.FirstOrDefault(pc => pc.ErpId == pharmacyCompany.ParentParty!.PartyId!.TrimEnd())!.Id,
+                Name = pharmacyCompany.ParentParty!.PartyName!.BG!.ToUpper().TrimEnd(),
+                ErpId = pharmacyCompany.ParentParty.PartyId!.TrimEnd()
+            }).ToList();
         await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
         
-        var pharmaciesErpCheck = await _pharmaciesService.GetAllCheckErp();
+        var pharmaciesCheck = await _pharmaciesService.GetAllCheckErp();
+        pharmaciesCheck = pharmaciesCheck.Where(p => p.ErpId != "e6400a83-398c-496d-bf7d-558104e978a3").ToList();
+
         var pharmaciesErpDistinct = pharmaciesErp!
-            .Where(c => c.PartyId != null)
-            .Where(p=>p.Address!=null && (bool)p.IsActive!).DistinctBy(c => c.PartyId).ToList();
+            .Where(c => c.PartyId != null && c.Address!=null).DistinctBy(c => c.PartyId).ToList();
 
         var pharmaciesForUpdate = new List<PharmacyDbUpdateModel>();
         
-        foreach (var pharmacy in pharmaciesErpCheck)
+        foreach (var pharmacy in pharmaciesCheck)
         {
-            var pharmacyChanged = new PharmacyDbUpdateModel();
+            
+            Console.WriteLine(pharmacy.ErpId);
+            var pharmacyChanged = new PharmacyDbUpdateModel()
+            {
+                Id = pharmacy.Id,
+                Address = pharmacy.Address,
+                CompanyId = pharmacy.CompanyId,
+                Name = pharmacy.Name,
+                PharmacyChainId = pharmacy.PharmacyChainId,
+                PharmnetId = pharmacy.PharmnetId,
+                PhoenixId = pharmacy.PhoenixId,
+                RegionId = pharmacy.RegionId,
+                SopharmaId = pharmacy.SopharmaId,
+                StingId = pharmacy.StingId
+            };
             var pharmacyErp = pharmaciesErpDistinct.FirstOrDefault(p => p.PartyId == pharmacy.ErpId);
             
-            if (pharmacyErp is { LocationName: { } } && pharmacyErp.LocationName.BG!!=pharmacy.Name)
+            Console.WriteLine(pharmacyErp.PartyCode);
+
+            if (pharmacyErp is { LocationName: { } } && pharmacyErp.LocationName.BG! != pharmacy.Name)
             {
-                pharmacyChanged.Name = pharmacyErp.LocationName.BG;
+                pharmacyChanged.Name = pharmacyErp.LocationName.BG.ToUpper().TrimEnd();
             }
 
-            if (pharmacyErp is { Address: { } } && pharmacyErp.Address.Value!=pharmacy.Address)
+            if (pharmacyErp is { Address: { } } && pharmacyErp.Address.Value != pharmacy.Address)
             {
-                pharmacyChanged.Address = pharmacyErp.Address.Value;
+                pharmacyChanged.Address = pharmacyErp.Address.Value.ToUpper().TrimEnd();
             }
+            
+            // if (pharmacyErp.IsActive!=pharmacy.IsActive) pharmacyChanged.Active = pharmacyErp.IsActive;
 
             if (pharmacyErp?.PhoenixId?.Value != null 
-                && pharmacy.PhoenixId != null 
-                && pharmacyErp.PhoenixId.Value!= " "
-                && !string.IsNullOrEmpty(pharmacyErp.PhoenixId.Value) 
-                && int.Parse(pharmacyErp.PhoenixId.Value.TrimEnd())!=pharmacy.PhoenixId )
+                    && pharmacy.PhoenixId != null 
+                    && pharmacyErp.PhoenixId.Value!= " "
+                    && !string.IsNullOrEmpty(pharmacyErp.PhoenixId.Value) 
+                    && int.Parse(pharmacyErp.PhoenixId.Value.TrimEnd())!=pharmacy.PhoenixId )
             {
                 pharmacyChanged.PhoenixId = int.Parse(pharmacyErp.PhoenixId.Value.TrimEnd());
             }
@@ -225,7 +257,7 @@ public class PharmaciesController : AdministrationController
                 && !string.IsNullOrEmpty(pharmacyErp.SopharmaId.Value) 
                 && int.Parse(pharmacyErp.SopharmaId.Value.TrimEnd())!=pharmacy.SopharmaId )
             {
-                pharmacyChanged.PharmnetId = int.Parse(pharmacyErp.SopharmaId.Value.TrimEnd());
+                pharmacyChanged.SopharmaId = int.Parse(pharmacyErp.SopharmaId.Value.TrimEnd());
             }
             
             if (pharmacyErp?.StingId?.Value != null 
@@ -237,39 +269,36 @@ public class PharmaciesController : AdministrationController
                 pharmacyChanged.StingId = int.Parse(pharmacyErp.StingId.Value.TrimEnd());
             }
 
-            if (pharmacyErp.ParentParty.PartyId!=pharmacy.ErpId)
+            if (pharmacyErp.ParentParty.PartyId!=null && pharmacyErp.ParentParty.PartyId.TrimEnd()!=pharmacy.CompanyIdErp)
             {
-                pharmacyChanged.CompanyId = pharmacyCompaniesErpCheck.Where(p => p.ErpId == pharmacyErp.ParentParty.PartyId)
+                pharmacyChanged.CompanyId = pharmacyCompaniesCheck.Where(p => p.ErpId == pharmacyErp.ParentParty!.PartyId!.TrimEnd())
                     .Select(p => p.Id).FirstOrDefault();
             }
             
-            if (pharmacyErp.Region?.ValueId!=pharmacy.RegionErp)
+            if (pharmacyErp.Region.ValueId!=null && pharmacyErp.Region?.ValueId!=pharmacy.RegionErp)
             {
-                pharmacyChanged.RegionId = regionsCheck.Where(p => p.ErpId == pharmacyErp.Region?.ValueId)
+                pharmacyChanged.RegionId = regionsCheck.Where(p => p.ErpId == pharmacyErp.Region?.ValueId!.TrimEnd())
                     .Select(p => p.Id).FirstOrDefault();
             }
             
-            if (pharmacyErp.PharmacyChain?.ValueId!=pharmacy.PharmacyChainErp)
+            if (pharmacyErp.PharmacyChain?.ValueId!=null && pharmacyErp.PharmacyChain.ValueId!=pharmacy.PharmacyChainErp)
             {
-                pharmacyChanged.PharmacyChainId = regionsCheck.Where(p => p.ErpId == pharmacyErp.PharmacyChain?.ValueId)
+                pharmacyChanged.PharmacyChainId = pharmacyChainsCheck.Where(p => p.ErpId == pharmacyErp.PharmacyChain!.ValueId!.TrimEnd())
                     .Select(p => p.Id).FirstOrDefault();
             }
-            
-            if (pharmacyErp.IsActive!=pharmacy.IsActive)
+
+            if (pharmacy.Address!=pharmacyChanged.Address || pharmacy.Name!=pharmacyChanged.Name || pharmacy.PharmnetId!=pharmacyChanged.PharmnetId
+                || pharmacy.PhoenixId!=pharmacyChanged.PhoenixId || pharmacy.RegionId != pharmacyChanged.RegionId || pharmacy.SopharmaId != pharmacyChanged.SopharmaId
+                || pharmacy.StingId != pharmacyChanged.StingId || pharmacy.CompanyId != pharmacyChanged.CompanyId || pharmacy.PharmacyChainId != pharmacyChanged.PharmacyChainId
+                )
             {
-                pharmacyChanged.IsActive = pharmacyErp.IsActive;
+                pharmaciesForUpdate.Add(pharmacyChanged);
             }
-            
-            
-            pharmaciesForUpdate.Add(pharmacyChanged);
-            
-        } 
-        
-        // var pharmaciesForUpdate = (from pharmacy in pharmaciesErpCheck
-        //     let pharmacyErp = pharmaciesErpDistinct.FirstOrDefault(c =>int.Parse(c.PartyCode!)== pharmacy.BrandexId) 
-        //     where pharmacyErp != null
-        //     select new BasicCheckErpModel { Id = pharmacy.Id, Name = pharmacy.Name!.ToUpper().TrimEnd(), ErpId = pharmacyErp!.PartyId }).ToList();
-        
+
+        }
+
+        var shema = pharmaciesForUpdate.Where(r => r.CompanyId == 0).ToList();
+
         await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
         
         return Result.Success;
