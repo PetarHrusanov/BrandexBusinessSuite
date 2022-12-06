@@ -196,7 +196,7 @@ public class PharmaciesService : IPharmaciesService
         var connection = _configuration.GetConnectionString("DefaultConnection");
 
         await using var conn = new SqlConnection(connection);
-        await using var command = new SqlCommand("CREATE TABLE #TmpTable(Id int NOT NULL, Name nvarchar(400) NOT NULL, CompanyId int NOT NULL, PharmacyChainId int NOT NULL, Address nvarchar(max) NOT NULL, PharmnetId int, PhoenixId int, SopharmaId int, StingId int, RegionId int NOT NULL)", conn);
+        await using var command = new SqlCommand("CREATE TABLE #TmpTable(Id int NOT NULL, Name nvarchar(400) NOT NULL, CompanyId int NOT NULL, PharmacyChainId int NOT NULL, Address nvarchar(max) NOT NULL, PharmnetId int, PhoenixId int, SopharmaId int, StingId int, RegionId int NOT NULL, ModifiedOn datetime2)", conn);
         try
         {
             conn.Open();
@@ -211,7 +211,7 @@ public class PharmaciesService : IPharmaciesService
             }
 
             command.CommandTimeout = 3000;
-            command.CommandText = $"UPDATE P SET P.[Name]= T.[Name], P.[CompanyId]= T.[CompanyId], P.[PharmacyChainId]= T.[PharmacyChainId], P.[Address]= T.[Address], P.[PharmnetId]= T.[PharmnetId], P.[PhoenixId]= T.[PhoenixId], P.[SopharmaId]= T.[SopharmaId], P.[StingId]= T.[StingId], P.[RegionId]= T.[RegionId] FROM [{Pharmacies}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
+            command.CommandText = $"UPDATE P SET P.[Name]= T.[Name], P.[CompanyId]= T.[CompanyId], P.[PharmacyChainId]= T.[PharmacyChainId], P.[Address]= T.[Address], P.[PharmnetId]= T.[PharmnetId], P.[PhoenixId]= T.[PhoenixId], P.[SopharmaId]= T.[SopharmaId], P.[StingId]= T.[StingId], P.[RegionId]= T.[RegionId], P.[ModifiedOn]= T.[ModifiedOn] FROM [{Pharmacies}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
             command.ExecuteNonQuery();
         }
         catch (Exception)

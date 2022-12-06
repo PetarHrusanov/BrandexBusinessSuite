@@ -1,3 +1,5 @@
+using System;
+
 namespace BrandexBusinessSuite.SalesAnalysis.Models.Pharmacies;
 
 public class PharmacyDbUpdateModel
@@ -12,4 +14,5 @@ public class PharmacyDbUpdateModel
     public int? SopharmaId { get; set; }
     public int? StingId { get; set; }
     public int RegionId { get; set; }
+    public DateTime ModifiedOn { get; set; }
 }

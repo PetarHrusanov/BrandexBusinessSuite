@@ -42,9 +42,9 @@ public class IdentityController : ApiController
     
     [HttpPost]
     [AuthorizeAdministrator]
-    public async Task CreateRole([FromBody]SingleStringInputModel singleStringInputModel)
+    public async Task CreateRole([FromForm]string role)
     {
-        await _identity.CreateRole(singleStringInputModel.SingleStringValue);
+        await _identity.CreateRole(role);
         // if (!result.Succeeded) return BadRequest(result.Errors);
 
     }
@@ -52,19 +52,13 @@ public class IdentityController : ApiController
     [HttpGet]
     [AuthorizeAdministrator]
     public async Task<string[] > GetRoles()
-    {
-        return await _identity.GetRoles();
-        // if (!result.Succeeded) return BadRequest(result.Errors);
+    => await _identity.GetRoles();
 
-    }
-    
     [HttpGet]
     [AuthorizeAdministrator]
-    public async Task<UsersIds[] > GetUsers()
-    {
-        return await _identity.GetUsers();
-
-    }
+    public async Task<UsersIds[] > GetUsers() 
+        => await _identity.GetUsers();
+   
 
     [HttpPost]
     public async Task<ActionResult<UserOutputModel>> Login(UserInputModel input)
