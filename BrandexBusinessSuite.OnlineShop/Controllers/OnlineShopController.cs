@@ -66,16 +66,15 @@ public class OnlineShopController : ApiController
 
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
-    public async Task<DeliveryPrice> GetDeliveryPrice()
-    {
-        return await _deliveryPriceService.GetDeliveryPrice();
-    }
-    
+    public async Task<DeliveryPrice> GetDeliveryPrice() 
+        => await _deliveryPriceService.GetDeliveryPrice();
+
     [HttpPost]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
-    public async Task EditDeliveryPrice(DeliveryPrice deliveryPrice)
+    public async Task<ActionResult> EditDeliveryPrice(DeliveryPrice deliveryPrice)
     { 
         await _deliveryPriceService.EditDeliveryPrice(deliveryPrice);
+        return Result.Success;
     }
 
     [HttpGet]
@@ -127,14 +126,14 @@ public class OnlineShopController : ApiController
         {
             
             double orderAmountSpeedy = 0;
-            if (order.payment_method_title == "Наложен платеж") orderAmountSpeedy = (double)order.total;
+            if (order.payment_method_title == "Наложен платеж") orderAmountSpeedy = (double)order.total!;
 
             var newSpeedyInput = new SpeedyInputOrder(
                 _speedyUserSettings.UsernameSpeedy,
                 _speedyUserSettings.PasswordSpeedy,
                 new SpeedyInputOrder._Service(505, orderAmountSpeedy),
                 new SpeedyInputOrder._Recipient(order),
-                order.id.ToString()
+                order.id.ToString()!
                 );
          
             var jsonPostString = JsonConvert.SerializeObject(newSpeedyInput, Formatting.Indented);
@@ -151,9 +150,9 @@ public class OnlineShopController : ApiController
 
             var saleInvoiceCheck = new SaleInvoiceCheck(
                 $"{order.date_created:yyyy-MM-dd}",
-                (double)order.total,
+                (double)order.total!,
                 order.shipping.first_name+" "+order.shipping.last_name,
-                order.id.ToString(),
+                order.id.ToString()!,
                 order.shipping.city,
                 deliveryPrice,
                 speedyTracking);
@@ -167,7 +166,7 @@ public class OnlineShopController : ApiController
 
             try
             {
-                await wc.Order.Update( (int)order.id, orderStatus);
+                await wc.Order.Update( (int)order.id!, orderStatus);
             }
             catch
             {
@@ -254,7 +253,7 @@ public class OnlineShopController : ApiController
 
             var orderLinesList = JsonConvert.DeserializeObject<List<ErpSalesLinesOutput>>(responseContentJObj["value"].ToString());
 
-            var invoiceNew = new ErpInvoice(order.id.ToString(), $"{order.date_created:yyyy-MM-dd}");
+            var invoiceNew = new ErpInvoice(order.id.ToString()!, $"{order.date_created:yyyy-MM-dd}");
 
             foreach (var orderLine in orderLinesList)
             {
@@ -326,22 +325,15 @@ public class OnlineShopController : ApiController
         
         var newPath = Path.Combine(sWebRootFolder, DateTime.Now.ToString("yyyy-MM-dd:HH:mm:ss"));
         
-        if (!Directory.Exists(newPath))
-        {
-            Directory.CreateDirectory(newPath);
-        }
+        if (!Directory.Exists(newPath)) Directory.CreateDirectory(newPath);
         
-        const string filePdf = "tracking_codes.pdf";
-
-        await using(var newFile = System.IO.File.Create(Path.Combine(newPath,filePdf )))
+        await using(var newFile = System.IO.File.Create(Path.Combine(newPath,"tracking_codes.pdf" )))
         { 
             var stream = await responseContent.ReadAsStreamAsync();
             await stream.CopyToAsync(newFile);
         }
         
-        const string fileXlsx = "invoices.xlsx";
-        
-        await using (var fs = new FileStream(Path.Combine(newPath, fileXlsx), FileMode.Create, FileAccess.Write))
+        await using (var fs = new FileStream(Path.Combine(newPath, "invoices.xlsx"), FileMode.Create, FileAccess.Write))
         {
             IWorkbook workbook = new XSSFWorkbook();
 
