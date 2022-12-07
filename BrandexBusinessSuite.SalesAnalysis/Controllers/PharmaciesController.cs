@@ -111,7 +111,6 @@ public class PharmaciesController : AdministrationController
         }
 
         var pharmaciesErpSelected = new List<string>();
-        
         switch(inputModel.Distributor)
         {
             case Phoenix:
@@ -127,7 +126,7 @@ public class PharmaciesController : AdministrationController
                 pharmaciesErpSelected = pharmaciesErp.Where(p => p.SopharmaId is { Value: { } }).Select(p=>p.SopharmaId.Value).ToList();
                 break;
         }
-
+        
         return pharmaciesFile.Where(pharmacy => !pharmaciesErpSelected.Contains(pharmacy.Code)).ToList();
     }
     
@@ -222,8 +221,8 @@ public class PharmaciesController : AdministrationController
 
         await _pharmaciesService.UploadBulk(pharmaciesForUpload);
 
-        pharmaciesErp = await GetPharmaciesErp(false);
-    
+        pharmaciesErp = await GetPharmaciesErp(true);
+
         var regionsCheck = await _regionsService.GetAllCheck();
         var regionsErpDistinct = pharmaciesErp!.Where(c=>c.Region is { Value: { } }).DistinctBy(c => c.Region!.ValueId).ToList();
         var regionsForUpdate = (from region in regionsErpDistinct 
@@ -263,8 +262,7 @@ public class PharmaciesController : AdministrationController
         await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
         
         var pharmacyCompaniesCheck = await _pharmacyCompaniesService.GetAllCheck();
-        pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty?.PartyName?.BG != null).DistinctBy(c => c.ParentParty.PartyId).ToList();
-
+        pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty?.PartyName?.BG != null && c.ParentParty.PartyId!=null).DistinctBy(c => c.ParentParty.PartyId).ToList();
         var pharmacyCompaniesForUpdate = (from pharmacyCompany in pharmacyCompaniesErpDistinct
             where pharmacyCompaniesCheck.All(pc => pc.Name!.ToUpper().TrimEnd() != pharmacyCompany.ParentParty!.PartyName!.BG!.ToUpper().TrimEnd()) 
             select new BasicCheckErpModel
@@ -298,13 +296,14 @@ public class PharmaciesController : AdministrationController
                 StingId = pharmacy.StingId,
                 ModifiedOn = DateTime.Now
             };
+
+            if (pharmaciesErpDistinct.All(p => p.PartyId != pharmacy.ErpId)) continue;
             var pharmacyErp = pharmaciesErpDistinct.FirstOrDefault(p => p.PartyId == pharmacy.ErpId);
 
             if (pharmacyErp is { LocationName: { } } && pharmacyErp.LocationName.BG! != pharmacy.Name) pharmacyChanged.Name = pharmacyErp.LocationName.BG.ToUpper().TrimEnd();
             if (pharmacyErp is { Address: { } } && pharmacyErp.Address.Value != pharmacy.Address) pharmacyChanged.Address = pharmacyErp.Address.Value.ToUpper().TrimEnd();
 
-            if (pharmacyErp?.PhoenixId?.Value != null 
-                && pharmacy.PhoenixId != null 
+            if (pharmacyErp?.PhoenixId?.Value != null
                 && pharmacyErp.PhoenixId.Value!= " "
                 && !string.IsNullOrEmpty(pharmacyErp.PhoenixId.Value) 
                 && int.Parse(pharmacyErp.PhoenixId.Value.TrimEnd())!=pharmacy.PhoenixId )
@@ -312,31 +311,31 @@ public class PharmaciesController : AdministrationController
                 pharmacyChanged.PhoenixId = int.Parse(pharmacyErp.PhoenixId.Value.TrimEnd());
             }
 
-            if (pharmacyErp?.PharmnetId?.Value != null 
-                && pharmacy.PharmnetId != null 
+            if (pharmacyErp?.PharmnetId?.Value != null
                 && pharmacyErp.PharmnetId.Value!= " "
                 && !string.IsNullOrEmpty(pharmacyErp.PharmnetId.Value) 
+                && int.TryParse(pharmacyErp.PharmnetId.Value.TrimEnd(), out int pharmnetParsed)
                 && int.Parse(pharmacyErp.PharmnetId.Value.TrimEnd())!=pharmacy.PharmnetId )
             {
-                pharmacyChanged.PharmnetId = int.Parse(pharmacyErp.PharmnetId.Value.TrimEnd());
+                pharmacyChanged.PharmnetId = pharmnetParsed;
             }
             
-            if (pharmacyErp?.SopharmaId?.Value != null 
-                && pharmacy.SopharmaId != null 
+            if (pharmacyErp?.SopharmaId?.Value != null
                 && pharmacyErp.SopharmaId.Value!= " "
-                && !string.IsNullOrEmpty(pharmacyErp.SopharmaId.Value) 
-                && int.Parse(pharmacyErp.SopharmaId.Value.TrimEnd())!=pharmacy.SopharmaId )
+                && !string.IsNullOrEmpty(pharmacyErp.SopharmaId?.Value) 
+                && int.TryParse(pharmacyErp.SopharmaId.Value.TrimEnd(), out var sopharmaParsed) 
+                && int.Parse(pharmacyErp.SopharmaId?.Value.TrimEnd())!=pharmacy.SopharmaId )
             {
-                pharmacyChanged.SopharmaId = int.Parse(pharmacyErp.SopharmaId.Value.TrimEnd());
+                pharmacyChanged.SopharmaId = sopharmaParsed;
             }
             
-            if (pharmacyErp?.StingId?.Value != null 
-                && pharmacy.StingId != null 
+            if (pharmacyErp?.StingId?.Value != null
                 && pharmacyErp.StingId.Value!= " "
                 && !string.IsNullOrEmpty(pharmacyErp.StingId.Value) 
+                && int.TryParse(pharmacyErp.StingId.Value.TrimEnd(), out int stingParsed) 
                 && int.Parse(pharmacyErp.StingId.Value.TrimEnd())!=pharmacy.StingId )
             {
-                pharmacyChanged.StingId = int.Parse(pharmacyErp.StingId.Value.TrimEnd());
+                pharmacyChanged.StingId = stingParsed;
             }
 
             if (pharmacyErp.ParentParty.PartyId!=null && pharmacyErp.ParentParty.PartyId.TrimEnd()!=pharmacy.CompanyIdErp)
@@ -419,5 +418,4 @@ public class PharmaciesController : AdministrationController
         
         return pharmacy;
     }
-
 }
