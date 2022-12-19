@@ -1,3 +1,5 @@
+using BrandexBusinessSuite.Models;
+
 namespace BrandexBusinessSuite.SalesBrandex.Controllers;
 
 using System.Text;
@@ -265,4 +267,10 @@ public class SalesController : ApiController
         return Result.Success;
         
     }
+
+    [HttpGet]
+    [IgnoreAntiforgeryToken]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    public async Task<List<ProductQuantitiesOutputModel>> GetAverageSales()
+        => await  _salesService.AverageSales();
 }

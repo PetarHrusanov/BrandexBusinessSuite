@@ -184,7 +184,7 @@ public class ConversionController : ApiController
         var euro = await _context.Currencies.Where(c => c.Name == Euro).Select(c => c.Value).FirstOrDefaultAsync();
 
         var productsPrices = ProductPriceDictionaryFromText(rawText, products);
-        var facebookActivity = await _context.MarketingActivityDetails.Where(c => c.Name == MarketingDataConstants.Facebook).FirstOrDefaultAsync();
+        var facebookActivity = await _context.MarketingActivityDetails.Where(c => c.Name == Facebook).FirstOrDefaultAsync();
 
         foreach (var (key, value) in productsPrices)
         {
@@ -270,17 +270,13 @@ public class ConversionController : ApiController
 
         foreach (var product in products)
         {
-            
             var lines = rawTextSplit.Where(element => element.Contains(product.FacebookName)).ToList();
             if (lines.Count==0) continue;
             
             foreach (var line in lines)
             {
-                if (!productsPrices.ContainsKey(product.FacebookName))
-                {
-                    productsPrices.Add(product.FacebookName,0);
-                }
-
+                if (!productsPrices.ContainsKey(product.FacebookName)) productsPrices.Add(product.FacebookName,0);
+                
                 var priceString = PriceRegex.Matches(line)[0].ToString();
                 var price = decimal.Parse(priceString, new NumberFormatInfo { NumberDecimalSeparator = "," });
                 

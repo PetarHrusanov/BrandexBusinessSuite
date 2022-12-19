@@ -1,4 +1,5 @@
-﻿using BrandexBusinessSuite.Models.Dates;
+﻿using BrandexBusinessSuite.Models;
+using BrandexBusinessSuite.Models.Dates;
 using Microsoft.EntityFrameworkCore;
 
 namespace BrandexBusinessSuite.SalesBrandex.Services.Sales;
@@ -86,7 +87,50 @@ public class SalesService :ISalesService
         => await _db.Sales
             .Where(d => d.Date >= dateStartEndInputModel.DateStart && d.Date <= dateStartEndInputModel.DateEnd)
             .Select(d => d.ErpId).ToListAsync();
-    
+
+    public async Task<List<ProductQuantitiesOutputModel>> AverageSales()
+    {
+        var curDate = DateTime.Now;
+        var startDate = curDate.AddMonths(-3).AddDays(1 - curDate.Day);
+        var endDate = startDate.AddMonths(3).AddDays(-1);
+        var sales = await _db.Sales.Where(s=>s.Count>0).Where(s => s.Date.Day >= startDate.Day && s.Date.Day <= endDate.Day).Select(s=> new
+        {
+            ProductName = s.Product.Name,
+            ProductErp = s.Product.ErpId,
+            Count = s.Count
+        }).ToListAsync();
+
+        var salesGrouped = new List<ProductQuantitiesOutputModel>();
+        
+        foreach (var sale in sales)
+        {
+            if (salesGrouped.All(s => s.ErpId != sale.ProductErp))
+            {
+                var saleGroup = new ProductQuantitiesOutputModel
+                {
+                    Name = sale.ProductName,
+                    ErpId = sale.ProductErp,
+                    Quantity = 0
+                };
+                salesGrouped.Add(saleGroup);
+            }
+            var productQuantity = salesGrouped.FirstOrDefault(p => p.ErpId == sale.ProductErp);
+            productQuantity!.Quantity += sale.Count;
+        }
+        
+        salesGrouped = salesGrouped.Select(item => new ProductQuantitiesOutputModel()
+        {
+            Name = item.Name,
+            ErpId = item.ErpId,
+            Quantity = item.Quantity / 3
+        }).ToList();
+        
+        // var salesGrouped = sales.GroupBy(a=>a.ProductName).Select(b=>
+        //     new ProductQuantitiesOutputModel { Name = b.First().ProductName, ErpId = b.First().ProductErp, Quantity =(b.Sum(c=>c.Count))/3 } ).ToList();
+        
+        return salesGrouped;
+    }
+
     // public async Task<int> ProductCountSumByIdDate(int productId, DateTime? dateBegin, DateTime? dateEnd, int? regionId)
     // {
     //

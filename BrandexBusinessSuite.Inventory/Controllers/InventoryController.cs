@@ -1,23 +1,24 @@
 namespace BrandexBusinessSuite.Inventory.Controllers;
 
+using System.Net.Http.Headers;
 using System.Text;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-
 using Newtonsoft.Json;
 
 using BrandexBusinessSuite.Controllers;
+using BrandexBusinessSuite.Models;
 using BrandexBusinessSuite.Models.ErpDocuments;
 using Data.Enums;
-using Models.Products;
 using Models.Materials;
+using Models.Products;
 using Services.Orders;
 using Services.Products;
 using Services.Recipes;
 
-using static  Common.Constants;
+using static Common.Constants;
 using static Common.ErpConstants;
 using static Requests.RequestsMethods;
 
@@ -54,7 +55,7 @@ public class InventoryController : ApiController
     public async Task<List<ProductQuantitiesOutputModel>> GetProducts()
     {
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
         var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryLots}");
         var batchesList = JsonConvert.DeserializeObject<List<ErpLot>>(responseContentJObj["value"].ToString());
@@ -76,7 +77,7 @@ public class InventoryController : ApiController
             let sum = (int)currentBalancesNecessary.Where(b => b.Product.Id == product.ErpId)
                 .Select(q => q.QuantityBase.Value)
                 .Sum()
-            select new ProductQuantitiesOutputModel() { Quantity = sum, Name = product.Name }).ToList();
+            select new ProductQuantitiesOutputModel { Quantity = sum, Name = product.Name, ErpId = product.ErpId}).ToList();
 
         return productQuantities;
     }
@@ -86,7 +87,7 @@ public class InventoryController : ApiController
     public async Task<List<ProductMaterialQuantities>> GetProductMaterials()
     {
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
         
         var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesMaterials}");
         var currentBalances = JsonConvert.DeserializeObject<List<ErpCurrentBalances>>(responseContentJObj["value"].ToString());
@@ -99,24 +100,25 @@ public class InventoryController : ApiController
         foreach (var product in productsCheck)
         {
             var recipesForProduct = recipes.Where(p => p.ProductId == product.Id).ToList();
-            foreach (var recipe in recipesForProduct)
-            {
-                var substanceStock = currentBalances!
-                    .Where(p => p.Product.Id == recipe.MaterialErpId)
+            productQuantities.AddRange(from recipe in recipesForProduct
+                let substanceStock = currentBalances!.Where(p => p.Product.Id == recipe.MaterialErpId)
                     .Select(r => r.QuantityBase.Value)
-                    .FirstOrDefault();
-
-                var productMaterial = new ProductMaterialQuantities(product.Name!, recipe.MaterialName);
-
-                productMaterial.Quantity = recipe.MaterialType switch
+                    .FirstOrDefault()
+                select new ProductMaterialQuantities(product.Name!, recipe.MaterialName)
                 {
-                    MaterialType.Extract or MaterialType.Excipient => substanceStock / (recipe.QuantityRequired * recipe.ProductPills),
-                    MaterialType.Blisters => substanceStock / (recipe.QuantityRequired * recipe.ProductBlisters),
-                    _ => substanceStock / recipe.QuantityRequired
-                };
+                    Quantity = recipe.MaterialType switch
+                    {
+                        MaterialType.Extract or MaterialType.Excipient => substanceStock / (recipe.QuantityRequired * recipe.ProductPills),
+                        MaterialType.Blisters => substanceStock / (recipe.QuantityRequired * recipe.ProductBlisters),
+                        _ => substanceStock / recipe.QuantityRequired
+                    }
+                });
+        }
 
-                productQuantities.Add(productMaterial);
-            }
+        foreach (var quantity in productQuantities)
+        {
+            if (double.IsPositiveInfinity(quantity.Quantity)) quantity.Quantity = 1000000000;
+            if (double.IsNegativeInfinity(quantity.Quantity)) quantity.Quantity = 0;
         }
 
         return productQuantities;
@@ -128,7 +130,7 @@ public class InventoryController : ApiController
     public async Task<List<MaterialsQuantitiesOutputModel>> GetMaterials()
     {
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
         
         var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesMaterials}");
         var currentBalances = JsonConvert.DeserializeObject<List<ErpCurrentBalances>>(responseContentJObj["value"].ToString());
