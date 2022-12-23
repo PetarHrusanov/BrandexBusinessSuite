@@ -37,6 +37,13 @@ public class RecipesService :IRecipesService
         await _db.SaveChangesAsync();
     }
 
+    public async Task Delete(RecipeInputModel inputModel)
+    {
+        var recipe = await _db.Recipes.FirstOrDefaultAsync(r => r.ProductId == inputModel.ProductId && r.MaterialId == inputModel.MaterialId);
+        _db.Remove(recipe);
+        await _db.SaveChangesAsync();
+    }
+
     public async Task<List<RecipeDisplayModel>> GetRecipesDisplay()
         => await _db.Recipes.Select(r => new RecipeDisplayModel()
         {

@@ -56,4 +56,12 @@ public class RecipeController :ApiController
         await _recipesService.EditRecipe(inputModel);
         return Result.Success;
     }
+    
+    [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<ActionResult> Delete(RecipeInputModel inputModel)
+    {
+        await _recipesService.Delete(inputModel);
+        return Result.Success;
+    }
 }
