@@ -20,7 +20,6 @@ public class ErpInvoiceLinesAccounting
         
         CustomProperty_Продукт_u002Dпокупки = new ErpCharacteristicValueDescriptionBg();
         CustomProperty_ВРМ_u002Dпокупки = new ErpCharacteristicValueDescriptionBg();
-
     }
     
     

@@ -93,8 +93,6 @@ public class SalesController : ApiController
         
         var orderAnalyses = JsonConvert.DeserializeObject<List<ErpSalesOrderAnalysis>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
 
-        // foreach (var order in orderAnalyses!) order = order.Where(i => i.Quantity.Value >= 0).ToList();
-
         orderAnalyses = orderAnalyses!.Where(o => o.State != "New").ToList();
 
         var citiesSales = orderAnalyses?
@@ -282,6 +280,6 @@ public class SalesController : ApiController
     [HttpGet]
     [IgnoreAntiforgeryToken]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
-    public async Task<List<ProductQuantitiesOutputModel>> GetAverageSales()
-        => await  _salesService.AverageSales();
+    public async Task<List<ProductQuantitiesOutputModel>> GetAverageSales() 
+        =>await _salesService.AverageSales();
 }

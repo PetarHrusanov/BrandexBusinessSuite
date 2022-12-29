@@ -93,12 +93,18 @@ public class SalesService :ISalesService
         var curDate = DateTime.Now;
         var startDate = curDate.AddMonths(-3).AddDays(1 - curDate.Day);
         var endDate = startDate.AddMonths(3).AddDays(-1);
-        var sales = await _db.Sales.Where(s=>s.Count>0).Where(s => s.Date.Day >= startDate.Day && s.Date.Day <= endDate.Day).Select(s=> new
-        {
-            ProductName = s.Product.Name,
-            ProductErp = s.Product.ErpId,
-            Count = s.Count
-        }).ToListAsync();
+        
+        Console.WriteLine(startDate);
+        Console.WriteLine(endDate);
+        
+        var sales = await _db.Sales
+            .Where(s=>s.Count>0)
+            .Where(s => s.Date.Date >= startDate.Date && s.Date.Date <= endDate.Date)
+            .Select(s=> new { 
+                ProductName = s.Product.Name, 
+                ProductErp = s.Product.ErpId, 
+                Count = s.Count 
+            }).ToListAsync();
 
         var salesGrouped = new List<ProductQuantitiesOutputModel>();
         
@@ -117,6 +123,11 @@ public class SalesService :ISalesService
             var productQuantity = salesGrouped.FirstOrDefault(p => p.ErpId == sale.ProductErp);
             productQuantity!.Quantity += sale.Count;
         }
+
+        foreach (var pederasti in salesGrouped)
+        {
+            Console.WriteLine($"{pederasti.Name} - {pederasti.Quantity}");
+        }
         
         salesGrouped = salesGrouped.Select(item => new ProductQuantitiesOutputModel()
         {
@@ -125,36 +136,11 @@ public class SalesService :ISalesService
             Quantity = item.Quantity / 3
         }).ToList();
         
-        // var salesGrouped = sales.GroupBy(a=>a.ProductName).Select(b=>
-        //     new ProductQuantitiesOutputModel { Name = b.First().ProductName, ErpId = b.First().ProductErp, Quantity =(b.Sum(c=>c.Count))/3 } ).ToList();
-        
+        foreach (var pederasti in salesGrouped)
+        {
+            Console.WriteLine($"{pederasti.Name} - {pederasti.Quantity}");
+        }
+
         return salesGrouped;
     }
-
-    // public async Task<int> ProductCountSumByIdDate(int productId, DateTime? dateBegin, DateTime? dateEnd, int? regionId)
-    // {
-    //
-    //     dateBegin ??= DateTime.MinValue;
-    //     dateEnd ??= DateTime.MaxValue;
-    //         
-    //     if (regionId != null)
-    //     {
-    //         return await db.Sales
-    //             .Where(p => p.Pharmacy.RegionId == regionId)
-    //             .Where(d => d.Date >= dateBegin && d.Date <= dateEnd)
-    //             .Where(p => p.ProductId == productId).SumAsync(c => c.Count);
-    //     }
-    //         
-    //     return await db.Sales
-    //         .Where(d => d.Date >= dateBegin && d.Date <= dateEnd)
-    //         .Where(p => p.ProductId == productId).SumAsync(c => c.Count);
-    //         
-    // }
-    //
-    // public async Task<List<DateTime>> GetDistinctDatesByMonths()
-    // {
-    //     var datesRough = await this.db.Sales.Select(s => s.Date).Distinct().ToListAsync();
-    //     var dates = datesRough.Select(t => new DateTime(t.Year, t.Month, 1)).Distinct().ToList();
-    //     return dates;
-    // }
 }

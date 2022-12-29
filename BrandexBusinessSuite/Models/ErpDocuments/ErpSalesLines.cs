@@ -2,10 +2,6 @@ namespace BrandexBusinessSuite.Models.ErpDocuments;
 
 public class ErpSalesLines
 {
-    // public ErpSalesLines()
-    // {
-    //     
-    // }
     
     public ErpSalesLines(string productId, decimal quantity, decimal discount, decimal unitPrice)
     {
