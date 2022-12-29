@@ -9,15 +9,15 @@ public class Publisher : IPublisher
 {
     private const int TimeoutMilliseconds = 2000;
 
-    private readonly IBus bus;
+    private readonly IBus _bus;
 
-    public Publisher(IBus bus) => this.bus = bus;
+    public Publisher(IBus bus) => this._bus = bus;
 
     public Task Publish<TMessage>(TMessage message)
-        => this.bus.Publish(message, GetCancellationToken());
+        => _bus.Publish(message, GetCancellationToken());
 
     public Task Publish<TMessage>(TMessage message, Type messageType)
-        => this.bus.Publish(message, messageType, GetCancellationToken());
+        => _bus.Publish(message, messageType, GetCancellationToken());
 
     private static CancellationToken GetCancellationToken()
     {

@@ -7,21 +7,21 @@ using Microsoft.AspNetCore.Http;
 
 public class CurrentUserService : ICurrentUserService
 {
-    private readonly ClaimsPrincipal user;
+    private readonly ClaimsPrincipal _user;
 
     public CurrentUserService(IHttpContextAccessor httpContextAccessor)
     {
-        this.user = httpContextAccessor.HttpContext?.User;
+        _user = httpContextAccessor.HttpContext?.User;
 
-        if (user == null)
+        if (_user == null)
         {
             throw new InvalidOperationException("This request does not have an authenticated user.");
         }
 
-        this.UserId = this.user.FindFirstValue(ClaimTypes.NameIdentifier);
+        UserId = _user.FindFirstValue(ClaimTypes.NameIdentifier);
     }
 
     public string UserId { get; }
 
-    public bool IsAdministrator => this.user.IsAdministrator();
+    public bool IsAdministrator => _user.IsAdministrator();
 }

@@ -11,16 +11,16 @@ public class ErpPharmacyCheck
     public bool? IsActive { get; set; }
     
     [JsonProperty("CustomProperty_ADDRES")]
-    public ErpCharacteristicValue? Address { get; set; }
+    public ErpCharacteristicValueValueId? Address { get; set; }
     
     [JsonProperty("CustomProperty_ID_u002DA_u002DKI_u002DPhoenix")]
-    public ErpCharacteristicValue? PhoenixId { get; set; }
+    public ErpCharacteristicValueValueId? PhoenixId { get; set; }
     [JsonProperty("CustomProperty_ID_u002DA_u002DKI_u002DFarmnet")]
-    public ErpCharacteristicValue? PharmnetId { get; set; }
+    public ErpCharacteristicValueValueId? PharmnetId { get; set; }
     [JsonProperty("CustomProperty_ID_u002DA_u002DKI_u002DSOPHARMA")]
-    public ErpCharacteristicValue? SopharmaId { get; set; }
+    public ErpCharacteristicValueValueId? SopharmaId { get; set; }
     [JsonProperty("CustomProperty_ID_u002DA_u002DKI_u002DSting")]
-    public ErpCharacteristicValue? StingId { get; set; }
+    public ErpCharacteristicValueValueId? StingId { get; set; }
     
     [JsonProperty("CustomProperty_RETREG")]
     public ErpCharacteristicValueValueId? Region { get; set; }

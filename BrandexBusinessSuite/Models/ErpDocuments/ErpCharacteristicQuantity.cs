@@ -2,12 +2,6 @@ namespace BrandexBusinessSuite.Models.ErpDocuments;
 
 public class ErpCharacteristicQuantity
 {
-
-    public ErpCharacteristicQuantity()
-    {
-        
-    }
-
     public ErpCharacteristicQuantity(int value)
     {
         Value = value;

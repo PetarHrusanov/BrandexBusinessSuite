@@ -1,12 +1,7 @@
 namespace BrandexBusinessSuite.Models.ErpDocuments;
 
-using Newtonsoft.Json;
-
 public class ErpCharacteristicValue
 {
-
-    public ErpCharacteristicValue() { }
-
     public ErpCharacteristicValue(string value)
     {
         Value = value;

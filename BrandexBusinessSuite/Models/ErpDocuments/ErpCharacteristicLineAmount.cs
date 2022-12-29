@@ -2,12 +2,6 @@ namespace BrandexBusinessSuite.Models.ErpDocuments;
 
 public class ErpCharacteristicLineAmount
 {
-
-    public ErpCharacteristicLineAmount()
-    {
-        
-    }
-
     public ErpCharacteristicLineAmount(decimal value)
     {
         Value = value;

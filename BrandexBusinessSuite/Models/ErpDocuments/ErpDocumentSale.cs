@@ -8,7 +8,6 @@ public abstract class ErpDocumentSale : ErpDocument
         DocumentCurrency = new ErpCharacteristicId();
         PaymentAccount = new ErpCharacteristicId();
         PaymentType = new ErpCharacteristicId();
-        // Store = new ErpCharacteristicId();
     }
     
     public ErpCharacteristicId DocumentCurrency { get; set; } 
