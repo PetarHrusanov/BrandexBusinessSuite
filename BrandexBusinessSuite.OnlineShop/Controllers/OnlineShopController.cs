@@ -1,4 +1,5 @@
 using BrandexBusinessSuite.OnlineShop.Data.Models;
+using Newtonsoft.Json.Linq;
 
 namespace BrandexBusinessSuite.OnlineShop.Controllers;
 
@@ -140,10 +141,18 @@ public class OnlineShopController : ApiController
 
             const string speedyLink = "https://api.speedy.bg/v1/shipment";
 
-            var responseContentJObj = await JObjectByUriPostRequest(Client, speedyLink, jsonPostString);
+            JObject responseContentJObj;
             
-            if(responseContentJObj.ContainsKey("error")) continue;
-            
+            try
+            {
+                responseContentJObj = await JObjectByUriPostRequest(Client, speedyLink, jsonPostString);
+                if(responseContentJObj.ContainsKey("error")) continue;
+            }
+            catch (Exception e)
+            {
+                continue;
+            }
+
             var speedyTracking = responseContentJObj["id"]!.ToString();
             speedyTrackingList.Add(speedyTracking);
             var deliveryPrice = Convert.ToDouble(responseContentJObj["price"]!["total"]!.ToString());
@@ -318,7 +327,9 @@ public class OnlineShopController : ApiController
         
         var uri = new Uri("https://api.speedy.bg/v1/print");
         var content = new StringContent(speedyContentSerialized, Encoding.UTF8, "application/json");
-        var response = await Client.PostAsync(uri, content);
+
+        // var response = await Client.PostAsync(uri, content);
+        var response = await ExecuteWithRetry(uri, content);
         var responseContent = response.Content;
 
         var sWebRootFolder = _hostEnvironment.WebRootPath;
@@ -475,4 +486,47 @@ public class OnlineShopController : ApiController
 
         return Result.Success;
     }
+    
+    [HttpGet]
+    [IgnoreAntiforgeryToken]
+    [Authorize(Roles = $"{AdministratorRoleName}")]
+    public async Task<ActionResult> UpdatePrices()
+    {
+        
+        var productsDb = await _productsService.GetCheckModels();
+        
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
+        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+        var queryDate =
+            $"Crm_ProductPrices?$top=1000&$filter=PriceList%20eq%20'Crm_PriceLists(db6b7ec3-f3f0-4e1e-811d-5d8e9895843e)'&$select=FromDate,Id,Price,PriceList,Product&$expand=PriceList($select=Id),Product($select=Id)";
+        
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{queryDate}");
+        var prices = JsonConvert.DeserializeObject<List<CrmProductPrice>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+
+        foreach (var product in productsDb)
+        {
+            var productPrice = prices!.Where(p => p.Product.Id == product.ErpCode).MaxBy(r => r.FromDate);
+            if (product.ErpPriceCode == productPrice.Id) continue;
+            product.ErpPriceCode = productPrice.Id;
+            product.ErpPriceNoVat = productPrice.Price.Value;
+            await _productsService.UpdateProduct(product);
+        }
+        
+        
+        return Result.Success;
+    }
+    
+    private static async Task<HttpResponseMessage> ExecuteWithRetry(Uri url, StringContent contentString)
+    {
+        var result = new HttpResponseMessage();
+        var success = false;
+        using var client = new HttpClient();
+        while (!success)
+        {
+            result = await client.PostAsync(url, contentString);
+            success = result.IsSuccessStatusCode;
+        }
+        return result;
+    } 
 }

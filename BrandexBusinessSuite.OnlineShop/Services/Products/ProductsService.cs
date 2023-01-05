@@ -6,20 +6,25 @@ namespace BrandexBusinessSuite.OnlineShop.Services.Products;
 
 public class ProductsService : IProductsService
 {
-    private OnlineShopDbContext db;
-    public ProductsService(OnlineShopDbContext db)
-    {
-        this.db = db;
-    }
+    private readonly OnlineShopDbContext _db;
+    public ProductsService(OnlineShopDbContext db) 
+        =>_db = db;
 
     public async Task<List<Product>> GetCheckModels()
-     => await db.Products.ToListAsync();
+     => await _db.Products.ToListAsync();
 
     public async Task ChangeBatch(Product product, string erpLot)
     {
-        var productDb = await db.Products.Where(p => p.Id == product.Id).FirstOrDefaultAsync();
+        var productDb = await _db.Products.Where(p => p.Id == product.Id).FirstOrDefaultAsync();
         productDb!.ErpLot = erpLot;
-        await db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
     }
-   
+
+    public async Task UpdateProduct(Product product)
+    {
+        var productDb = await _db.Products.Where(p => p.Id == product.Id).FirstOrDefaultAsync();
+        productDb!.ErpPriceCode = product.ErpPriceCode;
+        productDb!.ErpPriceNoVat = product.ErpPriceNoVat;
+        await _db.SaveChangesAsync();
+    }
 }
