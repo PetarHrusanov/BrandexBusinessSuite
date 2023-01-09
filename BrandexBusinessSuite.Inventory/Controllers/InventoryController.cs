@@ -106,7 +106,8 @@ public class InventoryController : ApiController
                     .FirstOrDefault()
                 select new ProductMaterialQuantities(product.Name!, recipe.MaterialName)
                 {
-                    Quantity = recipe.MaterialType switch
+                    Quantity = substanceStock,
+                    QuantityProduct = recipe.MaterialType switch
                     {
                         MaterialType.Extract or MaterialType.Excipient => substanceStock / (recipe.QuantityRequired * recipe.ProductPills),
                         MaterialType.Blisters => substanceStock / (recipe.QuantityRequired * recipe.ProductBlisters),

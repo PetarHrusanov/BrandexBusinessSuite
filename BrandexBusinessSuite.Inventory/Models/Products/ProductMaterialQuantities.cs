@@ -10,4 +10,6 @@ public class ProductMaterialQuantities
     public string ProductName { get; set; }
     public string MaterialName { get; set; }
     public double Quantity { get; set; }
+    
+    public double QuantityProduct { get; set; }
 }
