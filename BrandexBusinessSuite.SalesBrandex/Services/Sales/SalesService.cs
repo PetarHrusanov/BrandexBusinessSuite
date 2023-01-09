@@ -93,10 +93,7 @@ public class SalesService :ISalesService
         var curDate = DateTime.Now;
         var startDate = curDate.AddMonths(-3).AddDays(1 - curDate.Day);
         var endDate = startDate.AddMonths(3).AddDays(-1);
-        
-        Console.WriteLine(startDate);
-        Console.WriteLine(endDate);
-        
+
         var sales = await _db.Sales
             .Where(s=>s.Count>0)
             .Where(s => s.Date.Date >= startDate.Date && s.Date.Date <= endDate.Date)
@@ -123,11 +120,6 @@ public class SalesService :ISalesService
             var productQuantity = salesGrouped.FirstOrDefault(p => p.ErpId == sale.ProductErp);
             productQuantity!.Quantity += sale.Count;
         }
-
-        foreach (var pederasti in salesGrouped)
-        {
-            Console.WriteLine($"{pederasti.Name} - {pederasti.Quantity}");
-        }
         
         salesGrouped = salesGrouped.Select(item => new ProductQuantitiesOutputModel()
         {
@@ -136,10 +128,6 @@ public class SalesService :ISalesService
             Quantity = item.Quantity / 3
         }).ToList();
         
-        foreach (var pederasti in salesGrouped)
-        {
-            Console.WriteLine($"{pederasti.Name} - {pederasti.Quantity}");
-        }
 
         return salesGrouped;
     }
