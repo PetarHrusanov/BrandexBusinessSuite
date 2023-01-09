@@ -166,6 +166,8 @@ public class OnlineShopController : ApiController
                 deliveryPrice,
                 speedyTracking);
             
+            if (order.payment_method_title != "Наложен платеж") saleInvoiceCheck.Notes = "платена";
+            
             salesInvoicesCheck.Add(saleInvoiceCheck);
 
             var orderStatus = new Order
@@ -367,6 +369,7 @@ public class OnlineShopController : ApiController
                 row.CreateCell(row.Cells.Count).SetCellValue(sale.City);
                 row.CreateCell(row.Cells.Count).SetCellValue(sale.DeliveryPrice);
                 row.CreateCell(row.Cells.Count).SetCellValue(sale.TrackingCode);
+                row.CreateCell(row.Cells.Count).SetCellValue(sale.Notes);
             }
             
             workbook.Write(fs);

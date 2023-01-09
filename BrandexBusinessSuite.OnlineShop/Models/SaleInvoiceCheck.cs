@@ -22,4 +22,6 @@ public class SaleInvoiceCheck
     public string TrackingCode { get; set; }
     public string InvoiceNumber { get; set; }
     
+    public string Notes { get; set; }
+    
 }
