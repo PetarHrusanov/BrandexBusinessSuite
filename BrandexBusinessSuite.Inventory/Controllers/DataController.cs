@@ -47,7 +47,7 @@ public class DataController :ApiController
     
     [HttpPost]
     [IgnoreAntiforgeryToken]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<ActionResult> GetProducts(ProductsInputModel inputModel)
     {
         
@@ -76,7 +76,7 @@ public class DataController :ApiController
     
     [HttpPost]
     [IgnoreAntiforgeryToken]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<ActionResult> GetRawMaterials(RawMaterialInputModel rawMaterialInputModel)
     {
         
@@ -105,7 +105,7 @@ public class DataController :ApiController
     
     [HttpPost]
     [IgnoreAntiforgeryToken]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}")]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<ActionResult> PostSupplier(SupplierInputModel inputModel)
     {
         await _suppliersService.Upload(inputModel);

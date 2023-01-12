@@ -79,8 +79,8 @@ public class OrdersService :IOrdersService
 
         foreach (var material in materials)
         {
-            var order = await _db.Orders.OrderBy(o => o.OrderDate).Where(o=>o.MaterialId==material).Select(o =>
-                new MaterialsQuantitiesOutputModel()
+            var order = await _db.Orders.OrderByDescending(o => o.OrderDate).Where(o=>o.MaterialId==material).Select(o =>
+                new MaterialsQuantitiesOutputModel
                 {
                     MaterialName = o.Material.Name,
                     MaterialErpId = o.Material.ErpId,
@@ -91,6 +91,7 @@ public class OrdersService :IOrdersService
                     PriceQuantity = o.Price/o.Quantity,
                     OrderDate = o.OrderDate.ToString("yyyy-MM-dd"),
                     DeliveryDate = o.DeliveryDate != null ? o.DeliveryDate.Value.ToString("yyyy-MM-dd") : null,
+                    Delivered = o.DeliveryDate != null ? true:false
                 }).FirstOrDefaultAsync();
             
             if (order!=null) materialsList.Add(order!);

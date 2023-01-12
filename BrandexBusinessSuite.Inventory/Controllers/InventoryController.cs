@@ -1,3 +1,5 @@
+using BrandexBusinessSuite.Inventory.Models.Recipes;
+
 namespace BrandexBusinessSuite.Inventory.Controllers;
 
 using System.Net.Http.Headers;
@@ -82,6 +84,8 @@ public class InventoryController : ApiController
         return productQuantities;
     }
     
+    
+    
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<ProductMaterialQuantities>> GetProductMaterials()
@@ -95,26 +99,33 @@ public class InventoryController : ApiController
         var productsCheck = await _productsService.GetProductsCheck();
         var recipes = await _recipesService.GetRecipesErpIds();
 
-        var productQuantities = new List<ProductMaterialQuantities>();
+        var orders = await _ordersService.GetLatest();
 
-        foreach (var product in productsCheck)
-        {
-            var recipesForProduct = recipes.Where(p => p.ProductId == product.Id).ToList();
-            productQuantities.AddRange(from recipe in recipesForProduct
-                let substanceStock = currentBalances!.Where(p => p.Product.Id == recipe.MaterialErpId)
-                    .Select(r => r.QuantityBase.Value)
-                    .FirstOrDefault()
-                select new ProductMaterialQuantities(product.Name!, recipe.MaterialName)
+        var productQuantities = (from product in productsCheck
+            let recipesForProduct = recipes.Where(p => p.ProductId == product.Id).ToList()
+            from recipe in recipesForProduct
+            let substanceStock = currentBalances!.Where(p => p.Product.Id == recipe.MaterialErpId)
+                .Select(r => r.QuantityBase.Value)
+                .FirstOrDefault()
+            let orderLast = orders.Where(p => p.MaterialErpId == recipe.MaterialErpId)
+                .Select(r => new
                 {
-                    Quantity = substanceStock,
-                    QuantityProduct = recipe.MaterialType switch
-                    {
-                        MaterialType.Extract or MaterialType.Excipient => substanceStock / (recipe.QuantityRequired * recipe.ProductPills),
-                        MaterialType.Blisters => substanceStock / (recipe.QuantityRequired * recipe.ProductBlisters),
-                        _ => substanceStock / recipe.QuantityRequired
-                    }
-                });
-        }
+                    r.Delivered,
+                    LastOrderQuantity = r.QuantityOrdered
+                })
+                .FirstOrDefault()
+            select new ProductMaterialQuantities(product.Name!, recipe.MaterialName)
+            {
+                Quantity = substanceStock,
+                QuantityProduct = recipe.MaterialType switch
+                {
+                    MaterialType.Extract or MaterialType.Excipient => substanceStock / (recipe.QuantityRequired * recipe.ProductPills),
+                    MaterialType.Blisters => substanceStock / (recipe.QuantityRequired * recipe.ProductBlisters),
+                    _ => substanceStock / recipe.QuantityRequired
+                },
+                Delivered = orderLast?.Delivered ?? false,
+                LastOrderQuantity = orderLast?.LastOrderQuantity ?? 0
+            }).ToList();
 
         foreach (var quantity in productQuantities)
         {
@@ -123,6 +134,38 @@ public class InventoryController : ApiController
         }
 
         return productQuantities;
+
+    }
+    
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
+    public async Task<List<RecipeCalculationModel>> Calculator([FromQuery]int productId, [FromQuery]double quantityForProduction)
+    { 
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}"); 
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray)); 
+        
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesMaterials}"); 
+        var currentBalances = JsonConvert.DeserializeObject<List<ErpCurrentBalances>>(responseContentJObj["value"].ToString()); 
+        
+        var recipes = await _recipesService.GetRecipesErpIds(); 
+        recipes = recipes.Where(p => p.ProductId == productId).ToList();
+        
+        var recipeQuantities = recipes.Select(recipe => new RecipeCalculationModel 
+            { 
+                MaterialName = recipe.MaterialName, 
+                AvailableQuantity = currentBalances!.Where(p => p.Product.Id == recipe.MaterialErpId)
+                    .Select(r => r.QuantityBase.Value)
+                    .FirstOrDefault(), 
+                NecessaryQuantity = recipe.MaterialType switch 
+                {
+                    MaterialType.Extract or MaterialType.Excipient => (recipe.QuantityRequired * recipe.ProductPills) * quantityForProduction,
+                    MaterialType.Blisters => (recipe.QuantityRequired * recipe.ProductBlisters) * quantityForProduction,
+                    _ => recipe.QuantityRequired * quantityForProduction
+                },
+            })
+            .ToList();
+        
+        return recipeQuantities;
 
     }
     
