@@ -1,3 +1,5 @@
+using System.Net.Http.Headers;
+
 namespace BrandexBusinessSuite.Inventory.Controllers;
 
 using System.Text;
@@ -50,26 +52,19 @@ public class DataController :ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<ActionResult> GetProducts(ProductsInputModel inputModel)
     {
-        
+
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
         var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryDate}");
-        
         var productsCheck = await _productsService.GetProductsCheck();
         var productsErp = JsonConvert.DeserializeObject<List<ErpProduct>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
-        var productNamesArray = inputModel.ProductNames.Split(", ").ToArray();
 
-        var productsErpSelected = (from productErp in productsErp 
-            from product in productNamesArray 
-            where product.TrimEnd() == productErp.Name.BG.TrimEnd() 
-            select productErp).ToList();
+        var productsErpSelected = productsErp.Where(productErp => inputModel.ProductNames.Split(", ").Contains(productErp.Name.BG.TrimEnd()));
+        var productsCheckDic = productsCheck.ToDictionary(p => p.ErpId, StringComparer.OrdinalIgnoreCase);
+        var productsUnique = productsErpSelected.Where(p => !productsCheckDic.ContainsKey(p.Id));
 
-        var productsUnique = (from product in productsErpSelected 
-            where productsCheck.All(c => !string.Equals(c.ErpId, product.Id, StringComparison.CurrentCultureIgnoreCase)) 
-            select product).ToList();
-        
-        await _productsService.UploadBulk(productsUnique, inputModel.Pills, inputModel.Blisters);
+        await _productsService.UploadBulk(productsUnique, inputModel.Pills);
 
         return Result.Success;
     }
@@ -79,25 +74,18 @@ public class DataController :ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<ActionResult> GetRawMaterials(RawMaterialInputModel rawMaterialInputModel)
     {
-        
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
         var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryDate}");
-        
+
         var materialsCheck = await _materialsService.GetAll();
         var materialsErp = JsonConvert.DeserializeObject<List<ErpProduct>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
-        var materialNamesArray = rawMaterialInputModel.MaterialsValue.Split(", ").ToArray();
-
-        var materialsErpSelected = (from materialErp in materialsErp 
-            from product in materialNamesArray 
-            where product == materialErp.Name.BG 
-            select materialErp).ToList();
-
-        var materialsUnique = (from materials in materialsErpSelected 
-            where materialsCheck.All(c => !string.Equals(c.ErpId, materials.Id, StringComparison.CurrentCultureIgnoreCase)) 
-            select materials).ToList();
+        var materialNamesArray = rawMaterialInputModel.MaterialsValue.Split(", ");
         
+        var materialsErpSelected = materialsErp.Where(m => materialNamesArray.Contains(m.Name.BG)).ToList();
+        var materialsUnique = materialsErpSelected.Where(m => materialsCheck.All(c => c.ErpId != m.Id)).ToList();
+
         await _materialsService.UploadBulk(materialsUnique, rawMaterialInputModel.MaterialsType, rawMaterialInputModel.MaterialsMeasure);
 
         return Result.Success;

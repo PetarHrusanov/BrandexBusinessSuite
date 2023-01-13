@@ -10,12 +10,8 @@ public class RecipesService :IRecipesService
 {
     
     private readonly InventoryDbContext _db;
+    public RecipesService(InventoryDbContext db)=>_db = db;
 
-    public RecipesService(InventoryDbContext db)
-    {
-        _db = db;
-    }
-    
     public async Task PostRecipe(RecipeInputModel inputModel)
     {
         var recipe = new Recipe
@@ -63,7 +59,6 @@ public class RecipesService :IRecipesService
             MaterialType = r.Material.Type,
             ProductId = r.ProductId,
             ProductPills = r.Product.Pills,
-            // ProductBlisters = r.Product.Blisters,
             QuantityRequired = r.QuantityRequired
         }).ToListAsync();
 }

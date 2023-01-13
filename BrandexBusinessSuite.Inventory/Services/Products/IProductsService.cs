@@ -7,5 +7,5 @@ using BrandexBusinessSuite.Models.DataModels;
 public interface IProductsService
 {
     Task<List<BasicCheckErpModel>> GetProductsCheck();
-    Task UploadBulk(List<ErpProduct> products, int pills, int blisters);
+    Task UploadBulk(IEnumerable<ErpProduct> products, int pills);
 }

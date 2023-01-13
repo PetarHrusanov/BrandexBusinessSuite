@@ -1,3 +1,6 @@
+using NPOI.HPSF;
+using Array = System.Array;
+
 namespace BrandexBusinessSuite.Inventory.Services.Products;
 
 using System.Data;
@@ -20,7 +23,6 @@ public class ProductsService : IProductsService
     private readonly IConfiguration _configuration;
 
     private const string Pills = "Pills";
-    private const string Blisters = "Blisters";
 
     public ProductsService(InventoryDbContext db, IConfiguration configuration)
     {
@@ -36,49 +38,40 @@ public class ProductsService : IProductsService
             ErpId = p.ErpId 
         }).ToListAsync();
 
-    public async Task UploadBulk(List<ErpProduct> products, int pills, int blisters)
+    public async Task UploadBulk(IEnumerable<ErpProduct> products, int pills)
     {
         var table = new DataTable();
         table.TableName = "Products";
-            
-        table.Columns.Add(Name);
-        table.Columns.Add(ErpId);
-        table.Columns.Add(PartNumber);
-        table.Columns.Add(Pills);
-        table.Columns.Add(Blisters);
-        
-        table.Columns.Add(CreatedOn);
-        table.Columns.Add(IsDeleted, typeof(bool));
 
-        foreach (var product in products)
+        var dataColumns = new DataColumn[]
         {
-            var row = table.NewRow();
-            row[Name] = product.Name.BG.TrimEnd();
-            row[ErpId] = product.Id;
-            row[PartNumber] = product.PartNumber;
-            row[Pills] = pills;
-            row[Blisters] = blisters;
-            
-            row[CreatedOn] = DateTime.Now;
-            row[IsDeleted] = false;
-            
-            table.Rows.Add(row);
+            new (Name),
+            new (ErpId),
+            new (PartNumber),
+            new (Pills),
+            new (CreatedOn),
+            new (IsDeleted, typeof(bool)),
+        };
+        
+        table.Columns.AddRange(dataColumns);
+
+        foreach (var values in products.Select(product => new object[] { product.Name.BG.TrimEnd(), product.Id, product.PartNumber, pills, DateTime.Now, false }))
+        {
+            table.LoadDataRow(values, true);
         }
 
         var connection = _configuration.GetConnectionString("DefaultConnection");
-        
         var con = new SqlConnection(connection);
             
         var objbulk = new SqlBulkCopy(con);  
             
         objbulk.DestinationTableName = "Products";
-            
+
         objbulk.ColumnMappings.Add(Name, Name);
         objbulk.ColumnMappings.Add(ErpId, ErpId);
         objbulk.ColumnMappings.Add(PartNumber, PartNumber);
         objbulk.ColumnMappings.Add(Pills, Pills);
-        objbulk.ColumnMappings.Add(Blisters, Blisters);
-        
+
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
         objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
 

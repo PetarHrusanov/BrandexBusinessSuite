@@ -4,5 +4,4 @@ public class ProductsInputModel
 {
     public string ProductNames { get; set; }
     public int Pills { get; set; }
-    public int Blisters { get; set; }
 }
