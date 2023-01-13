@@ -9,7 +9,7 @@ public class Product : IAuditInfo, IDeletableEntity
     public string ErpId { get; set; }
     public string PartNumber { get; set; }
     public int Pills { get; set; }
-    public int Blisters { get; set; }
+    // public int Blisters { get; set; }
     
     public virtual ICollection<Recipe> Recipes { get; set; } = new HashSet<Recipe>();
     public DateTime CreatedOn { get; set; }

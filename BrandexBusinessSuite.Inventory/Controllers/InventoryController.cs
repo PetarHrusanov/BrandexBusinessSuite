@@ -72,6 +72,7 @@ public class InventoryController : ApiController
         
         responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesProducts}");
         var currentBalances = JsonConvert.DeserializeObject<List<ErpCurrentBalances>>(responseContentJObj["value"].ToString());
+        
         var currentBalancesNecessary = batchesRequired
             .Select(batch => currentBalances!.FirstOrDefault(b => b.Lot?.Id == batch.Id)).ToList();
 
@@ -83,88 +84,59 @@ public class InventoryController : ApiController
 
         return productQuantities;
     }
-    
-    
-    
+
+
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<ProductMaterialQuantities>> GetProductMaterials()
     {
-        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-        
-        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesMaterials}");
-        var currentBalances = JsonConvert.DeserializeObject<List<ErpCurrentBalances>>(responseContentJObj["value"].ToString());
-        
+        var currentBalancesDic = (await GetCurrentBalances()).ToDictionary(x=>x.Product.Id);
         var productsCheck = await _productsService.GetProductsCheck();
         var recipes = await _recipesService.GetRecipesErpIds();
-
-        var orders = await _ordersService.GetLatest();
+        var ordersDic = (await _ordersService.GetLatest()).ToDictionary(x=>x.MaterialErpId);
 
         var productQuantities = (from product in productsCheck
-            let recipesForProduct = recipes.Where(p => p.ProductId == product.Id).ToList()
+            let recipesForProduct = recipes.Where(p => p.ProductId == product.Id)
             from recipe in recipesForProduct
-            let substanceStock = currentBalances!.Where(p => p.Product.Id == recipe.MaterialErpId)
-                .Select(r => r.QuantityBase.Value)
-                .FirstOrDefault()
-            let orderLast = orders.Where(p => p.MaterialErpId == recipe.MaterialErpId)
-                .Select(r => new
-                {
-                    r.Delivered,
-                    LastOrderQuantity = r.QuantityOrdered
-                })
-                .FirstOrDefault()
+            let substanceStock = currentBalancesDic.TryGetValue(recipe.MaterialErpId, out var value) ? value.QuantityBase.Value : 0
+            let orderLast = ordersDic.TryGetValue(recipe.MaterialErpId, out var order) ? order : null
             select new ProductMaterialQuantities(product.Name!, recipe.MaterialName)
             {
                 Quantity = substanceStock,
                 QuantityProduct = recipe.MaterialType switch
                 {
                     MaterialType.Extract or MaterialType.Excipient => substanceStock / (recipe.QuantityRequired * recipe.ProductPills),
-                    MaterialType.Blisters => substanceStock / (recipe.QuantityRequired * recipe.ProductBlisters),
                     _ => substanceStock / recipe.QuantityRequired
                 },
                 Delivered = orderLast?.Delivered ?? false,
-                LastOrderQuantity = orderLast?.LastOrderQuantity ?? 0
+                LastOrderQuantity = orderLast?.QuantityOrdered ?? 0
             }).ToList();
 
-        foreach (var quantity in productQuantities)
-        {
-            if (double.IsPositiveInfinity(quantity.Quantity)) quantity.Quantity = 1000000000;
-            if (double.IsNegativeInfinity(quantity.Quantity)) quantity.Quantity = 0;
-        }
-
-        return productQuantities;
+        return productQuantities.Select(quantity => {
+            quantity.Quantity = Math.Min(1000000000,quantity.Quantity);
+            quantity.Quantity = Math.Max(0,quantity.Quantity);
+            return quantity;
+        }).ToList();
 
     }
     
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<RecipeCalculationModel>> Calculator([FromQuery]int productId, [FromQuery]double quantityForProduction)
-    { 
-        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}"); 
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray)); 
-        
-        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesMaterials}"); 
-        var currentBalances = JsonConvert.DeserializeObject<List<ErpCurrentBalances>>(responseContentJObj["value"].ToString()); 
-        
-        var recipes = await _recipesService.GetRecipesErpIds(); 
-        recipes = recipes.Where(p => p.ProductId == productId).ToList();
+    {
+        var currentBalancesDic = (await GetCurrentBalances()).ToDictionary(x=>x.Product.Id);
+        var recipes = (await _recipesService.GetRecipesErpIds()).Where(p => p.ProductId == productId).ToList();
         
         var recipeQuantities = recipes.Select(recipe => new RecipeCalculationModel 
-            { 
-                MaterialName = recipe.MaterialName, 
-                AvailableQuantity = currentBalances!.Where(p => p.Product.Id == recipe.MaterialErpId)
-                    .Select(r => r.QuantityBase.Value)
-                    .FirstOrDefault(), 
-                NecessaryQuantity = recipe.MaterialType switch 
-                {
-                    MaterialType.Extract or MaterialType.Excipient => (recipe.QuantityRequired * recipe.ProductPills) * quantityForProduction,
-                    MaterialType.Blisters => (recipe.QuantityRequired * recipe.ProductBlisters) * quantityForProduction,
-                    _ => recipe.QuantityRequired * quantityForProduction
-                },
-            })
-            .ToList();
-        
+        { 
+            MaterialName = recipe.MaterialName, 
+            AvailableQuantity = currentBalancesDic.TryGetValue(recipe.MaterialErpId, out var value) ? value.QuantityBase.Value : 0, 
+            NecessaryQuantity = recipe.MaterialType switch 
+            {
+                MaterialType.Extract or MaterialType.Excipient => (recipe.QuantityRequired * recipe.ProductPills) * quantityForProduction,
+                _ => recipe.QuantityRequired * quantityForProduction
+            },
+        }).ToList();
         return recipeQuantities;
 
     }
@@ -173,23 +145,22 @@ public class InventoryController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<MaterialsQuantitiesOutputModel>> GetMaterials()
     {
-        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        var updatedOrders = 
+            from order in await _ordersService.GetLatest()
+            join balance in await GetCurrentBalances() on order.MaterialErpId equals balance.Product.Id into balances
+            from b in balances.DefaultIfEmpty()
+            select new {order, QuantityStock = b?.QuantityBase.Value ?? 0};
+
+        return updatedOrders.Select(x=> { x.order.QuantityStock = x.QuantityStock; return x.order;}).ToList();
+    }
+
+    private async Task<IEnumerable<ErpCurrentBalances>> GetCurrentBalances()
+    {
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}"); 
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray)); 
         
-        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesMaterials}");
-        var currentBalances = JsonConvert.DeserializeObject<List<ErpCurrentBalances>>(responseContentJObj["value"].ToString());
-
-        var ordersLatest = await _ordersService.GetLatest();
-        
-        foreach (var order in ordersLatest)
-        {
-            var stockQuantity = currentBalances!.Where(c => c.Product.Id == order.MaterialErpId)
-                .Select(o => o.QuantityBase.Value).FirstOrDefault();
-            order.QuantityStock = stockQuantity;
-        }
-
-        return ordersLatest;
-
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesMaterials}"); 
+        return JsonConvert.DeserializeObject<IEnumerable<ErpCurrentBalances>>(responseContentJObj["value"].ToString()); 
     }
     
 }

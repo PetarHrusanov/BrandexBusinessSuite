@@ -63,7 +63,7 @@ public class RecipesService :IRecipesService
             MaterialType = r.Material.Type,
             ProductId = r.ProductId,
             ProductPills = r.Product.Pills,
-            ProductBlisters = r.Product.Blisters,
+            // ProductBlisters = r.Product.Blisters,
             QuantityRequired = r.QuantityRequired
         }).ToListAsync();
 }
