@@ -52,14 +52,9 @@ public class DataController :ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<ActionResult> GetProducts(ProductsInputModel inputModel)
     {
-
-        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-
-        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryDate}");
+        
         var productsCheck = await _productsService.GetProductsCheck();
-        var productsErp = JsonConvert.DeserializeObject<List<ErpProduct>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
-
+        var productsErp = await GetProducts();
         var productsErpSelected = productsErp.Where(productErp => inputModel.ProductNames.Split(", ").Contains(productErp.Name.BG.TrimEnd()));
         var productsCheckDic = productsCheck.ToDictionary(p => p.ErpId, StringComparer.OrdinalIgnoreCase);
         var productsUnique = productsErpSelected.Where(p => !productsCheckDic.ContainsKey(p.Id));
@@ -74,15 +69,9 @@ public class DataController :ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<ActionResult> GetRawMaterials(RawMaterialInputModel rawMaterialInputModel)
     {
-        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-
-        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryDate}");
-
         var materialsCheck = await _materialsService.GetAll();
-        var materialsErp = JsonConvert.DeserializeObject<List<ErpProduct>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
+        var materialsErp = await GetProducts();
         var materialNamesArray = rawMaterialInputModel.MaterialsValue.Split(", ");
-        
         var materialsErpSelected = materialsErp.Where(m => materialNamesArray.Contains(m.Name.BG)).ToList();
         var materialsUnique = materialsErpSelected.Where(m => materialsCheck.All(c => c.ErpId != m.Id)).ToList();
 
@@ -98,5 +87,13 @@ public class DataController :ApiController
     {
         await _suppliersService.Upload(inputModel);
         return Result.Success;
+    }
+    
+    private async Task<IEnumerable<ErpProduct>?> GetProducts()
+    {
+        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryDate}");
+        return JsonConvert.DeserializeObject<IEnumerable<ErpProduct>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
     }
 }
