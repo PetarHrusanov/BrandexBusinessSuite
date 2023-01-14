@@ -36,10 +36,8 @@ public class InventoryController : ApiController
     private readonly IOrdersService _ordersService;
     
     private const string QueryLots = "Logistics_Inventory_Lots?$top=100000&$select=ExpiryDate,Id,Number,ReceiptDate&$expand=Product($select=Id)";
-
     private const string QueryBalancesProducts =
         "Logistics_Inventory_CurrentBalances?$top=1000000&$filter=Store%20eq%20'Logistics_Inventory_Stores(100447ff-44f4-4799-a4c2-7c9b22fb0aaa)'&$select=QuantityBase&$expand=Lot($select=Id),Product($select=Id)";
-
     private const string QueryBalancesMaterials =
         "Logistics_Inventory_CurrentBalances?$top=1000000&$filter=Store%20eq%20'Logistics_Inventory_Stores(38f4c900-8428-4f94-bc6a-76159b53fb3f)'&$select=QuantityBase&$expand=Lot($select=Id),Product($select=Id,Name)";
 
@@ -70,9 +68,7 @@ public class InventoryController : ApiController
                 .Take(3))
             .ToList();
         
-        responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesProducts}");
-        var currentBalances = JsonConvert.DeserializeObject<List<ErpCurrentBalances>>(responseContentJObj["value"].ToString());
-        
+        var currentBalances = await GetCurrentBalances(false);
         var currentBalancesNecessary = batchesRequired
             .Select(batch => currentBalances!.FirstOrDefault(b => b.Lot?.Id == batch.Id)).ToList();
 
@@ -85,12 +81,11 @@ public class InventoryController : ApiController
         return productQuantities;
     }
 
-
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<ProductMaterialQuantities>> GetProductMaterials()
     {
-        var currentBalancesDic = (await GetCurrentBalances()).ToDictionary(x=>x.Product.Id);
+        var currentBalancesDic = (await GetCurrentBalances(true)).ToDictionary(x=>x.Product.Id);
         var productsCheck = await _productsService.GetProductsCheck();
         var recipes = await _recipesService.GetRecipesErpIds();
         var ordersDic = (await _ordersService.GetLatest()).ToDictionary(x=>x.MaterialErpId);
@@ -117,14 +112,13 @@ public class InventoryController : ApiController
             quantity.Quantity = Math.Max(0,quantity.Quantity);
             return quantity;
         }).ToList();
-
     }
     
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<RecipeCalculationModel>> Calculator([FromQuery]int productId, [FromQuery]double quantityForProduction)
     {
-        var currentBalancesDic = (await GetCurrentBalances()).ToDictionary(x=>x.Product.Id);
+        var currentBalancesDic = (await GetCurrentBalances(true)).ToDictionary(x=>x.Product.Id);
         var recipes = (await _recipesService.GetRecipesErpIds()).Where(p => p.ProductId == productId).ToList();
         
         var recipeQuantities = recipes.Select(recipe => new RecipeCalculationModel 
@@ -138,7 +132,6 @@ public class InventoryController : ApiController
             },
         }).ToList();
         return recipeQuantities;
-
     }
     
     [HttpGet]
@@ -147,20 +140,19 @@ public class InventoryController : ApiController
     {
         var updatedOrders = 
             from order in await _ordersService.GetLatest()
-            join balance in await GetCurrentBalances() on order.MaterialErpId equals balance.Product.Id into balances
+            join balance in await GetCurrentBalances(true) on order.MaterialErpId equals balance.Product.Id into balances
             from b in balances.DefaultIfEmpty()
             select new {order, QuantityStock = b?.QuantityBase.Value ?? 0};
 
         return updatedOrders.Select(x=> { x.order.QuantityStock = x.QuantityStock; return x.order;}).ToList();
     }
 
-    private async Task<IEnumerable<ErpCurrentBalances>> GetCurrentBalances()
+    private async Task<IEnumerable<ErpCurrentBalances>> GetCurrentBalances(bool materialsOnly)
     {
         var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}"); 
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray)); 
-        
-        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryBalancesMaterials}"); 
+
+        var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{(materialsOnly ? QueryBalancesMaterials : QueryBalancesProducts)}"); 
         return JsonConvert.DeserializeObject<IEnumerable<ErpCurrentBalances>>(responseContentJObj["value"].ToString()); 
     }
-    
 }
