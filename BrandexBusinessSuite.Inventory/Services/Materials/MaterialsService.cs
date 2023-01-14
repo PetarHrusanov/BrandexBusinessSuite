@@ -4,11 +4,11 @@ namespace BrandexBusinessSuite.Inventory.Services.Materials;
 
 using System.Data;
 
-using BrandexBusinessSuite.Inventory.Data.Enums;
+using Data.Enums;
 using BrandexBusinessSuite.Inventory.Models.Materials;
 using BrandexBusinessSuite.Models.ErpDocuments;
 using AutoMapper;
-using BrandexBusinessSuite.Inventory.Data;
+using Data;
 using Microsoft.EntityFrameworkCore;
 
 using static  Common.Constants;
@@ -37,50 +37,40 @@ public class MaterialsService : IMaterialsService
     {
         var table = new DataTable();
         table.TableName = Materials;
-            
-        table.Columns.Add(Name);
-        table.Columns.Add(ErpId);
-        table.Columns.Add(PartNumber);
-        table.Columns.Add(Type, typeof(int));
-        table.Columns.Add(Measurement, typeof(int));
         
-        table.Columns.Add(CreatedOn);
-        table.Columns.Add(IsDeleted, typeof(bool));
-
-        foreach (var product in products)
+        var dataColumns = new DataColumn[]
         {
-            var row = table.NewRow();
-            row[Name] = product.Name.BG.TrimEnd();
-            row[ErpId] = product.Id;
-            row[PartNumber] = product.PartNumber;
-            row[Type] = materialType;
-            row[Measurement] = materialMeasurement;
-            
-            row[CreatedOn] = DateTime.Now;
-            row[IsDeleted] = false;
-            
-            table.Rows.Add(row);
+            new (Name),
+            new (ErpId),
+            new (PartNumber),
+            new (Type, typeof(int)),
+            new (Measurement, typeof(int)),
+            new (CreatedOn),
+            new (IsDeleted, typeof(bool)),
+        };
+        
+        table.Columns.AddRange(dataColumns);
+
+        foreach (var values in products.Select(product => new object[] { product.Name.BG.TrimEnd(), product.Id, product.PartNumber, 
+                     materialType,materialMeasurement, DateTime.Now, false }))
+        {
+            table.LoadDataRow(values, true);
         }
 
-        var connection = _configuration.GetConnectionString("DefaultConnection");
-        
-        var con = new SqlConnection(connection);
-            
-        var objbulk = new SqlBulkCopy(con);  
-            
+        await using var con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+        using var objbulk = new SqlBulkCopy(con);
         objbulk.DestinationTableName = Materials;
-            
+
         objbulk.ColumnMappings.Add(Name, Name);
         objbulk.ColumnMappings.Add(ErpId, ErpId);
         objbulk.ColumnMappings.Add(PartNumber, PartNumber);
         objbulk.ColumnMappings.Add(Type, Type);
         objbulk.ColumnMappings.Add(Measurement, Measurement);
-        
         objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
         objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
 
         con.Open();
-        await objbulk.WriteToServerAsync(table);  
-        con.Close();  
+        await objbulk.WriteToServerAsync(table);
+        con.Close(); 
     }
 }
