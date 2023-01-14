@@ -22,16 +22,14 @@ public class OrdersService :IOrdersService
 
     public async Task Upload(OrderInputModel inputModel)
     {
-        var order = new Order()
-        {
-            MaterialId = inputModel.MaterialId,
-            SupplierId = inputModel.SupplierId,
-            Quantity = inputModel.Quantity,
-            Price = inputModel.Price,
-            Notes = inputModel.Notes ?? string.Empty,
-            OrderDate = inputModel.OrderDate,
-            DeliveryDate = inputModel.DeliveryDate,
-        };
+        var order = new Order(
+            inputModel.MaterialId, 
+            inputModel.SupplierId, 
+            inputModel.Quantity, 
+            inputModel.Price, 
+            inputModel.Notes ?? string.Empty, 
+            inputModel.OrderDate, 
+            inputModel.DeliveryDate);
         
         await _db.Orders.AddAsync(order);
         await _db.SaveChangesAsync();
@@ -74,9 +72,7 @@ public class OrdersService :IOrdersService
     {
 
         var materials = await _db.Materials.Select(m => m.Id).ToListAsync();
-
         var materialsList = new List<MaterialsQuantitiesOutputModel>();
-
         foreach (var material in materials)
         {
             var order = await _db.Orders.OrderByDescending(o => o.OrderDate).Where(o=>o.MaterialId==material).Select(o =>
@@ -96,24 +92,17 @@ public class OrdersService :IOrdersService
             
             if (order!=null) materialsList.Add(order!);
         }
-
-        return materialsList;
-    }
-
-    public async Task<List<OrderOutputModel>> GetSpecificOrders(int ordersNumber, int? materialId)
-    {
-
-        if (materialId!=null)
-        {
-            return await _mapper.ProjectTo<OrderOutputModel>(_db.Orders.OrderByDescending(o=>o.OrderDate).Where(m => m.MaterialId == materialId)).Take(ordersNumber)
-                .ToListAsync();
-        }
         
-        return await _mapper.ProjectTo<OrderOutputModel>(_db.Orders.OrderByDescending(o=>o.OrderDate).Take(ordersNumber))
-            .ToListAsync();
+        return materialsList;
+
     }
 
-    public async Task<List<OrderOutputModel>> GetUndelivered() 
-        => await _mapper.ProjectTo<OrderOutputModel>(_db.Orders.Where(m => m.DeliveryDate == null))
-            .ToListAsync();
+    public async Task<List<OrderOutputModel>> GetOrders(bool delivered, int ordersNumber, int? materialId)
+    {
+        var query = _db.Orders.OrderByDescending(o => o.OrderDate);
+        if (materialId != null) query = (IOrderedQueryable<Order>)query.Where(m => m.MaterialId == materialId);
+        if (!delivered) query = (IOrderedQueryable<Order>)query.Where(m => m.DeliveryDate == null);
+        return await _mapper.ProjectTo<OrderOutputModel>(query.Take(ordersNumber)).ToListAsync();
+    }
+    
 }

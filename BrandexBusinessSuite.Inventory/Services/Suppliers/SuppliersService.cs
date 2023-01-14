@@ -9,11 +9,7 @@ namespace BrandexBusinessSuite.Inventory.Services.Suppliers;
 public class SuppliersService :ISuppliersService
 {
     private readonly InventoryDbContext _db;
-
-    public SuppliersService(InventoryDbContext db)
-    {
-        _db = db;
-    }
+    public SuppliersService(InventoryDbContext db) =>_db = db;
 
     public async Task<List<BasicCheckModel>> GetAll()
         => await _db.Suppliers.Select(s => new BasicCheckModel()

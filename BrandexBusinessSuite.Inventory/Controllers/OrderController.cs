@@ -83,7 +83,7 @@ public class OrderController : ApiController
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<OrderOutputModel>> GetOrdersUndelivered()
-        => await _ordersService.GetUndelivered();
+        => await _ordersService.GetOrders(false, Int32.MaxValue, null);
 
 
     [HttpGet]
@@ -91,11 +91,8 @@ public class OrderController : ApiController
     public async Task<List<OrderOutputModel>> GetSpecificOrders([FromQuery] int ordersNumber,
         [FromQuery] string? materialId)
     {
-        if (int.TryParse(materialId, out var materialConverted))
-        {
-            return await _ordersService.GetSpecificOrders(ordersNumber, materialConverted);
-        }
-        return await _ordersService.GetSpecificOrders(ordersNumber, null);
+        var materialConverted = int.TryParse(materialId, out var id) ? id : (int?)null;
+        return await _ordersService.GetOrders(true, ordersNumber, materialConverted);
     }
         
     

@@ -4,6 +4,23 @@ namespace BrandexBusinessSuite.Inventory.Data.Models;
 
 public class Order : IAuditInfo, IDeletableEntity
 {
+
+    public Order()
+    {
+        
+    }
+    
+    public Order(int materialId, int supplierId, double quantity, double price, string notes, DateTime orderDate, DateTime? deliveryDate)
+    {
+        MaterialId = materialId;
+        SupplierId = supplierId;
+        Quantity = quantity;
+        Price = price;
+        Notes = notes;
+        OrderDate = orderDate;
+        DeliveryDate = deliveryDate;
+    }
+
     public int Id { get; set; }
     public double Quantity { get; set; }
     public double Price { get; set; }
