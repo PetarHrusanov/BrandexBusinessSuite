@@ -94,6 +94,5 @@ public class OrderController : ApiController
         var materialConverted = int.TryParse(materialId, out var id) ? id : (int?)null;
         return await _ordersService.GetOrders(true, ordersNumber, materialConverted);
     }
-        
-    
+
 }
