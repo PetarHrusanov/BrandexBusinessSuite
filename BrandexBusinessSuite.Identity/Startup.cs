@@ -28,8 +28,10 @@ public class Startup
         
         services.AddWebService<ApplicationUsersDbContext>(Configuration);
                 
-        services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
-            .AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationUsersDbContext>();
+        services
+            .AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
+            .AddRoles<ApplicationRole>()
+            .AddEntityFrameworkStores<ApplicationUsersDbContext>();
 
         services
             .AddTransient<ISeeder, ApplicationDbContextSeeder>()

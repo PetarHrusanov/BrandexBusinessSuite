@@ -14,11 +14,9 @@ public class TokenGeneratorService : ITokenGeneratorService
 {
     private readonly ApplicationSettings _applicationSettings;
 
-    public TokenGeneratorService(IOptions<ApplicationSettings> applicationSettings)
-    {
-        _applicationSettings = applicationSettings.Value;
-    }
-
+    public TokenGeneratorService(IOptions<ApplicationSettings> applicationSettings) 
+        =>_applicationSettings = applicationSettings.Value;
+   
     public string GenerateToken(ApplicationUser user, IEnumerable<string> roles = null)
     {
         var tokenHandler = new JwtSecurityTokenHandler();

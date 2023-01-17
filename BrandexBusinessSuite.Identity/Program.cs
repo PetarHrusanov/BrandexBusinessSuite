@@ -1,15 +1,31 @@
-namespace BrandexBusinessSuite.Identity;
+using BrandexBusinessSuite.Identity;
+using BrandexBusinessSuite.Identity.Data;
+using BrandexBusinessSuite.Identity.Data.Models;
+using BrandexBusinessSuite.Identity.Data.Seeding;
+using BrandexBusinessSuite.Identity.Services.Identity;
+using BrandexBusinessSuite.Infrastructure;
+using BrandexBusinessSuite.Services.Data;
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
-{
-    public static void Main(string[] args)
-        => CreateHostBuilder(args).Build().Run();
+builder.Services  
+    .AddTransient<ISeeder, ApplicationDbContextSeeder>()
+    .AddTransient<IIdentityService, IdentityService>()
+    .AddTransient<ITokenGeneratorService, TokenGeneratorService>();
 
-    public static IHostBuilder CreateHostBuilder(string[] args)
-        => Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder => webBuilder
-                .UseStartup<Startup>());
-}
+builder.Services
+    .Configure<AdminSettings>(
+        builder.Configuration.GetSection(nameof(AdminSettings)),
+        config => config.BindNonPublicProperties = true)
+    .AddWebService<ApplicationUsersDbContext>(builder.Configuration);
+
+builder.Services
+    .AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
+    .AddRoles<ApplicationRole>()
+    .AddEntityFrameworkStores<ApplicationUsersDbContext>()
+    ;
+
+var app = builder.Build();
+
+app.UseWebService(builder.Environment).Initialize();
+app.Run();

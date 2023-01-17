@@ -15,17 +15,10 @@ using static  Common.Constants;
 
 internal class RolesSeeder : ISeeder
 {
-    
-    // private readonly ApplicationUsersDbContext _dbContext;
     private readonly IServiceProvider _serviceProvider;
 
-    public RolesSeeder(
-        // ApplicationUsersDbContext dbContext,
-        IServiceProvider serviceProvider)
-    {
-        // _dbContext = dbContext;
-        _serviceProvider = serviceProvider;
-    }
+    public RolesSeeder(IServiceProvider serviceProvider) 
+        => _serviceProvider = serviceProvider;
     
     public void SeedAsync()
     {

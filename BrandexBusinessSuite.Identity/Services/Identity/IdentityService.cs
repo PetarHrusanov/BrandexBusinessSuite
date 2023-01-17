@@ -44,11 +44,9 @@ public class IdentityService : IIdentityService
 
         var identityResult = await _userManager.CreateAsync(user, userInput.Password);
 
-        var errors = identityResult.Errors.Select(e => e.Description);
-
         return identityResult.Succeeded
             ? Result<ApplicationUser>.SuccessWith(user)
-            : Result<ApplicationUser>.Failure(errors);
+            : Result<ApplicationUser>.Failure(identityResult.Errors.Select(e => e.Description));
     }
 
     public async Task RegisterWithRole(UserWithRoleInputModel userInput)
@@ -86,15 +84,11 @@ public class IdentityService : IIdentityService
         }
     }
 
-    public async Task<string[]> GetRoles()
-    {
-        return await _roleManager.Roles.Select(r => r.Name).ToArrayAsync();
-    }
+    public async Task<string[]> GetRoles() 
+        => await _roleManager.Roles.Select(r => r.Name).ToArrayAsync();
 
-    public async Task<UsersIds[]> GetUsers()
-    {
-        return await _mapper.ProjectTo<UsersIds>(_userManager.Users).ToArrayAsync();
-    }
+    public async Task<UsersIds[]> GetUsers() 
+        =>await _mapper.ProjectTo<UsersIds>(_userManager.Users).ToArrayAsync();
 
     public async Task<Result> ChangePassword(
         string userId,
@@ -108,10 +102,8 @@ public class IdentityService : IIdentityService
             changePasswordInput.CurrentPassword,
             changePasswordInput.NewPassword);
 
-        var errors = identityResult.Errors.Select(e => e.Description);
-
         return identityResult.Succeeded
             ? Result.Success
-            : Result.Failure(errors);
+            : Result.Failure(identityResult.Errors.Select(e => e.Description));
     }
 }
