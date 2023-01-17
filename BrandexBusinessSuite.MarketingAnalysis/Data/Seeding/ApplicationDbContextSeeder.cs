@@ -17,17 +17,11 @@ public class ApplicationDbContextSeeder : ISeeder
     public void SeedAsync()
     {
         if (db.Products.Any()) return;
-        foreach (var product in GetProducts())
-        {
-            db.Products.Add(product);
-        }
+        db.Products.AddRange(GetProducts());
         db.SaveChanges();
         
         if (db.MediaTypes.Any()) return;
-        foreach (var mediaType in GetMediaTypes())
-        {
-            db.MediaTypes.Add(mediaType);
-        }
+        db.MediaTypes.AddRange(GetMediaTypes());
         db.SaveChanges();
     }
 

@@ -22,24 +22,14 @@ public class DataController : ApiController
     private readonly IAdMediasService _adMediasService;
     private readonly ICompaniesService _companiesService;
 
-    private readonly ErpUserSettings _userSettings;
-
-    private static readonly HttpClient Client = new();
-
-    public DataController(IOptions<ErpUserSettings> userSettings,
-        IProductsService productsService,
-        IAdMediasService adMediasService,
-        ICompaniesService companiesService
-    )
+    public DataController(IProductsService productsService, IAdMediasService adMediasService, ICompaniesService companiesService)
 
     {
-        _userSettings = userSettings.Value;
         _productsService = productsService;
         _adMediasService = adMediasService;
         _companiesService = companiesService;
     }
-    
-    
+
     // COMPANY LOGIC
     
     [HttpPost]
@@ -126,5 +116,4 @@ public class DataController : ApiController
     public async Task<List<ProductCheckModel>> GetProducts() 
         => await _productsService.GetCheckModels();
     
-
 }

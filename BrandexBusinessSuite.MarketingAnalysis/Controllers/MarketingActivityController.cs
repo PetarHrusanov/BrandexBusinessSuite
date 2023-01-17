@@ -217,8 +217,7 @@ public class MarketingActivityController : ApiController
 
         var jsonPostString = JsonConvert.SerializeObject(activityObject, Formatting.Indented);
 
-        var byteArray = Encoding.ASCII.GetBytes($"{_userSettings.User}:{_userSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        AuthenticateUserBasicHeader(Client, _userSettings.User, _userSettings.Password);
 
         var responseContentJObj = await  JObjectByUriPostRequest(Client, $"{ErpRequests.BaseUrl}General_Contacts_Activities/", jsonPostString);
 

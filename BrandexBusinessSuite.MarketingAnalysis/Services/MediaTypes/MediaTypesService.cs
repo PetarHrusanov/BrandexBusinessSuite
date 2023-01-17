@@ -8,21 +8,13 @@ using BrandexBusinessSuite.MarketingAnalysis.Models.MediaTypes;
 public class MediaTypesService : IMediaTypesService
 {
     
-    private MarketingAnalysisDbContext _db;
-    private readonly IConfiguration _configuration;
-    
-    public MediaTypesService(MarketingAnalysisDbContext db, IConfiguration configuration)
-    {
-        _db = db;
-        _configuration = configuration;
-    }
-    
-    public async Task<List<MediaTypesCheckModel>> GetCheckModels()
-    {
-        return await _db.MediaTypes.Select(p => new MediaTypesCheckModel()
-        {
-            Id = p.Id,
-            Name = p.Name
+    private readonly MarketingAnalysisDbContext _db;
+    public MediaTypesService(MarketingAnalysisDbContext db) => _db = db;
+
+    public async Task<List<MediaTypesCheckModel>> GetCheckModels() 
+        => await _db.MediaTypes.Select(p => new MediaTypesCheckModel() 
+        { 
+            Id = p.Id, 
+            Name = p.Name 
         }).ToListAsync();
-    }
 }
