@@ -9,41 +9,29 @@ using static Common.ProductConstants;
 
 public class ApplicationDbContextSeeder : ISeeder
 {
-    private readonly AccountingDbContext db;
+    private readonly AccountingDbContext _db;
+    public ApplicationDbContextSeeder(AccountingDbContext db) =>_db = db;
 
-    public ApplicationDbContextSeeder(AccountingDbContext db)
-    {
-        this.db = db;
-    }
-    
     public void SeedAsync()
     {
-        if (!db.Products.Any())
+        if (!_db.Products.Any())
         {
-            foreach (var product in GetProducts())
-            {
-                db.Products.Add(product);
-            }
-            db.SaveChanges();
+            _db.Products.AddRange(GetProducts());
+            _db.SaveChanges();
         }
 
-        if (!db.Currencies.Any())
+        if (!_db.Currencies.Any())
         {
-            foreach (var currency in GetCurrencies())
-            {
-                db.Currencies.Add(currency);
-            }
-            db.SaveChanges();
+            _db.Currencies.AddRange(GetCurrencies());
+            _db.SaveChanges();
         }
         
-        if (db.MarketingActivityDetails.Any()) return;
-        foreach (var media in GetMarketingActivityDetails())
-        {
-            db.MarketingActivityDetails.Add(media);
-        }
-        db.SaveChanges();
+        if (_db.MarketingActivityDetails.Any()) return;
+        _db.MarketingActivityDetails.AddRange(GetMarketingActivityDetails());
+        _db.SaveChanges();
 
     }
+
 
     private static IEnumerable<Product> GetProducts() =>
         new List<Product>

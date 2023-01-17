@@ -1,20 +1,22 @@
-namespace BrandexBusinessSuite.Accounting;
+using BrandexBusinessSuite;
+using BrandexBusinessSuite.Accounting.Data;
+using BrandexBusinessSuite.Accounting.Data.Seeding;
+using BrandexBusinessSuite.Infrastructure;
+using BrandexBusinessSuite.Services.Data;
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        CreateHostBuilder(args).Build().Run();
-    }
+builder.Services
+    .Configure<ApplicationSettings>(
+        builder.Configuration.GetSection(nameof(ApplicationSettings)),
+        config => config.BindNonPublicProperties = true)
+    .Configure<ErpUserSettings>(
+        builder.Configuration.GetSection(nameof(ErpUserSettings)),
+        config => config.BindNonPublicProperties = true)
+    .AddWebService<AccountingDbContext>(builder.Configuration)
+    .AddTransient<ISeeder, ApplicationDbContextSeeder>();
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            });
-    
-}
+var app = builder.Build();
+
+app.UseWebService(builder.Environment).Initialize();
+app.Run();

@@ -6,16 +6,11 @@ public class Product : IAuditInfo, IDeletableEntity
 {
     
     public int Id { get; set; }
-    
     public string Name { get; set; }
-    
     public string FacebookName { get; set; }
-    
     public string GoogleName { get; set; }
     public string GoogleNameErp { get; set; }
-    
     public string AccountingName { get; set; }
-    
     public string AccountingErpNumber { get; set; }
     
     public DateTime CreatedOn { get; set; }

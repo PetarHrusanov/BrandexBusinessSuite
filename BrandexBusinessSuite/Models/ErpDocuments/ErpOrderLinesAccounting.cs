@@ -2,18 +2,32 @@ namespace BrandexBusinessSuite.Models.ErpDocuments;
 
 public class ErpOrderLinesAccounting
 {
+    // public ErpOrderLinesAccounting(
+    //     ErpCharacteristicId product,
+    //     ErpCharacteristicLineAmount lineAmount,
+    //     ErpCharacteristicValueNumber quantity,
+    //     ErpCharacteristicId lineStore
+    // )
+    // {
+    //     Product = product;
+    //     LineAmount = lineAmount;
+    //     Quantity = quantity;
+    //     LineStore = lineStore;
+    //     PricePerUnit = lineAmount;
+    // }
+    
     public ErpOrderLinesAccounting(
-        ErpCharacteristicId product,
-        ErpCharacteristicLineAmount lineAmount,
-        ErpCharacteristicValueNumber quantity,
-        ErpCharacteristicId lineStore
+        string product,
+        decimal lineAmount,
+        double quantity,
+        string lineStore
     )
     {
-        Product = product;
-        LineAmount = lineAmount;
-        Quantity = quantity;
-        LineStore = lineStore;
-        PricePerUnit = lineAmount;
+        Product = new ErpCharacteristicId(product);
+        LineAmount = new ErpCharacteristicLineAmount(lineAmount);
+        Quantity =  new ErpCharacteristicValueNumber(quantity);
+        LineStore = new ErpCharacteristicId(lineStore);
+        PricePerUnit = LineAmount;
     }
 
     public ErpCharacteristicId Product { get; set; }
