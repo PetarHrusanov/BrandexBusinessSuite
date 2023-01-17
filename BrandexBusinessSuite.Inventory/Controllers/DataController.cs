@@ -91,8 +91,7 @@ public class DataController :ApiController
     
     private async Task<IEnumerable<ErpProduct>?> GetProducts()
     {
-        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        AuthenticateUserBasicHeader(Client, _erpUserSettings.User, _erpUserSettings.Password);
         var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryDate}");
         return JsonConvert.DeserializeObject<IEnumerable<ErpProduct>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
     }

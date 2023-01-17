@@ -153,6 +153,6 @@ public class InventoryController : ApiController
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray)); 
 
         var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{(materialsOnly ? QueryBalancesMaterials : QueryBalancesProducts)}"); 
-        return JsonConvert.DeserializeObject<IEnumerable<ErpCurrentBalances>>(responseContentJObj["value"].ToString()); 
+        return JsonConvert.DeserializeObject<IEnumerable<ErpCurrentBalances>>(responseContentJObj["value"]!.ToString())!; 
     }
 }

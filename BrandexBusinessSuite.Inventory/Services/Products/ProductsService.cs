@@ -1,6 +1,3 @@
-using NPOI.HPSF;
-using Array = System.Array;
-
 namespace BrandexBusinessSuite.Inventory.Services.Products;
 
 using System.Data;
@@ -55,7 +52,7 @@ public class ProductsService : IProductsService
         
         table.Columns.AddRange(dataColumns);
 
-        foreach (var values in products.Select(product => new object[] { product.Name.BG.TrimEnd(), product.Id, product.PartNumber, pills, DateTime.Now, false }))
+        foreach (var values in products.Select(product => new object[] { product.Name!.BG!.TrimEnd(), product.Id, product.PartNumber!, pills, DateTime.Now, false }))
         {
             table.LoadDataRow(values, true);
         }
