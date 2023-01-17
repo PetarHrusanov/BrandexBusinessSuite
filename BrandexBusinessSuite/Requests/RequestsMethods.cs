@@ -34,5 +34,11 @@ public static class RequestsMethods
         var uriChangeState = new Uri($"{GeneralRequest}{document}/ChangeState");
         await client.PostAsync(uriChangeState, StateContent);
     }
+    
+    public static void AuthenticateUserBasicHeader(HttpClient client, string user, string password)
+    {
+        var byteArray = Encoding.ASCII.GetBytes($"{user}:{password}");
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+    }
 
 }
