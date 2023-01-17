@@ -1,3 +1,6 @@
+using BrandexBusinessSuite.Inventory.Data.Models;
+using EFCore.BulkExtensions;
+
 namespace BrandexBusinessSuite.Inventory.Services.Products;
 
 using System.Data;
@@ -37,44 +40,17 @@ public class ProductsService : IProductsService
 
     public async Task UploadBulk(IEnumerable<ErpProduct> products, int pills)
     {
-        var table = new DataTable();
-        table.TableName = "Products";
-
-        var dataColumns = new DataColumn[]
+        var entities = products.Select(product => new Product()
         {
-            new (Name),
-            new (ErpId),
-            new (PartNumber),
-            new (Pills),
-            new (CreatedOn),
-            new (IsDeleted, typeof(bool)),
-        };
-        
-        table.Columns.AddRange(dataColumns);
+            Name = product.Name!.BG!.TrimEnd(),
+            ErpId = product.Id,
+            PartNumber = product.PartNumber!,
+            Pills = pills,
+            CreatedOn = DateTime.Now,
+            IsDeleted = false
+        }).ToList();
 
-        foreach (var values in products.Select(product => new object[] { product.Name!.BG!.TrimEnd(), product.Id, product.PartNumber!, pills, DateTime.Now, false }))
-        {
-            table.LoadDataRow(values, true);
-        }
-
-        var connection = _configuration.GetConnectionString("DefaultConnection");
-        var con = new SqlConnection(connection);
-            
-        var objbulk = new SqlBulkCopy(con);  
-            
-        objbulk.DestinationTableName = "Products";
-
-        objbulk.ColumnMappings.Add(Name, Name);
-        objbulk.ColumnMappings.Add(ErpId, ErpId);
-        objbulk.ColumnMappings.Add(PartNumber, PartNumber);
-        objbulk.ColumnMappings.Add(Pills, Pills);
-
-        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
-        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
-
-        con.Open();
-        await objbulk.WriteToServerAsync(table);  
-        con.Close();  
+        await _db.BulkInsertAsync(entities);
     }
     
 }

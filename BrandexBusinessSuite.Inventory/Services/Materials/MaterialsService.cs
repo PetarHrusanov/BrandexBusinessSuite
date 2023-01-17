@@ -1,32 +1,23 @@
-using Microsoft.Data.SqlClient;
-
 namespace BrandexBusinessSuite.Inventory.Services.Materials;
 
-using System.Data;
-
-using Data.Enums;
-using BrandexBusinessSuite.Inventory.Models.Materials;
-using BrandexBusinessSuite.Models.ErpDocuments;
+using EFCore.BulkExtensions;
 using AutoMapper;
 using Data;
 using Microsoft.EntityFrameworkCore;
 
-using static  Common.Constants;
-using static  Common.ExcelDataConstants.Generic;
+using Data.Enums;
+using BrandexBusinessSuite.Inventory.Models.Materials;
+using BrandexBusinessSuite.Models.ErpDocuments;
+using BrandexBusinessSuite.Inventory.Data.Models;
 
 public class MaterialsService : IMaterialsService
 {
     private readonly InventoryDbContext _db;
-    private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
-    private const string Materials = "Materials";
-    private const string Type = "Type";
-    private const string Measurement = "Measurement";
 
-    public MaterialsService(InventoryDbContext db, IConfiguration configuration, IMapper mapper)
+    public MaterialsService(InventoryDbContext db, IMapper mapper)
     {
         _db = db;
-        _configuration = configuration;
         _mapper = mapper;
     }
     
@@ -35,42 +26,18 @@ public class MaterialsService : IMaterialsService
 
     public async Task UploadBulk(List<ErpProduct> products, MaterialType materialType, MaterialMeasurement materialMeasurement)
     {
-        var table = new DataTable();
-        table.TableName = Materials;
         
-        var dataColumns = new DataColumn[]
+        var entities = products.Select(product => new Material()
         {
-            new (Name),
-            new (ErpId),
-            new (PartNumber),
-            new (Type, typeof(int)),
-            new (Measurement, typeof(int)),
-            new (CreatedOn),
-            new (IsDeleted, typeof(bool)),
-        };
-        
-        table.Columns.AddRange(dataColumns);
+            Name = product.Name!.BG!.TrimEnd(),
+            ErpId = product.Id,
+            PartNumber = product.PartNumber!,
+            Type = materialType,
+            Measurement = materialMeasurement,
+            CreatedOn = DateTime.Now,
+            IsDeleted = false
+        }).ToList();
 
-        foreach (var values in products.Select(product => new object[] { product.Name.BG.TrimEnd(), product.Id, product.PartNumber, 
-                     materialType,materialMeasurement, DateTime.Now, false }))
-        {
-            table.LoadDataRow(values, true);
-        }
-
-        await using var con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-        using var objbulk = new SqlBulkCopy(con);
-        objbulk.DestinationTableName = Materials;
-
-        objbulk.ColumnMappings.Add(Name, Name);
-        objbulk.ColumnMappings.Add(ErpId, ErpId);
-        objbulk.ColumnMappings.Add(PartNumber, PartNumber);
-        objbulk.ColumnMappings.Add(Type, Type);
-        objbulk.ColumnMappings.Add(Measurement, Measurement);
-        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
-        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
-
-        con.Open();
-        await objbulk.WriteToServerAsync(table);
-        con.Close(); 
+        await _db.BulkInsertAsync(entities);
     }
 }
