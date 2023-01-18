@@ -1,8 +1,4 @@
-using System.Net.Http.Headers;
-
 namespace BrandexBusinessSuite.Inventory.Controllers;
-
-using System.Text;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

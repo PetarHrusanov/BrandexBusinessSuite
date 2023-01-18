@@ -1,10 +1,10 @@
-using System.Diagnostics;
-using BrandexBusinessSuite.Inventory.Data;
-using BrandexBusinessSuite.Inventory.Data.Models;
-using BrandexBusinessSuite.Inventory.Models.Recipes;
+namespace BrandexBusinessSuite.Inventory.Services.Recipes;
+
 using Microsoft.EntityFrameworkCore;
 
-namespace BrandexBusinessSuite.Inventory.Services.Recipes;
+using Data;
+using BrandexBusinessSuite.Inventory.Data.Models;
+using BrandexBusinessSuite.Inventory.Models.Recipes;
 
 public class RecipesService :IRecipesService
 {

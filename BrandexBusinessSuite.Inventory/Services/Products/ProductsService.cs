@@ -1,35 +1,20 @@
-using BrandexBusinessSuite.Inventory.Data.Models;
-using EFCore.BulkExtensions;
-
 namespace BrandexBusinessSuite.Inventory.Services.Products;
 
-using System.Data;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
+using EFCore.BulkExtensions;
 
 using BrandexBusinessSuite.Models.DataModels;
 using BrandexBusinessSuite.Models.ErpDocuments;
+using BrandexBusinessSuite.Inventory.Data.Models;
 
 using Data;
-
-using static  Common.Constants;
-using static  Common.ExcelDataConstants.Generic;
-
 
 public class ProductsService : IProductsService
 {
     private readonly InventoryDbContext _db;
-    private readonly IConfiguration _configuration;
+    public ProductsService(InventoryDbContext db) => _db = db;
 
-    private const string Pills = "Pills";
-
-    public ProductsService(InventoryDbContext db, IConfiguration configuration)
-    {
-        _db = db;
-        _configuration = configuration;
-    }
-    
     public async Task<List<BasicCheckErpModel>> GetProductsCheck() 
         => await _db.Products.Select(p => new BasicCheckErpModel
         { 

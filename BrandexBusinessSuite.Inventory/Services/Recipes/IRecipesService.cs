@@ -1,6 +1,6 @@
-using BrandexBusinessSuite.Inventory.Models.Recipes;
-
 namespace BrandexBusinessSuite.Inventory.Services.Recipes;
+
+using BrandexBusinessSuite.Inventory.Models.Recipes;
 
 public interface IRecipesService
 {

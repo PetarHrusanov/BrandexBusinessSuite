@@ -54,8 +54,7 @@ public class InventoryController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<ProductQuantitiesOutputModel>> GetProducts()
     {
-        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        AuthenticateUserBasicHeader(Client, _erpUserSettings.User, _erpUserSettings.Password);
 
         var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}{QueryLots}");
         var batchesList = JsonConvert.DeserializeObject<List<ErpLot>>(responseContentJObj["value"].ToString());
