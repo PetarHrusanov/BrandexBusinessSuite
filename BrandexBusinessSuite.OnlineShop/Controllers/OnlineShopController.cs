@@ -1,6 +1,4 @@
 using BrandexBusinessSuite.OnlineShop.Data.Models;
-using Newtonsoft.Json.Linq;
-using WooCommerceNET.Base;
 
 namespace BrandexBusinessSuite.OnlineShop.Controllers;
 
@@ -12,11 +10,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 using WooCommerceNET;
+using WooCommerceNET.Base;
 using WooCommerceNET.WooCommerce.v3;
 
 using BrandexBusinessSuite.Models.ErpDocuments;
@@ -97,7 +98,10 @@ public class OnlineShopController : ApiController
 
             var newestBatch = batchesList!.OrderByDescending(p=>p.ExpiryDate).ThenByDescending(p=>p.ReceiptDate).FirstOrDefault();
 
-            if (product.ErpLot !=newestBatch!.Id) await _productsService.ChangeBatch(product, newestBatch.Id);
+            if (product.ErpLot == newestBatch!.Id) continue;
+            
+            product.ErpLot = newestBatch.Id;
+            await _productsService.UpdateProduct(product);
         }
         
         return Result.Success;
@@ -133,9 +137,7 @@ public class OnlineShopController : ApiController
             var newSpeedyInput = new SpeedyInputOrder(
                 _speedyUserSettings.UsernameSpeedy,
                 _speedyUserSettings.PasswordSpeedy,
-                // new SpeedyInputOrder._Service(505, orderAmountSpeedy),
                 orderAmountSpeedy,
-                // new SpeedyInputOrder._Recipient(order),
                 order
             );
          
@@ -244,33 +246,31 @@ public class OnlineShopController : ApiController
 
             var invoiceNew = new ErpInvoice(order.id.ToString()!, $"{order.date_created:yyyy-MM-dd}");
 
-            foreach (var orderLine in orderLinesList)
+            try
             {
-                try
-                {
-                    responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_InvoiceOrderLines?$top=20&$filter=SalesOrderLine%20eq%20'{orderLine.Id}'");
-                }
-                catch
-                {
-                    continue;
-                }
-                
-                var listInvoiceOrderLine = JsonConvert.DeserializeObject<List<ErpInvoiceOrderLines>>(responseContentJObj["value"]!.ToString());
-
-                if (listInvoiceOrderLine == null || listInvoiceOrderLine.Count==0) continue; 
-                
-                var invoiceLine = new ErpInvoiceLines(listInvoiceOrderLine![0], orderLine, newDocumentId);
-                
-                invoiceNew.Lines.Add(invoiceLine);
+                responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_InvoiceOrders?$top=100&$filter=SalesOrder%20eq%20'{newDocumentId}'&$select=Id&$expand=Lines($expand=SalesOrderLine($select=Id);$select=Id,LineAmount,LineCustomDiscountPercent,ProductDescription,Quantity,QuantityBase,UnitPrice)");
+            }
+            catch
+            {
+                continue;
             }
 
+            var listInvoiceOrders = JsonConvert.DeserializeObject<List<ErpInvoiceOrder>>(responseContentJObj["value"]!.ToString());
+       
+            var listInvoiceOrderLine = listInvoiceOrders!.SelectMany(x => x.Lines);
+        
+            var invoiceLines = from orderLine in orderLinesList
+                join invoiceOrderLine in listInvoiceOrderLine on orderLine.Id equals invoiceOrderLine.SalesOrderLine.Id
+                select new ErpInvoiceLines(invoiceOrderLine, orderLine, newDocumentId);
+        
+            invoiceNew.Lines.AddRange(invoiceLines);
+            
             if (invoiceNew.Lines.Count == 0)
             {
                 continue;
             }
 
             jsonPostString = JsonConvert.SerializeObject(invoiceNew, Formatting.Indented);
-
             try
             {
                 responseContentJObj = await JObjectByUriPostRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_Invoices/", jsonPostString);
@@ -279,11 +279,10 @@ public class OnlineShopController : ApiController
             {
                 continue;
             }
-
-            if (!responseContentJObj.ContainsKey(ErpDocuments.ODataId)) continue;
             
-            var newInvoiceId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
-
+            var newInvoiceId = responseContentJObj.GetValue(ErpDocuments.ODataId)?.ToString() ?? "";
+            if (newInvoiceId == "") continue;
+            
             saleInvoiceCheck.InvoiceNumber = responseContentJObj[ErpDocuments.DocumentNo]!.ToString();
 
             try
@@ -313,14 +312,10 @@ public class OnlineShopController : ApiController
         {
             // ignored
         }
-
+        
         var speedyPrintRequest = new SpeedyPrintRequest(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy);
-        
-        foreach (var code in speedyTrackingList)
-        {
-            speedyPrintRequest.Parcels.Add(new SpeedyParcelId(code));
-        }
-        
+        speedyPrintRequest.Parcels.AddRange(speedyTrackingList.Select(code => new SpeedyParcelId(code)));
+
         var speedyContentSerialized = JsonConvert.SerializeObject(speedyPrintRequest, Formatting.Indented);
         
         var uri = new Uri("https://api.speedy.bg/v1/print");
@@ -383,15 +378,27 @@ public class OnlineShopController : ApiController
         }
         
         var memory = new MemoryStream();
-
+        
         await using (var stream = new FileStream(zipFile, FileMode.Open))
         {
             await stream.CopyToAsync(memory);
         }
-
+        
         memory.Position = 0;
-
+        
         return File(memory, "application/zip", "Collection.zip");
+        
+        // var files = Directory.GetFiles(newPath);
+        // var memory = new MemoryStream();
+        // using (var archive = new ZipArchive(memory, ZipArchiveMode.Create, true))
+        // {
+        //     foreach (var fPath in files)
+        //     {
+        //         archive.CreateEntryFromFile(fPath, Path.GetFileName(fPath));
+        //     }
+        // }
+        // memory.Position = 0;
+        // return File(memory, "application/zip", "Collection.zip");
     }
 
     [HttpPost]
@@ -460,11 +467,9 @@ public class OnlineShopController : ApiController
         var orderIds = (from order in orderList select new SpeedyReference(order.id.ToString())).ToList();
 
         var speedyRequest = new SpeedyCheckCompleted(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy, orderIds);
-        
         var jsonPostString = JsonConvert.SerializeObject(speedyRequest, Formatting.Indented);
 
         const string speedyLink = "https://api.speedy.bg/v1/track";
-        
         var responseContentJObj = await JObjectByUriPostRequest(Client, speedyLink, jsonPostString);
         
         var parcels = JsonConvert.DeserializeObject<List<SpeedyCheckCompletedResponse>>(responseContentJObj["parcels"].ToString());
@@ -508,11 +513,10 @@ public class OnlineShopController : ApiController
             product.ErpPriceNoVat = productPrice.Price.Value;
             await _productsService.UpdateProduct(product);
         }
-        
-        
+
         return Result.Success;
     }
-    
+
     private static async Task<HttpResponseMessage> ExecuteWithRetry(Uri url, StringContent contentString)
     {
         var result = new HttpResponseMessage();
