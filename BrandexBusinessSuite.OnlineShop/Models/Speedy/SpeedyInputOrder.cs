@@ -4,15 +4,26 @@ using Newtonsoft.Json;
 using WooCommerceNET.WooCommerce.v3;
 public class SpeedyInputOrder
 {
-    public SpeedyInputOrder(string userName, string password, _Service service, _Recipient recipient, string ref1)
+    // public SpeedyInputOrder(string userName, string password, _Service service, _Recipient recipient, string ref1)
+    // {
+    //     UserName = userName;
+    //     Password = password;
+    //     Service = service;
+    //     Content = new _Content();
+    //     Payment = new _Payment();
+    //     Recipient = recipient;
+    //     Ref1 = ref1;
+    // }
+    
+    public SpeedyInputOrder(string userName, string password, double orderPrice, Order order)
     {
         UserName = userName;
         Password = password;
-        Service = service;
+        Service = new _Service(orderPrice);
         Content = new _Content();
         Payment = new _Payment();
-        Recipient = recipient;
-        Ref1 = ref1;
+        Recipient = new _Recipient(order);
+        Ref1 = order.id.ToString();
     }
     
     [JsonProperty("userName")]
@@ -45,9 +56,15 @@ public class SpeedyInputOrder
     public class _Service
     {
 
-        public _Service(int serviceCode, double orderPrice)
+        // public _Service(int serviceCode, double orderPrice)
+        // {
+        //     Id = serviceCode;
+        //     AdditionalServices = new _AdditionalServices(orderPrice);
+        // }
+        
+        public _Service(double orderPrice)
         {
-            Id = serviceCode;
+            Id = 505;
             AdditionalServices = new _AdditionalServices(orderPrice);
         }
         

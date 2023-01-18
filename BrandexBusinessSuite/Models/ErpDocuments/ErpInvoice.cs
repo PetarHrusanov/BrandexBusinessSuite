@@ -21,7 +21,7 @@ public class ErpInvoice : ErpDocumentSale
         DeliveryDate = deliveryDate;
 
     }
-    
+
     public string DocumentNotes { get; set; }
     public ErpCharacteristicProductName PaymentTypeDescription { get; set; } = new ErpCharacteristicProductName("");
     public ErpCharacteristicId FromParty { get; set; }

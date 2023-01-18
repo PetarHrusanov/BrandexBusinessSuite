@@ -1,5 +1,6 @@
 using BrandexBusinessSuite.OnlineShop.Data.Models;
 using Newtonsoft.Json.Linq;
+using WooCommerceNET.Base;
 
 namespace BrandexBusinessSuite.OnlineShop.Controllers;
 
@@ -116,11 +117,11 @@ public class OnlineShopController : ApiController
             { "status","processing" },
             { "per_page","40" },
         });
-        
-        var salesInvoicesCheck = new List<SaleInvoiceCheck>();
-
         var productsDb = await _productsService.GetCheckModels();
+        var productsDict = productsDb.ToDictionary(p => p.WooCommerceName);
+        var delivery = await _deliveryPriceService.GetDeliveryPrice();
 
+        var salesInvoicesCheck = new List<SaleInvoiceCheck>();
         var speedyTrackingList = new List<string>();
         
         foreach (var order in orderList)
@@ -132,10 +133,11 @@ public class OnlineShopController : ApiController
             var newSpeedyInput = new SpeedyInputOrder(
                 _speedyUserSettings.UsernameSpeedy,
                 _speedyUserSettings.PasswordSpeedy,
-                new SpeedyInputOrder._Service(505, orderAmountSpeedy),
-                new SpeedyInputOrder._Recipient(order),
-                order.id.ToString()!
-                );
+                // new SpeedyInputOrder._Service(505, orderAmountSpeedy),
+                orderAmountSpeedy,
+                // new SpeedyInputOrder._Recipient(order),
+                order
+            );
          
             var jsonPostString = JsonConvert.SerializeObject(newSpeedyInput, Formatting.Indented);
 
@@ -157,55 +159,32 @@ public class OnlineShopController : ApiController
             speedyTrackingList.Add(speedyTracking);
             var deliveryPrice = Convert.ToDouble(responseContentJObj["price"]!["total"]!.ToString());
 
-            var saleInvoiceCheck = new SaleInvoiceCheck(
-                $"{order.date_created:yyyy-MM-dd}",
-                (double)order.total!,
-                order.shipping.first_name+" "+order.shipping.last_name,
-                order.id.ToString()!,
-                order.shipping.city,
-                deliveryPrice,
-                speedyTracking);
+            var saleInvoiceCheck = new SaleInvoiceCheck(order, deliveryPrice, speedyTracking);
             
             if (order.payment_method_title != "Наложен платеж") saleInvoiceCheck.Notes = "платена";
             
             salesInvoicesCheck.Add(saleInvoiceCheck);
 
-            var orderStatus = new Order
-            {
-                status = "shipped"
-            };
+            var erpSale = new ErpOnlineSale(order.id.ToString()!, $"{order.date_created:yyyy-MM-dd}");
 
-            try
+            var lines = order.line_items.Select(productLine =>
             {
-                await wc.Order.Update( (int)order.id!, orderStatus);
-            }
-            catch
-            {
-                continue;
-            }
+                var productCurrent = productsDict[productLine.name];
+                var discount = Math.Round((decimal)(1 - productLine.total! / productLine.subtotal!), 2);
+                return new ErpSalesLines(
+                    $"General_Products_Products({productCurrent.ErpCode})",
+                    (decimal)productLine.quantity,
+                    discount,
+                    $"Crm_ProductPrices({productCurrent.ErpPriceCode})",
+                    productCurrent.ErpPriceNoVat,
+                    $"Logistics_Inventory_Lots({productCurrent.ErpLot})"
+                );
+            });
 
-            var erpSale = new ErpOnlineSale(order.id.ToString(), $"{order.date_created:yyyy-MM-dd}");
-
-            foreach (var line in from productLine in order.line_items
-                     let productCurrent = productsDb.FirstOrDefault(p => p.WooCommerceName == productLine.name) 
-                     let discount = Math.Round((decimal)(1 - productLine.total! / productLine.subtotal!),2)
-                     select new ErpSalesLines(
-                         $"General_Products_Products({productCurrent!.ErpCode})",
-                         (decimal)productLine.quantity,
-                         discount,
-                         $"Crm_ProductPrices({productCurrent!.ErpPriceCode})",
-                         productCurrent!.ErpPriceNoVat,
-                         $"Logistics_Inventory_Lots({productCurrent!.ErpLot})"
-                     )) 
-            {
-                erpSale.Lines.Add(line);
-            }
+            erpSale.Lines.AddRange(lines);
 
             if (order.shipping_total!=0)
             {
-
-                var delivery = await _deliveryPriceService.GetDeliveryPrice();
-                
                 var line = new ErpSalesLines(
                     $"General_Products_Products({delivery.ErpId})",
                     1,
@@ -235,9 +214,8 @@ public class OnlineShopController : ApiController
             }
             
             jsonPostString = JsonConvert.SerializeObject(erpSale, Formatting.Indented);
-            
-            var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-            Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+            AuthenticateUserBasicHeader(Client, _erpUserSettings.User, _erpUserSettings.Password);
 
             try
             {
@@ -318,6 +296,24 @@ public class OnlineShopController : ApiController
             }
         }
         
+        try
+        {
+            var orders = salesInvoicesCheck.Select(p => new Order()
+            {
+                id = (ulong?)int.Parse(p.Order),
+                status = "shipped"
+            }).ToList();
+            var batch = new BatchObject<Order>
+            {
+                update = orders
+            };
+            await wc.Order.UpdateRange(batch);
+        }
+        catch
+        {
+            // ignored
+        }
+
         var speedyPrintRequest = new SpeedyPrintRequest(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy);
         
         foreach (var code in speedyTrackingList)
@@ -329,8 +325,7 @@ public class OnlineShopController : ApiController
         
         var uri = new Uri("https://api.speedy.bg/v1/print");
         var content = new StringContent(speedyContentSerialized, Encoding.UTF8, "application/json");
-
-        // var response = await Client.PostAsync(uri, content);
+        
         var response = await ExecuteWithRetry(uri, content);
         var responseContent = response.Content;
 
@@ -476,16 +471,15 @@ public class OnlineShopController : ApiController
 
         var parcelsCompleted = parcels.Where(o => o.Operations.Any(op => op.OperationCode == -14))
             .Select(r => r.Reference).ToList();
-        
-        var orderStatus = new Order
-        {
-            status = "completed"
-        };
 
-        foreach (var parcel in parcelsCompleted)
+        var orders = parcelsCompleted.Select(p => new Order
         {
-            await wc.Order.Update(Convert.ToInt32(parcel), orderStatus);
-        }
+            id = (ulong?)int.Parse(p),
+            status = "completed"
+        }).ToList();
+        
+        var batch = new BatchObject<Order> { update = orders };
+        await wc.Order.UpdateRange(batch);
 
         return Result.Success;
     }
@@ -498,8 +492,7 @@ public class OnlineShopController : ApiController
         
         var productsDb = await _productsService.GetCheckModels();
         
-        var byteArray = Encoding.ASCII.GetBytes($"{_erpUserSettings.User}:{_erpUserSettings.Password}");
-        Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+        AuthenticateUserBasicHeader(Client, _erpUserSettings.User, _erpUserSettings.Password);
 
         var queryDate =
             $"Crm_ProductPrices?$top=1000&$filter=PriceList%20eq%20'Crm_PriceLists(db6b7ec3-f3f0-4e1e-811d-5d8e9895843e)'&$select=FromDate,Id,Price,PriceList,Product&$expand=PriceList($select=Id),Product($select=Id)";

@@ -1,14 +1,16 @@
+using WooCommerceNET.WooCommerce.v3;
+
 namespace BrandexBusinessSuite.OnlineShop.Models;
 
 public class SaleInvoiceCheck
 {
-    public SaleInvoiceCheck(string date, double orderTotal, string clientName, string order, string city, double deliveryPrice, string trackingCode)
+    public SaleInvoiceCheck(Order order, double deliveryPrice, string trackingCode)
     {
-        Date = date;
-        OrderTotal = orderTotal;
-        ClientName = clientName;
-        Order = order;
-        City = city;
+        Date = $"{order.date_created:yyyy-MM-dd}";
+        OrderTotal = (double)order.total!;
+        ClientName = order.shipping.first_name+" "+order.shipping.last_name;
+        Order = order.id.ToString()!;
+        City = order.shipping.city;
         DeliveryPrice = deliveryPrice;
         TrackingCode = trackingCode;
     }
