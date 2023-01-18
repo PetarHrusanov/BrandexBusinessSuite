@@ -13,13 +13,6 @@ public class ProductsService : IProductsService
     public async Task<List<Product>> GetCheckModels()
      => await _db.Products.ToListAsync();
 
-    public async Task ChangeBatch(Product product, string erpLot)
-    {
-        var productDb = await _db.Products.Where(p => p.Id == product.Id).FirstOrDefaultAsync();
-        productDb!.ErpLot = erpLot;
-        await _db.SaveChangesAsync();
-    }
-
     public async Task UpdateProduct(Product product)
     {
         var productDb = await _db.Products.Where(p => p.Id == product.Id).FirstOrDefaultAsync();
