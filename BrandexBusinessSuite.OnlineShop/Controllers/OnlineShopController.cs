@@ -255,20 +255,15 @@ public class OnlineShopController : ApiController
                 continue;
             }
 
-            var listInvoiceOrders = JsonConvert.DeserializeObject<List<ErpInvoiceOrder>>(responseContentJObj["value"]!.ToString());
-       
-            var listInvoiceOrderLine = listInvoiceOrders!.SelectMany(x => x.Lines);
-        
+            var invoiceOrders = JsonConvert.DeserializeObject<List<ErpInvoiceOrder>>(responseContentJObj["value"]!.ToString());
+            var invoiceOrderLines = invoiceOrders!.SelectMany(x => x.Lines);
             var invoiceLines = from orderLine in orderLinesList
-                join invoiceOrderLine in listInvoiceOrderLine on orderLine.Id equals invoiceOrderLine.SalesOrderLine.Id
+                join invoiceOrderLine in invoiceOrderLines on orderLine.Id equals invoiceOrderLine.SalesOrderLine.Id
                 select new ErpInvoiceLines(invoiceOrderLine, orderLine, newDocumentId);
         
             invoiceNew.Lines.AddRange(invoiceLines);
             
-            if (invoiceNew.Lines.Count == 0)
-            {
-                continue;
-            }
+            if (invoiceNew.Lines.Count == 0) continue;
 
             jsonPostString = JsonConvert.SerializeObject(invoiceNew, Formatting.Indented);
             try
@@ -284,7 +279,6 @@ public class OnlineShopController : ApiController
             if (newInvoiceId == "") continue;
             
             saleInvoiceCheck.InvoiceNumber = responseContentJObj[ErpDocuments.DocumentNo]!.ToString();
-
             try
             {
                 await ChangeStateToRelease(Client, newInvoiceId);
@@ -365,40 +359,40 @@ public class OnlineShopController : ApiController
             workbook.Write(fs);
         }
         
-        var files = Directory.GetFiles(newPath);
-        
-        var zipFile = Path.Combine(newPath, "Collection.zip");
-        
-        using (var archive = ZipFile.Open(zipFile, ZipArchiveMode.Create))
-        {
-            foreach (var fPath in files)
-            {
-                archive.CreateEntryFromFile(fPath, Path.GetFileName(fPath));
-            }
-        }
-        
-        var memory = new MemoryStream();
-        
-        await using (var stream = new FileStream(zipFile, FileMode.Open))
-        {
-            await stream.CopyToAsync(memory);
-        }
-        
-        memory.Position = 0;
-        
-        return File(memory, "application/zip", "Collection.zip");
-        
         // var files = Directory.GetFiles(newPath);
-        // var memory = new MemoryStream();
-        // using (var archive = new ZipArchive(memory, ZipArchiveMode.Create, true))
+        //
+        // var zipFile = Path.Combine(newPath, "Collection.zip");
+        //
+        // using (var archive = ZipFile.Open(zipFile, ZipArchiveMode.Create))
         // {
         //     foreach (var fPath in files)
         //     {
         //         archive.CreateEntryFromFile(fPath, Path.GetFileName(fPath));
         //     }
         // }
+        //
+        // var memory = new MemoryStream();
+        //
+        // await using (var stream = new FileStream(zipFile, FileMode.Open))
+        // {
+        //     await stream.CopyToAsync(memory);
+        // }
+        //
         // memory.Position = 0;
+        //
         // return File(memory, "application/zip", "Collection.zip");
+        
+        var files = Directory.GetFiles(newPath);
+        var memory = new MemoryStream();
+        using (var archive = new ZipArchive(memory, ZipArchiveMode.Create, true))
+        {
+            foreach (var fPath in files)
+            {
+                archive.CreateEntryFromFile(fPath, Path.GetFileName(fPath));
+            }
+        }
+        memory.Position = 0;
+        return File(memory, "application/zip", "Collection.zip");
     }
 
     [HttpPost]
