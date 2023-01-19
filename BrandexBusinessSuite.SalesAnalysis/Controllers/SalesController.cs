@@ -173,7 +173,6 @@ public class SalesController : AdministrationController
         for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
         {
             var row = sheet.GetRow(i);
-
             if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
             var newSale = new SaleInputModel
@@ -299,17 +298,12 @@ public class SalesController : AdministrationController
     private async Task CreateHeaderColumnsAsync(IRow row)
     {
         var products = await _productsService.GetAllCheck();
-        row.CreateCell(0).SetCellValue("Pharmacy Name");
-        row.CreateCell(1).SetCellValue("Pharmacy Address");
-        row.CreateCell(2).SetCellValue("Pharmacy Class");
-        row.CreateCell(3).SetCellValue("Region");
+        var headers = new[] { "Pharmacy Name", "Pharmacy Address", "Pharmacy Class", "Region"};
+        
+        foreach (var header in headers) row.CreateCell(row.Cells.Count).SetCellValue(header);
+        foreach (var product in products) row.CreateCell(row.Cells.Count).SetCellValue(product.Name);
 
-        foreach (var product in products)
-        {
-            row.CreateCell(row.Cells.Count()).SetCellValue(product.Name);
-        }
-
-        row.CreateCell(row.Cells.Count()).SetCellValue("SumSale");
+        row.CreateCell(row.Cells.Count).SetCellValue("SumSale");
     }
 
     private static void CreatePharmacySalesRow(ISheet excelSheet, IEnumerable<PharmacyExcelModel> collectionPharmacies,
@@ -323,32 +317,23 @@ public class SalesController : AdministrationController
             row.CreateCell(row.Cells.Count).SetCellValue(pharmacy.Address);
             row.CreateCell(row.Cells.Count).SetCellValue(pharmacy.PharmacyClass.ToString());
             row.CreateCell(row.Cells.Count).SetCellValue(pharmacy.Region);
+            
+            var filteredSales = currentDate != null 
+                ? pharmacy.Sales.Where(i => i.Date == currentDate) 
+                : pharmacy.Sales;
 
-            if (currentDate != null)
+            foreach (var product in products)
             {
-                foreach (var product in products)
-                {
-                    var sumCount = pharmacy.Sales.Where(i => i.ProductId == product.Id && i.Date == currentDate)
-                        .Sum(b => b.Count);
-                    row.CreateCell(row.Cells.Count()).SetCellValue(sumCount);
-                }
-
-                row.CreateCell(row.Cells.Count())
-                    .SetCellValue(pharmacy.Sales.Select(p => p.ProductPrice * p.Count).Sum());
-
-                row.CreateCell(row.Cells.Count()).SetCellValue(currentDate.ToString());
+                var sumCount = filteredSales.Where(i => i.ProductId == product.Id).Sum(b => b.Count);
+                row.CreateCell(row.Cells.Count).SetCellValue(sumCount);
             }
-            else
-            {
-                foreach (var product in products)
-                {
-                    var sumCount = pharmacy.Sales.Where(i => i.ProductId == product.Id).Sum(b => b.Count);
-                    row.CreateCell(row.Cells.Count()).SetCellValue(sumCount);
-                }
 
-                row.CreateCell(row.Cells.Count())
-                    .SetCellValue(pharmacy.Sales.Select(p => p.ProductPrice * p.Count).Sum());
-            }
+            var totalCell = row.CreateCell(products.Count);
+            totalCell.SetCellValue(filteredSales.Select(p => p.ProductPrice * p.Count).Sum());
+
+            if (currentDate == null) continue;
+            var dateCell = row.CreateCell(products.Count + 1);
+            dateCell.SetCellValue(currentDate.ToString());
         }
     }
 }

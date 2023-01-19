@@ -86,38 +86,61 @@ public class PharmacyChainsService : IPharmacyChainsService
         }).ToListAsync();
     }
     
+    // public async Task BulkUpdateData(List<BasicCheckErpModel> list)
+    // {
+    //     var dt = ConvertToDataTable(list);
+    //     
+    //     var connection = _configuration.GetConnectionString("DefaultConnection");
+    //
+    //     await using var conn = new SqlConnection(connection);
+    //     await using var command = new SqlCommand($"CREATE TABLE #TmpTable(Id smallint NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(50) NOT NULL)", conn);
+    //     try
+    //     {
+    //         conn.Open();
+    //         command.ExecuteNonQuery();
+    //
+    //         using (var bulkCopy = new SqlBulkCopy(conn))
+    //         {
+    //             bulkCopy.BulkCopyTimeout = 6600;
+    //             bulkCopy.DestinationTableName = "#TmpTable";
+    //             await bulkCopy.WriteToServerAsync(dt);
+    //             bulkCopy.Close();
+    //         }
+    //
+    //         command.CommandTimeout = 3000;
+    //         command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{PharmacyChains}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
+    //         command.ExecuteNonQuery();
+    //     }
+    //     catch (Exception)
+    //     {
+    //         // Handle exception properly
+    //     }
+    //     finally
+    //     {
+    //         conn.Close();
+    //     }
+    // }
+    
     public async Task BulkUpdateData(List<BasicCheckErpModel> list)
     {
         var dt = ConvertToDataTable(list);
-        
+
         var connection = _configuration.GetConnectionString("DefaultConnection");
 
         await using var conn = new SqlConnection(connection);
+        await conn.OpenAsync();
+
         await using var command = new SqlCommand($"CREATE TABLE #TmpTable(Id smallint NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(50) NOT NULL)", conn);
-        try
-        {
-            conn.Open();
-            command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
 
-            using (var bulkCopy = new SqlBulkCopy(conn))
-            {
-                bulkCopy.BulkCopyTimeout = 6600;
-                bulkCopy.DestinationTableName = "#TmpTable";
-                await bulkCopy.WriteToServerAsync(dt);
-                bulkCopy.Close();
-            }
+        using (var bulkCopy = new SqlBulkCopy(conn))
+        {
+            bulkCopy.DestinationTableName = "#TmpTable";
+            await bulkCopy.WriteToServerAsync(dt);
+        }
 
-            command.CommandTimeout = 3000;
-            command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{PharmacyChains}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
-            command.ExecuteNonQuery();
-        }
-        catch (Exception)
-        {
-            // Handle exception properly
-        }
-        finally
-        {
-            conn.Close();
-        }
+        command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{PharmacyChains}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
+        await command.ExecuteNonQueryAsync();
     }
+
 }
