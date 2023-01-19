@@ -85,7 +85,6 @@ public class PharmaciesController : AdministrationController
         for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)
         {
             var row = sheet.GetRow(i);
-
             if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
             var pharmacyDisplay = inputModel.Distributor switch
@@ -96,7 +95,6 @@ public class PharmaciesController : AdministrationController
                 Sopharma => CreatePharmacyDisplayModel(row, 5, 6, 8, 4, 7, 9),
                 _ => new PharmacyDisplayModel()
             };
-            
             pharmaciesFile.Add(pharmacyDisplay);
         }
         
@@ -117,16 +115,7 @@ public class PharmaciesController : AdministrationController
                 pharmaciesErpSelected = pharmaciesErp.Where(p => p.SopharmaId is { Value: { } }).Select(p=>p.SopharmaId.Value).ToList();
                 break;
         }
-        
-        // OPTIMISATION VERSION
-        // var pharmaciesErpSelected = pharmaciesErp.SelectMany(p => p.GetType()
-        //         .GetProperties()
-        //         .Where(x => x.Name.Equals($"{inputModel.Distributor}Id"))
-        //         .Select(x => x.GetValue(p))
-        //         .Where(x => x != null)
-        //         .Select(x => x.ToString()))
-        //     .ToList();
-        
+
         return pharmaciesFile.Where(pharmacy => !pharmaciesErpSelected.Contains(pharmacy.Code)).ToList();
     }
     
@@ -140,7 +129,8 @@ public class PharmaciesController : AdministrationController
         var pharmaciesErp = await GetPharmaciesErp(true);
         
         var citiesCheck = await _citiesService.GetAllCheck();
-        var citiesErpDistinct = await GetCitiesErp(false);
+        var citiesErp = await GetCitiesErp();
+        var citiesErpDistinct = citiesErp.DistinctBy(c => c.City?.ValueId).ToList();;
         var citiesNew = citiesErpDistinct.Where(c => citiesCheck.All(i => i.ErpId != c.City!.ValueId)).ToList();
         await _citiesService.UploadBulk(citiesNew);
         citiesCheck = await _citiesService.GetAllCheck();
@@ -149,7 +139,7 @@ public class PharmaciesController : AdministrationController
             .Where(c => c != null)
             .Distinct()
             .Where(c => citiesCheck.All(cc => cc.Name!.ToUpper().TrimEnd() != c.Value!.ToUpper().TrimEnd()))
-            .Select(c => new BasicCheckErpModel
+            .Select(c => new BasicCheckErpModel 
             {
                 Id = (int)citiesCheck.FirstOrDefault(cc => cc.ErpId == c.ValueId!.TrimEnd())?.Id!,
                 Name = c.Value!.ToUpper().TrimEnd(),
@@ -159,46 +149,57 @@ public class PharmaciesController : AdministrationController
         await _citiesService.BulkUpdateData(citiesForUpdate);
 
         var pharmacyChainsCheck = await _pharmacyChainsService.GetAllCheck();
+        var pharmacyChainDict = pharmacyChainsCheck.DistinctBy(c => c.ErpId)
+            .ToList().ToDictionary(p => p.ErpId);
         var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain?.Value != null & c.PharmacyChain?.ValueId!=null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
         var pharmacyChainsNew = pharmacyChainsErpDistinct
-            .Where(p => pharmacyChainsCheck.All(i=> !string.Equals(i.ErpId, p.PharmacyChain!.ValueId, StringComparison.InvariantCultureIgnoreCase))).ToList();
+            .Where(p => !pharmacyChainDict.ContainsKey(p.PharmacyChain!.ValueId!)).ToList();
         await _pharmacyChainsService.UploadBulk(pharmacyChainsNew);
+        
         pharmacyChainsCheck = await _pharmacyChainsService.GetAllCheck();
-        var pharmacyChainsForUpdate = (from pharmacyChain in pharmacyChainsErpDistinct
-            where pharmacyChainsCheck.All(ph => ph.Name!.ToUpper().TrimEnd() != pharmacyChain.PharmacyChain!.Value!.ToUpper().TrimEnd()) 
-            select new BasicCheckErpModel
-            {
-                Id = pharmacyChainsCheck.FirstOrDefault(c => string.Equals(c.ErpId!.TrimEnd(), pharmacyChain.PharmacyChain!.ValueId!.TrimEnd(), StringComparison.InvariantCultureIgnoreCase))!.Id, 
-                Name = pharmacyChain.PharmacyChain!.Value!.ToUpper().TrimEnd(), 
-                ErpId = pharmacyChain.PharmacyChain!.ValueId!.TrimEnd()
+        pharmacyChainDict = pharmacyChainsCheck.DistinctBy(c => c.ErpId)
+            .ToList().ToDictionary(p => p.ErpId);
+        
+        var pharmacyChainsForUpdate = pharmacyChainsErpDistinct
+            .Where(p=>pharmacyChainDict.TryGetValue(p.PharmacyChain!.ValueId!, out var item) && item!=null && item.Name!.ToUpper().TrimEnd() != p.PharmacyChain!.Value!.ToUpper().TrimEnd())
+            .Select(p=>new BasicCheckErpModel 
+            { 
+                Id = pharmacyChainDict[p.PharmacyChain!.ValueId!].Id, 
+                Name = p.PharmacyChain!.Value!.ToUpper().TrimEnd(), 
+                ErpId = p.PharmacyChain!.ValueId!.TrimEnd() 
             }).ToList();
         await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
         
         var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetAllCheck();
+        var pharmacyCompaniesErpCheckDict = pharmacyCompaniesErpCheck.DistinctBy(c => c.ErpId).ToDictionary(p => p.ErpId, p => p);
         var pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty?.PartyName?.BG != null && c.ParentParty.PartyId!=null).DistinctBy(c => c.ParentParty.PartyId).ToList();
-        var pharmacyCompaniesNew = pharmacyCompaniesErpDistinct
-            .Where(p => pharmacyCompaniesErpCheck.All(i => i.ErpId != p.ParentParty!.PartyId)).ToList();
-        await _pharmacyCompaniesService.UploadBulk(pharmacyCompaniesNew);
+        var pharmaciesCompaniesNew = pharmacyCompaniesErpDistinct
+            .Where(p => !pharmacyCompaniesErpCheckDict.ContainsKey(p.ParentParty!.PartyId!)).ToList();
+        await _pharmacyCompaniesService.UploadBulk(pharmaciesCompaniesNew);
+        
         pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetAllCheck();
-        var pharmacyCompaniesForUpdate = (from pharmacyCompany in pharmacyCompaniesErpDistinct
-            where pharmacyCompaniesErpCheck.All(pc => pc.Name!.ToUpper().TrimEnd() != pharmacyCompany.ParentParty!.PartyName!.BG!.ToUpper().TrimEnd()) 
-            select new BasicCheckErpModel
+        pharmacyCompaniesErpCheckDict = pharmacyCompaniesErpCheck.DistinctBy(c => c.ErpId).ToDictionary(p => p.ErpId, p => p);
+
+        var pharmacyCompaniesForUpdate = pharmacyCompaniesErpDistinct
+            .Where(p => pharmacyCompaniesErpCheckDict.TryGetValue(p.ParentParty!.PartyId!, out var item) && item.Name!.ToUpper().TrimEnd() != p.ParentParty.PartyName!.BG!.ToUpper().TrimEnd())
+            .Select(p => new BasicCheckErpModel
             {
-                Id = pharmacyCompaniesErpCheck.FirstOrDefault(pc => pc.ErpId == pharmacyCompany.ParentParty!.PartyId!.TrimEnd())!.Id,
-                Name = pharmacyCompany.ParentParty!.PartyName!.BG!.ToUpper().TrimEnd(),
-                ErpId = pharmacyCompany.ParentParty.PartyId!.TrimEnd()
+                Id = pharmacyCompaniesErpCheckDict[p.ParentParty!.PartyId!].Id,
+                Name = p.ParentParty.PartyName!.BG!.ToUpper().TrimEnd(),
+                ErpId = p.ParentParty.PartyId!.TrimEnd()
             }).ToList();
         await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
         
         var regionsCheck = await _regionsService.GetAllCheck();
+        var regionsCheckDict = regionsCheck.ToDictionary(p => p.ErpId);
         var regionsForUpdate = pharmaciesErp
             .Select(c => c.Region)
-            .Where(r => r != null)
+            .Where(r => r is { Value: { }, ValueId: { } })
             .Distinct()
-            .Where(r => regionsCheck.All(rc => rc.Name?.ToUpper().TrimEnd() != r.Value?.ToUpper().TrimEnd()))
+            .Where(r => regionsCheckDict.TryGetValue(r.ValueId!, out var item) && item.Name?.ToUpper().TrimEnd() != r.Value?.ToUpper().TrimEnd())
             .Select(r => new BasicCheckErpModel
             {
-                Id = (int)regionsCheck.FirstOrDefault(rc => rc.ErpId == r.ValueId)?.Id!,
+                Id = regionsCheckDict[r.ValueId!].Id,
                 Name = r.Value!.ToUpper().TrimEnd(),
                 ErpId = r.ValueId
             })
@@ -222,8 +223,6 @@ public class PharmaciesController : AdministrationController
                                       && p.ParentParty!.PartyId!="068dd627-7837-4dac-8e0e-a34c16717599"
             )
             .Where(p => pharmaciesErpCheck.All(i => i.ErpId != p.PartyId)).ToList();
-        
-        var citiesErpWithPartyId = await GetCitiesErp(true);
 
         if (pharmaciesNew.Any(pharmacy => pharmacy.PharmacyChain == null))
             return Result.Failure("Some pharmacies don't have a chain");
@@ -233,10 +232,7 @@ public class PharmaciesController : AdministrationController
             return Result.Failure("Some pharmacies don't have a region");
 
         var pharmaciesErpDict = pharmaciesErpDistinct.ToDictionary(p => p.PartyId);
-        var pharmacyCompaniesDict = pharmaciesErpCheck.ToDictionary(p => p.ErpId);
-        var regionsCheckDict = regionsCheck.ToDictionary(p => p.ErpId);
-        var pharmacyChainDict = pharmacyChainsCheck.DistinctBy(c => c.ErpId).ToList().ToDictionary(p => p.ErpId);
-        
+
         var pharmaciesForUpload = pharmaciesNew.Select(pharmacy => new PharmacyDbInputModel
         {
             BrandexId = int.Parse(pharmacy.PartyCode!),
@@ -244,11 +240,11 @@ public class PharmaciesController : AdministrationController
             PharmacyClass = pharmacy.Class != null ? (PharmacyClass)Enum.Parse(typeof(PharmacyClass), pharmacy.Class.Value!.TrimEnd(), true) : PharmacyClass.Other,
             Address = pharmacy.Address!.Value,
             Active = (bool)pharmacy.IsActive!,
-            CompanyId = pharmacyCompaniesDict.TryGetValue(pharmacy?.ParentParty.PartyId.TrimEnd(), out var company) ? company.Id :0 ,
-            CityId = citiesCheck.FirstOrDefault(c => c.ErpId == citiesErpWithPartyId.FirstOrDefault(c => c.Party!.PartyId == pharmacy.PartyId)?.City!.ValueId)?.Id ?? 0,
-            RegionId = regionsCheckDict.TryGetValue(pharmacy.Region.ValueId, out var region) ? region.Id : 0,
+            CompanyId = pharmacyCompaniesErpCheckDict.TryGetValue(pharmacy?.ParentParty?.PartyId?.TrimEnd() ?? string.Empty, out var company) ? company.Id :0 ,
+            CityId = citiesCheck.FirstOrDefault(c => c.ErpId == citiesErp.FirstOrDefault(c => c.Party!.PartyId == pharmacy.PartyId)?.City!.ValueId)?.Id ?? 0,
+            RegionId = regionsCheckDict.TryGetValue(pharmacy.Region!.ValueId ?? string.Empty, out var region) ? region.Id : 0,
             ErpId = pharmacy.PartyId,
-            PharmacyChainId = pharmacyChainDict.TryGetValue(pharmacy.PharmacyChain.ValueId, out var pharmacyChain) ? pharmacyChain.Id : 0,
+            PharmacyChainId = pharmacyChainDict.TryGetValue(pharmacy.PharmacyChain!.ValueId!, out var pharmacyChain) ? pharmacyChain.Id : 0,
             PharmnetId = pharmacy.PharmnetId?.Value != null ? int.Parse(pharmacy.PharmnetId.Value) : (int?)null,
             PhoenixId = pharmacy.PhoenixId?.Value != null ? int.Parse(pharmacy.PhoenixId.Value) : (int?)null,
             SopharmaId = pharmacy.SopharmaId?.Value != null ? int.Parse(pharmacy.SopharmaId.Value) : (int?)null,
@@ -259,7 +255,6 @@ public class PharmaciesController : AdministrationController
 
         var pharmaciesCheck = await _pharmaciesService.GetAllCheckErp();
         pharmaciesCheck = pharmaciesCheck.Where(p => p.ErpId != "e6400a83-398c-496d-bf7d-558104e978a3").ToList();
-        
 
         var pharmaciesForUpdate = new List<PharmacyDbUpdateModel>();
 
@@ -272,33 +267,17 @@ public class PharmaciesController : AdministrationController
             {
                 Id = pharmacy.Id,
                 Address = pharmacyErp!.Address?.Value?.ToUpper().TrimEnd() ?? pharmacy.Address,
-                CompanyId = pharmacy.CompanyId,
+                CompanyId = pharmacyCompaniesErpCheckDict.TryGetValue(pharmacyErp?.ParentParty?.PartyId?.TrimEnd() ?? string.Empty, out var company) ? company.Id : pharmacy.CompanyId,
                 Name = pharmacyErp!.LocationName?.BG?.ToUpper().TrimEnd() ?? pharmacy.Name,
-                PharmacyChainId = pharmacy.PharmacyChainId,
-                PharmnetId = int.TryParse(pharmacyErp!.PharmnetId?.Value?.TrimEnd(), out var pharmnetParsed) ? pharmnetParsed : pharmacy.PharmnetId,
-                PhoenixId = int.TryParse(pharmacyErp.PhoenixId?.Value?.TrimEnd(), out var phoenixParsed) ? phoenixParsed : pharmacy.PhoenixId,
-                RegionId = pharmacy.RegionId,
-                SopharmaId = int.TryParse(pharmacyErp.SopharmaId?.Value?.TrimEnd(), out var sopharmaParsed) ? sopharmaParsed : pharmacy.SopharmaId,
-                StingId = int.TryParse(pharmacyErp.StingId?.Value?.TrimEnd(), out var stingParsed) ? stingParsed : pharmacy.StingId,
+                PharmacyChainId = pharmacyChainDict.TryGetValue(pharmacyErp?.PharmacyChain?.ValueId ?? string.Empty, out var pharmacyChain) ? pharmacyChain.Id : pharmacy.PharmacyChainId,
+                PharmnetId = int.TryParse(pharmacyErp?.PharmnetId?.Value?.TrimEnd(), out var pharmnetParsed) ? pharmnetParsed : pharmacy.PharmnetId,
+                PhoenixId = int.TryParse(pharmacyErp?.PhoenixId?.Value?.TrimEnd(), out var phoenixParsed) ? phoenixParsed : pharmacy.PhoenixId,
+                RegionId = regionsCheckDict.TryGetValue(pharmacyErp?.Region?.ValueId ?? string.Empty, out var region) ? region.Id : pharmacy.RegionId,
+                SopharmaId = int.TryParse(pharmacyErp?.SopharmaId?.Value?.TrimEnd(), out var sopharmaParsed) ? sopharmaParsed : pharmacy.SopharmaId,
+                StingId = int.TryParse(pharmacyErp?.StingId?.Value?.TrimEnd(), out var stingParsed) ? stingParsed : pharmacy.StingId,
                 ModifiedOn = DateTime.Now
             };
             
-            if (pharmacyErp?.ParentParty?.PartyId != null 
-                && pharmacyCompaniesDict.TryGetValue(pharmacyErp?.ParentParty.PartyId.TrimEnd(), out var company))
-            {
-                pharmacyChanged.CompanyId = company.Id;
-            }
-            
-            if (pharmacyErp!.Region?.ValueId != null && regionsCheckDict.TryGetValue(pharmacyErp.Region.ValueId, out var region))
-            {
-                pharmacyChanged.RegionId = region.Id;
-            }
-            
-            if (pharmacyErp.PharmacyChain?.ValueId != null && pharmacyChainDict.TryGetValue(pharmacyErp.PharmacyChain.ValueId, out var pharmacyChain))
-            {
-                pharmacyChanged.PharmacyChainId = pharmacyChain.Id;
-            }
-
             if (pharmacy.Address!=pharmacyChanged.Address || pharmacy.Name!=pharmacyChanged.Name || pharmacy.PharmnetId!=pharmacyChanged.PharmnetId
                 || pharmacy.PhoenixId!=pharmacyChanged.PhoenixId || pharmacy.RegionId != pharmacyChanged.RegionId || pharmacy.SopharmaId != pharmacyChanged.SopharmaId
                 || pharmacy.StingId != pharmacyChanged.StingId || pharmacy.CompanyId != pharmacyChanged.CompanyId || pharmacy.PharmacyChainId != pharmacyChanged.PharmacyChainId
@@ -307,20 +286,17 @@ public class PharmaciesController : AdministrationController
                 pharmaciesForUpdate.Add(pharmacyChanged);
             }
         }
-
-
         await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
-
+        
         return Result.Success;
     }
 
-    private static async Task<List<ErpCityCheck>> GetCitiesErp(bool withIds)
+    private static async Task<List<ErpCityCheck>> GetCitiesErp()
     {
-        var citiesQuery = "Crm_Customers?$top=60000&$select=CustomProperty_GRAD_u002DKLIENT";
-        if (withIds) citiesQuery += ",Id&$expand=Party($select=PartyId)";
+        const string citiesQuery = "Crm_Customers?$top=60000&$select=CustomProperty_GRAD_u002DKLIENT,Id&$expand=Party($select=PartyId)";
         var responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpConstants.ErpRequests.BaseUrl}{citiesQuery}");
         var citiesErp = JsonConvert.DeserializeObject<List<ErpCityCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
-        return withIds ? citiesErp.Where(c => c.City is { Value: { } }).ToList() : citiesErp.Where(c => c.City is { Value: { } }).DistinctBy(c => c.City.ValueId).ToList();
+        return citiesErp!.Where(c => c.City is { Value: { } }).ToList();
     }
 
     private static async Task<List<ErpPharmacyCheck>> GetPharmaciesErp(bool filtered)
@@ -330,31 +306,6 @@ public class PharmaciesController : AdministrationController
         return JsonConvert.DeserializeObject<List<ErpPharmacyCheck>>(responseContentJObj["value"]?.ToString() ?? throw new InvalidOperationException("No result for the request"));
     }
 
-    // private static PharmacyDisplayModel CreatePharmacyDisplayModel(IRow row, int codeRow, int nameRow, int addressRow, int cityRow, int vatRow, int? chainRow)
-    // {
-    //     var pharmacy = new PharmacyDisplayModel();
-    //     var codeCell = row.GetCell(codeRow);
-    //     if (codeCell!=null) pharmacy.Code = codeCell.ToString()?.TrimEnd();
-    //     
-    //     var nameCell = row.GetCell(nameRow);
-    //     if (nameCell!=null) pharmacy.Name = nameCell.ToString()?.TrimEnd();
-    //
-    //     var addressCell = row.GetCell(addressRow);
-    //     if (addressCell!=null) pharmacy.Address = addressCell.ToString()?.TrimEnd();
-    //
-    //     var cityCell = row.GetCell(cityRow);
-    //     if (cityCell!=null) pharmacy.City = cityCell.ToString()?.TrimEnd();
-    //
-    //     var vatCell = row.GetCell(vatRow);
-    //     if (vatCell!=null) pharmacy.Vat = vatCell.ToString()?.TrimEnd();
-    //
-    //     if (chainRow == null) return pharmacy;
-    //     var chainCell = row.GetCell((int)chainRow);
-    //     if (chainCell!=null) pharmacy.PharmacyChain = chainCell.ToString()?.TrimEnd();
-    //     
-    //     return pharmacy;
-    // }
-    
     private static PharmacyDisplayModel CreatePharmacyDisplayModel(IRow row, int codeRow, int nameRow, int addressRow, int cityRow, int vatRow, int? chainRow)
     {
         var pharmacy = new PharmacyDisplayModel
@@ -369,8 +320,6 @@ public class PharmaciesController : AdministrationController
         return pharmacy;
     }
 
-    private static string? GetCellValue(IRow row, int? index)
-    {
-        return index != null ? row.GetCell((int)index)?.ToString() : null;
-    }
+    private static string? GetCellValue(IRow row, int? index) 
+        => index != null ? row.GetCell((int)index)?.ToString() : null;
 }

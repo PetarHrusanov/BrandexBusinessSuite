@@ -9,6 +9,5 @@ public class ErpCityCheck
     
     [JsonProperty("CustomProperty_GRAD_u002DKLIENT")]
     public ErpCharacteristicValueValueId? City { get; set; }
-    
     public ErpToPartyAnalysis? Party { get; set; }
 }
