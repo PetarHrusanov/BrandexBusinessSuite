@@ -1,4 +1,7 @@
-﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Pharmacies;
+﻿using BrandexBusinessSuite.SalesAnalysis.Data.Models;
+using EFCore.BulkExtensions;
+
+namespace BrandexBusinessSuite.SalesAnalysis.Services.Pharmacies;
 
 using System;
 using System.Collections.Generic;
@@ -35,86 +38,28 @@ public class PharmaciesService : IPharmaciesService
 
     public async Task UploadBulk(List<PharmacyDbInputModel> pharmacies)
     {
-        var table = new DataTable();
-        table.TableName = Pharmacies;
-            
-        table.Columns.Add(BrandexId);
-        table.Columns.Add(Name);
-        table.Columns.Add(PharmacyClass, typeof(int));
-        table.Columns.Add(Active, typeof(bool));
-        table.Columns.Add(CompanyId);
-        table.Columns.Add(PharmacyChainId);
-        table.Columns.Add(Address);
-        table.Columns.Add(CityId);
-        table.Columns.Add(PharmnetId);
-        table.Columns.Add(PhoenixId);
-        table.Columns.Add(SopharmaId);
-        table.Columns.Add(StingId);
-        table.Columns.Add(RegionId);
         
-        table.Columns.Add(ErpId);
-            
-        table.Columns.Add(CreatedOn);
-        table.Columns.Add(IsDeleted, typeof(bool));
-
-        foreach (var pharmacy in pharmacies)
+        var entities = pharmacies.Select(o => new Pharmacy
         {
-            var row = table.NewRow();
-            row[BrandexId] = pharmacy.BrandexId;
-            row[Name] = pharmacy.Name;
-            row[PharmacyClass] = pharmacy.PharmacyClass;
-            row[Active] = pharmacy.Active;
-            row[CompanyId] = pharmacy.CompanyId;
-            row[PharmacyChainId] = pharmacy.PharmacyChainId;
-            row[Address] = pharmacy.Address;
-            row[CityId] = pharmacy.CityId;
-
-            row[PharmnetId] = pharmacy.PharmnetId;
-            row[PhoenixId] = pharmacy.PhoenixId;
-            row[SopharmaId] = pharmacy.SopharmaId;
-            row[StingId] = pharmacy.StingId;
-                
-            row[RegionId] = pharmacy.RegionId;
-            
-            row[ErpId] = pharmacy.ErpId;
-            
-            row[CreatedOn] = DateTime.Now;
-            row[IsDeleted] = false;
-            
-            table.Rows.Add(row);
-        }
-
-        var connection = _configuration.GetConnectionString("DefaultConnection");
-            
-        var con = new SqlConnection(connection);
-            
-        var objbulk = new SqlBulkCopy(con);  
-            
-        objbulk.DestinationTableName = Pharmacies;
-            
-        objbulk.ColumnMappings.Add(BrandexId, BrandexId);
-        objbulk.ColumnMappings.Add(Name, Name); 
-        objbulk.ColumnMappings.Add(PharmacyClass, PharmacyClass); 
-        objbulk.ColumnMappings.Add(Active, Active); 
-        objbulk.ColumnMappings.Add(CompanyId, CompanyId); 
-        objbulk.ColumnMappings.Add(PharmacyChainId, PharmacyChainId); 
-        objbulk.ColumnMappings.Add(Address, Address); 
-        objbulk.ColumnMappings.Add(CityId, CityId); 
-        objbulk.ColumnMappings.Add(PharmnetId, PharmnetId);
-        objbulk.ColumnMappings.Add(PhoenixId, PhoenixId); 
-        objbulk.ColumnMappings.Add(SopharmaId, SopharmaId); 
-        objbulk.ColumnMappings.Add(StingId, StingId); 
-        objbulk.ColumnMappings.Add(RegionId, RegionId); 
+            BrandexId = o.BrandexId,
+            Name = o.Name,
+            PharmacyClass = o.PharmacyClass,
+            Active = o.Active,
+            CompanyId = o.CompanyId,
+            PharmacyChainId = o.PharmacyChainId,
+            Address = o.Address,
+            CityId = o.CityId,
+            PharmnetId = o.PharmnetId,
+            PhoenixId = o.PhoenixId,
+            SopharmaId = o.SopharmaId,
+            StingId = o.StingId,
+            RegionId = o.RegionId,
+            ErpId = o.ErpId,
+            CreatedOn = DateTime.Now,
+            IsDeleted = false
+        }).ToList();
         
-        objbulk.ColumnMappings.Add(ErpId, ErpId); 
-        
-        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
-        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
-            
-        con.Open();
-        await objbulk.WriteToServerAsync(table);  
-        con.Close(); 
-            
+        await _db.BulkInsertAsync(entities);
     }
 
     public async Task<List<PharmacyCheckErpModel>> GetAllCheckErp()
@@ -147,46 +92,25 @@ public class PharmaciesService : IPharmaciesService
 
     public async Task<List<PharmacyExcelModel>> GetPharmaciesExcelModel(DateTime? dateBegin, DateTime? dateEnd, int? regionId)
     {
-        if (regionId!=null)
-        {
-            return await _db.Pharmacies
-                .Where(p => p.RegionId == regionId)
-                .Select(p => new PharmacyExcelModel
-                {
-                    Name = p.Name,
-                    Address = p.Address,
-                    PharmacyClass = p.PharmacyClass,
-                    Region = p.Region.Name,
-                    Sales = p.Sales
-                        .Where(d => d.Date >= dateBegin &&  d.Date<=dateEnd)
-                        .Select(s => new SaleExcelOutputModel
-                        {
-                            Name = s.Product.Name,
-                            ProductId = s.ProductId,
-                            Count = s.Count,
-                            ProductPrice = s.Product.Price
-                            // Date = date
-                        }).ToList()
-                }).ToListAsync();
-        }
-
-        return await _db.Pharmacies.Select(p => new PharmacyExcelModel
-        {
+        var pharmacies = _db.Pharmacies.AsQueryable();
+        if (regionId != null) pharmacies = pharmacies.Where(p => p.RegionId == regionId);
+        
+        return await pharmacies.Select(p => new PharmacyExcelModel 
+        { 
             Name = p.Name,
             Address = p.Address,
             PharmacyClass = p.PharmacyClass,
             Region = p.Region.Name,
             Sales = p.Sales
                 .Where(d => d.Date >= dateBegin &&  d.Date<=dateEnd)
-                .Select(s => new SaleExcelOutputModel
-                {
-                    Name = s.Product.Name,
-                    ProductId = s.ProductId,
-                    Count = s.Count,
-                    ProductPrice = s.Product.Price
+                .Select(s => new SaleExcelOutputModel 
+                { 
+                    Name = s.Product.Name, 
+                    ProductId = s.ProductId, 
+                    Count = s.Count, 
+                    ProductPrice = s.Product.Price 
                 }).ToList()
         }).ToListAsync();
-
     }
 
     public async Task BulkUpdateData(List<PharmacyDbUpdateModel> list)
@@ -238,5 +162,4 @@ public class PharmaciesService : IPharmaciesService
             SopharmaId = p.SopharmaId
         }).ToListAsync();
     }
-    
 }

@@ -261,21 +261,39 @@ public class SalesController : AdministrationController
         IDictionary<int, string> errorDictionary, string distributor, int dateColumn, int productIdColumn,
         int pharmacyIdColumn, int saleCountColumn)
     {
-        var dateRow = row.GetCell(dateColumn);
+        // var dateRow = row.GetCell(dateColumn);
+        // if (dateRow.CellType != CellType.Numeric)
+        // {
+        //     errorDictionary[i + 1] = IncorrectDateFormat;
+        //     return;
+        // }
+        // newSale.Date = DateTime.FromOADate(dateRow.NumericCellValue);
+        
+        // if (!DateTime.TryParse(row.GetCell(dateColumn).ToString(), out var date))
+        // {
+        //     errorDictionary[i + 1] = IncorrectDateFormat;
+        //     return;
+        // }
+        // newSale.Date = date;
+        
+        try
+        {
+            newSale.Date = DateTime.FromOADate(row.GetCell(dateColumn).NumericCellValue);
+        }
+        catch (Exception)
+        {
+            errorDictionary[i + 1] = IncorrectDateFormat;
+            return;
+        }
 
-        if (dateRow.CellType == CellType.Numeric) newSale.Date = DateTime.FromOADate(dateRow.NumericCellValue);
-
-        var productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor,
-            productIdsForCheck);
-        var pharmacyIdRow = ResolvePharmacyId(row.GetCell(pharmacyIdColumn).ToString()?.TrimEnd(), distributor,
-            pharmacyIdsForCheck);
-
+        var productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor, productIdsForCheck);
         if (productRow == 0)
         {
             errorDictionary[i + 1] = IncorrectProductId;
             return;
         }
-
+        
+        var pharmacyIdRow = ResolvePharmacyId(row.GetCell(pharmacyIdColumn).ToString()?.TrimEnd(), distributor, pharmacyIdsForCheck);
         if (pharmacyIdRow == 0)
         {
             errorDictionary[i + 1] = IncorrectPharmacyId;
@@ -283,7 +301,6 @@ public class SalesController : AdministrationController
         }
 
         var saleCountRow = row.GetCell(saleCountColumn);
-
         if (saleCountRow == null || !int.TryParse(saleCountRow.ToString()?.TrimEnd(), out var saleCountInt))
         {
             errorDictionary[i + 1] = IncorrectSalesCount;

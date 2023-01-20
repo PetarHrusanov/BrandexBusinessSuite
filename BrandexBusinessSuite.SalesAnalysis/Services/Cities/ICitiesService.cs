@@ -1,11 +1,10 @@
-﻿using BrandexBusinessSuite.Models.ErpDocuments;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.Cities;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.Cities;
 
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
 
 public interface ICitiesService
 {
