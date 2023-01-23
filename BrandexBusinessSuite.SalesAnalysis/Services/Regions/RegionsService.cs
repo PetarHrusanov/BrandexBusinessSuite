@@ -6,25 +6,17 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+using EFCore.BulkExtensions;
 
 using BrandexBusinessSuite.Models.DataModels;
 using Data;
 using SalesAnalysis.Data.Models;
 
-using static Methods.DataMethods;
-
 public class RegionsService : IRegionsService
 {
     private readonly SalesAnalysisDbContext _db;
-    private readonly IConfiguration _configuration;
-
-    public RegionsService(SalesAnalysisDbContext db, IConfiguration configuration)
-    {
-        _db = db;
-        _configuration = configuration;
-    }
+    public RegionsService(SalesAnalysisDbContext db) => _db = db;
+    
     
     public async Task<List<BasicCheckErpModel>> GetAllCheck() 
         =>await _db.Regions.Select(a => new BasicCheckErpModel
@@ -36,36 +28,17 @@ public class RegionsService : IRegionsService
 
     public async Task BulkUpdateData(List<BasicCheckErpModel> list)
     {
-        var dt = ConvertToDataTable(list);
+        var pharmacyCompany = await _db.Regions.ToDictionaryAsync(c => c.Id);
+        var entities = list.Select(o => new Region()
+        {
+            Id = o.Id,
+            Name = o.Name,
+            ErpId = o.ErpId,
+            ModifiedOn = DateTime.Now,
+            CreatedOn = pharmacyCompany[o.Id].CreatedOn,
+            IsDeleted = pharmacyCompany[o.Id].IsDeleted
+        }).ToList();
         
-        var connection = _configuration.GetConnectionString("DefaultConnection");
-
-        await using var conn = new SqlConnection(connection);
-        await using var command = new SqlCommand("CREATE TABLE #TmpTable(Id smallint NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(50) NOT NULL)", conn);
-        try
-        {
-            conn.Open();
-            command.ExecuteNonQuery();
-
-            using (var bulkCopy = new SqlBulkCopy(conn))
-            {
-                bulkCopy.BulkCopyTimeout = 6600;
-                bulkCopy.DestinationTableName = "#TmpTable";
-                await bulkCopy.WriteToServerAsync(dt);
-                bulkCopy.Close();
-            }
-
-            command.CommandTimeout = 3000;
-            command.CommandText = "UPDATE P SET P.[Name]= T.[Name] FROM [Regions] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
-            command.ExecuteNonQuery();
-        }
-        catch (Exception)
-        {
-            // Handle exception properly
-        }
-        finally
-        {
-            conn.Close();
-        }
+        await _db.BulkUpdateAsync(entities);
     }
 }

@@ -87,6 +87,7 @@ public class PharmaciesService : IPharmaciesService
         
         var entities = list.Select(o => new Pharmacy
         {
+            Id = o.Id,
             BrandexId = pharmacies[o.Id].BrandexId,
             Name = o.Name,
             PharmacyClass = pharmacies[o.Id].PharmacyClass,
@@ -101,7 +102,8 @@ public class PharmaciesService : IPharmaciesService
             StingId = o.StingId,
             RegionId = o.RegionId,
             ErpId = pharmacies[o.Id].ErpId,
-            CreatedOn = DateTime.Now,
+            ModifiedOn = DateTime.Now,
+            CreatedOn = pharmacies[o.Id].CreatedOn,
             IsDeleted = false
         }).ToList();
         

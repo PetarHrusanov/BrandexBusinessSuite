@@ -195,7 +195,7 @@ public class PharmaciesController : AdministrationController
         var regionsForUpdate = pharmaciesErp
             .Select(c => c.Region)
             .Where(r => r is { Value: { }, ValueId: { } })
-            .Distinct()
+            .DistinctBy(erpId => erpId.ValueId)
             .Where(r => regionsCheckDict.TryGetValue(r.ValueId!, out var item) && item.Name?.ToUpper().TrimEnd() != r.Value?.ToUpper().TrimEnd())
             .Select(r => new BasicCheckErpModel
             {
