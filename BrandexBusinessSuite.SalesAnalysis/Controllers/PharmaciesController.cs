@@ -132,7 +132,7 @@ public class PharmaciesController : AdministrationController
         var citiesErp = await GetCitiesErp();
         var citiesErpDistinct = citiesErp.DistinctBy(c => c.City?.ValueId).ToList();;
         var citiesNew = citiesErpDistinct.Where(c => citiesCheck.All(i => i.ErpId != c.City!.ValueId)).ToList();
-        await _citiesService.UploadBulk(citiesNew);
+        if (citiesNew.Count>0) await _citiesService.UploadBulk(citiesNew);
         citiesCheck = await _citiesService.GetAllCheck();
         var citiesForUpdate = citiesErpDistinct
             .Select(c => c.City)
@@ -146,7 +146,7 @@ public class PharmaciesController : AdministrationController
                 ErpId = c.ValueId!.TrimEnd(),
             })
             .ToList();
-        await _citiesService.BulkUpdateData(citiesForUpdate);
+        if (citiesForUpdate.Count>0) await _citiesService.BulkUpdateData(citiesForUpdate);
 
         var pharmacyChainsCheck = await _pharmacyChainsService.GetAllCheck();
         var pharmacyChainDict = pharmacyChainsCheck.DistinctBy(c => c.ErpId)
@@ -154,7 +154,7 @@ public class PharmaciesController : AdministrationController
         var pharmacyChainsErpDistinct = pharmaciesErp.Where(c => c.PharmacyChain?.Value != null & c.PharmacyChain?.ValueId!=null).DistinctBy(c => c.PharmacyChain.ValueId).ToList();
         var pharmacyChainsNew = pharmacyChainsErpDistinct
             .Where(p => !pharmacyChainDict.ContainsKey(p.PharmacyChain!.ValueId!)).ToList();
-        await _pharmacyChainsService.UploadBulk(pharmacyChainsNew);
+        if (pharmacyChainsNew.Count>0) await _pharmacyChainsService.UploadBulk(pharmacyChainsNew);
         
         pharmacyChainsCheck = await _pharmacyChainsService.GetAllCheck();
         pharmacyChainDict = pharmacyChainsCheck.DistinctBy(c => c.ErpId)
@@ -168,14 +168,14 @@ public class PharmaciesController : AdministrationController
                 Name = p.PharmacyChain!.Value!.ToUpper().TrimEnd(), 
                 ErpId = p.PharmacyChain!.ValueId!.TrimEnd() 
             }).ToList();
-        await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
+        if (pharmacyChainsForUpdate.Count>0) await _pharmacyChainsService.BulkUpdateData(pharmacyChainsForUpdate);
         
         var pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetAllCheck();
         var pharmacyCompaniesErpCheckDict = pharmacyCompaniesErpCheck.DistinctBy(c => c.ErpId).ToDictionary(p => p.ErpId, p => p);
         var pharmacyCompaniesErpDistinct = pharmaciesErp!.Where(c => c.ParentParty?.PartyName?.BG != null && c.ParentParty.PartyId!=null).DistinctBy(c => c.ParentParty.PartyId).ToList();
         var pharmaciesCompaniesNew = pharmacyCompaniesErpDistinct
             .Where(p => !pharmacyCompaniesErpCheckDict.ContainsKey(p.ParentParty!.PartyId!)).ToList();
-        await _pharmacyCompaniesService.UploadBulk(pharmaciesCompaniesNew);
+        if (pharmaciesCompaniesNew.Count>0) await _pharmacyCompaniesService.UploadBulk(pharmaciesCompaniesNew);
         
         pharmacyCompaniesErpCheck = await _pharmacyCompaniesService.GetAllCheck();
         pharmacyCompaniesErpCheckDict = pharmacyCompaniesErpCheck.DistinctBy(c => c.ErpId).ToDictionary(p => p.ErpId, p => p);
@@ -188,7 +188,7 @@ public class PharmaciesController : AdministrationController
                 Name = p.ParentParty.PartyName!.BG!.ToUpper().TrimEnd(),
                 ErpId = p.ParentParty.PartyId!.TrimEnd()
             }).ToList();
-        await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
+        if (pharmacyCompaniesForUpdate.Count>0) await _pharmacyCompaniesService.BulkUpdateData(pharmacyCompaniesForUpdate);
         
         var regionsCheck = await _regionsService.GetAllCheck();
         var regionsCheckDict = regionsCheck.ToDictionary(p => p.ErpId);
@@ -204,7 +204,7 @@ public class PharmaciesController : AdministrationController
                 ErpId = r.ValueId
             })
             .ToList();
-        await _regionsService.BulkUpdateData(regionsForUpdate);
+        if (regionsForUpdate.Count>0) await _regionsService.BulkUpdateData(regionsForUpdate);
         
         var pharmaciesErpCheck = await _pharmaciesService.GetAllCheck();
         var pharmaciesErpDistinct = pharmaciesErp!.Where(c => c.PartyId != null)
@@ -251,7 +251,7 @@ public class PharmaciesController : AdministrationController
             StingId = pharmacy.StingId?.Value != null ? int.Parse(pharmacy.StingId.Value) : (int?)null,
         }).ToList();
 
-        await _pharmaciesService.UploadBulk(pharmaciesForUpload);
+        if (pharmaciesForUpload.Count>0) await _pharmaciesService.UploadBulk(pharmaciesForUpload);
 
         var pharmaciesCheck = await _pharmaciesService.GetAllCheckErp();
         pharmaciesCheck = pharmaciesCheck.Where(p => p.ErpId != "e6400a83-398c-496d-bf7d-558104e978a3").ToList();
@@ -286,7 +286,7 @@ public class PharmaciesController : AdministrationController
                 pharmaciesForUpdate.Add(pharmacyChanged);
             }
         }
-        await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
+        if (pharmaciesForUpdate.Count>0) await _pharmaciesService.BulkUpdateData(pharmaciesForUpdate);
         
         return Result.Success;
     }

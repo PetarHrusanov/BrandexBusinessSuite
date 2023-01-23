@@ -1,134 +1,59 @@
-﻿using BrandexBusinessSuite.Models.DataModels;
-using BrandexBusinessSuite.Models.ErpDocuments;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyCompanies;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyCompanies;
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
     
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-    
+using EFCore.BulkExtensions;
+
 using Data;
 using Data.Models;
-    
-using Models.PharmacyCompanies;
-using Microsoft.Data.SqlClient;
-    
-using static Common.ExcelDataConstants.CompaniesColumns;
-using static Common.ExcelDataConstants.Generic;
-using static  Common.Constants;
 
-using static Methods.DataMethods;
+using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
+
 
 public class PharmacyCompaniesService : IPharmacyCompaniesService
 {
     private readonly SalesAnalysisDbContext _db;
-    private readonly IConfiguration _configuration;
-
-    public PharmacyCompaniesService(SalesAnalysisDbContext db ,IConfiguration configuration)
-    {
-        _db = db;
-        _configuration = configuration;
-    }
+    public PharmacyCompaniesService(SalesAnalysisDbContext db) => _db = db;
 
     public async Task UploadBulk(List<ErpPharmacyCheck> pharmacyCompanies)
     {
-        var table = new DataTable();
-        table.TableName = PharmacyCompanies;
-            
-        table.Columns.Add(Name);
-        table.Columns.Add(ErpId);
-
-        table.Columns.Add(CreatedOn);
-        table.Columns.Add(IsDeleted, typeof(bool));
-            
-        foreach (var pharmacyCompany in pharmacyCompanies)
+        var entities = pharmacyCompanies.Select(o => new Company
         {
-            var row = table.NewRow();
-            row[Name] = pharmacyCompany.ParentParty!.PartyName.BG.ToUpper().TrimEnd();
-            row[ErpId] = pharmacyCompany.ParentParty!.PartyId;
-
-            row[CreatedOn] = DateTime.Now;
-            row[IsDeleted] = false;
-            
-            table.Rows.Add(row);
-        }
-
-        var connection = _configuration.GetConnectionString("DefaultConnection");
-            
-        var con = new SqlConnection(connection);
-            
-        var objbulk = new SqlBulkCopy(con);  
-            
-        objbulk.DestinationTableName = PharmacyCompanies;
-            
-        objbulk.ColumnMappings.Add(Name, Name);
-        objbulk.ColumnMappings.Add(ErpId, ErpId);
-
-        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
-        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
-
-        con.Open();
-        await objbulk.WriteToServerAsync(table);  
-        con.Close();  
+            Name = o.ParentParty!.PartyName.BG.ToUpper().TrimEnd(),
+            ErpId = o.ParentParty!.PartyId,
+            CreatedOn = DateTime.Now,
+            IsDeleted = false,
+        }).ToList();
+        
+        await _db.BulkInsertAsync(entities);
     }
 
-    public async Task<List<PharmacyCompanyCheckModel>> GetPharmacyCompaniesCheck()
-    {
-        return await _db.Companies.Select(p => new PharmacyCompanyCheckModel()
-        {
-            Id = p.Id,
-            Name = p.Name,
-            VAT = p.VAT
-        }).ToListAsync();
-    }
-    
     public async Task<List<BasicCheckErpModel>> GetAllCheck()
-    {
-        return await _db.Companies.Select(p => new BasicCheckErpModel()
-        {
-            Id = p.Id,
-            Name = p.Name,
-            ErpId = p.ErpId
-        }).ToListAsync();
-    }
-    
+    => await _db.Companies.Select(p => new BasicCheckErpModel
+    { 
+        Id = p.Id, 
+        Name = p.Name, 
+        ErpId = p.ErpId 
+    }).ToListAsync();
+
     public async Task BulkUpdateData(List<BasicCheckErpModel> list)
     {
-        var dt = ConvertToDataTable(list);
+        var pharmacyCompany = await _db.Companies.ToDictionaryAsync(c => c.Id);
+        var entities = list.Select(o => new Company
+        {
+            Id = o.Id,
+            Name = o.Name,
+            ErpId = o.ErpId,
+            ModifiedOn = DateTime.Now,
+            CreatedOn = pharmacyCompany[o.Id].CreatedOn,
+            IsDeleted = pharmacyCompany[o.Id].IsDeleted
+        }).ToList();
         
-        var connection = _configuration.GetConnectionString("DefaultConnection");
-
-        await using var conn = new SqlConnection(connection);
-        await using var command = new SqlCommand($"CREATE TABLE #TmpTable(Id smallint NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(400) NOT NULL)", conn);
-        try
-        {
-            conn.Open();
-            command.ExecuteNonQuery();
-
-            using (var bulkCopy = new SqlBulkCopy(conn))
-            {
-                bulkCopy.BulkCopyTimeout = 6600;
-                bulkCopy.DestinationTableName = "#TmpTable";
-                await bulkCopy.WriteToServerAsync(dt);
-                bulkCopy.Close();
-            }
-
-            command.CommandTimeout = 3000;
-            command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{PharmacyCompanies}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
-            command.ExecuteNonQuery();
-        }
-        catch (Exception)
-        {
-            // Handle exception properly
-        }
-        finally
-        {
-            conn.Close();
-        }
+        await _db.BulkUpdateAsync(entities);
     }
 }

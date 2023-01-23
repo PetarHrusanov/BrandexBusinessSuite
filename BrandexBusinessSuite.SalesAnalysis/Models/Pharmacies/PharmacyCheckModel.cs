@@ -1,6 +1,11 @@
 ﻿namespace BrandexBusinessSuite.SalesAnalysis.Models.Pharmacies;
 
-public class PharmacyCheckModel
+using AutoMapper;
+
+using BrandexBusinessSuite.Models;
+using BrandexBusinessSuite.SalesAnalysis.Data.Models;
+
+public class PharmacyCheckModel : IMapFrom<Pharmacy>
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -10,5 +15,9 @@ public class PharmacyCheckModel
     public int? PhoenixId { get; set; }
     public int? SopharmaId { get; set; }
     public int? StingId { get; set; }
+    
+    public virtual void Mapping(Profile mapper)
+        => mapper
+            .CreateMap<Pharmacy, PharmacyCheckModel>();
 
 }

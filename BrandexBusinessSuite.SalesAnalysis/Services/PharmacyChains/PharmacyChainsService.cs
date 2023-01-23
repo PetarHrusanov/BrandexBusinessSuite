@@ -1,146 +1,59 @@
-﻿using BrandexBusinessSuite.Models.DataModels;
-using BrandexBusinessSuite.Models.ErpDocuments;
-
-namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
+﻿namespace BrandexBusinessSuite.SalesAnalysis.Services.PharmacyChains;
 
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Data;
-    
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Data.SqlClient;
+using EFCore.BulkExtensions;
 
 using Data;
 using Data.Models;
-    
-using static BrandexBusinessSuite.Common.ExcelDataConstants.PharmacyChainsColumns;
-using static Common.ExcelDataConstants.Generic;
-using static  BrandexBusinessSuite.Common.Constants;
-
-using static Methods.DataMethods;
+using BrandexBusinessSuite.Models.DataModels;
+using BrandexBusinessSuite.Models.ErpDocuments;
 
 
 public class PharmacyChainsService : IPharmacyChainsService
 {
     private readonly SalesAnalysisDbContext _db;
-    private readonly IConfiguration _configuration;
-
-    public PharmacyChainsService(SalesAnalysisDbContext db , IConfiguration configuration)
-    {
-        _db = db;
-        _configuration = configuration;
-    }
+    public PharmacyChainsService(SalesAnalysisDbContext db) => _db = db;
 
     public async Task UploadBulk(List<ErpPharmacyCheck> pharmacyChains)
     {
-        var table = new DataTable();
-        table.TableName = PharmacyChains;
-            
-        table.Columns.Add(Name);
-        table.Columns.Add(ErpId);
-        
-        table.Columns.Add(CreatedOn);
-        table.Columns.Add(IsDeleted, typeof(bool));
-
-        foreach (var pharmacyChain in pharmacyChains)
+        var entities = pharmacyChains.Select(o => new PharmacyChain
         {
-            var row = table.NewRow();
-            row[Name] = pharmacyChain.PharmacyChain!.Value!.TrimEnd().ToUpper();
-            row[ErpId] = pharmacyChain.PharmacyChain!.ValueId!;
-            
-            row[CreatedOn] = DateTime.Now;
-            row[IsDeleted] = false;
-            
-            table.Rows.Add(row);
-        }
-
-        string connection = _configuration.GetConnectionString("DefaultConnection");
-            
-        var con = new SqlConnection(connection);
-            
-        var objbulk = new SqlBulkCopy(con);  
-            
-        objbulk.DestinationTableName = PharmacyChains;
-            
-        objbulk.ColumnMappings.Add(Name, Name);
-        objbulk.ColumnMappings.Add(ErpId, ErpId);
+            Name = o.PharmacyChain!.Value!.TrimEnd().ToUpper(),
+            ErpId = o.PharmacyChain!.ValueId!,
+            CreatedOn = DateTime.Now,
+            IsDeleted = false,
+        }).ToList();
         
-        objbulk.ColumnMappings.Add(CreatedOn, CreatedOn);
-        objbulk.ColumnMappings.Add(IsDeleted, IsDeleted);
-
-        con.Open();
-        await objbulk.WriteToServerAsync(table);  
-        con.Close();  
+        await _db.BulkInsertAsync(entities);
     }
 
-    public async Task<List<BasicCheckErpModel>> GetAllCheck()
-    {
-        return await _db.PharmacyChains.Select(p => new BasicCheckErpModel()
-        {
-            Id = p.Id,
-            Name = p.Name,
-            ErpId = p.ErpId
+    public async Task<List<BasicCheckErpModel>> GetAllCheck() 
+        => await _db.PharmacyChains.Select(p => new BasicCheckErpModel
+        { 
+            Id = p.Id, 
+            Name = p.Name, 
+            ErpId = p.ErpId 
         }).ToListAsync();
-    }
     
-    // public async Task BulkUpdateData(List<BasicCheckErpModel> list)
-    // {
-    //     var dt = ConvertToDataTable(list);
-    //     
-    //     var connection = _configuration.GetConnectionString("DefaultConnection");
-    //
-    //     await using var conn = new SqlConnection(connection);
-    //     await using var command = new SqlCommand($"CREATE TABLE #TmpTable(Id smallint NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(50) NOT NULL)", conn);
-    //     try
-    //     {
-    //         conn.Open();
-    //         command.ExecuteNonQuery();
-    //
-    //         using (var bulkCopy = new SqlBulkCopy(conn))
-    //         {
-    //             bulkCopy.BulkCopyTimeout = 6600;
-    //             bulkCopy.DestinationTableName = "#TmpTable";
-    //             await bulkCopy.WriteToServerAsync(dt);
-    //             bulkCopy.Close();
-    //         }
-    //
-    //         command.CommandTimeout = 3000;
-    //         command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{PharmacyChains}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
-    //         command.ExecuteNonQuery();
-    //     }
-    //     catch (Exception)
-    //     {
-    //         // Handle exception properly
-    //     }
-    //     finally
-    //     {
-    //         conn.Close();
-    //     }
-    // }
     
     public async Task BulkUpdateData(List<BasicCheckErpModel> list)
     {
-        var dt = ConvertToDataTable(list);
-
-        var connection = _configuration.GetConnectionString("DefaultConnection");
-
-        await using var conn = new SqlConnection(connection);
-        await conn.OpenAsync();
-
-        await using var command = new SqlCommand($"CREATE TABLE #TmpTable(Id smallint NOT NULL,ErpId nvarchar(50) NOT NULL, Name nvarchar(50) NOT NULL)", conn);
-        await command.ExecuteNonQueryAsync();
-
-        using (var bulkCopy = new SqlBulkCopy(conn))
+        var pharmacyChains = await _db.PharmacyChains.ToDictionaryAsync(c => c.Id);
+        var entities = list.Select(o => new PharmacyChain
         {
-            bulkCopy.DestinationTableName = "#TmpTable";
-            await bulkCopy.WriteToServerAsync(dt);
-        }
-
-        command.CommandText = $"UPDATE P SET P.[ErpId]= T.[ErpId] FROM [{PharmacyChains}] AS P INNER JOIN #TmpTable AS T ON P.[Id] = T.[Id] ;DROP TABLE #TmpTable;";
-        await command.ExecuteNonQueryAsync();
+            Id = o.Id,
+            Name = o.Name,
+            ErpId = o.ErpId,
+            ModifiedOn = DateTime.Now,
+            CreatedOn = pharmacyChains[o.Id].CreatedOn,
+            IsDeleted = pharmacyChains[o.Id].IsDeleted
+        }).ToList();
+        
+        await _db.BulkUpdateAsync(entities);
     }
-
 }

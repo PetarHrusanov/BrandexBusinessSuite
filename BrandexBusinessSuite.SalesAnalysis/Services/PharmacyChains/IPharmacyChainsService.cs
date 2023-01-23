@@ -10,6 +10,5 @@ public interface IPharmacyChainsService
 {
     Task UploadBulk(List<ErpPharmacyCheck> pharmacyChains);
     Task<List<BasicCheckErpModel>> GetAllCheck();
-    
     Task BulkUpdateData(List<BasicCheckErpModel> list);
 }

@@ -10,7 +10,6 @@ using BrandexBusinessSuite.Models.ErpDocuments;
 public interface IPharmacyCompaniesService
 {
     Task UploadBulk(List<ErpPharmacyCheck> pharmacyCompanies);
-    Task<List<PharmacyCompanyCheckModel>> GetPharmacyCompaniesCheck();
     Task<List<BasicCheckErpModel>> GetAllCheck();
     Task BulkUpdateData(List<BasicCheckErpModel> list);
 }
