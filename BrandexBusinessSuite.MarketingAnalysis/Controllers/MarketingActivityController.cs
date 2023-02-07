@@ -1,7 +1,6 @@
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
 using System.Globalization;
-using System.Text;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
