@@ -9,5 +9,4 @@ public interface IRegionsService
 {
     Task<List<BasicCheckErpModel>> GetAllCheck();
     Task BulkUpdateData(List<BasicCheckErpModel> list);
-
 }

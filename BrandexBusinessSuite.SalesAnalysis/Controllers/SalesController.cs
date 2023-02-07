@@ -80,6 +80,10 @@ public class SalesController : AdministrationController
 
         var memory = new MemoryStream();
 
+        var sales = await _salesService.GetAll();
+        sales = sales.Where(d => d.Date >= dateBegin && d.Date <= dateEnd).ToList();
+        if (regionId != null) sales = sales.Where(r => r.RegionId == regionId).ToList();
+
         await using (var fs = new FileStream(Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
         {
             IWorkbook workbook = new XSSFWorkbook();
@@ -89,18 +93,15 @@ public class SalesController : AdministrationController
 
             var products = await _productsService.GetProductsIdPrices();
 
-            foreach (var product in products)
+            foreach (var sumCount in products.Select(product => sales.Where(s=>s.ProductId==product.Id).Sum(c=>c.Count)))
             {
-                var sumCount = await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
                 row.CreateCell(ProductCounter + row.Cells.Count()).SetCellValue(sumCount);
             }
 
             row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
 
-            foreach (var product in products)
+            foreach (var productRevenue in from product in products let sumCount = sales.Where(s=>s.ProductId==product.Id).Sum(c=>c.Count) select sumCount * product.Price)
             {
-                var sumCount = await _salesService.ProductCountSumByIdDate(product.Id, dateBegin, dateEnd, regionId);
-                var productRevenue = sumCount * product.Price;
                 row.CreateCell(row.Cells.Count() + ProductCounter).SetCellValue(productRevenue);
             }
 
@@ -118,7 +119,8 @@ public class SalesController : AdministrationController
 
                 case "Separated":
                     row.CreateCell(row.Cells.Count()).SetCellValue("Date");
-                    var dates = await _salesService.GetDistinctDatesByMonths();
+                    var datesRough = sales.Select(s => s.Date).Distinct().ToList();
+                    var dates = datesRough.Select(t => new DateTime(t.Year, t.Month, 1)).Distinct().ToList();
                     foreach (var currentDate in dates)
                     {
                         CreatePharmacySalesRow(excelSheet, collectionPharmacies, products, currentDate);
@@ -261,29 +263,14 @@ public class SalesController : AdministrationController
         IDictionary<int, string> errorDictionary, string distributor, int dateColumn, int productIdColumn,
         int pharmacyIdColumn, int saleCountColumn)
     {
-        // var dateRow = row.GetCell(dateColumn);
-        // if (dateRow.CellType != CellType.Numeric)
-        // {
-        //     errorDictionary[i + 1] = IncorrectDateFormat;
-        //     return;
-        // }
-        // newSale.Date = DateTime.FromOADate(dateRow.NumericCellValue);
-        
-        // if (!DateTime.TryParse(row.GetCell(dateColumn).ToString(), out var date))
-        // {
-        //     errorDictionary[i + 1] = IncorrectDateFormat;
-        //     return;
-        // }
-        // newSale.Date = date;
-        
+
         try
         {
             newSale.Date = DateTime.FromOADate(row.GetCell(dateColumn).NumericCellValue);
         }
         catch (Exception)
         {
-            errorDictionary[i + 1] = IncorrectDateFormat;
-            return;
+            // ignored
         }
 
         var productRow = ResolveProductId(row.GetCell(productIdColumn).ToString()?.TrimEnd(), distributor, productIdsForCheck);

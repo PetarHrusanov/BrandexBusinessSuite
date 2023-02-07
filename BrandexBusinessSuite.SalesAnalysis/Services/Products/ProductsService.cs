@@ -13,8 +13,7 @@ using SalesAnalysis.Models.Products;
 public class ProductsService : IProductsService
 {
     private readonly SalesAnalysisDbContext _db;
-    public ProductsService(SalesAnalysisDbContext db)
-    => _db = db;
+    public ProductsService(SalesAnalysisDbContext db) => _db = db;
 
     public async Task<string> CreateProduct(ProductInputModel productInputModel)
     {
