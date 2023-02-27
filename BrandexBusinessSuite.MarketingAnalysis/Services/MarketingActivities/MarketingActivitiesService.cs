@@ -141,13 +141,19 @@ public class MarketingActivitiesService : IMarketingActivitesService
         marketingActivity!.ErpPublished = !marketingActivity.ErpPublished;
         await _db.SaveChangesAsync();
     }
-    
-    public async Task<DateTime> MarketingActivitiesTemplate()
+
+    public async Task<DateTime> MarketingActivitiesTemplate(bool complete)
     {
         var date = _db.MarketingActivities.Max(m => m.Date);
         var marketingActivities = await _db.MarketingActivities
-            .Where(m => m.Date.Month == date.Month && m.Date.Year == date.Year).Where(m => m.AdMedia.Name == "FACEBOOK" || m.AdMedia.Name == "GOOGLE ADS")
+            .Where(m => m.Date.Month == date.Month && m.Date.Year == date.Year)
             .ToListAsync();
+
+        if (complete is false)
+        {
+            marketingActivities = marketingActivities
+                .Where(m => m.AdMedia.Name == "FACEBOOK" || m.AdMedia.Name == "GOOGLE ADS").ToList();
+        }
         
         date = date.AddMonths(1);
 

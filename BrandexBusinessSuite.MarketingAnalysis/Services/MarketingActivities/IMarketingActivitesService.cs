@@ -22,7 +22,6 @@ public interface IMarketingActivitesService
     
     Task ErpPublishMarketingActivity(int id);
 
-    Task<DateTime> MarketingActivitiesTemplate();
-
+    Task<DateTime> MarketingActivitiesTemplate(bool complete);
 
 }

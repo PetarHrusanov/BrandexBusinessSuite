@@ -237,7 +237,12 @@ public class MarketingActivityController : ApiController
     
     [HttpGet]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
-    public async Task<DateTime> CreateTemplate() 
-        => await _marketingActivitiesService.MarketingActivitiesTemplate();
+    public async Task<DateTime> CreateTemplateComplete() 
+        => await _marketingActivitiesService.MarketingActivitiesTemplate(true);
+    
+    [HttpGet]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    public async Task<DateTime> CreateTemplate(bool isComplete) 
+        => await _marketingActivitiesService.MarketingActivitiesTemplate(isComplete);
     
 }
