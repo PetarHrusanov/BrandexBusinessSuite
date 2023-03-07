@@ -1,6 +1,7 @@
 namespace BrandexBusinessSuite.MarketingAnalysis.Services.MarketingActivities;
 
 using MarketingAnalysis.Models.MarketingActivities;
+using Models.Facebook;
 
 public interface IMarketingActivitesService
 {
@@ -23,5 +24,9 @@ public interface IMarketingActivitesService
     Task ErpPublishMarketingActivity(int id);
 
     Task<DateTime> MarketingActivitiesTemplate(bool complete);
+    
+    Task UploadFacebookAdSets(FileAndDateInputModel inputModel, decimal euroRate);
+    
+    Task UploadGoogleAds(FileAndDateInputModel inputModel);
 
 }

@@ -1,3 +1,5 @@
+using System.Xml.Linq;
+
 namespace BrandexBusinessSuite.MarketingAnalysis.Controllers;
 
 using System.Globalization;
@@ -15,6 +17,7 @@ using BrandexBusinessSuite.Controllers;
 using BrandexBusinessSuite.Models.ErpDocuments;
 using BrandexBusinessSuite.Services;
 
+using Models.Facebook;
 using Models.MarketingActivities;
 using Models.MediaTypes;
 using Services.MarketingActivities;
@@ -244,5 +247,36 @@ public class MarketingActivityController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     public async Task<DateTime> CreateTemplate(bool isComplete) 
         => await _marketingActivitiesService.MarketingActivitiesTemplate(isComplete);
+    
+    [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    [IgnoreAntiforgeryToken]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult> UploadFacebookAdSets([FromForm] FileAndDateInputModel inputModel)
+    {
+        const string ecbUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
+        var response = await Client.GetAsync(ecbUrl);
+        response.EnsureSuccessStatusCode();
+        var contentStream = await response.Content.ReadAsStreamAsync();
+        var xml = XDocument.Load(contentStream);
+        var euroRate = xml.Descendants()
+            .First(x => x.Attribute("currency")?.Value == "BGN")
+            .Attribute("rate")?.Value;
+        var euroToBgnRate = decimal.Parse(euroRate);
+
+        await _marketingActivitiesService.UploadFacebookAdSets(inputModel, euroToBgnRate);
+        return Result.Success;
+    }
+    
+    [HttpPost]
+    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
+    [IgnoreAntiforgeryToken]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult> UploadGoogleAds([FromForm] FileAndDateInputModel inputModel)
+    {
+        
+        await _marketingActivitiesService.UploadGoogleAds(inputModel);
+        return Result.Success;
+    }
     
 }

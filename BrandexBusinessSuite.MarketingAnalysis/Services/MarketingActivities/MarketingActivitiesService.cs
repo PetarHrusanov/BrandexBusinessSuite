@@ -1,3 +1,7 @@
+using System.Text.RegularExpressions;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+
 namespace BrandexBusinessSuite.MarketingAnalysis.Services.MarketingActivities;
 
 using AutoMapper;
@@ -5,14 +9,19 @@ using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 
 using BrandexBusinessSuite.MarketingAnalysis.Data.Models;
+using Models.Facebook;
 using Data;
 using Models.MarketingActivities;
+
+using static Methods.ExcelMethods;
 
 public class MarketingActivitiesService : IMarketingActivitesService
 {
     
     private readonly MarketingAnalysisDbContext _db;
     private readonly IMapper _mapper;
+    
+    private static readonly Regex PriceRegex = new(@"[0-9]+[.,][0-9]*");
 
     public MarketingActivitiesService(MarketingAnalysisDbContext db, IMapper mapper)
     {
@@ -55,7 +64,6 @@ public class MarketingActivitiesService : IMarketingActivitesService
              CompanyName = n.AdMedia.Company.Name,
              Paid = n.Paid,
              ErpPublished = n.ErpPublished
-
          }).ToArrayAsync();
 
     public async Task UploadMarketingActivity(MarketingActivityInputModel inputModel)
@@ -174,5 +182,84 @@ public class MarketingActivitiesService : IMarketingActivitesService
         await _db.SaveChangesAsync();
 
         return date;
+    }
+
+    public async Task UploadFacebookAdSets(FileAndDateInputModel inputModel, decimal euroRate)
+    {
+
+        var marketingActivitiesToChange = await _db.MarketingActivities
+            .Where(s => s.Date.Month == inputModel.Date.Month && s.Date.Year == inputModel.Date.Year).Where(a=>a.AdMedia.Name=="FACEBOOK").ToListAsync();
+
+        await using var stream = new MemoryStream();
+        await inputModel.ImageFile.CopyToAsync(stream);
+
+        stream.Position = 0;
+
+        if (!CheckXlsx(inputModel.ImageFile)) throw new Exception("Not xlsx.");
+
+        var hssfwb = new XSSFWorkbook(stream);
+        var sheet = hssfwb.GetSheetAt(0);
+
+        for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++) //Read Excel File
+        {
+            var row = sheet.GetRow(i);
+            if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+            
+            var adSetName = row.GetCell(2).ToString();
+
+            var activity = marketingActivitiesToChange.FirstOrDefault(s => s.Description.Contains(adSetName));
+            if (activity == null) continue;
+            var price = decimal.Parse(row.GetCell(15).ToString()!);
+            activity.Price = price * euroRate;
+        }
+        
+        await _db.BulkUpdateAsync(marketingActivitiesToChange);
+    }
+
+    public async Task UploadGoogleAds(FileAndDateInputModel inputModel)
+    {
+        var marketingActivitiesToChange = await _db.MarketingActivities
+            .Where(s => s.Date.Month == inputModel.Date.Month && s.Date.Year == inputModel.Date.Year).Where(a=>a.AdMedia.Name=="GOOGLE").ToListAsync();
+
+        await using var stream = new MemoryStream();
+        await inputModel.ImageFile.CopyToAsync(stream);
+
+        stream.Position = 0;
+
+        if (!CheckXlsx(inputModel.ImageFile)) throw new Exception("Not xlsx.");
+
+        var hssfwb = new XSSFWorkbook(stream);
+        var sheet = hssfwb.GetSheetAt(0);
+
+        var activityDictionary = new Dictionary<string, decimal>();
+
+        foreach (IRow row in sheet)
+        {
+            if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+
+            var adSetName = row.GetCell(2)?.ToString();
+            if (string.IsNullOrWhiteSpace(adSetName) || !marketingActivitiesToChange.Any(activity => activity.Description.Contains(adSetName))) continue;
+
+            if (!activityDictionary.ContainsKey(adSetName))
+            {
+                activityDictionary.Add(adSetName, 0);
+            }
+
+            var priceRow = row.GetCell(4)?.ToString()?.TrimEnd();
+            var price = decimal.TryParse(PriceRegex.Match(priceRow)?.Value, out var p) ? p : (decimal?)null;
+
+            if (price.HasValue) activityDictionary[adSetName] += price.Value;
+            else activityDictionary[adSetName] = price.GetValueOrDefault();
+        }
+
+        foreach (var activity in marketingActivitiesToChange)
+        {
+            if (activityDictionary.TryGetValue(activity.Description, out var price))
+            {
+                activity.Price = price;
+            }
+        }
+        
+        await _db.BulkUpdateAsync(marketingActivitiesToChange);
     }
 }
