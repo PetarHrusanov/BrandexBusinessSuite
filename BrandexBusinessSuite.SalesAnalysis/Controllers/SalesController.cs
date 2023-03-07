@@ -172,7 +172,7 @@ public class SalesController : AdministrationController
         var hssfwb = new XSSFWorkbook(stream);
         var sheet = hssfwb.GetSheetAt(0);
 
-        for (var i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++) //Read Excel File
+        for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++) //Read Excel File
         {
             var row = sheet.GetRow(i);
             if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
