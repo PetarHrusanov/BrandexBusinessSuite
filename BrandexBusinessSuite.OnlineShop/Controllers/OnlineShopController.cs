@@ -358,30 +358,7 @@ public class OnlineShopController : ApiController
             
             workbook.Write(fs);
         }
-        
-        // var files = Directory.GetFiles(newPath);
-        //
-        // var zipFile = Path.Combine(newPath, "Collection.zip");
-        //
-        // using (var archive = ZipFile.Open(zipFile, ZipArchiveMode.Create))
-        // {
-        //     foreach (var fPath in files)
-        //     {
-        //         archive.CreateEntryFromFile(fPath, Path.GetFileName(fPath));
-        //     }
-        // }
-        //
-        // var memory = new MemoryStream();
-        //
-        // await using (var stream = new FileStream(zipFile, FileMode.Open))
-        // {
-        //     await stream.CopyToAsync(memory);
-        // }
-        //
-        // memory.Position = 0;
-        //
-        // return File(memory, "application/zip", "Collection.zip");
-        
+
         var files = Directory.GetFiles(newPath);
         var memory = new MemoryStream();
         using (var archive = new ZipArchive(memory, ZipArchiveMode.Create, true))
