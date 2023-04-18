@@ -25,8 +25,8 @@ public interface IMarketingActivitesService
 
     Task<DateTime> MarketingActivitiesTemplate(bool complete);
     
-    Task UploadFacebookAdSets(FileAndDateInputModel inputModel, decimal euroRate);
+    Task UploadFacebookAdSets(SocialMediaBudgetInputModel inputModel, decimal euroRate);
     
-    Task UploadGoogleAds(FileAndDateInputModel inputModel);
+    Task UploadGoogleAds(SocialMediaBudgetInputModel inputModel);
 
 }

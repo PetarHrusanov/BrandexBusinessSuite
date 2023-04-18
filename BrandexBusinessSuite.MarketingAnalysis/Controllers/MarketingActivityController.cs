@@ -252,31 +252,37 @@ public class MarketingActivityController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult> UploadFacebookAdSets([FromForm] FileAndDateInputModel inputModel)
+    public async Task<ActionResult> UploadGoogleAndFacebookAdsBudget([FromForm] SocialMediaBudgetInputModel inputModel)
     {
-        const string ecbUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
-        var response = await Client.GetAsync(ecbUrl);
-        response.EnsureSuccessStatusCode();
-        var contentStream = await response.Content.ReadAsStreamAsync();
-        var xml = XDocument.Load(contentStream);
-        var euroRate = xml.Descendants()
-            .First(x => x.Attribute("currency")?.Value == "BGN")
-            .Attribute("rate")?.Value;
-        var euroToBgnRate = decimal.Parse(euroRate);
 
-        await _marketingActivitiesService.UploadFacebookAdSets(inputModel, euroToBgnRate);
-        return Result.Success;
-    }
-    
-    [HttpPost]
-    [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
-    [IgnoreAntiforgeryToken]
-    [Consumes("multipart/form-data")]
-    public async Task<ActionResult> UploadGoogleAds([FromForm] FileAndDateInputModel inputModel)
-    {
+        var result = Result.Success;
+        switch (inputModel.Media)
+        {
+            case "Facebook":
+            {
+                const string ecbUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
+                var response = await Client.GetAsync(ecbUrl);
+                response.EnsureSuccessStatusCode();
+                var contentStream = await response.Content.ReadAsStreamAsync();
+                var xml = XDocument.Load(contentStream);
+                var euroRate = xml.Descendants()
+                    .First(x => x.Attribute("currency")?.Value == "BGN")
+                    .Attribute("rate")?.Value;
+                var euroToBgnRate = decimal.Parse(euroRate);
+
+                await _marketingActivitiesService.UploadFacebookAdSets(inputModel, euroToBgnRate);
+                break;
+            }
+            case "Google":
+                await _marketingActivitiesService.UploadGoogleAds(inputModel);
+                break;
+            default:
+                result = Result.Failure("Invalid media type specified");
+                break;
+        }
+
+        return result;
         
-        await _marketingActivitiesService.UploadGoogleAds(inputModel);
-        return Result.Success;
     }
-    
+
 }

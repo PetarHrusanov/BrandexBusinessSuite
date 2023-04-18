@@ -184,7 +184,7 @@ public class MarketingActivitiesService : IMarketingActivitesService
         return date;
     }
 
-    public async Task UploadFacebookAdSets(FileAndDateInputModel inputModel, decimal euroRate)
+    public async Task UploadFacebookAdSets(SocialMediaBudgetInputModel inputModel, decimal euroRate)
     {
 
         var marketingActivitiesToChange = await _db.MarketingActivities
@@ -216,10 +216,10 @@ public class MarketingActivitiesService : IMarketingActivitesService
         await _db.BulkUpdateAsync(marketingActivitiesToChange);
     }
 
-    public async Task UploadGoogleAds(FileAndDateInputModel inputModel)
+    public async Task UploadGoogleAds(SocialMediaBudgetInputModel inputModel)
     {
         var marketingActivitiesToChange = await _db.MarketingActivities
-            .Where(s => s.Date.Month == inputModel.Date.Month && s.Date.Year == inputModel.Date.Year).Where(a=>a.AdMedia.Name=="GOOGLE").ToListAsync();
+            .Where(s => s.Date.Month == inputModel.Date.Month && s.Date.Year == inputModel.Date.Year).Where(a=>a.AdMedia.Name=="GOOGLE ADS").ToListAsync();
 
         await using var stream = new MemoryStream();
         await inputModel.ImageFile.CopyToAsync(stream);
