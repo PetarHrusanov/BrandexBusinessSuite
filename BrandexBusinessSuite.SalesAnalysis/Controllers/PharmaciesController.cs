@@ -225,7 +225,17 @@ public class PharmaciesController : AdministrationController
             .Where(p => pharmaciesErpCheck.All(i => i.ErpId != p.PartyId)).ToList();
 
         if (pharmaciesNew.Any(pharmacy => pharmacy.PharmacyChain == null))
-            return Result.Failure("Some pharmacies don't have a chain");
+        {
+            var pharmaciesNoChains = pharmaciesNew
+                .Where(p => p.PharmacyChain == null)
+                .Select(p => p.LocationName.BG)
+                .ToList();
+
+            var pharmaciesNoChainsString = string.Join(", ", pharmaciesNoChains);
+
+            return Result.Failure($"Some pharmacies don't have a chain: {pharmaciesNoChainsString}");
+
+        }
         if (pharmaciesNew.Any(pharmacy => pharmacy.ParentParty!.PartyId == null)) 
             return Result.Failure("Some pharmacies don't have a companies");
         if (pharmaciesNew.Any(pharmacy => pharmacy.Region!.ValueId == null)) 
