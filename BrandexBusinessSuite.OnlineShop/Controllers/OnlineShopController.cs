@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using BrandexBusinessSuite.OnlineShop.Data.Models;
 
 namespace BrandexBusinessSuite.OnlineShop.Controllers;
@@ -420,46 +421,74 @@ public class OnlineShopController : ApiController
 
         return Result.Success;
     }
-    
+
     [HttpGet]
     [IgnoreAntiforgeryToken]
     [Authorize(Roles = $"{AdministratorRoleName}")]
     public async Task<ActionResult> OrdersCompleted()
     {
-        var rest = new RestAPI("https://botanic.cc/wp-json/wc/v3",_wooCommerceSettings.Key, _wooCommerceSettings.Secret);
+        var rest = new RestAPI("https://botanic.cc/wp-json/wc/v3", _wooCommerceSettings.Key, _wooCommerceSettings.Secret);
         var wc = new WCObject(rest);
-        
-        var orderList = await wc.Order.GetAll(new Dictionary < string, string > ()
+
+        const int perPage = 100;
+
+        using var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_wooCommerceSettings.Key}:{_wooCommerceSettings.Secret}")));
+
+        var response = await httpClient.GetAsync("https://botanic.cc/wp-json/wc/v3/orders?status=shipped&per_page=1");
+        var shippedOrdersCount = response.Headers.Contains("x-wp-total") ? int.Parse(response.Headers.GetValues("x-wp-total").FirstOrDefault()) : 0;
+
+        if (shippedOrdersCount == 0)
         {
-            { "status","shipped"},
-            { "per_page","100" },
-        });
+            return Result.Success;
+        }
 
-        var orderIds = (from order in orderList select new SpeedyReference(order.id.ToString())).ToList();
+        int totalPages = (int)Math.Ceiling((double)shippedOrdersCount / perPage);
 
+        var allOrders = new List<Order>();
+
+        for (int page = 1; page <= totalPages; page++)
+        {
+            var pagedOrders = await wc.Order.GetAll(new Dictionary<string, string>
+            {
+                { "status", "shipped" },
+                { "per_page", perPage.ToString() },
+                { "page", page.ToString() },
+            });
+            allOrders.AddRange(pagedOrders);
+        }
+            
+        var orderIds = (from order in allOrders select new SpeedyReference(order.id.ToString())).ToList();
+            
         var speedyRequest = new SpeedyCheckCompleted(_speedyUserSettings.UsernameSpeedy, _speedyUserSettings.PasswordSpeedy, orderIds);
         var jsonPostString = JsonConvert.SerializeObject(speedyRequest, Formatting.Indented);
-
+            
         const string speedyLink = "https://api.speedy.bg/v1/track";
         var responseContentJObj = await JObjectByUriPostRequest(Client, speedyLink, jsonPostString);
-        
+            
         var parcels = JsonConvert.DeserializeObject<List<SpeedyCheckCompletedResponse>>(responseContentJObj["parcels"].ToString());
-
+            
         var parcelsCompleted = parcels.Where(o => o.Operations.Any(op => op.OperationCode == -14))
             .Select(r => r.Reference).ToList();
-
+            
         var orders = parcelsCompleted.Select(p => new Order
         {
             id = (ulong?)int.Parse(p),
             status = "completed"
         }).ToList();
-        
-        var batch = new BatchObject<Order> { update = orders };
-        await wc.Order.UpdateRange(batch);
+
+        const int batchSize = 50;
+        for (int i = 0; i < orders.Count; i += batchSize)
+        {
+            var ordersBatch = orders.Skip(i).Take(batchSize).ToList();
+            var batch = new BatchObject<Order> { update = ordersBatch };
+            await wc.Order.UpdateRange(batch);
+        }
 
         return Result.Success;
     }
-    
+
+
     [HttpGet]
     [IgnoreAntiforgeryToken]
     [Authorize(Roles = $"{AdministratorRoleName}")]
