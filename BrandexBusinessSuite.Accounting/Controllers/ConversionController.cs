@@ -45,7 +45,8 @@ public class ConversionController : ApiController
     private readonly AccountingDbContext _context;
 
     private static readonly Regex RegexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
-    private static readonly Regex PriceRegex = new(@"[0-9]+[.,][0-9]*");
+    private static readonly Regex PriceRegex = new(@"[0-9]+[.,][0-9]*\s*€$");
+
     private static readonly Regex FacebookInvoiceRegex = new(@"FBADS-[0-9]{3}-[0-9]{9}");
 
     public ConversionController(IWebHostEnvironment hostEnvironment, IOptions<ErpUserSettings> userSettings,
@@ -81,9 +82,15 @@ public class ConversionController : ApiController
 
         var productsWithPrices = products.Where(product => productsPrices.ContainsKey(product.FacebookName));
         var productCodesPrices = productsWithPrices
-            .Select(product => new AccountingModel(product.AccountingName, product.AccountingErpNumber,
-                Math.Round(productsPrices[product.FacebookName], 2))
-            ).ToDictionary(p => p.AccountingName);
+            .GroupBy(product => product.AccountingName)
+            .ToDictionary(
+                group => group.Key,
+                group => new AccountingModel(
+                    group.Key,
+                    group.First().AccountingErpNumber,
+                    Math.Round(group.Sum(product => productsPrices[product.FacebookName]), 2)
+                )
+            );
 
         var facebookInvoiceNumber = FacebookInvoiceRegex.Matches(rawText)[0].ToString();
 
@@ -304,26 +311,44 @@ public class ConversionController : ApiController
         return (product, price);
     }
 
-    private async Task<Dictionary<string, decimal>> ProductPriceDictionaryFromText(string rawText,
-        List<Product> products)
+    private async Task<Dictionary<string, decimal>> ProductPriceDictionaryFromText(string rawText, List<Product> products)
     {
         var rawTextSplit = rawText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList();
-
         var euro = await _context.Currencies.Where(c => c.Name == Euro).Select(c => c.Value).FirstOrDefaultAsync();
-
+        var numberFormat = new NumberFormatInfo { NumberDecimalSeparator = "," };
+    
         var productsPrices = rawTextSplit
             .Where(x => products.Any(y => x.Contains(y.FacebookName)))
-            .Select(line => new
+            .Select(line =>
             {
-                productName = products.First(x => line.Contains(x.FacebookName)).FacebookName,
-                price = decimal.Parse(PriceRegex.Match(line).Value,
-                    new NumberFormatInfo { NumberDecimalSeparator = "," })
+                var productName = products.First(x => line.Contains(x.FacebookName)).FacebookName;
+                var priceMatches = PriceRegex.Matches(line);
+            
+                if (priceMatches.Count == 0) return null;
+            
+                var priceMatch = priceMatches[priceMatches.Count - 1]; // Take the last match
+                var priceString = priceMatch.Value.Replace("€", "").Trim(); // Remove '€' symbol and any trailing or leading white spaces
+            
+                if (!decimal.TryParse(priceString, NumberStyles.Number, numberFormat, out var price))
+                {
+                    // Handle the error
+                    return null;
+                }
+            
+                return new { ProductName = productName, Price = price };
             })
-            .GroupBy(x => x.productName)
-            .ToDictionary(x => x.Key, x => x.Sum(y => y.price) * (decimal)euro);
-
+            .Where(x => x != null)
+            .GroupBy(x => x.ProductName)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Sum(x => x.Price * (decimal)euro)
+            );
+    
         return productsPrices;
     }
+
+    
+
 
     private async Task PostMarketingActivitiesToErp(MarketingActivityDetails activity, string product, double price,
         DateTime date)
