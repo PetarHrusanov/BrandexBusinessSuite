@@ -22,13 +22,38 @@ public static class RequestsMethods
         var responseContent = await response.Content.ReadAsStringAsync();
         return JObject.Parse(responseContent);
     }
+
     public static async Task<JObject> JObjectByUriGetRequest(HttpClient client, string newUri)
     {
-        var uri = new Uri(newUri);
-        var response = await client.GetAsync(uri);
-        var responseContent = await response.Content.ReadAsStringAsync();
-        return JObject.Parse(responseContent);
+        int retryCount = 3; // Maximum number of retries
+        int retryDelayMilliseconds = 1000; // Delay between retries in milliseconds
+
+        for (int retry = 0; retry < retryCount; retry++)
+        {
+            try
+            {
+                var uri = new Uri(newUri);
+                var response = await client.GetAsync(uri);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var jObject = JObject.Parse(responseContent);
+
+                if (jObject != null) // Check if the JObject is not null
+                {
+                    return jObject;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                // You can log or handle the exception here if needed
+            }
+
+            await Task.Delay(retryDelayMilliseconds);
+        }
+
+        return null; // Return null if retries are unsuccessful
     }
+    
     public static async Task ChangeStateToRelease(HttpClient client, string document)
     {
         var uriChangeState = new Uri($"{GeneralRequest}{document}/ChangeState");
