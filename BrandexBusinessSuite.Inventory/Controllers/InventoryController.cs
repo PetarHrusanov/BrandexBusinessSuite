@@ -1,5 +1,3 @@
-using BrandexBusinessSuite.Inventory.Models.Recipes;
-
 namespace BrandexBusinessSuite.Inventory.Controllers;
 
 using System.Net.Http.Headers;
@@ -16,6 +14,7 @@ using BrandexBusinessSuite.Models.ErpDocuments;
 using Data.Enums;
 using Models.Materials;
 using Models.Products;
+using Models.Recipes;
 using Services.Orders;
 using Services.Products;
 using Services.Recipes;
@@ -84,7 +83,7 @@ public class InventoryController : ApiController
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}, {ViewerExecutive}")]
     public async Task<List<ProductMaterialQuantities>> GetProductMaterials()
     {
-        var currentBalancesDic = (await GetCurrentBalances(true)).ToDictionary(x=>x.Product.Id);
+        var currentBalancesDic = (await GetCurrentBalances(true)).Where(p=>p.Product!=null).ToDictionary(x=>x.Product.Id);
         var productsCheck = await _productsService.GetProductsCheck();
         var recipes = await _recipesService.GetRecipesErpIds();
         var ordersDic = (await _ordersService.GetLatest()).ToDictionary(x=>x.MaterialErpId);
