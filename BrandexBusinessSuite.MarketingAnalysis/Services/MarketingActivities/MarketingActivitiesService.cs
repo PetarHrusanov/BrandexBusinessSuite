@@ -17,6 +17,8 @@ using static Methods.ExcelMethods;
 
 public class MarketingActivitiesService : IMarketingActivitesService
 {
+    private const string Facebook = "FACEBOOK";
+    private const string Google = "GOOGLE ADS";
     
     private readonly MarketingAnalysisDbContext _db;
     private readonly IMapper _mapper;
@@ -152,31 +154,85 @@ public class MarketingActivitiesService : IMarketingActivitesService
 
     public async Task<DateTime> MarketingActivitiesTemplate(bool complete)
     {
+
         var date = _db.MarketingActivities.Max(m => m.Date);
         var marketingActivities = await _db.MarketingActivities
+            .Include(m => m.AdMedia) // Include the AdMedia entity
             .Where(m => m.Date.Month == date.Month && m.Date.Year == date.Year)
             .ToListAsync();
 
-        if (complete is false)
+        if (!complete)
         {
             marketingActivities = marketingActivities
-                .Where(m => m.AdMedia.Name == "FACEBOOK" || m.AdMedia.Name == "GOOGLE ADS").ToList();
+                .Where(m => m.AdMedia.Name == "FACEBOOK" || m.AdMedia.Name == "GOOGLE ADS")
+                .ToList();
         }
+
+        // foreach (var t in marketingActivities
+        //              .Where(t => t.AdMedia != null &&
+        //                          !string.Equals(t.AdMedia.Name, "FACEBOOK", StringComparison.OrdinalIgnoreCase) &&
+        //                          !string.Equals(t.AdMedia.Name, "GOOGLE ADS", StringComparison.OrdinalIgnoreCase)))
+        // {
+        //     t.Paid = false;
+        //     t.ErpPublished = false;
+        // }
+        //
+        // date = date.AddMonths(1);
+        //
+        // var newActivities = marketingActivities.Select(activity => new MarketingActivity()
+        // {
+        //     Description = activity.Description,
+        //     Notes = activity.Notes,
+        //     Date = date,
+        //     Price = activity.Price,
+        //     ProductId = activity.ProductId,
+        //     Paid = activity.Paid,
+        //     ErpPublished = activity.Paid,
+        //     AdMediaId = activity.AdMediaId,
+        //     MediaTypeId = activity.MediaTypeId
+        // }).ToList();
         
+        var modifiedActivities = marketingActivities
+            .Select(activity =>
+            {
+                if (activity.AdMedia != null &&
+                    !string.Equals(activity.AdMedia.Name, "FACEBOOK", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(activity.AdMedia.Name, "GOOGLE ADS", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new MarketingActivity
+                    {
+                        Description = activity.Description,
+                        Notes = activity.Notes,
+                        Date = activity.Date,
+                        Price = activity.Price,
+                        ProductId = activity.ProductId,
+                        Paid = false,
+                        ErpPublished = false,
+                        AdMediaId = activity.AdMediaId,
+                        MediaTypeId = activity.MediaTypeId
+                    };
+                }
+                return activity;
+            })
+            .ToList();
+
         date = date.AddMonths(1);
 
-        var newActivities = marketingActivities.Select(activity => new MarketingActivity()
-        {
-            Description = activity.Description,
-            Notes = activity.Notes,
-            Date = date,
-            Price = activity.Price,
-            ProductId = activity.ProductId,
-            Paid = true,
-            ErpPublished = true,
-            AdMediaId = activity.AdMediaId,
-            MediaTypeId = activity.MediaTypeId
-        }).ToList();
+        var newActivities = modifiedActivities
+            .Select(activity => new MarketingActivity
+            {
+                Description = activity.Description,
+                Notes = activity.Notes,
+                Date = date,
+                Price = activity.Price,
+                ProductId = activity.ProductId,
+                Paid = activity.Paid,
+                ErpPublished = activity.Paid,
+                AdMediaId = activity.AdMediaId,
+                MediaTypeId = activity.MediaTypeId
+            })
+            .ToList();
+
 
         await _db.MarketingActivities.AddRangeAsync(newActivities);
         await _db.SaveChangesAsync();
@@ -187,8 +243,20 @@ public class MarketingActivitiesService : IMarketingActivitesService
     public async Task UploadFacebookAdSets(SocialMediaBudgetInputModel inputModel, decimal euroRate)
     {
 
-        var marketingActivitiesToChange = await _db.MarketingActivities
+        var marketingActivitiesToDelete = await _db.MarketingActivities
             .Where(s => s.Date.Month == inputModel.Date.Month && s.Date.Year == inputModel.Date.Year).Where(a=>a.AdMedia.Name=="FACEBOOK").ToListAsync();
+        
+        await _db.BulkDeleteAsync(marketingActivitiesToDelete);
+
+        var adMedia = await _db.AdMedias
+            .Where(a => a.Name.ToUpper() == "FACEBOOK")
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+
+        var adMediaType = await _db.MediaTypes
+            .Where(a => a.Name.ToUpper() == "FACEBOOK")
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
 
         await using var stream = new MemoryStream();
         await inputModel.ImageFile.CopyToAsync(stream);
@@ -200,6 +268,8 @@ public class MarketingActivitiesService : IMarketingActivitesService
         var hssfwb = new XSSFWorkbook(stream);
         var sheet = hssfwb.GetSheetAt(0);
 
+        var marketingActivitiesUpload = new List<MarketingActivity>();
+
         for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++) //Read Excel File
         {
             var row = sheet.GetRow(i);
@@ -207,20 +277,94 @@ public class MarketingActivitiesService : IMarketingActivitesService
             
             var adSetName = row.GetCell(2).ToString();
 
-            var activity = marketingActivitiesToChange.FirstOrDefault(s => s.Description.Contains(adSetName));
-            if (activity == null) continue;
-            var price = decimal.Parse(row.GetCell(15).ToString()!);
-            activity.Price = price * euroRate;
+            var activity = marketingActivitiesUpload.FirstOrDefault(s => s.Description.Contains(adSetName));
+            
+            // var price = decimal.Parse(row.GetCell(15).ToString()!) * euroRate;
+            
+            var priceString = row.GetCell(19).ToString()!;
+            priceString = priceString.Replace(',', '.'); // Replace comma with dot
+            // var price = decimal.Parse(priceString) * euroRate;
+
+            // var priceString = row.GetCell(15).ToString()!;
+            decimal price;
+            
+            if (decimal.TryParse(priceString, out var parsedPrice))
+            {
+                price = parsedPrice * euroRate;
+                // Process the price further or perform any desired actions
+            }
+            else
+            {
+                // Unable to parse the priceString, handle the error or continue with the next iteration
+                continue;
+            }
+            
+            var dateString = row.GetCell(0).ToString();
+            
+            if (activity == null)
+            {
+
+                var productId = await _db.Products.Where(s => adSetName.Contains(s.Name)).Select(s => s.Id)
+                    .FirstOrDefaultAsync();
+
+                if (productId==0)
+                {
+                    if (adSetName!.Contains("LadyHarmonia"))
+                    {
+                        productId = await _db.Products.Where(s => s.Name=="Lady Harmonia").Select(s => s.Id)
+                            .FirstOrDefaultAsync();
+                    }
+                    else
+                    {
+                        productId = await _db.Products.Where(s => s.Name=="Botanic").Select(s => s.Id)
+                            .FirstOrDefaultAsync();
+                    }
+                }
+
+                var marketingActivity = new MarketingActivity()
+                {
+                    Description = adSetName,
+                    Notes = string.Empty,
+                    Date = DateTime.Parse(dateString),
+                    Price = price,
+                    ProductId = productId,
+                    Paid = true,
+                    ErpPublished = true,
+                    AdMediaId = adMedia,
+                    MediaTypeId = adMediaType
+                };
+                
+                marketingActivitiesUpload.Add(marketingActivity);
+                continue;
+            }
+            activity.Price +=price;
         }
+
+        await _db.MarketingActivities.AddRangeAsync(marketingActivitiesUpload);
+        await _db.SaveChangesAsync();
         
-        await _db.BulkUpdateAsync(marketingActivitiesToChange);
+        // await _db.BulkUpdateAsync(marketingActivitiesToChange);
     }
 
     public async Task UploadGoogleAds(SocialMediaBudgetInputModel inputModel)
     {
         var marketingActivitiesToChange = await _db.MarketingActivities
             .Where(s => s.Date.Month == inputModel.Date.Month && s.Date.Year == inputModel.Date.Year).Where(a=>a.AdMedia.Name=="GOOGLE ADS").ToListAsync();
+        
+        await _db.BulkDeleteAsync(marketingActivitiesToChange);
+        
+        var adMedia = await _db.AdMedias
+            .Where(a => a.Name.ToUpper() == "GOOGLE ADS")
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
 
+        var adMediaType = await _db.MediaTypes
+            .Where(a => a.Name.ToUpper() == "Google")
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync();
+        
+        var products = await _db.Products.ToListAsync();
+        
         await using var stream = new MemoryStream();
         await inputModel.ImageFile.CopyToAsync(stream);
 
@@ -236,9 +380,12 @@ public class MarketingActivitiesService : IMarketingActivitesService
         foreach (IRow row in sheet)
         {
             if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
+            
+            var type = row.GetCell(1)?.ToString();
+            if (type!="Campaigns") continue;
 
             var adSetName = row.GetCell(2)?.ToString();
-            if (string.IsNullOrWhiteSpace(adSetName) || !marketingActivitiesToChange.Any(activity => activity.Description.Contains(adSetName))) continue;
+            // if (string.IsNullOrWhiteSpace(adSetName) || !marketingActivitiesToChange.Any(activity => activity.Description.Contains(adSetName))) continue;
 
             if (!activityDictionary.ContainsKey(adSetName))
             {
@@ -252,14 +399,49 @@ public class MarketingActivitiesService : IMarketingActivitesService
             else activityDictionary[adSetName] = price.GetValueOrDefault();
         }
 
-        foreach (var activity in marketingActivitiesToChange)
+        var marketingActivitiesForUpload = new List<MarketingActivity>();
+
+        foreach (var entry in activityDictionary)
         {
-            if (activityDictionary.TryGetValue(activity.Description, out var price))
+            // var productId = products.Where(g => entry.Key.Contains(g.Name)).Select(p => p.Id).FirstOrDefault();
+            // if (entry.Key.Contains("Display") || entry.Key.Contains("Genral"))
+            // {
+            //     productId = products.Where(p => p.Name == "Botanic").Select(p => p.Id).FirstOrDefault();
+            // }
+            
+            int productId = products.Where(g => entry.Key.IndexOf(g.Name, StringComparison.OrdinalIgnoreCase) >= 0).Select(g=>g.Id).FirstOrDefault();
+            if (entry.Key.IndexOf("Display", StringComparison.OrdinalIgnoreCase) >= 0 || entry.Key.IndexOf("General", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                activity.Price = price;
+                productId = products.FirstOrDefault(p => string.Equals(p.Name, "Botanic", StringComparison.OrdinalIgnoreCase)).Id;
             }
+
+            var marketingActivity = new MarketingActivity()
+            {
+                Description = entry.Key,
+                Notes = string.Empty,
+                Date = inputModel.Date,
+                Price = entry.Value,
+                ProductId = productId,
+                Paid = true,
+                ErpPublished = true,
+                AdMediaId = adMedia,
+                MediaTypeId = adMediaType
+            };
+
+            marketingActivitiesForUpload.Add(marketingActivity);
         }
         
-        await _db.BulkUpdateAsync(marketingActivitiesToChange);
+        await _db.MarketingActivities.AddRangeAsync(marketingActivitiesForUpload);
+        await _db.SaveChangesAsync();
+
+        // foreach (var activity in marketingActivitiesToChange)
+        // {
+        //     if (activityDictionary.TryGetValue(activity.Description, out var price))
+        //     {
+        //         activity.Price = price;
+        //     }
+        // }
+        
+        // await _db.BulkUpdateAsync(marketingActivitiesToChange);
     }
 }
