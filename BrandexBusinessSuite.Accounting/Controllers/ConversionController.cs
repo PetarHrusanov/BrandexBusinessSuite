@@ -24,7 +24,6 @@ using BrandexBusinessSuite.Accounting.Data.Models;
 using BrandexBusinessSuite.Models.ErpDocuments;
 using Data;
 using Services;
-using Infrastructure;
 using Models;
 
 using static  Common.Constants;
@@ -46,6 +45,7 @@ public class ConversionController : ApiController
 
     private static readonly Regex RegexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
     private static readonly Regex PriceRegex = new(@"[0-9]+[.,][0-9]*\s*€$");
+    private static readonly Regex PriceRegexBgn = new(@"(-?BGN)([0-9]+[.,][0-9]*)$");
 
     private static readonly Regex FacebookInvoiceRegex = new(@"FBADS-[0-9]{3}-[0-9]{9}");
 
@@ -63,16 +63,13 @@ public class ConversionController : ApiController
     [Consumes("multipart/form-data")]
     public async Task<ActionResult> ConvertFacebookPdfForAccounting([FromForm] IFormFile file)
     {
-        var newPath = CreateFileDirectories.CreatePDFFilesInputDirectory(_hostEnvironment);
-
         if (file.Length <= 0) return BadRequest();
 
-        var fullPath = System.IO.Path.Combine(newPath, file.FileName);
+        await using var memoryStream = new MemoryStream();
+        await file.CopyToAsync(memoryStream);
+        memoryStream.Position = 0;  // Set stream position to beginning after copy
 
-        await using var streamRead = new FileStream(fullPath, FileMode.Create);
-        await file.CopyToAsync(streamRead);
-
-        var rawText = PdfText(fullPath);
+        var rawText = PdfText(memoryStream);
 
         var dateString = RegexDate.Matches(file.FileName)[0].Value;
         var date = DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -149,18 +146,17 @@ public class ConversionController : ApiController
     [Consumes("multipart/form-data")]
     public async Task<ActionResult> ConvertFacebookPdfForMarketing([FromForm] IFormFile file)
     {
-        var dateString = RegexDate.Matches(file.FileName)[0];
-        var date = DateTime.ParseExact(dateString.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-
-        var newPath = CreateFileDirectories.CreatePDFFilesInputDirectory(_hostEnvironment);
-
+        
         if (file.Length <= 0) return BadRequest();
-        var fullPath = System.IO.Path.Combine(newPath, file.FileName);
 
-        await using var streamRead = new FileStream(fullPath, FileMode.Create);
-        await file.CopyToAsync(streamRead);
+        await using var memoryStream = new MemoryStream();
+        await file.CopyToAsync(memoryStream);
+        memoryStream.Position = 0;  // Set stream position to beginning after copy
 
-        var rawText = PdfText(fullPath);
+        var rawText = PdfText(memoryStream);
+
+        var dateString = RegexDate.Matches(file.FileName)[0].Value;
+        var date = DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
         var products = await _context.Products.ToListAsync();
 
@@ -184,16 +180,15 @@ public class ConversionController : ApiController
     public async Task<ActionResult> ConvertGoogleForMarketing([FromForm] IFormFile file)
     {
 
-        var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
+        await using var memoryStream = new MemoryStream();
+        await file.CopyToAsync(memoryStream);
 
-        await using var stream = new FileStream(fullPath, FileMode.Create);
-        await file.CopyToAsync(stream);
-
-        stream.Position = 0;
+        memoryStream.Position = 0;
 
         if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
 
-        var hssfwb = new XSSFWorkbook(stream);
+
+        var hssfwb = new XSSFWorkbook(memoryStream);
         var sheet = hssfwb.GetSheetAt(0);
 
         var products = await _context.Products.ToListAsync();
@@ -217,77 +212,72 @@ public class ConversionController : ApiController
 
         return Result.Success;
     }
-
+    
+    
     [HttpPost]
     [Authorize(Roles = $"{AdministratorRoleName}, {AccountantRoleName}, {MarketingRoleName}")]
     [IgnoreAntiforgeryToken]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult> ConvertGoogleForAccounting([FromForm] IFormFile file)
     {
-
-        var fullPath = CreateFileDirectories.CreateExcelFilesInputCompletePath(_hostEnvironment, file);
-
-        await using var stream = new FileStream(fullPath, FileMode.Create);
-        await file.CopyToAsync(stream);
-
-        stream.Position = 0;
-
-        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
-
-        var hssfwb = new XSSFWorkbook(stream);
-        var sheet = hssfwb.GetSheetAt(0);
-
         var products = await _context.Products.ToListAsync();
         var productPriceDictionary = new Dictionary<string, double>();
 
+        byte[] fileBytes;
+        await using (var ms = new MemoryStream())
+        {
+            await file.CopyToAsync(ms);
+            fileBytes = ms.ToArray();
+        }
+
+        var originalMemoryStream = new MemoryStream(fileBytes);
+
+        if (!CheckXlsx(file)) return BadRequest(Errors.IncorrectFileFormat);
+
+        originalMemoryStream.Position = 0;
+        var workbook = new XSSFWorkbook(originalMemoryStream);
+        var sheet = workbook.GetSheetAt(0);
+
+        IRow? row;
         for (var i = sheet.FirstRowNum + 1; i <= sheet.LastRowNum; i++)
         {
-            var row = sheet.GetRow(i);
+            row = sheet.GetRow(i);
             if (row == null || row.Cells.All(d => d.CellType == CellType.Blank)) continue;
 
-            var (product, price) = GetProductAndPriceFromGoogleRow(row, products);
-            if (product==null || price==null ) continue;
+            var type = row.GetCell(1)?.ToString();
+            if (type != "Campaigns") continue;
 
-            if (!productPriceDictionary.ContainsKey(product.AccountingName)) productPriceDictionary.Add(product.AccountingName, 0);
+            var (product, price) = GetProductAndPriceFromGoogleRow(row, products);
+            if (product == null || price == null) continue;
+
+            if (!productPriceDictionary.ContainsKey(product.AccountingName))
+                productPriceDictionary.Add(product.AccountingName, 0);
 
             productPriceDictionary[product.AccountingName] += (double)price;
         }
 
-        const string sFileName = @"Google.xlsx";
+        var workbookGoogle = new XSSFWorkbook();
+        var excelSheet = workbookGoogle.CreateSheet("Google");
+        row = excelSheet.CreateRow(0);
 
-        var memory = new MemoryStream();
-
-        var sWebRootFolder = _hostEnvironment.WebRootPath;
-
-        await using (var fs = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Create, FileAccess.Write))
+        foreach (var (key, value) in productPriceDictionary)
         {
-            IWorkbook workbook = new XSSFWorkbook();
-
-            var excelSheet = workbook.CreateSheet("Google");
-            var row = excelSheet.CreateRow(0);
-
-            foreach (var (key, value) in productPriceDictionary)
-            {
-                row.CreateCell(row.Cells.Count()).SetCellValue(key);
-                row.CreateCell(row.Cells.Count()).SetCellValue(value);
-                row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
-            }
-
-            workbook.Write(fs);
+            row.CreateCell(row.Cells.Count).SetCellValue(key);
+            row.CreateCell(row.Cells.Count).SetCellValue(value);
+            row = excelSheet.CreateRow(excelSheet.LastRowNum + 1);
         }
 
-        await using (var streamOutput = new FileStream(System.IO.Path.Combine(sWebRootFolder, sFileName), FileMode.Open))
+        await using (var memory = new MemoryStream())
         {
-            await streamOutput.CopyToAsync(memory);
+            workbookGoogle.Write(memory);
+            var array = memory.ToArray();
+            return File(array, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Google.xlsx");
         }
-
-        memory.Position = 0;
-        return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", sFileName);
     }
-
-    private static string PdfText(string path)
+    
+    public string PdfText(Stream stream)
     {
-        var reader = new PdfReader(path);
+        var reader = new PdfReader(stream);
         var text = string.Empty;
         for (var page = 1; page <= reader.NumberOfPages; page++)
         {
@@ -306,7 +296,12 @@ public class ConversionController : ApiController
         var product = products.FirstOrDefault(e => productRow?.Contains(e.GoogleName, StringComparison.CurrentCultureIgnoreCase) ?? false);
 
         var priceRow = row.GetCell(4)?.ToString()?.TrimEnd();
-        var price = priceRow != null && double.TryParse(PriceRegex.Match(priceRow).Value, out var p) ? p : (double?)null;
+        double? price = null;
+        if (priceRow == null) return (product, price);
+        var match = PriceRegexBgn.Match(priceRow);
+        if (!match.Success) return (product, price);
+        var numberPart = match.Groups[2].Value; // get the second group which should be the number
+        price = double.TryParse(numberPart, out var p) ? p : (double?)null;
 
         return (product, price);
     }
@@ -346,9 +341,6 @@ public class ConversionController : ApiController
     
         return productsPrices;
     }
-
-    
-
 
     private async Task PostMarketingActivitiesToErp(MarketingActivityDetails activity, string product, double price,
         DateTime date)
