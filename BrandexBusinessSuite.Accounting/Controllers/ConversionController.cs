@@ -35,8 +35,6 @@ using static Requests.RequestsMethods;
 
 public class ConversionController : ApiController
 {
-
-    private readonly IWebHostEnvironment _hostEnvironment;
     private readonly ErpUserSettings _userSettings;
 
     private static readonly HttpClient Client = new();
@@ -49,10 +47,8 @@ public class ConversionController : ApiController
 
     private static readonly Regex FacebookInvoiceRegex = new(@"FBADS-[0-9]{3}-[0-9]{9}");
 
-    public ConversionController(IWebHostEnvironment hostEnvironment, IOptions<ErpUserSettings> userSettings,
-        AccountingDbContext context)
+    public ConversionController(IOptions<ErpUserSettings> userSettings, AccountingDbContext context)
     {
-        _hostEnvironment = hostEnvironment;
         _userSettings = userSettings.Value;
         _context = context;
     }
@@ -345,7 +341,11 @@ public class ConversionController : ApiController
     private async Task PostMarketingActivitiesToErp(MarketingActivityDetails activity, string product, double price,
         DateTime date)
     {
-        if (product == "General Audience") product = "Botanic";
+        if (product == "General") product = "Botanic";
+        if (product == "Madgicx") product = "Botanic";
+        if (product == "Target") product = "Botanic";
+        if (product == "Re-engage") product = "Botanic";
+        if (product == "Retarget") product = "Botanic";
 
         var activityObject = new MarketingActivityCm(activity.Subject, date, activity.PartyId,
             activity.Measure, activity.Type, activity.Media, activity.Type, price, product);
