@@ -403,14 +403,9 @@ public class MarketingActivitiesService : IMarketingActivitesService
 
         foreach (var entry in activityDictionary)
         {
-            // var productId = products.Where(g => entry.Key.Contains(g.Name)).Select(p => p.Id).FirstOrDefault();
-            // if (entry.Key.Contains("Display") || entry.Key.Contains("Genral"))
-            // {
-            //     productId = products.Where(p => p.Name == "Botanic").Select(p => p.Id).FirstOrDefault();
-            // }
             
             int productId = products.Where(g => entry.Key.IndexOf(g.Name, StringComparison.OrdinalIgnoreCase) >= 0).Select(g=>g.Id).FirstOrDefault();
-            if (entry.Key.IndexOf("Display", StringComparison.OrdinalIgnoreCase) >= 0 || entry.Key.IndexOf("General", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (entry.Key.IndexOf("Display", StringComparison.OrdinalIgnoreCase) >= 0 || entry.Key.IndexOf("General", StringComparison.OrdinalIgnoreCase) >= 0 || entry.Key.IndexOf("Discovery", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 productId = products.FirstOrDefault(p => string.Equals(p.Name, "Botanic", StringComparison.OrdinalIgnoreCase)).Id;
             }
@@ -433,15 +428,6 @@ public class MarketingActivitiesService : IMarketingActivitesService
         
         await _db.MarketingActivities.AddRangeAsync(marketingActivitiesForUpload);
         await _db.SaveChangesAsync();
-
-        // foreach (var activity in marketingActivitiesToChange)
-        // {
-        //     if (activityDictionary.TryGetValue(activity.Description, out var price))
-        //     {
-        //         activity.Price = price;
-        //     }
-        // }
         
-        // await _db.BulkUpdateAsync(marketingActivitiesToChange);
     }
 }
