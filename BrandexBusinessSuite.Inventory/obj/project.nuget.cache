@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "f3F+AfKO9Hgeynr+Nw/ZbgneJk3lKhkYZOE/T3L8sjCU7xYismBs6qK9MJ3lMOlHdgy8diXmodVJwy6xDKbGOQ==",
+  "dgSpecHash": "5MSmy8+52vBQu88IsYnZPvSL8c14SS8/NGN1j52wjTAM0CA7YaHwI2RtfAegGnD33zPTG0JihsgTQAetfeMC4g==",
   "success": true,
   "projectFilePath": "/Users/Petar/Documents/Documents – Petar’s MacBook Pro/Programiranka/Firmata/BrandexSalesAdapter/Server/BrandexBusinessSuite/BrandexBusinessSuite.Inventory/BrandexBusinessSuite.Inventory.csproj",
   "expectedPackageFiles": [
@@ -176,7 +176,10 @@
     "/Users/Petar/.nuget/packages/system.valuetuple/4.5.0/system.valuetuple.4.5.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/system.windows.extensions/5.0.0/system.windows.extensions.5.0.0.nupkg.sha512",
     "/Users/Petar/.nuget/packages/system.xml.readerwriter/4.3.1/system.xml.readerwriter.4.3.1.nupkg.sha512",
-    "/Users/Petar/.nuget/packages/system.xml.xdocument/4.3.0/system.xml.xdocument.4.3.0.nupkg.sha512"
+    "/Users/Petar/.nuget/packages/system.xml.xdocument/4.3.0/system.xml.xdocument.4.3.0.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/microsoft.netcore.app.ref/6.0.26/microsoft.netcore.app.ref.6.0.26.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.26/microsoft.aspnetcore.app.ref.6.0.26.nupkg.sha512",
+    "/Users/Petar/.nuget/packages/microsoft.netcore.app.host.osx-arm64/6.0.26/microsoft.netcore.app.host.osx-arm64.6.0.26.nupkg.sha512"
   ],
   "logs": []
 }

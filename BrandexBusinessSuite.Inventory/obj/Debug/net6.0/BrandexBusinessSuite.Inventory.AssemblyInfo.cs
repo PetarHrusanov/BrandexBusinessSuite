@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BrandexBusinessSuite.Inventory")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7cca26e918bfe3fe123f99b0394058e15abc3ec1")]
 [assembly: System.Reflection.AssemblyProductAttribute("BrandexBusinessSuite.Inventory")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BrandexBusinessSuite.Inventory")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

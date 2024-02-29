@@ -67,8 +67,13 @@ public class InventoryController : ApiController
             .ToList();
         
         var currentBalances = await GetCurrentBalances(false);
+        // var currentBalancesNecessary = batchesRequired
+        //     .Select(batch => currentBalances!.FirstOrDefault(b => b.Lot?.Id == batch.Id)).ToList();
+        
         var currentBalancesNecessary = batchesRequired
-            .Select(batch => currentBalances!.FirstOrDefault(b => b.Lot?.Id == batch.Id)).ToList();
+            .Select(batch => currentBalances?.FirstOrDefault(b => b?.Lot?.Id == batch.Id))
+            .Where(b => b != null) // Filter out any nulls
+            .ToList();
 
         var productQuantities = (from product in productsCheck
             let sum = (int)currentBalancesNecessary.Where(b => b.Product.Id == product.ErpId)
