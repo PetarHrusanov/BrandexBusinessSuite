@@ -43,7 +43,8 @@ public class ConversionController : ApiController
 
     private static readonly Regex RegexDate = new(@"([0-9]{4}-[0-9]{2}-[0-9]{2})");
     private static readonly Regex PriceRegex = new(@"[0-9]+[.,][0-9]*\s*€$");
-    private static readonly Regex PriceRegexBgn = new(@"(-?BGN)([0-9]+[.,][0-9]*)$");
+    // private static readonly Regex PriceRegexBgn = new(@"(-?BGN)([0-9]+[.,][0-9]*)$");
+    private static readonly Regex PriceRegexBgn = new (@"-BGN\s*([-\d,]+\.?\d*)");
 
     private static readonly Regex FacebookInvoiceRegex = new(@"FBADS-[0-9]{3}-[0-9]{9}");
 
@@ -287,20 +288,25 @@ public class ConversionController : ApiController
 
     private static (Product? product, double? price) GetProductAndPriceFromGoogleRow(IRow row, List<Product> products)
     {
+        // Normalize the product description from the row for better matching
+        var productDescription = row.GetCell(2)?.ToString()?.Trim().ToLowerInvariant();
 
-        var productRow = row.GetCell(2)?.ToString()?.TrimEnd();
-        var product = products.FirstOrDefault(e => productRow?.Contains(e.GoogleName, StringComparison.CurrentCultureIgnoreCase) ?? false);
+        // Attempt to find a product match considering various descriptors associated with "Botanic"
+        var product = products.FirstOrDefault(prod =>
+            productDescription?.Contains(prod.GoogleName.ToLowerInvariant().Replace(" ", "")) ?? false);
 
-        var priceRow = row.GetCell(4)?.ToString()?.TrimEnd();
+            // Parse the price
+        var priceRow = row.GetCell(4)?.ToString()?.Trim();
         double? price = null;
         if (priceRow == null) return (product, price);
         var match = PriceRegexBgn.Match(priceRow);
         if (!match.Success) return (product, price);
-        var numberPart = match.Groups[2].Value; // get the second group which should be the number
-        price = double.TryParse(numberPart, out var p) ? p : (double?)null;
+        var numberPart = match.Groups[1].Value.Replace(",", ""); // Assuming group 1 is the number part
+        price = double.TryParse(numberPart, NumberStyles.Number, CultureInfo.InvariantCulture, out double p) ? p : null;
 
         return (product, price);
     }
+
 
     private async Task<Dictionary<string, decimal>> ProductPriceDictionaryFromText(string rawText, List<Product> products)
     {

@@ -168,30 +168,6 @@ public class MarketingActivitiesService : IMarketingActivitesService
                 .ToList();
         }
 
-        // foreach (var t in marketingActivities
-        //              .Where(t => t.AdMedia != null &&
-        //                          !string.Equals(t.AdMedia.Name, "FACEBOOK", StringComparison.OrdinalIgnoreCase) &&
-        //                          !string.Equals(t.AdMedia.Name, "GOOGLE ADS", StringComparison.OrdinalIgnoreCase)))
-        // {
-        //     t.Paid = false;
-        //     t.ErpPublished = false;
-        // }
-        //
-        // date = date.AddMonths(1);
-        //
-        // var newActivities = marketingActivities.Select(activity => new MarketingActivity()
-        // {
-        //     Description = activity.Description,
-        //     Notes = activity.Notes,
-        //     Date = date,
-        //     Price = activity.Price,
-        //     ProductId = activity.ProductId,
-        //     Paid = activity.Paid,
-        //     ErpPublished = activity.Paid,
-        //     AdMediaId = activity.AdMediaId,
-        //     MediaTypeId = activity.MediaTypeId
-        // }).ToList();
-        
         var modifiedActivities = marketingActivities
             .Select(activity =>
             {
@@ -206,8 +182,8 @@ public class MarketingActivitiesService : IMarketingActivitesService
                         Date = activity.Date,
                         Price = activity.Price,
                         ProductId = activity.ProductId,
-                        Paid = false,
-                        ErpPublished = false,
+                        Paid = activity.Price == 1,
+                        ErpPublished = activity.Price == 1,
                         AdMediaId = activity.AdMediaId,
                         MediaTypeId = activity.MediaTypeId
                     };
