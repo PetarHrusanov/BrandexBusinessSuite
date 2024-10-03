@@ -16,7 +16,8 @@ public class MarketingActivityCm : ErpDocument
         string product
         )
     {
-        DocumentType = new ErpCharacteristicId("General_DocumentTypes(59b265f7-391a-4226-8bcb-44e192ba5690)");
+        // DocumentType = new ErpCharacteristicId("General_DocumentTypes(59b265f7-391a-4226-8bcb-44e192ba5690)");
+        DocumentType = new ErpCharacteristicId("Systems_Documents_DocumentTypes(59b265f7-391a-4226-8bcb-44e192ba5690)");
         EnterpriseCompany = new ErpCharacteristicId("General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)");
         EnterpriseCompanyLocation = new ErpCharacteristicId("General_Contacts_CompanyLocations(902743f5-6076-4b5e-b725-2daa192c71f6)");
         SystemType = "Task";

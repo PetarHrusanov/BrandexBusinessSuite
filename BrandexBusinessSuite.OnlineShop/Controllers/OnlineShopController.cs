@@ -231,12 +231,16 @@ public class OnlineShopController : ApiController
 
             if (!responseContentJObj.ContainsKey(ErpDocuments.ODataId)) continue;
             
-            var newDocumentId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
+            var newDocumentTypeandId = responseContentJObj[ErpDocuments.ODataId]!.ToString();
+            var newDocumentId = responseContentJObj[ErpDocuments.Id]?.ToString();
 
             try
             {
-                await ChangeStateToRelease(Client, newDocumentId);
-                responseContentJObj = await JObjectByUriGetRequest(Client, $"https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrderLines?$top=20&$filter=SalesOrder%20eq%20'{newDocumentId}'");
+                await ChangeStateToRelease(Client, newDocumentTypeandId);
+                // responseContentJObj = await JObjectByUriGetRequest(Client, $"https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrderLines?$top=20&$filter=SalesOrder/Id%20eq%20{newDocumentId}");
+                responseContentJObj = await JObjectByUriGetRequest(Client, 
+                    $"https://brandexbg.my.erp.net/api/domain/odata/Crm_Sales_SalesOrderLines?$top=20&$filter=SalesOrder/Id%20eq%20{Uri.EscapeDataString(newDocumentId)}");
+
             }
             catch
             {
@@ -249,7 +253,7 @@ public class OnlineShopController : ApiController
 
             try
             {
-                responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_InvoiceOrders?$top=100&$filter=SalesOrder%20eq%20'{newDocumentId}'&$select=Id&$expand=Lines($expand=SalesOrderLine($select=Id);$select=Id,LineAmount,LineCustomDiscountPercent,ProductDescription,Quantity,QuantityBase,UnitPrice)");
+                responseContentJObj = await JObjectByUriGetRequest(Client, $"{ErpRequests.BaseUrl}Crm_Invoicing_InvoiceOrders?$top=100&$filter=SalesOrder%20eq%20'{newDocumentTypeandId}'&$expand=Lines($expand=SalesOrderLine($select=Id);$select=LineAmount,LineCustomDiscountPercent,ProductDescription,Quantity,QuantityBase,UnitPrice)");
             }
             catch
             {
@@ -260,7 +264,7 @@ public class OnlineShopController : ApiController
             var invoiceOrderLines = invoiceOrders!.SelectMany(x => x.Lines);
             var invoiceLines = from orderLine in orderLinesList
                 join invoiceOrderLine in invoiceOrderLines on orderLine.Id equals invoiceOrderLine.SalesOrderLine.Id
-                select new ErpInvoiceLines(invoiceOrderLine, orderLine, newDocumentId);
+                select new ErpInvoiceLines(invoiceOrderLine, orderLine, newDocumentTypeandId);
         
             invoiceNew.Lines.AddRange(invoiceLines);
             

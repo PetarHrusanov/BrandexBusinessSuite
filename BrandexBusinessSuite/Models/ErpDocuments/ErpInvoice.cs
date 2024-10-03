@@ -6,7 +6,8 @@ public class ErpInvoice : ErpDocumentSale
     public ErpInvoice(string note, string deliveryDate)
     {
         DocumentNotes = note;
-        DocumentType = new ErpCharacteristicId("General_DocumentTypes(db26beb5-3604-4ab3-a8c7-a417d2c4ac59)");
+        // DocumentType = new ErpCharacteristicId("General_DocumentTypes(db26beb5-3604-4ab3-a8c7-a417d2c4ac59)");
+        DocumentType = new ErpCharacteristicId("Systems_Documents_DocumentTypes(db26beb5-3604-4ab3-a8c7-a417d2c4ac59)");
         EnterpriseCompany = new ErpCharacteristicId("General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)");
         EnterpriseCompanyLocation = new ErpCharacteristicId("General_Contacts_CompanyLocations(0396623b-ee4e-4a57-867f-5a433d8b6440)");
         DocumentCurrency = new ErpCharacteristicId("General_Currencies(3187833a-d3c1-4804-bfc0-e17e6aee3069)");

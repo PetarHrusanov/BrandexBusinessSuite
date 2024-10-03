@@ -4,11 +4,13 @@ public class ErpOnlineSale :ErpDocumentSale
 {
     public ErpOnlineSale(string documentNotes, string dateString)
     {
-        DocumentType = new ErpCharacteristicId("General_DocumentTypes(1f758f75-6b2d-4c0f-a630-09e2aa893348)");
+        // DocumentType = new ErpCharacteristicId("General_DocumentTypes(1f758f75-6b2d-4c0f-a630-09e2aa893348)");
+        DocumentType = new ErpCharacteristicId("Systems_Documents_DocumentTypes(1f758f75-6b2d-4c0f-a630-09e2aa893348)");
         EnterpriseCompany = new ErpCharacteristicId("General_EnterpriseCompanies(2c186d87-e81d-4318-9a7f-3cfb5399c0d0)");
         EnterpriseCompanyLocation = new ErpCharacteristicId("General_Contacts_CompanyLocations(0396623b-ee4e-4a57-867f-5a433d8b6440)");
         Customer = new ErpCharacteristicId("Crm_Customers(6053262d-3544-4cbb-a322-7036c07570ef)");
         DocumentCurrency = new ErpCharacteristicId("General_Currencies(3187833a-d3c1-4804-bfc0-e17e6aee3069)");
+        // DocumentCurrency = new ErpCharacteristicId("General_Currencies_Currencies(3187833a-d3c1-4804-bfc0-e17e6aee3069)");
         PaymentAccount = new ErpCharacteristicId("Finance_Payments_PaymentAccounts(708814be-0e15-45e3-854a-e2c0235b3231)");
         PaymentType = new ErpCharacteristicId("Finance_Payments_PaymentTypes(2ae637f8-a1ab-4a47-b3db-3ecbd40b821c)");
         FiscalPrinterPosDevice = new ErpCharacteristicId("Crm_Pos_Devices(99dd9d0e-3a74-4ec2-b16d-3c7be3c95ac0)");
